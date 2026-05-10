@@ -1,0 +1,4610 @@
+/* EMRALD Obsidian Plugin Styles */
+
+/* AP(E)CS E-Level Color Palette — fixed, not theme-dependent */
+:root {
+	--emerald-e1: #2D7A4A;  /* Deep forest green — light effort */
+	--emerald-e2: #B8912E;  /* Warm amber-gold — moderate effort */
+	--emerald-e3: #C06A30;  /* Muted burnt orange — demanding effort */
+	--emerald-e4: #B54545;  /* Muted brick red — maximum effort */
+}
+
+.emrald-sidebar {
+	padding: 10px;
+	height: 100%;
+	overflow-y: auto;
+}
+
+.emerald-header {
+	margin-bottom: 16px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.emerald-header-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-header h3 {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+/* Notification banner */
+.emerald-notif-banner {
+	margin-bottom: 12px;
+}
+.emerald-notif-banner:empty,
+.emerald-notif-banner[style*="display: none"] {
+	margin: 0;
+}
+
+.emerald-notif-row {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	padding: 6px 10px;
+	background: rgba(var(--interactive-accent-rgb), 0.06);
+	border-left: 3px solid var(--interactive-accent);
+	border-radius: 0 4px 4px 0;
+	margin-bottom: 4px;
+}
+
+.emerald-notif-title { font-size: 12px; font-weight: 600; }
+.emerald-notif-body { font-size: 11px; color: var(--text-muted); }
+.emerald-notif-more { font-size: 11px; color: var(--text-faint); text-align: center; padding: 4px 0; }
+
+.emerald-unconfigured,
+.emerald-error {
+	padding: 16px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.emerald-error {
+	color: var(--text-error);
+}
+
+.emerald-retry-btn {
+	margin-top: 10px;
+}
+
+/* ── Loading state ───────────────────────────────────── */
+
+.emerald-loading {
+	padding: 32px 16px;
+	text-align: center;
+	color: var(--text-muted);
+}
+
+.emerald-spinner {
+	width: 24px;
+	height: 24px;
+	border: 3px solid var(--background-modifier-border);
+	border-top-color: var(--interactive-accent);
+	border-radius: 50%;
+	margin: 0 auto 12px;
+	animation: emerald-spin 0.8s linear infinite;
+}
+
+@keyframes emerald-spin {
+	to { transform: rotate(360deg); }
+}
+
+.emerald-loading-text {
+	font-size: var(--font-ui-small);
+}
+
+/* ── Section styles ──────────────────────────────────── */
+
+.emerald-section {
+	margin-bottom: 16px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.emerald-section-header {
+	padding: 8px 12px;
+	background: var(--background-secondary);
+	font-weight: 500;
+	cursor: pointer;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.emerald-section-header-left {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-section-arrow {
+	font-size: 10px;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.emerald-section-icon {
+	display: flex;
+	align-items: center;
+	color: var(--text-muted);
+}
+
+.emerald-section-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.emerald-section-action {
+	font-size: 12px;
+	color: var(--interactive-accent);
+	cursor: pointer;
+	padding: 2px 6px;
+	border-radius: 3px;
+}
+
+.emerald-section-action:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-section-header:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-section-content {
+	padding: 12px;
+}
+
+/* display: none removed — section collapse is now handled by max-height
+   transition in the Gold Tier animation section below */
+
+/* ── Timeblock ───────────────────────────────────────── */
+
+.emerald-timeblock-content {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.emerald-timer {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+	font-size: 14px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.emerald-timer-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.emerald-timer-dot.is-recording {
+	background: var(--text-error);
+	animation: emerald-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes emerald-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.4; }
+}
+
+.emerald-timer-text {
+	color: var(--text-normal);
+}
+
+/* Bar wrapper */
+.emerald-bar-wrapper {
+	position: relative;
+	height: 44px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 2px solid var(--background-modifier-border);
+	overflow: hidden;
+	/* #4: Inset shadow — bar sits in a track */
+	box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 -1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.emerald-bar-label {
+	font-size: 11px;
+	color: var(--text-muted);
+	text-align: center;
+	padding: 3px 0 2px;
+}
+
+/* Tick bar */
+.emerald-tick-bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	display: flex;
+	transition: transform 0.3s linear;
+	pointer-events: none;
+}
+
+.emerald-tick {
+	position: relative;
+	width: 50px;
+	flex-shrink: 0;
+	border-left: 1px solid var(--background-modifier-border);
+	height: 100%;
+}
+
+.emerald-tick-label {
+	position: absolute;
+	top: 2px;
+	left: 4px;
+	font-size: 9px;
+	color: var(--text-faint);
+	user-select: none;
+}
+
+/* Green bar (session progress) */
+.emerald-green-bar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 0%;
+	/* #1: Gradient — slightly lighter at the leading edge */
+	background: linear-gradient(
+		to right,
+		rgba(45, 140, 80, 0.45) 0%,
+		rgba(55, 175, 95, 0.55) 85%,
+		rgba(70, 200, 110, 0.65) 100%
+	);
+	/* #2: Glowing leading edge */
+	border-right: 2px solid rgba(80, 210, 120, 0.9);
+	box-shadow: 2px 0 12px rgba(80, 210, 120, 0.5), 2px 0 4px rgba(80, 210, 120, 0.8);
+	transition: width 1s linear;
+	z-index: 1;
+	overflow: hidden;
+}
+
+/* #2: Pulsing glow on the leading edge during active session */
+.emerald-green-bar.is-active {
+	animation: emerald-leading-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes emerald-leading-pulse {
+	0%, 100% { box-shadow: 2px 0 12px rgba(80, 210, 120, 0.5), 2px 0 4px rgba(80, 210, 120, 0.8); }
+	50% { box-shadow: 2px 0 20px rgba(80, 210, 120, 0.85), 2px 0 8px rgba(80, 210, 120, 1.0); }
+}
+
+/* #5: Shimmer sweep — DISABLED (too distracting during work sessions)
+   To re-enable: uncomment the block below and the @keyframes emerald-shimmer */
+/*
+.emerald-green-bar.is-active::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 60%;
+	height: 100%;
+	background: linear-gradient(
+		to right,
+		transparent 0%,
+		rgba(255, 255, 255, 0.08) 50%,
+		transparent 100%
+	);
+	animation: emerald-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes emerald-shimmer {
+	0% { left: -100%; }
+	60%, 100% { left: 150%; }
+}
+*/
+
+/* Overtime bar */
+.emerald-overtime-bar {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 0%;
+	background: rgba(255, 193, 7, 0.35);
+	border-left: 2px solid rgba(255, 193, 7, 0.7);
+	display: none;
+	z-index: 1;
+}
+
+.emerald-overtime-counter {
+	position: absolute;
+	right: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 9px;
+	font-weight: 700;
+	color: rgba(255, 193, 7, 0.9);
+	white-space: nowrap;
+}
+
+/* E-level marker */
+.emerald-elevel-marker {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 2px;
+	background: var(--interactive-accent);
+	z-index: 2;
+	display: none;
+	font-size: 9px;
+	font-weight: 700;
+	color: var(--interactive-accent);
+	padding-top: 2px;
+	text-align: center;
+}
+
+.emerald-dh-marker {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 2px;
+	background: var(--text-muted);
+	opacity: 0.6;
+	z-index: 2;
+	font-size: 9px;
+	font-weight: 600;
+	color: var(--text-muted);
+	padding-top: 2px;
+	text-align: center;
+	border-left: 1px dashed var(--text-muted);
+}
+
+/* ── Controls ────────────────────────────────────────── */
+
+.emerald-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.emerald-active-label {
+	width: 100%;
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-top: 2px;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+
+.emerald-btn {
+	padding: 6px 12px;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	transition: background 0.15s;
+}
+
+.emerald-btn-primary {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.emerald-btn-primary:hover {
+	filter: brightness(1.15);
+}
+
+.emerald-btn-secondary {
+	background: var(--background-modifier-border);
+	color: var(--text-normal);
+}
+
+.emerald-btn-secondary:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-btn-danger {
+	background: rgba(244, 67, 54, 0.15);
+	color: var(--text-error);
+}
+
+.emerald-btn-danger:hover {
+	background: rgba(244, 67, 54, 0.25);
+}
+
+.emerald-btn-subtle {
+	background: transparent;
+	color: var(--text-muted);
+	border: 1px dashed var(--background-modifier-border);
+}
+
+.emerald-btn-subtle:hover {
+	background: var(--background-secondary);
+	color: var(--text-normal);
+}
+
+/* ── Summary ─────────────────────────────────────────── */
+
+.emerald-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 12px;
+}
+
+.emerald-available {
+	cursor: pointer;
+	color: var(--text-muted);
+}
+
+.emerald-available:hover {
+	color: var(--text-normal);
+	text-decoration: underline;
+}
+
+.emerald-worked {
+	color: var(--text-normal);
+}
+
+.emerald-overtime-label {
+	color: rgba(255, 193, 7, 0.9);
+	font-weight: 500;
+}
+
+/* Mini progress bar */
+.emerald-progress {
+	height: 4px;
+	background: var(--background-modifier-border);
+	border-radius: 2px;
+	overflow: hidden;
+	margin-top: 2px;
+}
+
+.emerald-progress-fill {
+	height: 100%;
+	background: rgba(76, 175, 80, 0.6);
+	border-radius: 2px;
+	transition: width 1s linear;
+}
+
+.emerald-day-closed {
+	text-align: center;
+	color: var(--text-muted);
+	font-style: italic;
+	padding: 8px;
+}
+
+.emerald-pending-sync-badge {
+	text-align: center;
+	color: var(--text-warning, #B8912E);
+	font-size: 0.8em;
+	padding: 4px 8px;
+	margin-bottom: 4px;
+	border-radius: 4px;
+	background: var(--background-modifier-warning, rgba(184, 145, 46, 0.1));
+}
+
+/* ── Projects ────────────────────────────────────────── */
+
+.emerald-projects-content {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.emerald-project-card {
+	padding: 8px 10px;
+	border-radius: 4px;
+	background: var(--background-secondary);
+	transition: background 0.15s;
+}
+
+.emerald-project-card:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-project-card.is-in-session {
+	border: 1px dashed var(--interactive-accent);
+	background: rgba(var(--interactive-accent-rgb), 0.05);
+}
+
+.emerald-project-top {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-project-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	display: inline-block;
+}
+
+.emerald-project-dot.is-active {
+	background: var(--text-success);
+}
+
+.emerald-project-dot.is-recording {
+	background: var(--text-error);
+	animation: emerald-pulse 1.5s ease-in-out infinite;
+}
+
+.emerald-project-dot.is-inactive {
+	background: var(--text-warning);
+}
+
+.emerald-project-name {
+	flex: 1;
+	font-size: 13px;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.emerald-project-name:hover {
+	color: var(--interactive-accent);
+	text-decoration: underline;
+}
+
+.emerald-elevel-badge {
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+
+.emerald-project-chevron {
+	font-size: 12px;
+	color: var(--text-muted);
+	cursor: pointer;
+	flex-shrink: 0;
+	padding: 0 2px;
+}
+
+.emerald-project-chevron:hover {
+	color: var(--text-normal);
+}
+
+.emerald-project-bottom {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-top: 2px;
+	padding-left: 18px;
+}
+
+.emerald-project-time {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.emerald-in-session-label {
+	font-size: 11px;
+	color: var(--interactive-accent);
+	font-weight: 500;
+	letter-spacing: 0.5px;
+}
+
+.emerald-in-session-progress {
+	font-size: 11px;
+	color: var(--text-muted);
+	margin-top: 1px;
+	font-variant-numeric: tabular-nums;
+}
+
+.emerald-projects-divider {
+	text-align: center;
+	font-size: 11px;
+	color: var(--text-faint);
+	border-top: 1px dashed var(--background-modifier-border);
+	padding-top: 6px;
+	margin-top: 4px;
+}
+
+.emerald-projects-empty {
+	text-align: center;
+	color: var(--text-muted);
+	font-style: italic;
+	padding: 12px 0;
+	font-size: 12px;
+}
+
+/* Inactive accordion */
+.emerald-inactive-accordion {
+	margin-top: 4px;
+}
+
+.emerald-inactive-header {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-muted);
+	cursor: pointer;
+	padding: 6px 0;
+	margin-top: 4px;
+}
+
+.emerald-inactive-header:hover {
+	color: var(--text-normal);
+}
+
+.emerald-inactive-content {
+	padding-left: 8px;
+}
+
+.emerald-inactive-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	color: var(--text-muted);
+	padding: 2px 0;
+	cursor: context-menu;
+	gap: 6px;
+}
+
+.emerald-inactive-item:hover {
+	color: var(--text-normal);
+}
+
+.emerald-inactive-icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	color: var(--text-faint);
+}
+
+.emerald-inactive-icon svg {
+	width: 14px;
+	height: 14px;
+}
+
+.emerald-elevel-badge-small {
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--text-faint);
+}
+
+.emerald-placeholder {
+	color: var(--text-faint);
+	font-style: italic;
+	font-size: 12px;
+	text-align: center;
+	padding: 8px;
+}
+
+/* ── EM Section ──────────────────────────────────────── */
+
+.emerald-em-content {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	align-items: stretch;
+}
+
+/* Energy Check-in Banner */
+.emerald-checkin-banner {
+	margin-bottom: 4px;
+}
+
+.emerald-checkin-inner {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 10px 12px;
+	background: rgba(76, 175, 80, 0.08);
+	border: 1px solid rgba(76, 175, 80, 0.2);
+	border-radius: 6px;
+}
+
+.emerald-checkin-icon { font-size: 20px; flex-shrink: 0; }
+
+.emerald-checkin-text { flex: 1; min-width: 100px; }
+.emerald-checkin-title { font-size: 13px; font-weight: 600; }
+.emerald-checkin-desc { font-size: 11px; color: var(--text-muted); }
+
+.emerald-checkin-btn {
+	flex-shrink: 0;
+	padding: 4px 10px;
+	font-size: 12px;
+}
+
+/* Sparklines */
+.emerald-sparklines {
+	background:
+		linear-gradient(180deg, rgba(110, 196, 184, 0.08) 0%, rgba(110, 196, 184, 0.03) 100%),
+		var(--background-secondary);
+	border: 1px solid rgba(110, 196, 184, 0.16);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 6px 18px rgba(0,0,0,0.10);
+	border-radius: 8px;
+	padding: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	display: block;
+}
+
+.emerald-sparklines-title {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-muted);
+	margin-bottom: 6px;
+}
+
+.emerald-sparkline-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	font-size: 11px;
+	padding: 2px 0;
+}
+
+.emerald-sparkline-key {
+	font-weight: 600;
+	color: var(--interactive-accent);
+	width: 24px;
+}
+
+.emerald-sparkline-graph {
+	flex: 0 1 auto;
+	display: flex;
+	align-items: center;
+	min-width: 80px;
+	max-width: 120px;
+}
+
+.emerald-sparkline-svg {
+	display: block;
+}
+
+.emerald-sparkline-line {
+	fill: none;
+	stroke: var(--interactive-accent);
+	stroke-width: 1.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.emerald-sparkline-line-empty {
+	stroke: var(--text-faint);
+	stroke-width: 1;
+	stroke-dasharray: 3 3;
+}
+
+.emerald-sparkline-dot {
+	fill: var(--interactive-accent);
+}
+
+.emerald-sparkline-value {
+	font-weight: 600;
+	color: var(--text-normal);
+	width: 32px;
+	text-align: right;
+}
+
+/* Insight bulletin */
+.emerald-insight-bulletin {
+	background: transparent;
+	border-radius: 8px;
+	padding: 0;
+	min-height: 60px;
+	width: 100%;
+	box-sizing: border-box;
+	display: block;
+}
+
+.emerald-insight-empty {
+	color: var(--text-faint);
+	font-style: italic;
+	font-size: 12px;
+	text-align: center;
+}
+
+.emerald-insight-container {
+	border: 1px solid rgba(201, 162, 39, 0.28);
+	border-radius: 8px;
+	padding: 10px;
+	background:
+		radial-gradient(circle at top right, rgba(201, 162, 39, 0.14), transparent 42%),
+		linear-gradient(180deg, rgba(201, 162, 39, 0.06) 0%, rgba(201, 162, 39, 0.02) 100%),
+		var(--background-secondary);
+	margin-top: 0;
+	width: 100%;
+	box-sizing: border-box;
+	height: 200px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 24px rgba(0,0,0,0.12);
+}
+
+.emerald-insight-header {
+	font-size: 10px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.7px;
+	color: var(--emerald-e2, #C9A227);
+	margin-bottom: 8px;
+}
+
+.emerald-insight-title {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--text-normal);
+	margin-bottom: 6px;
+}
+
+.emerald-insight-body {
+	font-size: 11px;
+	color: var(--text-muted);
+	line-height: 1.4;
+	flex: 1;                /* Push dots + actions to bottom */
+	overflow: hidden;
+	margin-bottom: 6px;
+}
+
+.emerald-insight-dots {
+	display: flex;
+	gap: 4px;
+	justify-content: center;
+	margin-bottom: 6px;
+}
+
+.emerald-insight-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--background-modifier-border);
+	cursor: pointer;
+}
+
+.emerald-insight-dot.is-active {
+	background: var(--interactive-accent);
+}
+
+.emerald-insight-actions {
+	display: flex;
+	gap: 6px;
+	justify-content: flex-end;
+}
+
+.emerald-btn-tiny {
+	padding: 3px 8px;
+	font-size: 10px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+}
+
+.emerald-btn-tiny:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.emerald-btn-tiny-icon {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+}
+
+.emerald-btn-tiny-icon svg {
+	width: 12px;
+	height: 12px;
+	stroke-width: 2;
+}
+
+/* Workspace buttons */
+.emerald-workspace-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.emerald-workspace-title {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-muted);
+	margin-bottom: 4px;
+}
+
+.emerald-workspace-btn {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 8px;
+	font-size: 12px;
+	border-radius: 3px;
+	cursor: pointer;
+	background: var(--background-secondary);
+}
+
+.emerald-workspace-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-workspace-btn-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-workspace-btn-icon {
+	display: flex;
+	align-items: center;
+}
+
+.emerald-workspace-btn-icon svg {
+	width: 14px;
+	height: 14px;
+	stroke-width: 2;
+}
+
+.emerald-badge {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: 10px;
+	font-weight: 600;
+	padding: 2px 6px;
+	border-radius: 10px;
+	margin-left: 4px;
+}
+
+/* ── Icons ───────────────────────────────────────────── */
+
+.emerald-icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.emerald-icon svg {
+	width: 16px;
+	height: 16px;
+	stroke-width: 2;
+}
+
+.emerald-btn-icon {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 4px;
+}
+
+.emerald-btn-icon svg {
+	width: 14px;
+	height: 14px;
+	stroke-width: 2;
+}
+
+.emerald-checkin-icon {
+	display: flex;
+	align-items: center;
+}
+
+.emerald-checkin-icon svg {
+	width: 24px;
+	height: 24px;
+	color: var(--text-warning);
+}
+
+/* ── Folder Picker ───────────────────────────────────── */
+
+.emerald-form-picker-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.emerald-folder-display {
+	flex: 1;
+	font-size: 13px;
+	color: var(--text-muted);
+	padding: 4px 8px;
+	background: var(--background-secondary);
+	border-radius: 3px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border: 1px solid transparent;
+	transition: border-color 0.15s, color 0.15s;
+}
+
+.emerald-folder-display.is-clickable {
+	cursor: pointer;
+	border-color: var(--background-modifier-border);
+}
+
+.emerald-folder-display.is-clickable:hover {
+	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+
+.emerald-onboard-link {
+	margin: 8px 0 16px;
+}
+
+.emerald-onboard-link a {
+	color: var(--interactive-accent);
+	font-size: 12px;
+	text-decoration: underline;
+}
+
+.emerald-onboard-hint-top {
+	margin-bottom: 12px;
+	font-size: 12px;
+	color: var(--text-muted);
+	padding: 6px 8px;
+	background: var(--background-secondary);
+	border-radius: 3px;
+}
+
+/* ── Modals ──────────────────────────────────────────── */
+
+.emerald-modal {
+	padding: 20px;
+	min-width: 400px;
+}
+
+.emerald-receipt-modal .emerald-slider,
+.emerald-checkin-modal .emerald-slider {
+	width: 100%;
+	min-width: 280px;
+}
+
+.emerald-receipt-modal .emerald-form-group,
+.emerald-checkin-modal .emerald-form-group {
+	width: 100%;
+}
+
+.emerald-modal h2 {
+	margin: 0 0 8px 0;
+	font-size: 20px;
+	text-align: center;
+}
+
+.emerald-modal-subtitle {
+	color: var(--text-muted);
+	font-size: 13px;
+	margin-bottom: 16px;
+}
+
+.emerald-modal-name-input {
+	width: 100%;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	background: transparent;
+	border: 2px solid var(--emerald-e1);
+	border-radius: 4px;
+	color: var(--text-normal);
+	font-size: 16px;
+	font-weight: 500;
+	font-family: var(--font-interface);
+}
+
+.emerald-modal-name-input:focus {
+	outline: none;
+	border-color: var(--emerald-e1);
+	box-shadow: 0 0 0 3px rgba(45, 122, 74, 0.1);
+}
+
+.emerald-modal-summary {
+	font-size: 14px;
+	margin-bottom: 16px;
+}
+
+.emerald-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.emerald-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.emerald-form-label-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.emerald-form-group label {
+	font-weight: 500;
+	font-size: 13px;
+}
+
+.emerald-form-desc {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.emerald-slider {
+	width: 100%;
+	flex: 1;
+}
+
+.emerald-slider-value {
+	font-weight: 600;
+	color: var(--interactive-accent);
+}
+
+.emerald-slider-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.emerald-slider-endpoint {
+	font-size: 11px;
+	color: var(--text-muted);
+	white-space: nowrap;
+	min-width: fit-content;
+}
+
+.emerald-slider-endpoints {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 2px;
+}
+
+.emerald-slider-endpoint-left,
+.emerald-slider-endpoint-right {
+	font-size: 10px;
+	color: var(--text-faint);
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.emerald-slider-endpoint-right {
+	text-align: right;
+}
+
+.emerald-btn-group {
+	display: flex;
+	gap: 6px;
+}
+
+.emerald-btn-toggle {
+	flex: 1;
+	padding: 8px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.emerald-btn-toggle:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-btn-toggle.is-active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+.emerald-checkbox-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.emerald-textarea {
+	width: 100%;
+	min-height: 60px;
+	padding: 8px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	font-family: inherit;
+	font-size: 12px;
+	resize: vertical;
+}
+
+.emerald-completion-prompt {
+	background: rgba(76, 175, 80, 0.1);
+	border-left: 3px solid var(--text-success);
+	padding: 12px;
+	border-radius: 4px;
+}
+
+.emerald-completion-prompt p {
+	margin: 0;
+	font-size: 13px;
+}
+
+.emerald-modal-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 16px;
+}
+
+.emerald-elevel-option {
+	width: 100%;
+	padding: 12px;
+	text-align: left;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.emerald-elevel-option:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-elevel-option.is-active {
+	border-color: var(--interactive-accent);
+	background: rgba(var(--interactive-accent-rgb), 0.1);
+}
+
+.emerald-burnout-modal {
+	border-left: 4px solid rgba(255, 193, 7, 0.8);
+}
+
+.emerald-burnout-yellow { background: rgba(255, 193, 7, 0.05); }
+.emerald-burnout-orange { background: rgba(255, 152, 0, 0.08); border-left-color: rgba(255, 152, 0, 0.8); }
+.emerald-burnout-red { background: rgba(244, 67, 54, 0.08); border-left-color: rgba(244, 67, 54, 0.8); }
+
+.emerald-burnout-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
+.emerald-burnout-icon { font-size: 28px; }
+.emerald-burnout-header h2 { margin: 0; }
+
+.emerald-burnout-message {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--text-normal);
+	margin-bottom: 16px;
+}
+
+.emerald-burnout-factors {
+	background: var(--background-secondary);
+	border-radius: 4px;
+	padding: 12px;
+	margin-bottom: 12px;
+}
+
+.emerald-burnout-factors-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-muted);
+	margin-bottom: 6px;
+}
+
+.emerald-burnout-factors-list {
+	margin: 0;
+	padding-left: 18px;
+	font-size: 13px;
+	color: var(--text-normal);
+}
+
+.emerald-burnout-factors-list li { margin-bottom: 2px; }
+
+.emerald-burnout-suggestion {
+	font-style: italic;
+	color: var(--text-muted);
+	font-size: 13px;
+	margin-bottom: 16px;
+}
+
+.emerald-burnout-suggestion p { margin: 0; }
+
+.emerald-burnout-actions {
+	flex-direction: column;
+	gap: 6px;
+}
+
+.emerald-btn-warm {
+	background: rgba(255, 193, 7, 0.85);
+	color: #1a1a1a;
+}
+
+.emerald-btn-warm:hover {
+	background: rgba(255, 193, 7, 1);
+}
+
+/* ── Close Day Modal ─────────────────────────────────── */
+
+.emerald-closeday-stats {
+	background: var(--background-secondary);
+	border-radius: 4px;
+	padding: 12px;
+	margin-bottom: 16px;
+}
+
+.emerald-closeday-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 4px 0;
+	font-size: 14px;
+}
+
+.emerald-closeday-label { color: var(--text-muted); }
+.emerald-closeday-value { font-weight: 600; }
+.emerald-closeday-overtime { color: rgba(255, 193, 7, 0.9); }
+.emerald-closeday-early { color: var(--text-success); }
+
+.emerald-closeday-sessions {
+	padding-top: 8px;
+	margin-top: 8px;
+	border-top: 1px solid var(--background-modifier-border);
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.emerald-closeday-breakdown {
+	margin-bottom: 16px;
+}
+
+.emerald-closeday-breakdown-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-muted);
+	margin-bottom: 6px;
+}
+
+.emerald-closeday-proj-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 4px 0;
+	font-size: 13px;
+}
+
+.emerald-closeday-proj-name { color: var(--text-normal); }
+.emerald-closeday-proj-time { color: var(--text-muted); }
+
+.emerald-closeday-warning {
+	text-align: center;
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+	margin-bottom: 8px;
+}
+
+/* ── E-Level Modal ───────────────────────────────────── */
+
+.emerald-elevel-current {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--interactive-accent);
+	margin-bottom: 4px;
+}
+
+.emerald-elevel-context {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin-bottom: 16px;
+}
+
+.emerald-elevel-options {
+	gap: 8px;
+}
+
+.emerald-elevel-option-label {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.emerald-elevel-option-level {
+	font-weight: 700;
+	font-size: 14px;
+}
+
+.emerald-elevel-option-desc {
+	color: var(--text-muted);
+	font-size: 13px;
+}
+
+.emerald-elevel-option-time {
+	font-size: 11px;
+	color: var(--text-faint);
+	margin-top: 2px;
+}
+
+/* ── Effort Receipt: Source Chips ─────────────────────── */
+
+.emerald-source-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	justify-content: center;
+}
+
+.emerald-source-chip {
+	padding: 8px 14px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	border-radius: 16px;
+	cursor: pointer;
+	font-size: 12px;
+	transition: all 0.15s;
+}
+
+.emerald-source-chip:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-source-chip.is-active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+/* ── Hour Override ───────────────────────────────────── */
+
+.emerald-houroverride-base {
+	font-size: 13px;
+	color: var(--text-muted);
+	padding: 8px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	margin-bottom: 8px;
+}
+
+.emerald-houroverride-modal .emerald-slider {
+	width: 100%;
+}
+
+.emerald-houroverride-modal .emerald-form-group {
+	width: 100%;
+}
+
+.emerald-houroverride-value {
+	font-size: 16px;
+}
+
+.emerald-houroverride-range {
+	display: flex;
+	justify-content: space-between;
+	font-size: 10px;
+	color: var(--text-faint);
+	margin-top: 2px;
+}
+
+.emerald-houroverride-note {
+	text-align: center;
+	font-style: italic;
+}
+
+/* ── Workspace Views ─────────────────────────────────── */
+
+.emerald-workspace-view {
+	padding: 24px;
+	max-width: 800px;
+}
+
+.emerald-wv-header { margin-bottom: 24px; }
+.emerald-wv-header h2 { margin: 0 0 4px 0; }
+.emerald-wv-subtitle { color: var(--text-muted); font-size: 14px; }
+
+.emerald-wv-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.emerald-wv-refresh {
+	font-size: 12px;
+	padding: 4px 8px;
+}
+
+.emerald-wv-placeholder {
+	padding: 32px;
+	text-align: center;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.emerald-wv-section { margin-bottom: 20px; }
+.emerald-wv-section h3 { margin: 0 0 8px 0; font-size: 15px; }
+
+.emerald-wv-row {
+	display: flex;
+	justify-content: space-between;
+	padding: 6px 8px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	font-size: 13px;
+}
+
+.emerald-wv-status { color: var(--text-muted); font-size: 12px; }
+.emerald-wv-empty { color: var(--text-faint); font-style: italic; font-size: 12px; }
+
+.emerald-wv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.emerald-wv-table th { text-align: left; padding: 8px; border-bottom: 2px solid var(--background-modifier-border); font-weight: 600; }
+.emerald-wv-col-info { display: inline-flex; margin-left: 3px; opacity: 0.5; cursor: help; vertical-align: middle; }
+.emerald-wv-col-info svg { width: 12px; height: 12px; }
+.emerald-wv-collapsible-header { cursor: pointer; user-select: none; }
+.emerald-wv-collapsible-header .emerald-section-arrow { margin-right: 4px; font-size: 10px; color: var(--text-muted); }
+.emerald-wv-table td { padding: 6px 8px; border-bottom: 1px solid var(--background-modifier-border); }
+
+.emerald-wv-insight-card { padding: 12px; background: var(--background-secondary); border-radius: 4px; margin-bottom: 8px; }
+.emerald-wv-insight-type { font-size: 10px; font-weight: 600; color: var(--interactive-accent); margin-bottom: 4px; }
+.emerald-wv-insight-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.emerald-wv-insight-body { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+.emerald-wv-insight-date { font-size: 11px; color: var(--text-faint); margin-top: 6px; }
+
+.emerald-wv-burnout-phase { font-size: 18px; margin-bottom: 16px; }
+.emerald-wv-phase-green { color: var(--text-success); }
+.emerald-wv-phase-yellow { color: var(--text-warning); }
+.emerald-wv-phase-orange { color: #f57c00; }
+.emerald-wv-phase-red { color: var(--text-error); }
+
+.emerald-wv-digest-card { padding: 12px; background: var(--background-secondary); border-radius: 4px; margin-bottom: 8px; }
+.emerald-wv-digest-period { font-weight: 500; font-size: 13px; }
+.emerald-wv-digest-date { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+
+/* ── Additional Workspace View Styles ────────────────── */
+
+.emerald-wv-error { color: var(--text-error); padding: 16px; text-align: center; }
+.emerald-wv-stale-banner {
+	background: var(--background-modifier-message);
+	color: var(--text-warning);
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 12px;
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.emerald-wv-stale-banner .emerald-icon { display: flex; }
+.emerald-wv-stale-banner .emerald-icon svg { width: 14px; height: 14px; }
+.emerald-wv-loading { color: var(--text-muted); padding: 16px; text-align: center; font-style: italic; }
+.emerald-wv-count { font-size: 12px; color: var(--text-faint); margin-bottom: 12px; }
+
+/* E-Level Overview: Allocation Bar */
+.emerald-wv-alloc-bar-outer {
+	height: 24px;
+	background: var(--background-modifier-border);
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 6px;
+}
+
+.emerald-wv-alloc-bar-fill {
+	height: 100%;
+	background: rgba(76, 175, 80, 0.5);
+	border-radius: 4px;
+	transition: width 0.3s;
+}
+
+.emerald-wv-alloc-bar-fill.is-over { background: rgba(255, 193, 7, 0.6); }
+.emerald-wv-alloc-bar-fill.is-under { background: rgba(76, 175, 80, 0.3); }
+
+.emerald-wv-alloc-label { font-size: 12px; color: var(--text-muted); }
+.emerald-wv-alloc-warn { color: rgba(255, 193, 7, 0.9); font-weight: 500; }
+
+/* E-Level Distribution Grid */
+.emerald-wv-dist-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.emerald-wv-dist-card {
+	text-align: center;
+	padding: 12px 8px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-dist-level { font-weight: 700; font-size: 16px; }
+.emerald-wv-dist-count { font-size: 24px; font-weight: 600; margin: 4px 0; }
+.emerald-wv-dist-label { font-size: 11px; color: var(--text-muted); }
+
+/* Project table extras */
+.emerald-wv-row-inactive { opacity: 0.5; }
+.emerald-wv-elevel-cell { font-weight: 700; }
+
+.emerald-wv-pct-bar {
+	position: relative;
+	height: 16px;
+	background: var(--background-modifier-border);
+	border-radius: 3px;
+	overflow: hidden;
+	min-width: 60px;
+}
+
+.emerald-wv-pct-fill {
+	height: 100%;
+	background: rgba(76, 175, 80, 0.5);
+	border-radius: 3px;
+}
+
+.emerald-wv-pct-fill.is-complete { background: rgba(76, 175, 80, 0.8); }
+.emerald-wv-pct-text { position: absolute; top: 0; right: 4px; font-size: 10px; line-height: 16px; font-weight: 600; }
+
+/* Suggestions */
+.emerald-wv-suggestion-card {
+	padding: 10px;
+	background: rgba(255, 193, 7, 0.08);
+	border-left: 3px solid rgba(255, 193, 7, 0.6);
+	border-radius: 4px;
+	margin-bottom: 6px;
+	font-size: 13px;
+}
+
+/* Filter bar */
+.emerald-wv-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-bottom: 16px;
+}
+
+.emerald-wv-filter-btn {
+	padding: 4px 10px;
+	font-size: 12px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	border-radius: 12px;
+	cursor: pointer;
+}
+
+.emerald-wv-filter-btn:hover { background: var(--background-modifier-hover); }
+.emerald-wv-filter-btn.is-active { background: var(--interactive-accent); color: var(--text-on-accent); border-color: var(--interactive-accent); }
+.emerald-wv-filter-btn.is-locked { opacity: 0.5; cursor: not-allowed; }
+.emerald-wv-filter-btn.is-locked:hover { background: var(--background-secondary); }
+
+/* Insight card enhancements */
+.emerald-wv-insight-card.is-unread { border-left: 3px solid var(--interactive-accent); }
+.emerald-wv-insight-card.is-dismissed { opacity: 0.4; }
+.emerald-wv-insight-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.emerald-wv-insight-metric { font-size: 10px; background: var(--background-modifier-border); padding: 2px 6px; border-radius: 8px; }
+.emerald-wv-insight-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* Data Center: Metric Grid */
+.emerald-wv-metric-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 10px;
+}
+
+.emerald-wv-metric-card {
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+	transition: border-color 0.15s;
+}
+
+.emerald-wv-metric-card:hover { border-color: var(--interactive-accent); }
+
+.emerald-wv-metric-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-metric-key { font-weight: 700; font-size: 14px; color: var(--interactive-accent); }
+.emerald-wv-metric-value { font-size: 16px; font-weight: 600; }
+.emerald-wv-metric-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+.emerald-wv-metric-desc { font-size: 11px; color: var(--text-muted); }
+.emerald-wv-metric-updated { font-size: 10px; color: var(--text-faint); margin-top: 6px; }
+
+.emerald-wv-metric-history {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-history-table { font-size: 12px; }
+
+/* Trend indicators */
+.emerald-wv-trend-up { color: var(--text-success); }
+.emerald-wv-trend-down { color: var(--text-error); }
+.emerald-wv-trend-flat { color: var(--text-muted); }
+
+/* Effort Profile: Drift indicator */
+.emerald-wv-drift-indicator {
+	padding: 12px;
+	border-radius: 4px;
+	margin-bottom: 16px;
+}
+
+.emerald-wv-drift-low { background: rgba(76, 175, 80, 0.1); border-left: 3px solid var(--text-success); }
+.emerald-wv-drift-pending { background: rgba(108, 206, 154, 0.08); border-left: 3px solid var(--text-muted); }
+.emerald-wv-drift-moderate { background: rgba(255, 193, 7, 0.1); border-left: 3px solid rgba(255, 193, 7, 0.8); }
+.emerald-wv-drift-high { background: rgba(244, 67, 54, 0.1); border-left: 3px solid var(--text-error); }
+
+.emerald-wv-drift-value { color: var(--text-muted); font-size: 12px; }
+.emerald-wv-drift-msg { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* Profile traits */
+.emerald-wv-calibration-score { font-size: 16px; margin-bottom: 4px; }
+.emerald-wv-score-value { font-weight: 700; color: var(--interactive-accent); }
+.emerald-wv-last-calibrated { font-size: 12px; color: var(--text-faint); margin-bottom: 16px; }
+
+.emerald-wv-traits { display: flex; flex-direction: column; gap: 10px; }
+
+.emerald-wv-trait-row {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.emerald-wv-trait-label { display: flex; flex-direction: column; }
+.emerald-wv-trait-name { font-weight: 500; font-size: 13px; }
+.emerald-wv-trait-desc { font-size: 11px; color: var(--text-faint); }
+
+.emerald-wv-trait-bar-container { display: flex; align-items: center; gap: 8px; }
+
+.emerald-wv-trait-bar {
+	flex: 1;
+	height: 8px;
+	background: var(--background-modifier-border);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.emerald-wv-trait-bar-fill {
+	height: 100%;
+	background: var(--interactive-accent);
+	border-radius: 4px;
+}
+
+.emerald-wv-trait-value { font-size: 12px; font-weight: 600; width: 28px; text-align: right; }
+.emerald-wv-trait-hint {
+	display: block;
+	font-size: 10px;
+	color: var(--text-faint);
+	font-style: italic;
+	margin-top: 2px;
+}
+
+.emerald-wv-profile-actions { margin-top: 16px; }
+
+/* Burnout Monitor */
+.emerald-wv-burnout-phase-display {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 24px;
+	font-weight: 600;
+	margin-bottom: 12px;
+}
+
+.emerald-wv-burnout-phase-icon {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	display: inline-block;
+	flex-shrink: 0;
+}
+
+.emerald-phase-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+	flex-shrink: 0;
+}
+
+.emerald-wv-icon {
+	display: inline-flex;
+	align-items: center;
+	margin-right: 8px;
+}
+
+.emerald-wv-icon svg {
+	width: 20px;
+	height: 20px;
+	stroke-width: 2;
+}
+
+.emerald-wv-stat-icon svg {
+	width: 20px;
+	height: 20px;
+	stroke-width: 2;
+}
+
+.emerald-wv-burnout-score { font-size: 14px; margin-bottom: 12px; }
+
+.emerald-wv-burnout-bar-outer {
+	height: 12px;
+	background: var(--background-modifier-border);
+	border-radius: 6px;
+	overflow: hidden;
+	margin-bottom: 16px;
+}
+
+.emerald-wv-burnout-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+.emerald-wv-bar-green { background: rgba(76, 175, 80, 0.6); }
+.emerald-wv-bar-yellow { background: rgba(255, 193, 7, 0.6); }
+.emerald-wv-bar-orange { background: rgba(255, 152, 0, 0.7); }
+.emerald-wv-bar-red { background: rgba(244, 67, 54, 0.7); }
+
+/* Trend chart */
+.emerald-wv-trend-chart {
+	display: flex;
+	align-items: flex-end;
+	gap: 4px;
+	height: 120px;
+	padding: 8px 0;
+}
+
+.emerald-wv-trend-col {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	height: 100%;
+}
+
+.emerald-wv-trend-bar {
+	width: 100%;
+	max-width: 24px;
+	border-radius: 2px 2px 0 0;
+	transition: height 0.3s;
+}
+
+.emerald-wv-trend-label { font-size: 9px; color: var(--text-faint); margin-top: 4px; text-align: center; }
+
+/* Factors */
+.emerald-wv-factor { display: flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 13px; }
+.emerald-wv-factor-dot { color: var(--interactive-accent); }
+
+/* Suggestion rows (Burnout Monitor) */
+.emerald-wv-suggestion-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 5px 0;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.emerald-wv-suggestion-bullet {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--text-muted);
+	margin-top: 1px;
+}
+
+.emerald-wv-suggestion-bullet svg { width: 14px; height: 14px; }
+
+.emerald-wv-suggestion-note {
+	font-size: 12px;
+	color: var(--text-faint);
+	font-style: italic;
+	margin-top: 8px;
+}
+
+/* Recovery sparkline row */
+.emerald-wv-burnout-sparkline-section { padding-bottom: 8px; }
+
+.emerald-wv-burnout-spark-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 6px;
+}
+
+.emerald-wv-burnout-spark-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.emerald-wv-burnout-spark-svg { display: block; flex: 1; max-width: 200px; }
+
+.emerald-wv-burnout-spark-value {
+	font-size: 13px;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.emerald-wv-burnout-expand-btn { margin-top: 4px; }
+
+.emerald-wv-burnout-full-chart { margin-top: 12px; }
+
+.emerald-wv-burnout-episodes-list { margin-top: 8px; }
+
+/* Episode cards */
+.emerald-wv-episode-card {
+	padding: 10px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	margin-bottom: 6px;
+}
+
+.emerald-wv-episode-header { display: flex; justify-content: space-between; align-items: center; }
+.emerald-wv-episode-dates { font-size: 12px; color: var(--text-muted); }
+.emerald-wv-episode-factors { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
+
+/* Digest View — Enhanced */
+.emerald-wv-digest-nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+	gap: 8px;
+}
+
+.emerald-wv-digest-period-label {
+	font-weight: 500;
+	font-size: 14px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-wv-digest-period-icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.emerald-wv-digest-period-icon svg {
+	width: 16px;
+	height: 16px;
+	stroke-width: 2;
+}
+
+.emerald-wv-digest-counter {
+	font-size: 12px;
+	color: var(--text-faint);
+	font-weight: 400;
+}
+
+.emerald-wv-digest-nav .emerald-btn.is-disabled { opacity: 0.3; pointer-events: none; }
+
+.emerald-wv-digest-generated { font-size: 11px; color: var(--text-faint); margin-bottom: 16px; }
+
+.emerald-wv-digest-stats {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.emerald-wv-digest-stats .emerald-wv-stat-card:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+.emerald-wv-stat-card {
+	text-align: center;
+	padding: 14px 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-stat-icon {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 4px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-stat-icon svg { width: 20px; height: 20px; stroke-width: 2; }
+.emerald-wv-stat-value { font-size: 20px; font-weight: 700; margin: 2px 0; }
+.emerald-wv-stat-label { font-size: 11px; color: var(--text-muted); }
+
+.emerald-wv-stat-sublabel {
+	font-size: 10px;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+/* Effort Source Breakdown */
+.emerald-wv-digest-source-summary {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+	flex-wrap: wrap;
+}
+
+.emerald-wv-digest-source-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.emerald-wv-digest-source-chip-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+}
+
+.emerald-wv-digest-source-chip-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-digest-source-dominant {
+	font-size: 12px;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.emerald-wv-digest-source-row { margin-bottom: 6px; }
+
+.emerald-wv-digest-source-label-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	margin-bottom: 3px;
+}
+
+.emerald-wv-digest-source-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+}
+
+.emerald-wv-digest-source-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-digest-source-name { flex: 1; }
+
+.emerald-wv-digest-source-pct {
+	font-weight: 600;
+	color: var(--text-muted);
+}
+
+.emerald-wv-digest-source-bar {
+	height: 6px;
+	background: var(--background-modifier-border);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.emerald-wv-digest-source-fill {
+	height: 100%;
+	border-radius: 3px;
+	transition: width 0.3s;
+}
+
+.emerald-wv-digest-pattern-insight {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+	margin-top: 8px;
+	line-height: 1.4;
+}
+
+/* Delivery footer */
+.emerald-wv-digest-delivery-footer {
+	margin-top: 20px;
+	padding-top: 12px;
+	border-top: 1px solid var(--background-modifier-border);
+	font-size: 11px;
+	color: var(--text-faint);
+}
+
+.emerald-wv-digest-settings-link {
+	color: var(--text-faint);
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.emerald-wv-digest-settings-link:hover { color: var(--text-muted); }
+
+.emerald-wv-digest-section {
+	margin-bottom: 16px;
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-digest-section-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.emerald-wv-digest-section-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+}
+
+.emerald-wv-digest-section-icon svg { width: 16px; height: 16px; stroke-width: 2; }
+
+.emerald-wv-digest-section-header h4 { margin: 0; font-size: 14px; }
+
+.emerald-wv-digest-section-body p {
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--text-normal);
+	margin: 0;
+}
+
+.emerald-wv-digest-summary-text {
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.emerald-wv-digest-movements {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.emerald-wv-digest-metric-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 0;
+	font-size: 13px;
+}
+
+.emerald-wv-digest-metric-key {
+	font-weight: 700;
+	font-size: 12px;
+	width: 36px;
+	color: var(--interactive-accent);
+}
+
+.emerald-wv-digest-insight-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 4px 0;
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+.emerald-wv-digest-insight-bullet {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--interactive-accent);
+}
+
+.emerald-wv-digest-insight-bullet svg { width: 14px; height: 14px; }
+
+.emerald-wv-digest-completed-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 0;
+	font-size: 13px;
+}
+
+.emerald-wv-digest-check-icon {
+	display: inline-flex;
+	color: var(--text-success);
+	flex-shrink: 0;
+}
+
+.emerald-wv-digest-check-icon svg { width: 14px; height: 14px; }
+
+/* Empty state */
+.emerald-wv-empty-state {
+	text-align: center;
+	padding: 48px 24px;
+}
+
+.emerald-wv-empty-icon {
+	display: flex;
+	justify-content: center;
+	color: var(--text-faint);
+	margin-bottom: 12px;
+}
+
+.emerald-wv-empty-icon svg { width: 40px; height: 40px; stroke-width: 1.5; }
+
+.emerald-wv-empty-state h3 {
+	margin: 0 0 8px 0;
+	color: var(--text-muted);
+}
+
+.emerald-wv-empty-desc {
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	max-width: 400px;
+	margin: 0 auto 16px;
+}
+
+.emerald-wv-empty-checklist {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 4px;
+	text-align: left;
+}
+
+.emerald-wv-empty-check {
+	font-size: 12px;
+	color: var(--text-faint);
+}
+
+/* ── Burnout Monitor — Enhanced ──────────────────────── */
+
+.emerald-wv-burnout-hero {
+	padding: 20px;
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-burnout-hero-green { border-left: 4px solid var(--text-success); }
+.emerald-wv-burnout-hero-yellow { border-left: 4px solid var(--text-warning); }
+.emerald-wv-burnout-hero-orange { border-left: 4px solid #e68a00; }
+.emerald-wv-burnout-hero-red { border-left: 4px solid var(--text-error); }
+
+.emerald-wv-burnout-phase-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.emerald-wv-burnout-hero-icon {
+	display: inline-flex;
+}
+
+.emerald-wv-burnout-hero-icon svg { width: 28px; height: 28px; stroke-width: 2; }
+
+.emerald-wv-burnout-phase-label {
+	font-size: 22px;
+	font-weight: 700;
+}
+
+.emerald-wv-burnout-message {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--text-normal);
+	margin: 0 0 6px 0;
+}
+
+.emerald-wv-burnout-tone {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+	margin: 0 0 14px 0;
+}
+
+.emerald-wv-burnout-score-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-burnout-score-label { flex-shrink: 0; }
+
+.emerald-wv-burnout-score-bar {
+	flex: 1;
+	height: 6px;
+	background: var(--background-modifier-border);
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.emerald-wv-burnout-score-fill {
+	height: 100%;
+	border-radius: 3px;
+	transition: width 0.3s;
+}
+
+.emerald-wv-burnout-score-num {
+	font-weight: 600;
+	flex-shrink: 0;
+	min-width: 44px;
+	text-align: right;
+}
+
+/* Section header rows */
+.emerald-wv-section-header-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.emerald-wv-section-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+}
+
+.emerald-wv-section-icon svg { width: 16px; height: 16px; stroke-width: 2; }
+
+.emerald-wv-section-header-row h3 { margin: 0; font-size: 15px; }
+
+/* Factors */
+.emerald-wv-factors-intro {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 0 0 10px 0;
+}
+
+.emerald-wv-factors-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.emerald-wv-factor-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+}
+
+.emerald-wv-factor-indicator {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* SVG chart styles */
+.emerald-wv-burnout-chart { display: block; margin: 8px 0; }
+
+.emerald-chart-bar-green { fill: rgba(76, 175, 80, 0.5); }
+.emerald-chart-bar-yellow { fill: rgba(255, 193, 7, 0.5); }
+.emerald-chart-bar-orange { fill: rgba(255, 152, 0, 0.6); }
+.emerald-chart-bar-red { fill: rgba(244, 67, 54, 0.6); }
+
+.emerald-chart-label {
+	font-size: 9px;
+	fill: var(--text-faint);
+}
+
+.emerald-wv-burnout-trend-summary {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 8px 0 0 0;
+	font-style: italic;
+}
+
+/* Recovery */
+.emerald-wv-recovery-sublabel {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 8px;
+}
+
+.emerald-wv-recovery-sublabel-spaced { margin-top: 16px; }
+
+.emerald-wv-protocol-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.emerald-wv-protocol-card {
+	padding: 10px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-protocol-name-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-protocol-icon { display: inline-flex; color: var(--text-success); }
+.emerald-wv-protocol-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-protocol-type { font-weight: 600; font-size: 13px; }
+.emerald-wv-protocol-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+
+.emerald-wv-recovery-prompt {
+	font-size: 13px;
+	color: var(--text-muted);
+	font-style: italic;
+	margin: 0;
+}
+
+.emerald-wv-stars-good { color: var(--text-warning); }
+.emerald-wv-stars-low { color: var(--text-faint); }
+
+/* Episodes */
+.emerald-wv-episodes-intro {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 0 0 10px 0;
+}
+
+.emerald-wv-episode-card {
+	padding: 10px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	margin-bottom: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-episode-top {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.emerald-wv-episode-badge {
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+.emerald-wv-bg-green { background: rgba(76, 175, 80, 0.15); color: var(--text-success); }
+.emerald-wv-bg-yellow { background: rgba(255, 193, 7, 0.15); color: var(--text-warning); }
+.emerald-wv-bg-orange { background: rgba(255, 152, 0, 0.15); color: #e68a00; }
+.emerald-wv-bg-red { background: rgba(244, 67, 54, 0.15); color: var(--text-error); }
+
+.emerald-wv-episode-dates { font-size: 12px; color: var(--text-muted); }
+.emerald-wv-episode-duration { font-size: 11px; color: var(--text-faint); }
+.emerald-wv-episode-factors { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+.emerald-wv-episode-notes { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
+
+/* ── Insight Log — Enhanced ──────────────────────────── */
+
+.emerald-wv-insight-health {
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	margin-bottom: 16px;
+	font-size: 13px;
+}
+
+.emerald-wv-health-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	flex-wrap: wrap;
+}
+
+.emerald-wv-health-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.emerald-wv-health-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-health-needs { color: var(--text-muted); font-size: 12px; }
+
+.emerald-wv-health-chips {
+	display: inline-flex;
+	gap: 4px;
+	margin-left: 4px;
+}
+
+.emerald-wv-chip {
+	font-size: 11px;
+	padding: 1px 8px;
+	border-radius: 10px;
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+}
+
+.emerald-wv-chip-accent {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.emerald-wv-filter-btn.is-empty { opacity: 0.5; }
+
+.emerald-wv-insight-card {
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	margin-bottom: 8px;
+	border: 1px solid var(--background-modifier-border);
+	transition: border-color 0.15s;
+}
+
+.emerald-wv-insight-card:hover { border-color: var(--background-modifier-border-hover, var(--interactive-accent)); }
+
+.emerald-wv-insight-card.is-unread {
+	border-left: 3px solid var(--interactive-accent);
+	box-shadow: inset 0 0 0 1px rgba(110, 196, 184, 0.10);
+}
+.emerald-wv-insight-card.is-dismissed { opacity: 0.4; }
+.emerald-wv-insight-card.is-expanded { background: var(--background-primary-alt, var(--background-secondary)); }
+
+.emerald-wv-insight-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.emerald-wv-insight-new-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	padding: 3px 7px;
+	border-radius: 999px;
+	background: rgba(110, 196, 184, 0.14);
+	color: var(--interactive-accent);
+	border: 1px solid rgba(110, 196, 184, 0.24);
+	flex-shrink: 0;
+}
+
+.emerald-wv-insight-top {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+	flex-wrap: wrap;
+}
+
+.emerald-wv-insight-type-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--interactive-accent);
+}
+
+.emerald-wv-insight-type-icon {
+	display: inline-flex;
+}
+
+.emerald-wv-insight-type-icon svg { width: 12px; height: 12px; stroke-width: 2.5; }
+
+.emerald-wv-insight-metric {
+	font-size: 10px;
+	background: var(--background-modifier-border);
+	padding: 2px 6px;
+	border-radius: 8px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-insight-date {
+	font-size: 11px;
+	color: var(--text-faint);
+	margin-left: auto;
+}
+
+.emerald-wv-insight-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.emerald-wv-insight-preview { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.emerald-wv-insight-body { font-size: 13px; color: var(--text-normal); line-height: 1.5; margin-bottom: 8px; }
+
+.emerald-wv-insight-source {
+	font-size: 11px;
+	color: var(--text-faint);
+	font-style: italic;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-insight-timestamp { font-size: 10px; color: var(--text-faint); }
+
+.emerald-wv-insight-actions { display: flex; gap: 6px; margin-top: 8px; }
+
+/* ── E-Level Overview — Enhanced ─────────────────────── */
+
+.emerald-wv-elevel-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+	.emerald-wv-elevel-grid { grid-template-columns: 1fr; }
+}
+
+.emerald-wv-elevel-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 14px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	border-left: 4px solid var(--text-muted);
+	transition: border-color 0.15s, background 0.15s;
+}
+
+.emerald-wv-elevel-card:hover { background: var(--background-modifier-hover); }
+
+.emerald-wv-elevel-card.is-active {
+	background: var(--background-primary-alt, var(--background-secondary));
+	border-color: var(--interactive-accent);
+	border-left-width: 4px;
+}
+
+.emerald-wv-elevel-info { flex: 1; }
+
+.emerald-wv-elevel-label { margin-bottom: 4px; }
+
+.emerald-wv-elevel-name {
+	font-weight: 700;
+	font-size: 16px;
+	margin-right: 6px;
+}
+
+.emerald-wv-elevel-desc {
+	font-size: 11px;
+	color: var(--text-faint);
+}
+
+.emerald-wv-elevel-count {
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-elevel-count-num {
+	font-weight: 700;
+	font-size: 16px;
+	color: var(--text-normal);
+}
+
+.emerald-wv-elevel-progress {
+	text-align: right;
+	flex-shrink: 0;
+}
+
+.emerald-wv-elevel-pct {
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.emerald-wv-elevel-time {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-elevel-no-work {
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+/* Allocation */
+.emerald-wv-alloc-section { margin-bottom: 16px; }
+
+.emerald-wv-alloc-hint {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-top: 4px;
+}
+
+/* Project table enhancements */
+.emerald-wv-project-name { font-weight: 500; }
+
+.emerald-wv-project-status {
+	font-size: 11px;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.emerald-wv-level-badge { font-weight: 700; }
+
+/* Clickable project names in tables */
+.emerald-wv-project-link {
+	cursor: pointer;
+	color: var(--text-accent);
+	transition: color 0.15s;
+}
+.emerald-wv-project-link:hover {
+	color: var(--interactive-accent);
+	text-decoration: underline;
+}
+
+/* Expandable ⓘ info button on E-level cards */
+.emerald-wv-elevel-info-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 6px;
+	cursor: pointer;
+	color: var(--text-faint);
+	transition: color 0.15s;
+	vertical-align: middle;
+}
+.emerald-wv-elevel-info-btn:hover { color: var(--text-accent); }
+.emerald-wv-elevel-info-btn.is-expanded { color: var(--text-accent); }
+.emerald-wv-elevel-info-btn svg { width: 14px; height: 14px; }
+
+.emerald-wv-elevel-detail {
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--text-muted);
+	margin-top: 6px;
+	padding: 6px 8px;
+	background: var(--background-primary);
+	border-radius: 4px;
+	border-left: 2px solid var(--text-faint);
+}
+
+/* "What is Effort Management?" link */
+.emerald-wv-em-link {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 16px;
+	padding: 10px 0;
+	border-top: 1px solid var(--background-modifier-border);
+}
+.emerald-wv-text-link {
+	cursor: pointer;
+	color: var(--text-accent);
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+}
+.emerald-wv-text-link:hover { text-decoration: underline; }
+.emerald-wv-link-arrow {
+	color: var(--text-faint);
+	display: inline-flex;
+	align-items: center;
+}
+.emerald-wv-link-arrow svg { width: 14px; height: 14px; }
+
+/* About EMRALD page styles */
+.emerald-wv-about-section p {
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--text-normal);
+	margin: 8px 0;
+}
+
+.emerald-wv-about-level-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 8px 0;
+}
+
+.emerald-wv-about-level-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	margin-top: 5px;
+}
+
+.emerald-wv-about-level-text {
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--text-normal);
+}
+
+.emerald-wv-about-thesis {
+	margin: 20px 0;
+}
+
+.emerald-wv-about-thesis blockquote {
+	font-size: 14px;
+	font-style: italic;
+	color: var(--text-muted);
+	border-left: 3px solid var(--interactive-accent);
+	padding: 10px 16px;
+	margin: 0;
+	background: var(--background-secondary);
+	border-radius: 4px;
+}
+
+.emerald-wv-about-callout {
+	margin: 20px 0;
+	padding: 16px 20px;
+	background: var(--background-secondary);
+	border-left: 4px solid var(--interactive-accent);
+	border-radius: 4px;
+}
+
+.emerald-wv-about-callout-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text-normal);
+	margin-bottom: 8px;
+}
+
+.emerald-wv-about-callout-body {
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--text-muted);
+	margin: 0;
+}
+
+.emerald-wv-about-links {
+	margin-top: 16px;
+	font-size: 13px;
+}
+
+.emerald-wv-about-links a {
+	color: var(--text-accent);
+	text-decoration: none;
+}
+.emerald-wv-about-links a:hover { text-decoration: underline; }
+
+/* Suggestions */
+.emerald-wv-suggestion-card {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	padding: 10px;
+	background: rgba(255, 193, 7, 0.08);
+	border-left: 3px solid rgba(255, 193, 7, 0.6);
+	border-radius: 4px;
+	margin-bottom: 6px;
+	font-size: 13px;
+}
+
+.emerald-wv-suggestion-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--text-warning);
+}
+
+.emerald-wv-suggestion-icon svg { width: 16px; height: 16px; }
+
+/* ── Data Center — Enhanced ──────────────────────────── */
+
+.emerald-wv-dc-pinned-note {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--text-muted);
+	padding: 8px 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	margin-bottom: 12px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-dc-pin-icon {
+	display: inline-flex;
+	color: var(--text-warning);
+	flex-shrink: 0;
+}
+
+.emerald-wv-dc-pin-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-dc-categories {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.emerald-wv-dc-category { margin-bottom: 0; }
+
+.emerald-wv-metric-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 10px;
+}
+
+.emerald-wv-metric-card {
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	border-left: 3px solid var(--background-modifier-border);
+	transition: border-color 0.15s;
+}
+
+.emerald-wv-metric-card:hover { border-color: var(--interactive-accent); }
+
+.emerald-wv-metric-card.is-expanded {
+	grid-column: 1 / -1;
+	background: var(--background-primary-alt, var(--background-secondary));
+}
+
+.emerald-wv-metric-card.is-no-data { opacity: 0.6; }
+.emerald-wv-metric-card.is-no-data:hover { opacity: 0.8; }
+
+/* Frosted Pro overlay for locked D9-D20 cards */
+.emerald-wv-metric-card.is-locked {
+	position: relative;
+	overflow: hidden;
+	pointer-events: none;
+}
+.emerald-wv-metric-card.is-locked .emerald-wv-metric-value,
+.emerald-wv-metric-card.is-locked .emerald-wv-metric-name,
+.emerald-wv-metric-card.is-locked .emerald-wv-metric-desc {
+	filter: blur(4px);
+	user-select: none;
+}
+.emerald-wv-metric-card.is-locked .emerald-wv-metric-key {
+	filter: none; /* Keep the D-key label readable */
+}
+.emerald-wv-metric-locked-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: var(--background-secondary-alt, rgba(0,0,0,0.15));
+	backdrop-filter: blur(2px);
+	border-radius: 6px;
+	pointer-events: auto;
+	cursor: default;
+	z-index: 1;
+}
+.emerald-wv-metric-lock-icon {
+	color: #C9A227;
+	display: flex;
+}
+.emerald-wv-metric-lock-icon svg {
+	width: 14px;
+	height: 14px;
+}
+.emerald-wv-metric-lock-text {
+	font-size: 0.75em;
+	font-weight: 600;
+	color: #C9A227;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.emerald-wv-metric-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-metric-key-row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.emerald-wv-metric-key { font-weight: 700; font-size: 14px; color: var(--interactive-accent); }
+.emerald-wv-metric-value { font-size: 18px; font-weight: 600; }
+.emerald-wv-metric-value.is-no-data { color: var(--text-faint); }
+
+.emerald-wv-metric-value-wrap {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* Mini trend arrows on collapsed metric cards */
+.emerald-wv-trend-arrow {
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+}
+.emerald-wv-trend-good { color: var(--text-success, #2D7A4A); }
+.emerald-wv-trend-bad { color: var(--text-error, #B54545); }
+.emerald-wv-trend-caution { color: #B8912E; }
+.emerald-wv-trend-neutral { color: var(--text-faint); }
+.emerald-wv-metric-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+.emerald-wv-metric-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+.emerald-wv-metric-updated { font-size: 10px; color: var(--text-faint); margin-top: 6px; }
+
+.emerald-wv-metric-nodata {
+	font-size: 11px;
+	color: var(--text-faint);
+	font-style: italic;
+	margin-top: 4px;
+}
+
+/* Pin button */
+.emerald-wv-pin-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 14px;
+	color: var(--text-faint);
+	padding: 0 2px;
+	line-height: 1;
+}
+
+.emerald-wv-pin-btn:hover { color: var(--text-warning); }
+.emerald-wv-pin-btn.is-pinned { color: var(--text-warning); }
+
+/* Expanded section */
+.emerald-wv-metric-expanded {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-metric-explainer {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	font-size: 12px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	padding: 8px 10px;
+	background: rgba(var(--interactive-accent-rgb, 76, 175, 80), 0.06);
+	border-radius: 4px;
+	margin-bottom: 12px;
+}
+
+.emerald-wv-metric-info-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--interactive-accent);
+	margin-top: 1px;
+}
+
+.emerald-wv-metric-info-icon svg { width: 14px; height: 14px; }
+
+.emerald-wv-metric-chart-area { margin-bottom: 12px; }
+
+/* SVG chart */
+.emerald-wv-metric-svg {
+	display: block;
+	width: 100%;
+	max-height: 100px;
+}
+
+.emerald-wv-chart-grid {
+	stroke: var(--background-modifier-border);
+	stroke-width: 0.5;
+	stroke-dasharray: 4 4;
+}
+
+.emerald-wv-chart-area {
+	fill: var(--interactive-accent);
+	fill-opacity: 0.08;
+}
+
+.emerald-wv-chart-line {
+	fill: none;
+	stroke: var(--interactive-accent);
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.emerald-wv-chart-dot {
+	fill: var(--background-primary);
+	stroke: var(--interactive-accent);
+	stroke-width: 1.5;
+}
+
+.emerald-wv-chart-dot-current {
+	fill: var(--interactive-accent);
+	stroke: var(--background-primary);
+	stroke-width: 2;
+}
+
+.emerald-wv-chart-range-label {
+	font-size: 9px;
+	fill: var(--text-faint);
+}
+
+.emerald-wv-dist-chart {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 4px 0 2px;
+}
+
+.emerald-wv-dist-row {
+	display: grid;
+	grid-template-columns: 84px 1fr 42px;
+	align-items: center;
+	gap: 10px;
+}
+
+.emerald-wv-dist-label,
+.emerald-wv-dist-value {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-dist-label {
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.emerald-wv-dist-value {
+	text-align: right;
+	font-weight: 700;
+	color: var(--text-normal);
+}
+
+.emerald-wv-dist-bar {
+	height: 14px;
+	border-radius: 999px;
+	overflow: hidden;
+	position: relative;
+	background: rgba(201, 162, 39, 0.12);
+	border: 1px solid rgba(201, 162, 39, 0.10);
+}
+
+.emerald-wv-dist-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, rgba(110, 196, 184, 0.82), rgba(110, 196, 184, 0.68));
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.emerald-wv-dist-row.is-dominant .emerald-wv-dist-bar {
+	background: rgba(201, 162, 39, 0.16);
+	border-color: rgba(201, 162, 39, 0.22);
+}
+
+.emerald-wv-dist-row.is-dominant .emerald-wv-dist-fill {
+	background: linear-gradient(90deg, rgba(110, 196, 184, 0.95), rgba(201, 162, 39, 0.78));
+}
+
+.emerald-wv-dist-row.is-dominant .emerald-wv-dist-label,
+.emerald-wv-dist-row.is-dominant .emerald-wv-dist-value {
+	color: var(--text-normal);
+}
+
+.emerald-wv-time-chart {
+	display: grid;
+	grid-template-columns: repeat(24, minmax(0, 1fr));
+	align-items: end;
+	gap: 3px;
+	height: 92px;
+	padding: 8px 6px 2px;
+	border-radius: 8px;
+	background:
+		linear-gradient(180deg, rgba(110, 196, 184, 0.10) 0 34%, rgba(201, 162, 39, 0.10) 34% 66%, rgba(192, 106, 48, 0.10) 66% 100%);
+}
+
+.emerald-wv-time-bucket {
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+	align-items: stretch;
+	height: 100%;
+	gap: 6px;
+}
+
+.emerald-wv-time-bucket-fill {
+	min-height: 4px;
+	border-radius: 6px 6px 2px 2px;
+	background: rgba(201, 162, 39, 0.42);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+.emerald-wv-time-bucket.is-best .emerald-wv-time-bucket-fill {
+	background: rgba(110, 196, 184, 0.95);
+}
+
+.emerald-wv-time-bucket.is-worst .emerald-wv-time-bucket-fill {
+	background: rgba(201, 162, 39, 0.72);
+}
+
+.emerald-wv-time-bucket.is-empty .emerald-wv-time-bucket-fill {
+	background: rgba(201, 162, 39, 0.12);
+}
+
+.emerald-wv-time-bucket-label {
+	font-size: 9px;
+	text-align: center;
+	color: var(--text-faint);
+}
+
+/* ── Effort Profile — Enhanced ───────────────────────── */
+
+.emerald-wv-profile-mode {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	margin-bottom: 16px;
+	font-size: 13px;
+}
+
+.emerald-wv-profile-mode-icon {
+	display: inline-flex;
+	color: var(--interactive-accent);
+}
+
+.emerald-wv-profile-mode-icon svg { width: 16px; height: 16px; }
+
+.emerald-wv-profile-mode-label { font-weight: 600; }
+
+.emerald-wv-profile-progress-text {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-left: auto;
+}
+
+.emerald-wv-profile-complete { color: var(--text-success); }
+
+/* Core Traits */
+.emerald-wv-trait-name-row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.emerald-wv-trait-icon {
+	display: inline-flex;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.emerald-wv-trait-icon svg { width: 14px; height: 14px; }
+
+/* Calibration Score */
+.emerald-wv-cal-score-row {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-cal-score-value {
+	font-size: 28px;
+	font-weight: 700;
+	color: var(--interactive-accent);
+}
+
+.emerald-wv-cal-score-desc {
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-cal-last {
+	font-size: 12px;
+	color: var(--text-faint);
+}
+
+/* Drift indicator enhanced */
+.emerald-wv-drift-header-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 4px;
+}
+
+.emerald-wv-drift-icon {
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
+.emerald-wv-drift-icon svg { width: 16px; height: 16px; }
+
+.emerald-wv-drift-low .emerald-wv-drift-icon { color: var(--text-success); }
+.emerald-wv-drift-pending .emerald-wv-drift-icon { color: var(--text-muted); }
+.emerald-wv-drift-moderate .emerald-wv-drift-icon { color: var(--text-warning); }
+.emerald-wv-drift-high .emerald-wv-drift-icon { color: var(--text-error); }
+
+.emerald-wv-drift-title { font-weight: 600; font-size: 14px; }
+
+/* Answer cards */
+.emerald-wv-answers-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 8px;
+}
+
+.emerald-wv-answer-card {
+	padding: 10px 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.emerald-wv-answer-question {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-bottom: 4px;
+	line-height: 1.3;
+	text-align: center;
+}
+
+.emerald-wv-answer-value {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-normal);
+	text-align: center;
+}
+
+/* Answer card — review nudge (D19 drift) */
+.emerald-wv-answer-card-nudge {
+	border-left: 3px solid var(--text-warning, #C09A4A);
+}
+
+.emerald-wv-answer-nudge {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-top: 6px;
+	font-size: 11px;
+	color: var(--text-warning, #C09A4A);
+}
+
+.emerald-wv-answer-nudge-icon {
+	display: flex;
+	align-items: center;
+}
+
+.emerald-wv-answer-nudge-icon svg {
+	width: 12px;
+	height: 12px;
+}
+
+/* Recovery Activities (Effort Profile) */
+.emerald-wv-recovery-section {
+	border-radius: 8px;
+	padding: 14px 16px;
+}
+
+.emerald-wv-recovery-grid {
+	display: flex !important;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.emerald-wv-recovery-card {
+	display: flex !important;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.emerald-wv-recovery-card:hover {
+	background: var(--background-modifier-hover);
+}
+
+.emerald-wv-recovery-card-filled {
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+}
+
+.emerald-wv-recovery-card-filled:hover {
+	border-color: var(--text-accent);
+}
+
+.emerald-wv-recovery-card-empty {
+	background: transparent;
+	border: 1px dashed var(--background-modifier-border-hover, var(--background-modifier-border));
+}
+
+.emerald-wv-recovery-card-empty:hover {
+	border-color: var(--text-muted);
+}
+
+.emerald-wv-recovery-name {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-normal);
+	line-height: 1.3;
+}
+
+.emerald-wv-recovery-desc {
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.emerald-wv-recovery-add-icon {
+	color: var(--text-faint);
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.emerald-wv-recovery-add-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.emerald-wv-recovery-placeholder {
+	font-size: 13px;
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.emerald-wv-recovery-note {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+/* Cross-link (Effort Profile → Data Center) */
+.emerald-wv-cross-link {
+	text-align: center;
+	margin-top: 16px;
+	margin-bottom: 8px;
+}
+
+.emerald-wv-cross-link-text {
+	font-size: 13px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: color 0.15s;
+}
+
+.emerald-wv-cross-link-text:hover {
+	color: var(--text-accent);
+}
+
+/* History intro */
+.emerald-wv-history-intro {
+	font-size: 13px;
+	color: var(--text-muted);
+	margin: 0 0 10px 0;
+}
+
+/* Profile actions */
+.emerald-wv-profile-actions-section { margin-top: 8px; }
+
+.emerald-wv-profile-btn-row {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.emerald-wv-profile-btn-row .emerald-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-btn-icon {
+	display: inline-flex;
+}
+
+.emerald-btn-icon svg { width: 14px; height: 14px; }
+
+/* ── Feedback Footer (Early Access) ──────────────────── */
+
+.emerald-feedback-footer {
+	margin-top: 12px;
+	padding-top: 8px;
+	border-top: 1px solid var(--background-modifier-border);
+	text-align: right;
+}
+
+.emerald-feedback-link {
+	font-size: 11px;
+	color: var(--text-faint);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.15s;
+}
+
+.emerald-feedback-link:hover {
+	color: var(--text-muted);
+}
+
+/* ── Onboarding ──────────────────────────────────────── */
+
+.emerald-onboarding-modal .modal-content { max-width: 520px; }
+
+/* Full-width sliders in onboarding + calibration modals */
+.emerald-onboarding-modal .emerald-slider,
+.emerald-calibration-modal .emerald-slider {
+	width: 100%;
+}
+
+.emerald-onboarding-modal .emerald-form-group,
+.emerald-calibration-modal .emerald-form-group {
+	width: 100%;
+}
+
+.emerald-onboard-progress {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0;
+	margin-bottom: 24px;
+	padding: 8px 0;
+}
+
+.emerald-onboard-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--background-modifier-border);
+	flex-shrink: 0;
+}
+
+.emerald-onboard-dot.is-active { background: var(--interactive-accent); transform: scale(1.3); }
+.emerald-onboard-dot.is-done { background: var(--text-success); }
+
+.emerald-onboard-line {
+	width: 24px;
+	height: 2px;
+	background: var(--background-modifier-border);
+}
+
+.emerald-onboard-line.is-done { background: var(--text-success); }
+
+.emerald-onboard-step-label {
+	text-align: center;
+	font-size: 11px;
+	color: var(--text-faint);
+	margin-bottom: 8px;
+}
+
+.emerald-onboard-icon {
+	text-align: center;
+	font-size: 48px;
+	margin-bottom: 8px;
+}
+
+.emerald-onboard-title {
+	text-align: center;
+	margin: 0 0 8px 0;
+}
+
+.emerald-onboard-desc {
+	text-align: center;
+	color: var(--text-muted);
+	font-size: 14px;
+	line-height: 1.5;
+	margin-bottom: 20px;
+}
+
+.emerald-onboard-profile-nudge {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	padding: 10px 14px;
+	font-size: 13px;
+}
+
+.emerald-onboard-done-actions {
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+}
+
+.emerald-onboard-features {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 24px;
+}
+
+.emerald-onboard-feature {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	padding: 8px 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+}
+
+.emerald-onboard-feature-icon { font-size: 20px; flex-shrink: 0; }
+
+.emerald-onboard-actions {
+	justify-content: center;
+}
+
+.emerald-btn-lg {
+	padding: 10px 24px;
+	font-size: 15px;
+}
+
+.emerald-onboard-input {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	font-family: inherit;
+	font-size: 14px;
+}
+
+.emerald-onboard-input:focus {
+	border-color: var(--interactive-accent);
+	outline: none;
+}
+
+.emerald-onboard-status {
+	padding: 8px;
+	text-align: center;
+	font-size: 13px;
+	border-radius: 4px;
+	min-height: 20px;
+}
+
+.emerald-onboard-status.is-loading { color: var(--text-muted); }
+.emerald-onboard-status.is-success { color: var(--text-success); background: rgba(76, 175, 80, 0.1); }
+.emerald-onboard-status.is-error { color: var(--text-error); background: rgba(244, 67, 54, 0.1); }
+
+.emerald-onboard-advanced-toggle {
+	font-size: 12px;
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.emerald-onboard-advanced-toggle:hover { color: var(--text-normal); }
+
+.emerald-onboard-explainer {
+	background: var(--background-secondary);
+	padding: 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	color: var(--text-muted);
+	text-align: center;
+	margin-bottom: 12px;
+}
+
+.emerald-onboard-project-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.emerald-onboard-project-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+}
+
+.emerald-onboard-project-info {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex: 1;
+	min-width: 0;
+}
+
+.emerald-onboard-project-note {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.emerald-onboard-note-path {
+	font-size: 10px;
+	color: var(--text-faint);
+	max-width: 120px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.emerald-onboard-project-name { flex: 1; font-size: 13px; }
+
+.emerald-onboard-add-row {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+.emerald-onboard-proj-name { flex: 1; }
+
+.emerald-onboard-select {
+	padding: 6px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	font-size: 13px;
+}
+
+.emerald-onboard-hint {
+	font-size: 12px;
+	color: var(--text-faint);
+	font-style: italic;
+	margin-top: 8px;
+}
+
+/* Tour */
+.emerald-onboard-tour {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.emerald-onboard-tour-step {
+	display: flex;
+	gap: 12px;
+	padding: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+}
+
+.emerald-onboard-tour-icon { font-size: 24px; flex-shrink: 0; }
+.emerald-onboard-tour-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.emerald-onboard-tour-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+/* Calibration enum buttons */
+.emerald-onboard-enum-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-top: 4px;
+}
+
+.emerald-onboard-enum-btn {
+	display: block;
+	width: 100%;
+	padding: 8px 12px;
+	font-size: 12px;
+	text-align: left;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.emerald-onboard-enum-btn:hover {
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-hover);
+}
+
+.emerald-onboard-enum-btn.is-active {
+	border-color: var(--interactive-accent);
+	background: rgba(76, 175, 80, 0.12);
+	color: var(--text-normal);
+	font-weight: 500;
+}
+
+.emerald-onboard-hint-top {
+	margin-bottom: 12px;
+}
+
+.emerald-calibration-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.emerald-actions-spacer {
+	flex: 1;
+}
+
+.emerald-btn-sm {
+	font-size: 11px;
+	padding: 4px 10px;
+	margin-bottom: 8px;
+}
+
+/* ── Offline Indicator ───────────────────────────────── */
+
+.emerald-offline-dot {
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--text-error);
+	margin-left: 6px;
+	animation: emerald-pulse 2s infinite;
+}
+
+@keyframes emerald-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.3; }
+}
+
+/* ── PRO Pill Badge ──────────────────────────────────── */
+
+span.emerald-pro-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 10px;
+	padding: 3px 8px;
+	border-radius: 999px;
+	background: var(--emerald-e2, #B8912E);
+	color: #151515;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	line-height: 1;
+	min-height: 20px;
+	flex-shrink: 0;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Sidebar Upgrade Card ────────────────────────────── */
+
+.emerald-sidebar-upgrade-card {
+	margin: 12px 0 4px;
+	padding: 10px 12px;
+	border-radius: 6px;
+	background: rgba(184, 145, 46, 0.08);
+	border: 1px solid rgba(184, 145, 46, 0.25);
+}
+
+.emerald-upgrade-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+}
+
+.emerald-upgrade-icon-svg {
+	display: flex;
+	align-items: center;
+}
+
+.emerald-upgrade-icon-svg svg {
+	width: 14px;
+	height: 14px;
+	color: var(--emerald-e2, #B8912E);
+}
+
+.emerald-upgrade-title {
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.emerald-upgrade-desc {
+	font-size: 9px;
+	color: var(--text-muted);
+	margin: 0 0 8px;
+	line-height: 1.4;
+}
+
+.emerald-btn-upgrade {
+	display: inline-block;
+	width: fit-content;
+	padding: 4px 10px;
+	border-radius: 4px;
+	background: var(--emerald-e2, #B8912E) !important;
+	color: #000 !important;
+	font-size: 10px;
+	font-weight: 600;
+	text-decoration: none;
+	text-align: center;
+	cursor: pointer;
+	transition: background 0.15s;
+	margin: 0 auto;
+}
+
+.emerald-btn-upgrade:hover {
+	background: #C9A237;
+	text-decoration: none;
+}
+
+.emerald-wv-pro-feature-text {
+	display: inline-block;
+	margin-left: 4px;
+}
+
+/* ── Workspace View Upgrade Gate ─────────────────────── */
+
+.emerald-wv-upgrade-gate {
+	text-align: center;
+	padding: 40px 24px;
+	max-width: 400px;
+	margin: 24px auto;
+}
+
+.emerald-wv-upgrade-icon {
+	margin-bottom: 16px;
+}
+
+.emerald-wv-upgrade-icon svg {
+	width: 48px;
+	height: 48px;
+	color: var(--emerald-e2, #B8912E);
+}
+
+.emerald-wv-upgrade-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--text-normal);
+	margin: 0 0 8px;
+}
+
+.emerald-wv-upgrade-desc {
+	font-size: 12px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	margin: 0 0 16px;
+}
+
+.emerald-wv-upgrade-features {
+	text-align: left;
+	list-style: none;
+	padding: 0;
+	margin: 0 0 20px;
+}
+
+.emerald-wv-upgrade-features li {
+	padding: 4px 0;
+	font-size: 11px;
+	color: var(--text-muted);
+	line-height: 1.4;
+}
+
+.emerald-wv-upgrade-features li::before {
+	content: '✓ ';
+	color: var(--emerald-e2, #B8912E);
+	font-weight: 600;
+}
+
+.emerald-wv-upgrade-annual {
+	font-size: 11px;
+	color: var(--text-faint);
+	margin-top: 8px;
+}
+
+/* ── About View Pro Teaser ───────────────────────────── */
+
+.emerald-wv-pro-teaser {
+	margin-top: 24px;
+	padding: 16px;
+	border-radius: 6px;
+	background: rgba(184, 145, 46, 0.06);
+	border: 1px solid rgba(184, 145, 46, 0.2);
+}
+
+.emerald-wv-pro-feature-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px 12px;
+	margin: 10px 0 16px;
+	align-items: start;
+}
+
+.emerald-wv-pro-feature-cell {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	padding: 6px 0;
+	font-size: 11px;
+	line-height: 1.45;
+	color: var(--text-normal);
+}
+
+.emerald-wv-pro-cta-row {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	padding: 8px 0 4px;
+	border-top: 1px solid rgba(184, 145, 46, 0.15);
+	margin-top: 8px;
+}
+
+.emerald-wv-pro-feature-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.emerald-wv-pro-feature-icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.emerald-wv-pro-feature-icon svg {
+	width: 14px;
+	height: 14px;
+	color: var(--emerald-e2, #B8912E) !important;
+}
+
+/* ── Runaway Session Modal ── */
+.emerald-modal-btn-row {
+	display: flex;
+	gap: 10px;
+	margin-top: 16px;
+	justify-content: flex-end;
+}
+.emerald-runaway-prompt {
+	font-weight: 500;
+	margin-top: 12px;
+}
+
+/* ── Burnout score explainer ── */
+.emerald-wv-burnout-score-label-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.emerald-wv-burnout-score-info {
+	cursor: pointer;
+	color: var(--text-muted);
+	display: inline-flex;
+	opacity: 0.7;
+	transition: opacity 0.15s;
+}
+.emerald-wv-burnout-score-info:hover { opacity: 1; }
+.emerald-wv-burnout-score-info svg { width: 14px; height: 14px; }
+.emerald-wv-burnout-score-explainer {
+	font-size: 11px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	padding: 8px 12px;
+	margin-top: 8px;
+	background: var(--background-secondary-alt, var(--background-secondary));
+	border-radius: 4px;
+	border-left: 2px solid var(--text-faint);
+}
+
+/* ── Data Center Pro teaser banner ── */
+.emerald-wv-dc-pro-teaser {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	margin-top: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid rgba(201, 162, 39, 0.25);
+	flex-wrap: wrap;
+}
+.emerald-wv-dc-pro-teaser-icon {
+	color: #C9A227;
+	display: flex;
+	flex-shrink: 0;
+}
+.emerald-wv-dc-pro-teaser-icon svg { width: 16px; height: 16px; }
+.emerald-wv-dc-pro-teaser-text {
+	font-size: 12px;
+	color: var(--text-normal);
+	flex: 1;
+}
+.emerald-wv-dc-pro-teaser-detail {
+	color: var(--text-muted);
+}
+.emerald-wv-dc-pro-teaser-link {
+	font-size: 12px;
+	font-weight: 600;
+	color: #C9A227;
+	text-decoration: none;
+	white-space: nowrap;
+}
+.emerald-wv-dc-pro-teaser-link:hover {
+	text-decoration: underline;
+}
+
+
+/* About EMRALD page — new structure */
+.emerald-wv-about-hero {
+  padding: 16px 20px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid var(--background-modifier-border);
+}
+.emerald-wv-about-hero-tagline {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+.emerald-wv-about-hero-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+.emerald-wv-about-hero-mission {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--emerald-e2, #B8912E);
+  margin: 10px 0 0;
+  line-height: 1.6;
+  border-left: 3px solid var(--emerald-e2, #B8912E);
+  padding-left: 10px;
+}
+.emerald-wv-about-specstrip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.emerald-wv-about-speckchip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--background-primary);
+  border: 1px solid var(--emerald-e2, #B8912E);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--emerald-e2, #B8912E);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.emerald-wv-about-speckchip-icon {
+  display: inline-flex;
+  align-items: center;
+}
+.emerald-wv-about-speckchip-icon svg {
+  width: 12px;
+  height: 12px;
+}
+.emerald-wv-about-section {
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 4px;
+}
+.emerald-wv-about-section:last-child {
+  border-bottom: none;
+}
+.emerald-wv-about-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px 6px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px;
+}
+.emerald-wv-about-section-header:hover {
+  background: var(--background-secondary);
+}
+.emerald-wv-about-section-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.emerald-wv-about-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--emerald-e2, #B8912E);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+.emerald-wv-about-section-icon svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2;
+}
+  stroke-width: 2;
+}
+.emerald-wv-about-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin: 0;
+  line-height: 1;
+}
+.emerald-wv-about-section-content {
+  padding: 0 8px 12px 32px;
+}
+.emerald-wv-about-p {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-normal);
+  margin: 6px 0;
+}
+.emerald-wv-about-bullet-list {
+  margin: 6px 0;
+  padding-left: 18px;
+}
+.emerald-wv-about-bullet-list li {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-normal);
+  margin-bottom: 5px;
+  padding-left: 4px;
+}
+.emerald-wv-about-numbered-list {
+  margin: 6px 0;
+  padding-left: 24px;
+  list-style: decimal;
+}
+.emerald-wv-about-numbered-list li {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-normal);
+  margin-bottom: 6px;
+}
+.emerald-wv-about-link-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.emerald-wv-about-link {
+  font-size: 13px;
+  color: var(--text-accent);
+  text-decoration: none;
+}
+.emerald-wv-about-link:hover {
+  text-decoration: underline;
+}
+.emerald-wv-about-thesis {
+  margin-top: 12px;
+}
+.emerald-wv-about-thesis blockquote {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-muted);
+  border-left: 3px solid var(--interactive-accent);
+  padding: 8px 14px;
+  margin: 0;
+  background: var(--background-secondary);
+  border-radius: 4px;
+  line-height: 1.6;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   GOLD TIER UI/UX — Animations, Transitions & Polish
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Fade-in animation (cards, sections, modals) ─────── */
+
+@keyframes emerald-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.emerald-fade-in {
+  animation: emerald-fade-in 0.25s ease-out both;
+}
+
+/* Staggered card entrance — each card delays slightly */
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(1) { animation: emerald-fade-in 0.2s ease-out 0.05s both; }
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(2) { animation: emerald-fade-in 0.2s ease-out 0.10s both; }
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(3) { animation: emerald-fade-in 0.2s ease-out 0.15s both; }
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(4) { animation: emerald-fade-in 0.2s ease-out 0.20s both; }
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(5) { animation: emerald-fade-in 0.2s ease-out 0.25s both; }
+.emerald-wv-metric-grid .emerald-wv-metric-card:nth-child(n+6) { animation: emerald-fade-in 0.2s ease-out 0.30s both; }
+
+/* ── Section collapse/expand transitions ─────────────── */
+
+.emerald-section-content {
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.35s ease;
+  opacity: 1;
+}
+
+.emerald-section.is-collapsed .emerald-section-content {
+  opacity: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.emerald-section-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.emerald-section.is-collapsed .emerald-section-arrow {
+  transform: rotate(-90deg);
+}
+
+/* ── Metric card hover polish ────────────────────────── */
+
+.emerald-wv-metric-card {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.emerald-wv-metric-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.emerald-wv-metric-card.is-expanded {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Modal entrance ──────────────────────────────────── */
+
+@keyframes emerald-modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.emerald-modal .modal-content,
+.emerald-checkin-modal .modal-content,
+.emerald-receipt-modal .modal-content,
+.emerald-calibration-modal .modal-content,
+.emerald-reassessment-modal .modal-content,
+.emerald-onboarding-modal .modal-content {
+  animation: emerald-modal-in 0.2s ease-out;
+}
+
+/* ── Button press feedback ─────────────────────────── */
+
+.emerald-btn {
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+}
+
+.emerald-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── "Your Story" summary card ───────────────────────── */
+
+.emerald-wv-story-card {
+  padding: 16px 20px;
+  margin: 12px 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--background-secondary) 0%, var(--background-primary) 100%);
+  border: 1px solid var(--background-modifier-border);
+  border-left: 4px solid var(--interactive-accent);
+}
+
+.emerald-wv-story-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.emerald-wv-story-icon {
+  color: var(--interactive-accent);
+  display: flex;
+}
+
+.emerald-wv-story-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.emerald-wv-story-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-normal);
+}
+
+.emerald-wv-story-body ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.emerald-wv-story-body li {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+/* Fallback for paragraph rendering */
+.emerald-wv-story-body p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* ── Recovery question in Daily Check-in ───────────── */
+
+.emerald-form-separator {
+  margin: 16px 0 8px;
+}
+
+.emerald-form-separator hr {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.emerald-radio-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.emerald-btn-radio {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.emerald-btn-radio:hover {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.emerald-btn-radio.is-active {
+  border-color: #2D7A4A;
+  background: rgba(45, 122, 74, 0.1);
+  color: #2D7A4A;
+  font-weight: 600;
+}
+
+/* ── Workspace view category stagger ───────────────── */
+
+.emerald-wv-dc-category {
+  animation: emerald-fade-in 0.3s ease-out both;
+}
+
+.emerald-wv-dc-category:nth-child(1) { animation-delay: 0s; }
+.emerald-wv-dc-category:nth-child(2) { animation-delay: 0.1s; }
+.emerald-wv-dc-category:nth-child(3) { animation-delay: 0.2s; }
+.emerald-wv-dc-category:nth-child(4) { animation-delay: 0.3s; }
+
+/* ── Enhanced sidebar project card hover ───────────── */
+
+.emerald-project-card {
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.emerald-project-card:hover {
+  background: var(--background-secondary-alt);
+}
+
+/* ── Sidebar load animation ──────────────────────────── */
+
+.emrald-sidebar > .emerald-section {
+  animation: emerald-fade-in 0.3s ease-out both;
+}
+
+.emrald-sidebar > .emerald-section:nth-child(2) { animation-delay: 0.05s; }
+.emrald-sidebar > .emerald-section:nth-child(3) { animation-delay: 0.10s; }
+.emrald-sidebar > .emerald-section:nth-child(4) { animation-delay: 0.15s; }
+
+/* ── Accessibility: focus-visible outlines ───────────── */
+
+.emerald-btn:focus-visible,
+.emerald-wv-filter-btn:focus-visible,
+.emerald-wv-metric-card:focus-visible,
+.emerald-btn-radio:focus-visible,
+.emerald-section-header:focus-visible,
+.emerald-workspace-btn:focus-visible,
+.emerald-btn-tiny:focus-visible,
+.emerald-section-action:focus-visible,
+.emerald-feedback-link:focus-visible,
+.emerald-project-card:focus-visible,
+.emerald-inactive-header:focus-visible,
+.emerald-inactive-item:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: 2px;
+}
+
+/* ── Celebration Modal ───────────────────────────────── */
+
+.emerald-celebration-modal {
+	text-align: center;
+}
+
+.emerald-celebration-icon {
+	font-size: 48px;
+	line-height: 1;
+	margin-bottom: 8px;
+}
+
+.emerald-celebration-modal h2 {
+	color: var(--emerald-e1);
+}
+
+.emerald-celebration-body {
+	text-align: left;
+	margin-bottom: 16px;
+}
+
+.emerald-celebration-body p {
+	font-size: 14px;
+	line-height: 1.5;
+	margin-bottom: 10px;
+	color: var(--text-normal);
+}
+
+.emerald-celebration-context {
+	background: rgba(45, 122, 74, 0.06);
+	border-left: 3px solid var(--emerald-e1);
+	padding: 8px 12px;
+	border-radius: 0 4px 4px 0;
+	font-size: 13px !important;
+	color: var(--text-muted) !important;
+}
+
+.emerald-celebration-encouragement {
+	font-style: italic;
+	color: var(--text-muted) !important;
+	font-size: 13px !important;
+}
+
+.emerald-celebration-actions {
+	justify-content: center;
+}
+
+/* ── Welcome Back Modal ──────────────────────────────── */
+
+.emerald-welcomeback-modal {
+	text-align: center;
+}
+
+.emerald-welcomeback-icon {
+	font-size: 40px;
+	line-height: 1;
+	margin-bottom: 8px;
+}
+
+.emerald-welcomeback-modal h2 {
+	color: var(--emerald-e2);
+}
+
+.emerald-welcomeback-body {
+	text-align: left;
+	margin-bottom: 16px;
+}
+
+.emerald-welcomeback-body p {
+	font-size: 14px;
+	line-height: 1.5;
+	margin-bottom: 10px;
+	color: var(--text-normal);
+}
+
+.emerald-welcomeback-summary {
+	background: var(--background-secondary);
+	border-radius: 4px;
+	padding: 12px;
+	margin-bottom: 12px;
+}
+
+.emerald-welcomeback-stat {
+	display: flex;
+	justify-content: space-between;
+	padding: 3px 0;
+	font-size: 13px;
+}
+
+.emerald-welcomeback-stat-label {
+	color: var(--text-muted);
+}
+
+.emerald-welcomeback-stat-value {
+	font-weight: 600;
+}
+
+.emerald-welcomeback-encouragement {
+	font-style: italic;
+	color: var(--text-muted) !important;
+	font-size: 13px !important;
+}
+
+.emerald-welcomeback-actions {
+	justify-content: center;
+}

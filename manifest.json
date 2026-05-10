@@ -1,0 +1,10 @@
+{
+  "id": "emrald",
+  "name": "EMRALD",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Track what work costs you: effort, flow, energy, and burnout risk, directly in Obsidian.",
+  "author": "Effort Mastery LLC",
+  "authorUrl": "https://effortmastery.com",
+  "isDesktopOnly": false
+}
