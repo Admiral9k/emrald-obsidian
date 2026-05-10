@@ -86,21 +86,21 @@ export class EmraldSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'EMRALD Settings' });
+		new Setting(containerEl).setName('General').setHeading();
 
 		// ── Account ─────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Account' });
+		new Setting(containerEl).setName('Account').setHeading();
 
 		new Setting(containerEl)
-			.setName('API Key')
+			.setName('API key')
 			.setDesc('Your EMRALD API key from effortmastery.com')
 			.addText(text => text
 				.setPlaceholder('em_...')
 				.setValue(this.plugin.settings.apiKey)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.apiKey = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				})
 				.inputEl.type = 'password');
 
@@ -109,25 +109,26 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('EMRALD API endpoint')
 			.addText(text => text
 				.setValue(this.plugin.settings.apiUrl)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.apiUrl = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// Connection status
 		const statusSetting = new Setting(containerEl)
-			.setName('Connection Status')
+			.setName('Connection status')
 			.setDesc('Testing...')
 			.addButton(btn => btn
 				.setButtonText('Re-test')
-				.onClick(async () => {
+				.onClick(() => {
 					statusSetting.setDesc('Testing...');
-					const resp = await this.plugin.apiClient.testConnection();
-					statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected ✓');
+					void this.plugin.apiClient.testConnection().then(resp => {
+						statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected ✓');
+					});
 				}));
 
 		if (this.plugin.settings.apiKey) {
-			this.plugin.apiClient.testConnection().then(resp => {
+			void this.plugin.apiClient.testConnection().then(resp => {
 				statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected ✓');
 			});
 		} else {
@@ -136,28 +137,28 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		// ── Folders ─────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Folders' });
+		new Setting(containerEl).setName('Folders').setHeading();
 
 		new Setting(containerEl)
-			.setName('Active Projects Folder')
+			.setName('Active projects folder')
 			.setDesc('Folder path for active project notes')
 			.addText(text => text
 				.setPlaceholder('Active')
 				.setValue(this.plugin.settings.activeFolderPath)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.activeFolderPath = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
-			.setName('Inactive Projects Folder')
+			.setName('Inactive projects folder')
 			.setDesc('Folder path for inactive/paused project notes')
 			.addText(text => text
 				.setPlaceholder('Inactive')
 				.setValue(this.plugin.settings.inactiveFolderPath)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.inactiveFolderPath = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
@@ -165,9 +166,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('Prompt when new notes appear in Active folder')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.autoDetectNotes)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.autoDetectNotes = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
@@ -175,37 +176,37 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('Prompt when notes move between Active/Inactive')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.autoDetectMoves)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.autoDetectMoves = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// ── Timeblock ───────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Timeblock' });
+		new Setting(containerEl).setName('Timeblock').setHeading();
 
 		new Setting(containerEl)
 			.setName('Show overtime indicator')
 			.setDesc('Yellow bar + counter when exceeding daily hours')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showOvertime)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showOvertime = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// ── Notifications ───────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Notifications' });
+		new Setting(containerEl).setName('Notifications').setHeading();
 
 		new Setting(containerEl)
 			.setName('Burnout warning modals')
 			.setDesc('Show burnout warning modals when D8 crosses threshold')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.burnoutModalEnabled)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.burnoutModalEnabled = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
@@ -215,14 +216,14 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.setLimits(5, 60, 5)
 				.setValue(this.plugin.settings.insightRotationSeconds)
 				.setDynamicTooltip()
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.insightRotationSeconds = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// ── Display ─────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Display' });
+		new Setting(containerEl).setName('Display').setHeading();
 
 		new Setting(containerEl)
 			.setName('Timer style')
@@ -232,14 +233,14 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.addOption('analog', 'Analog (post-MVP)')
 				.addOption('timetimer', 'Time Timer (post-MVP)')
 				.setValue(this.plugin.settings.timerStyle)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.timerStyle = value as 'digital' | 'analog' | 'timetimer';
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// ── Data ────────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Data' });
+		new Setting(containerEl).setName('Data').setHeading();
 
 		new Setting(containerEl)
 			.setName('Sync interval')
@@ -248,9 +249,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.setLimits(1, 30, 1)
 				.setValue(this.plugin.settings.syncIntervalMinutes)
 				.setDynamicTooltip()
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.syncIntervalMinutes = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
@@ -258,9 +259,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('Write EMRALD metadata to note frontmatter')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.frontmatterEnabled)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.frontmatterEnabled = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerEl)
@@ -268,9 +269,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('Log API calls and state changes to console')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.debugLogging)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.debugLogging = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// Offline queue diagnostics
@@ -286,10 +287,10 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.onClick(() => this.display()))
 			.addButton(btn => btn
 				.setWarning()
-				.setButtonText('Clear Queue')
-				.onClick(async () => {
+				.setButtonText('Clear queue')
+				.onClick(() => {
 					queue.clear();
-					await this.plugin.saveData(this.plugin.settings);
+					void this.plugin.saveData(this.plugin.settings);
 					new Notice('Offline queue cleared.');
 					this.display();
 				}));
@@ -303,9 +304,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 					.setDesc(desc)
 					.addButton(btn => btn
 						.setButtonText('Remove')
-						.onClick(async () => {
+						.onClick(() => {
 							queue.remove(action.id);
-							await this.plugin.saveData(this.plugin.settings);
+							void this.plugin.saveData(this.plugin.settings);
 							this.display();
 						}));
 			}
@@ -313,7 +314,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		// ── Privacy ─────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Privacy' });
+		new Setting(containerEl).setName('Privacy').setHeading();
 
 		new Setting(containerEl)
 			.setName('Help improve EMRALD')
@@ -324,20 +325,19 @@ export class EmraldSettingTab extends PluginSettingTab {
 			)
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.researchOptIn)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.researchOptIn = value;
-					await this.plugin.saveSettings();
-					try {
-						await this.plugin.apiClient.updatePreferences({ research_opt_in: value });
+					void this.plugin.saveSettings();
+					void this.plugin.apiClient.updatePreferences({ research_opt_in: value }).then(() => {
 						new Notice(value ? 'Thank you! Research opt-in saved.' : 'Research opt-in removed.');
-					} catch {
+					}).catch(() => {
 						new Notice('Failed to save preference — try again.');
-					}
+					});
 				}));
 
 		// ── Digest ──────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Digest' });
+		new Setting(containerEl).setName('Digest').setHeading();
 
 		new Setting(containerEl)
 			.setName('Digest delivery day')
@@ -351,10 +351,10 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.addOption('friday', 'Friday')
 				.addOption('saturday', 'Saturday')
 				.setValue(this.plugin.settings.digestDay)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.digestDay = value as EmraldSettings['digestDay'];
-					await this.plugin.saveSettings();
-					await this.plugin.syncDigestPreferences();
+					void this.plugin.saveSettings();
+					void this.plugin.syncDigestPreferences();
 				}));
 
 		new Setting(containerEl)
@@ -365,41 +365,41 @@ export class EmraldSettingTab extends PluginSettingTab {
 				text
 					.setPlaceholder('09:00')
 					.setValue(this.plugin.settings.digestTime)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.digestTime = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 						if (debounce) clearTimeout(debounce);
 						debounce = setTimeout(() => {
-							this.plugin.syncDigestPreferences();
+							void this.plugin.syncDigestPreferences();
 						}, 700);
 					});
 			});
 
 		// ── Onboarding ──────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Setup' });
+		new Setting(containerEl).setName('Setup').setHeading();
 
 		new Setting(containerEl)
 			.setName('Re-run onboarding')
 			.setDesc('Reset and show the first-time setup wizard again')
 			.addButton(btn => btn
-				.setButtonText('Reset Onboarding')
-				.onClick(async () => {
+				.setButtonText('Reset onboarding')
+				.onClick(() => {
 					this.plugin.settings.onboardingComplete = false;
 					this.plugin.settings.tourDismissed = false;
 					this.plugin.settings.advancedProfileCompleted = false;
-					await this.plugin.saveSettings();
-					// Open onboarding
-					const { OnboardingModal } = await import('./onboarding/onboarding');
-					const modal = new OnboardingModal(this.plugin.app, this.plugin, () => {
-						this.plugin.activateView();
+					void this.plugin.saveSettings().then(async () => {
+						const { OnboardingModal } = await import('./onboarding/onboarding');
+						const modal = new OnboardingModal(this.plugin.app, this.plugin, () => {
+							void this.plugin.activateView();
+						});
+						modal.open();
 					});
-					modal.open();
 				}));
 
 		// ── Feedback & Support ──────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Feedback & Support' });
+		new Setting(containerEl).setName('Feedback & support').setHeading();
 
 		new Setting(containerEl)
 			.setName('Send feedback')

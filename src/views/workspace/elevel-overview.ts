@@ -12,30 +12,26 @@ import { TrackedItem } from '../../api/client';
 
 const E_LEVEL_PCT: Record<string, number> = { E1: 25, E2: 50, E3: 75, E4: 100 };
 
-const E_LEVEL_META: Record<string, { label: string; desc: string; detail: string; color: string }> = {
+const E_LEVEL_META: Record<string, { label: string; desc: string; detail: string }> = {
 	E1: {
 		label: 'E1 — Light',
 		desc: '25% of your daily hours',
-		detail: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
-		color: '#2D7A4A'
+		detail: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.'
 	},
 	E2: {
 		label: 'E2 — Moderate',
 		desc: '50% of your daily hours',
-		detail: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.',
-		color: '#B8912E'
+		detail: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.'
 	},
 	E3: {
 		label: 'E3 — Demanding',
 		desc: '75% of your daily hours',
-		detail: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.',
-		color: '#C06A30'
+		detail: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.'
 	},
 	E4: {
 		label: 'E4 — Maximum',
 		desc: '100% of your daily hours',
-		detail: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.',
-		color: '#B54545'
+		detail: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.'
 	}
 };
 
@@ -47,14 +43,14 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	private projectContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'E-Level Overview');
+		super(leaf, plugin, 'E-level overview');
 	}
 
 	getViewType(): string { return VIEW_ELEVEL_OVERVIEW; }
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'E-Level Overview', 'Your projects by effort level', 'bar-chart-2');
+		this.renderHeader(container, 'E-level overview', 'Your projects by effort level', 'bar-chart-2');
 
 		// Fetch data concurrently
 		let itemsResp, sessionsResp, availResp, suggestionsResp;
@@ -97,7 +93,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			this.availableHours = todayRow?.available_hours ?? 4;
 		} else if (availData && typeof availData === 'object' && 'effective_today' in availData) {
 			// Future-proof: if API ever returns the structured Availability object
-			this.availableHours = (availData as any).effective_today ?? 4;
+			this.availableHours = ((availData as unknown as Record<string, unknown>).effective_today as number) ?? 4;
 		} else {
 			this.availableHours = 4;
 		}
@@ -141,7 +137,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		setIcon(linkIcon, 'arrow-right');
 		linkEl.addEventListener('click', (e) => {
 			e.preventDefault();
-			this.plugin.openWorkspaceView(VIEW_ABOUT);
+			void this.plugin.openWorkspaceView(VIEW_ABOUT);
 		});
 	}
 
@@ -178,7 +174,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const card = grid.createEl('div', {
 				cls: `emerald-wv-elevel-card ${this.activeFilter === level ? 'is-active' : ''}`
 			});
-			card.style.borderLeftColor = meta.color;
+			card.dataset.level = level;
 
 			// Left side: level info
 			const info = card.createEl('div', { cls: 'emerald-wv-elevel-info' });
@@ -190,11 +186,11 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const infoBtn = levelLabel.createEl('span', { cls: 'emerald-wv-elevel-info-btn', attr: { 'aria-label': `About ${level}` } });
 			setIcon(infoBtn, 'info');
 			const detailEl = info.createEl('div', { cls: 'emerald-wv-elevel-detail', text: meta.detail });
-			detailEl.style.display = 'none';
+			detailEl.addClass('emrald-hidden');
 			infoBtn.addEventListener('click', (e) => {
 				e.stopPropagation(); // Don't trigger card filter
-				const isVisible = detailEl.style.display !== 'none';
-				detailEl.style.display = isVisible ? 'none' : 'block';
+				const isVisible = !detailEl.hasClass('emrald-hidden');
+				isVisible ? detailEl.addClass('emrald-hidden') : detailEl.removeClass('emrald-hidden');
 				infoBtn.toggleClass('is-expanded', !isVisible);
 			});
 
@@ -216,7 +212,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			}
 
 			// Click to filter
-			card.style.cursor = 'pointer';
+			card.addClass('emrald-clickable');
 			card.addEventListener('click', () => {
 				if (this.activeFilter === level) {
 					this.activeFilter = null; // Toggle off
@@ -242,7 +238,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'pie-chart');
-		headerRow.createEl('h3', { text: 'Daily Allocation' });
+		headerRow.createEl('h3', { text: 'Daily allocation' });
 
 		// Bar
 		const barOuter = section.createEl('div', { cls: 'emerald-wv-alloc-bar-outer' });
@@ -340,9 +336,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// Status dot
 			const dotCell = row.createEl('td');
 			const dot = dotCell.createEl('span', { cls: 'emerald-phase-dot' });
-			dot.style.background = item.status === 'active' ? 'var(--text-success)'
-				: item.status === 'completed' ? 'var(--interactive-accent)'
-				: 'var(--text-muted)';
+			dot.dataset.status = item.status ?? 'unknown';
 
 			// Name (clickable → opens note in Obsidian)
 			const nameCell = row.createEl('td');
@@ -365,7 +359,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const levelCell = row.createEl('td');
 			const levelMeta = E_LEVEL_META[item.effort_level];
 			const levelBadge = levelCell.createEl('span', { cls: 'emerald-wv-level-badge', text: item.effort_level });
-			levelBadge.style.color = levelMeta?.color ?? 'var(--text-muted)';
+			levelBadge.dataset.level = item.effort_level ?? '';
 
 			// Today's time
 			const todayMin = this.minutesByItem.get(item.id) ?? 0;
@@ -398,8 +392,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	private openNote(item: TrackedItem) {
 		if (item.obsidian_note_path) {
 			const file = this.plugin.app.vault.getAbstractFileByPath(item.obsidian_note_path);
-			if (file) {
-				this.plugin.app.workspace.getLeaf(false).openFile(file as TFile);
+			if (file instanceof TFile) {
+				void this.plugin.app.workspace.getLeaf(false).openFile(file);
 			} else {
 				new Notice(`Note not found: ${item.obsidian_note_path}`);
 			}

@@ -3,7 +3,7 @@
 // On save: updates answers via PATCH /profile/questions, then snapshots
 // the old profile via POST /profile/reassessment.
 
-import { App, Modal, Notice, setIcon } from 'obsidian';
+import { App, Modal, setIcon } from 'obsidian';
 import EmraldPlugin from '../../main';
 
 // ── Question Definitions ────────────────────────────────
@@ -322,7 +322,7 @@ export class ReassessmentModal extends Modal {
 		// Header
 		const headerIcon = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
 		setIcon(headerIcon, 'refresh-cw');
-		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: isInAdvancedSection ? 'Reassess — Advanced Profile' : 'Reassess Your Profile' });
+		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: isInAdvancedSection ? 'Reassess — advanced profile' : 'Reassess your profile' });
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: isInAdvancedSection
@@ -446,9 +446,9 @@ export class ReassessmentModal extends Modal {
 			// Last page — Save & Reassess
 			const saveBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Save & Reassess'
+				text: 'Save & reassess'
 			});
-			saveBtn.addEventListener('click', () => this.saveAndReassess());
+			saveBtn.addEventListener('click', () => { void this.saveAndReassess(); });
 		}
 
 		// Cancel — always available
@@ -498,7 +498,7 @@ export class ReassessmentModal extends Modal {
 			// Success screen
 			const doneIcon = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
 			setIcon(doneIcon, 'check-circle');
-			contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile Updated!' });
+			contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile updated!' });
 
 			const changedCount = Object.keys(changed).length;
 			const message = changedCount > 0

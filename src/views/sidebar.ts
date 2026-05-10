@@ -11,12 +11,12 @@ export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
 
 export class EmraldSidebarView extends ItemView {
 	plugin: EmraldPlugin;
-	private timeblock: TimeblockComponent | null = null;
+	timeblock: TimeblockComponent | null = null;
 	private projects: ProjectsComponent | null = null;
 	private em: EMComponent | null = null;
 	private tierUnsubscribe: (() => void) | null = null;
 	private _startingSession = false;
-	private _stoppingSession = false;
+	_stoppingSession = false;
 	private _loadingTodayData = false;
 
 	/** Smoothly collapse/expand a section by animating to the real content height */
@@ -24,12 +24,12 @@ export class EmraldSidebarView extends ItemView {
 		const isCollapsing = !section.hasClass('is-collapsed');
 		if (isCollapsing) {
 			// Set explicit height from current scrollHeight so transition has a start value
-			content.style.maxHeight = content.scrollHeight + 'px';
-			content.style.overflow = 'hidden';
+			content.setCssProps({ '--section-max-height': content.scrollHeight + 'px' });
+			content.addClass('is-animating');
 			// Force reflow so the browser registers the starting max-height
 			void content.offsetHeight;
 			section.addClass('is-collapsed');
-			content.style.maxHeight = '0';
+			content.setCssProps({ '--section-max-height': '0px' });
 			arrowEl.textContent = '▸';
 			if (headerEl) headerEl.setAttribute('aria-expanded', 'false');
 			// Clean up after transition
@@ -40,14 +40,14 @@ export class EmraldSidebarView extends ItemView {
 		} else {
 			section.removeClass('is-collapsed');
 			// Temporarily set explicit max-height for the expand animation
-			content.style.maxHeight = content.scrollHeight + 'px';
-			content.style.overflow = 'hidden';
+			content.setCssProps({ '--section-max-height': content.scrollHeight + 'px' });
+			content.addClass('is-animating');
 			arrowEl.textContent = '▼';
 			if (headerEl) headerEl.setAttribute('aria-expanded', 'true');
 			// After transition, remove inline max-height so content can grow naturally
 			const onEnd = () => {
-				content.style.maxHeight = '';
-				content.style.overflow = '';
+				content.setCssProps({ '--section-max-height': '' });
+				content.removeClass('is-animating');
 				content.removeEventListener('transitionend', onEnd);
 			};
 			content.addEventListener('transitionend', onEnd);
@@ -83,10 +83,10 @@ export class EmraldSidebarView extends ItemView {
 		// sidebar refreshes triggered by reconnect, so loadTodayData()
 		// can detect "same session already running" and skip re-initialization.
 		if (this.timeblock?.state?.activeSession) {
-			(this.plugin as any)._activeSessionSnapshot = this.timeblock.serializeActiveSession();
+			(this.plugin as unknown as Record<string, unknown>)._activeSessionSnapshot = this.timeblock.serializeActiveSession();
 			// Also snapshot workedMinutes so the green bar / summary don't
 			// reset to 0 if the API is unreachable after a sidebar rebuild.
-			(this.plugin as any)._workedMinutesSnapshot = this.timeblock.state.workedMinutes;
+			(this.plugin as unknown as Record<string, unknown>)._workedMinutesSnapshot = this.timeblock.state.workedMinutes;
 		}
 
 		container.empty();
@@ -220,7 +220,7 @@ export class EmraldSidebarView extends ItemView {
 			cls: 'emerald-btn emerald-btn-secondary emerald-retry-btn',
 			text: 'Retry'
 		});
-		retryBtn.addEventListener('click', () => this.onOpen());
+		retryBtn.addEventListener('click', () => { void this.onOpen(); });
 	}
 
 	private renderSidebar(container: Element) {
@@ -231,17 +231,17 @@ export class EmraldSidebarView extends ItemView {
 
 		// Offline indicator (hidden by default, shown by offline queue state)
 		const offlineDot = headerRow.createEl('span', { cls: 'emerald-offline-dot' });
-		offlineDot.style.display = 'none';
+		offlineDot.addClass('emrald-hidden');
 		offlineDot.title = 'Offline — actions are queued';
 
 		// Check offline state
 		if (this.plugin.offlineQueue && !this.plugin.offlineQueue.isOnline) {
-			offlineDot.style.display = 'inline-block';
+			offlineDot.removeClass('emrald-hidden');
 		}
 
 		// Notification banner (populated by loadNotifications)
 		const notifBanner = container.createEl('div', { cls: 'emerald-notif-banner' });
-		notifBanner.style.display = 'none';
+		notifBanner.addClass('emrald-hidden');
 
 		// Three collapsible sections
 		this.renderTimeblockSection(container);
@@ -260,7 +260,7 @@ export class EmraldSidebarView extends ItemView {
 		const valid = resp.data.filter((n: any) => n.title?.trim() || n.body?.trim());
 		if (valid.length === 0) return;
 
-		bannerEl.style.display = 'block';
+		bannerEl.removeClass('emrald-hidden');
 		bannerEl.empty();
 
 		for (const notif of valid.slice(0, 3)) {
@@ -312,11 +312,11 @@ export class EmraldSidebarView extends ItemView {
 
 		// Wire up event handlers
 		this.timeblock.onStartRequest = () => this.handleStartSessionRequest();
-		this.timeblock.onPause = () => this.handlePauseSession();
-		this.timeblock.onResume = () => this.handleResumeSession();
-		this.timeblock.onStop = () => this.handleStopSession();
-		this.timeblock.onCloseDay = () => this.handleCloseDay();
-		this.timeblock.onHourOverride = () => this.handleHourOverride();
+		this.timeblock.onPause = () => { void this.handlePauseSession(); };
+		this.timeblock.onResume = () => { void this.handleResumeSession(); };
+		this.timeblock.onStop = () => { void this.handleStopSession(); };
+		this.timeblock.onCloseDay = () => { void this.handleCloseDay(); };
+		this.timeblock.onHourOverride = () => { void this.handleHourOverride(); };
 		this.timeblock.onSessionTick = (elapsedMin: number) => {
 			if (this.projects) {
 				this.projects.updateSessionProgress(elapsedMin);
@@ -324,7 +324,7 @@ export class EmraldSidebarView extends ItemView {
 		};
 
 		// Load today's session data
-		this.loadTodayData();
+		void this.loadTodayData();
 	}
 
 	private renderProjectsSection(container: Element) {
@@ -353,12 +353,12 @@ export class EmraldSidebarView extends ItemView {
 			menu.addItem(i => i
 				.setTitle('+ New project')
 				.setIcon('file-plus')
-				.onClick(() => this.handleAddNewProject())
+				.onClick(() => { void this.handleAddNewProject(); })
 			);
 			menu.addItem(i => i
 				.setTitle('+ Link existing note')
 				.setIcon('link')
-				.onClick(() => this.handleLinkExistingNote())
+				.onClick(() => { this.handleLinkExistingNote(); })
 			);
 			menu.showAtMouseEvent(e as MouseEvent);
 		});
@@ -391,13 +391,13 @@ export class EmraldSidebarView extends ItemView {
 		this.projects.render();
 
 		// Wire up event handlers
-		this.projects.onStartSession = (item: TrackedItem) => this.handleStartSession(item);
-		this.projects.onPauseSession = () => this.handlePauseSession();
-		this.projects.onStopSession = () => this.handleStopSession();
+		this.projects.onStartSession = (item: TrackedItem) => { void this.handleStartSession(item); };
+		this.projects.onPauseSession = () => { void this.handlePauseSession(); };
+		this.projects.onStopSession = () => { void this.handleStopSession(); };
 		this.projects.onChangeELevel = (item: TrackedItem) => this.handleChangeELevel(item);
 
 		// Load projects
-		this.loadProjects();
+		void this.loadProjects();
 	}
 
 	private renderEMSection(container: Element) {
@@ -406,7 +406,7 @@ export class EmraldSidebarView extends ItemView {
 		const header = section.createEl('div', { cls: 'emerald-section-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'true');
-		header.setAttribute('aria-label', 'Effort Management');
+		header.setAttribute('aria-label', 'Effort management');
 		header.tabIndex = 0;
 		const headerLeft = header.createEl('span', { cls: 'emerald-section-header-left' });
 		const arrowEl = headerLeft.createEl('span', { cls: 'emerald-section-arrow', text: '▼' });
@@ -414,7 +414,7 @@ export class EmraldSidebarView extends ItemView {
 		const iconEl = headerLeft.createEl('span', { cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'bar-chart-2');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createEl('span', { text: 'Effort Management' });
+		const labelEl = headerLeft.createEl('span', { text: 'Effort management' });
 
 		const content = section.createEl('div', { cls: 'emerald-section-content' });
 
@@ -493,7 +493,7 @@ export class EmraldSidebarView extends ItemView {
 		} else {
 			// API failed and no cache — fall back to snapshotted workedMinutes
 			// so the green bar / summary don't reset to 0 during offline rebuilds.
-			const snapshotMinutes = (this.plugin as any)._workedMinutesSnapshot as number | undefined;
+			const snapshotMinutes = (this.plugin as unknown as Record<string, unknown>)._workedMinutesSnapshot as number | undefined;
 			if (snapshotMinutes != null && snapshotMinutes > 0) {
 				this.timeblock.updateState({ workedMinutes: snapshotMinutes });
 			}
@@ -508,15 +508,15 @@ export class EmraldSidebarView extends ItemView {
 		// (e.g., after reconnect triggers refreshSidebar → onOpen → new timeblock).
 		// This gives the new timeblock instance the timer state so the
 		// session-aware check below can detect "same session already running."
-		const snapshot = (this.plugin as any)._activeSessionSnapshot as Record<string, unknown> | null;
+		const snapshot = (this.plugin as unknown as Record<string, unknown>)._activeSessionSnapshot as Record<string, unknown> | null;
 		if (snapshot && this.timeblock && !this.timeblock.state.activeSession) {
 			this.timeblock.restoreActiveSession(snapshot);
 			if (this.projects && snapshot.itemId) {
 				this.projects.updateState({ activeSessionItemId: snapshot.itemId as string });
 			}
 			// Clear snapshot so it doesn't re-apply on subsequent loadTodayData calls
-			(this.plugin as any)._activeSessionSnapshot = null;
-			(this.plugin as any)._workedMinutesSnapshot = null;
+			(this.plugin as unknown as Record<string, unknown>)._activeSessionSnapshot = null;
+			(this.plugin as unknown as Record<string, unknown>)._workedMinutesSnapshot = null;
 		}
 
 		// Check for active session
@@ -631,7 +631,7 @@ export class EmraldSidebarView extends ItemView {
 
 	// ── Session Handlers ────────────────────────────────────
 
-	async handleStartSessionRequest() {
+	handleStartSessionRequest() {
 		// Show a quick project picker from active projects
 		if (!this.projects) {
 			new Notice('No projects loaded yet.');
@@ -645,13 +645,13 @@ export class EmraldSidebarView extends ItemView {
 			return;
 		}
 
-		const self = this;
+		const handleStart = (item: TrackedItem) => { void this.handleStartSession(item); };
 
 		class ProjectPickerModal extends FuzzySuggestModal<TrackedItem> {
 			getItems() { return activeItems; }
 			getItemText(item: TrackedItem) { return `${item.name} (${item.effort_level})`; }
 			onChooseItem(item: TrackedItem) {
-				self.handleStartSession(item);
+				handleStart(item);
 			}
 		}
 
@@ -674,8 +674,8 @@ export class EmraldSidebarView extends ItemView {
 				this.plugin,
 				calibrationNeeded.answeredKeys,
 				calibrationNeeded.remaining,
-				() => this.doStartSession(item),  // After answering, start session
-				() => this.doStartSession(item)   // Skip also starts session
+				() => { void this.doStartSession(item); },  // After answering, start session
+				() => { void this.doStartSession(item); }   // Skip also starts session
 			);
 			modal.open();
 			return;
@@ -794,7 +794,7 @@ export class EmraldSidebarView extends ItemView {
 				this.app,
 				session.itemName,
 				sessionMinutes,
-				async (action) => {
+				(action: string) => { void (async () => {
 					if (action === 'discard') {
 						await this.plugin.apiClient.discardSession(session.sessionId);
 						new Notice('Runaway session discarded — no data recorded.');
@@ -802,8 +802,8 @@ export class EmraldSidebarView extends ItemView {
 						if (this.projects) {
 							this.projects.updateState({ activeSessionItemId: null });
 						}
-						await this.loadTodayData();
-						this.loadProjects();
+						await void this.loadTodayData();
+						void this.loadProjects();
 					} else {
 						// 'keep' — stop on API flagged as recovered, then show effort receipt
 						await this.plugin.apiClient.stopSession(session.sessionId, { was_recovered: true });
@@ -811,7 +811,7 @@ export class EmraldSidebarView extends ItemView {
 						if (this.projects) {
 							this.projects.updateState({ activeSessionItemId: null });
 						}
-						await this.loadTodayData();
+						await void this.loadTodayData();
 						void this.clearPersistedProvisionalSession();
 						// Open effort receipt (same as normal stop flow)
 						const { EffortReceiptModal } = await import('../modals/effort-receipt');
@@ -825,7 +825,7 @@ export class EmraldSidebarView extends ItemView {
 								sessionMinutes,
 								metPrescribedEffort
 							},
-							async (receipt, markComplete) => {
+							(receipt: import("../api/client").CreateReceiptPayload, markComplete: boolean) => { void (async () => {
 								const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 								if (!resp.error || resp.queued) {
 									new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
@@ -833,16 +833,16 @@ export class EmraldSidebarView extends ItemView {
 										await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' } as Partial<import('../api/client').TrackedItem>);
 										new Notice(`${session.itemName} marked complete`);
 									}
-									this.loadTodayData();
-									this.loadProjects();
+									void this.loadTodayData();
+									void this.loadProjects();
 									await this.updateFrontmatterStats(session.itemId);
 								}
-							}
+							})(); }
 						);
 						receiptModal.open();
 					}
 					this._stoppingSession = false;
-				}
+				})(); }
 			);
 			runawayModal.open();
 			return;
@@ -871,7 +871,7 @@ export class EmraldSidebarView extends ItemView {
 		// Reload today's data from API as single source of truth for minutes.
 		// This replaces the old manual todayMinutesByItem patch that caused
 		// oscillating timers when the API refresh raced with local state.
-		await this.loadTodayData();
+		await void this.loadTodayData();
 
 		// Clear persisted provisional session
 		void this.clearPersistedProvisionalSession();
@@ -884,8 +884,8 @@ export class EmraldSidebarView extends ItemView {
 		const MIN_RECEIPT_MINUTES = 5;
 		if (sessionMinutes < MIN_RECEIPT_MINUTES) {
 			new Notice(`Session too short for receipt (${Math.round(sessionMinutes)}m < ${MIN_RECEIPT_MINUTES}m). Recorded without receipt.`);
-			this.loadTodayData();
-			this.loadProjects();
+			void this.loadTodayData();
+			void this.loadProjects();
 			return;
 		}
 
@@ -901,7 +901,7 @@ export class EmraldSidebarView extends ItemView {
 				sessionMinutes,
 				metPrescribedEffort
 			},
-			async (receipt, markComplete) => {
+			(receipt: import("../api/client").CreateReceiptPayload, markComplete: boolean) => { void (async () => {
 				// Submit receipt
 				const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 				if (!resp.error || resp.queued) {
@@ -914,8 +914,8 @@ export class EmraldSidebarView extends ItemView {
 					}
 
 					// Reload data (will use cache if offline)
-					this.loadTodayData();
-					this.loadProjects();
+					void this.loadTodayData();
+					void this.loadProjects();
 
 					// Update frontmatter session stats if note is linked
 					await this.updateFrontmatterStats(session.itemId);
@@ -938,7 +938,7 @@ export class EmraldSidebarView extends ItemView {
 						await this.plugin.saveData(this.plugin.settings);
 					}
 				}
-			}
+			})(); }
 		);
 		modal.open();
 		} finally {
@@ -1016,7 +1016,7 @@ export class EmraldSidebarView extends ItemView {
 			this.plugin,
 			currentHours,
 			baseScheduleHours,
-			async (hours) => {
+			(hours: number) => { void (async () => {
 				// Persist override to API
 				const today = new Date().toISOString().split('T')[0];
 				await this.plugin.apiClient.setAvailabilityOverride(today, hours);
@@ -1034,7 +1034,7 @@ export class EmraldSidebarView extends ItemView {
 					}
 				}
 				new Notice(`Today's hours set to ${hours}h`);
-			}
+			})(); }
 		);
 		modal.open();
 	}
@@ -1056,7 +1056,7 @@ export class EmraldSidebarView extends ItemView {
 		const modal = new NewProjectModal(
 			this.app,
 			this.plugin,
-			async (name, level) => {
+			(name: string, level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
 				const resp = await this.plugin.apiClient.createItem({
 					name,
 					effort_level: level,
@@ -1067,15 +1067,15 @@ export class EmraldSidebarView extends ItemView {
 					return;
 				}
 				new Notice(`Created: ${name}`);
-				this.loadProjects();
+				void this.loadProjects();
 				this.restoreActiveSessionHighlight();
-			},
+			})(); },
 			availableHours
 		);
 		modal.open();
 	}
 
-	private async handleLinkExistingNote() {
+	private handleLinkExistingNote() {
 		// Enforce 5-active-project cap
 		const activeCount = this.projects?.state?.items?.filter(i => i.status === 'active').length ?? 0;
 		if (activeCount >= 5) {
@@ -1090,7 +1090,7 @@ export class EmraldSidebarView extends ItemView {
 		const picker = new AddProjectSuggestModal(
 			this.app,
 			files,
-			async (file) => {
+			(file: import("obsidian").TFile) => { void (async () => {
 				const name = file.basename;
 
 				const { ELevelModal } = await import('../modals/elevel');
@@ -1100,7 +1100,7 @@ export class EmraldSidebarView extends ItemView {
 					name,
 					'E2',
 					availableHours,
-					async (level) => {
+					(level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
 						const resp = await this.plugin.apiClient.createItem({
 							name,
 							effort_level: level,
@@ -1112,12 +1112,12 @@ export class EmraldSidebarView extends ItemView {
 						}
 						await initializeEmraldFrontmatter(this.app, file, resp.data.id, level);
 						new Notice(`Created & linked: ${name}`);
-						this.loadProjects();
+						void this.loadProjects();
 						this.restoreActiveSessionHighlight();
-					}
+					})(); }
 				);
 				modal.open();
-			}
+			})(); }
 		);
 		picker.open();
 	}
@@ -1141,13 +1141,13 @@ export class EmraldSidebarView extends ItemView {
 			item.name,
 			item.effort_level,
 			availableHours,
-			async (level) => {
+			(level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
 				const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level } as Partial<TrackedItem>);
 				if (!resp.error) {
 					new Notice(`${item.name} → ${level}`);
-					this.loadProjects();
+					void this.loadProjects();
 				}
-			}
+			})(); }
 		);
 		modal.open();
 	}
@@ -1169,7 +1169,7 @@ export class EmraldSidebarView extends ItemView {
 
 		const file = this.plugin.app.vault.getAbstractFileByPath(notePath);
 		if (!file || !(file instanceof TFile)) return;
-		if (!isEmraldNote(this.plugin.app, file as TFile)) return;
+		if (!isEmraldNote(this.plugin.app, file)) return;
 
 		// Fetch ALL sessions for this item (lifetime stats, not just today)
 		const allResp = await this.plugin.apiClient.getItemSessionStats(itemId);
@@ -1195,7 +1195,7 @@ export class EmraldSidebarView extends ItemView {
 		if (sessionCount > 0) {
 			await updateSessionStats(
 				this.plugin.app,
-				file as TFile,
+				file,
 				sessionCount,
 				totalMinutes,
 				lastSessionDate

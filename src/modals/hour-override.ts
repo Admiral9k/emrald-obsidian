@@ -35,7 +35,7 @@ export class HourOverrideModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-houroverride-modal');
 
-		contentEl.createEl('h2', { text: 'Adjust Today\'s Hours' });
+		contentEl.createEl('h2', { text: 'Adjust today\'s hours' });
 
 		const form = contentEl.createEl('div', { cls: 'emerald-form' });
 

@@ -36,7 +36,7 @@ export class CloseDayModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-closeday-modal');
 
-		contentEl.createEl('h2', { text: 'Close Your Work Day?' });
+		contentEl.createEl('h2', { text: 'Close your work day?' });
 
 		// Summary stats
 		const statsEl = contentEl.createEl('div', { cls: 'emerald-closeday-stats' });
@@ -81,7 +81,7 @@ export class CloseDayModal extends Modal {
 
 		const confirmBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Close Day ✓'
+			text: 'Close day ✓'
 		});
 		confirmBtn.addEventListener('click', () => {
 			this.onConfirm();

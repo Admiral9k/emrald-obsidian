@@ -4,7 +4,7 @@
 
 import { Notice } from 'obsidian';
 import EmraldPlugin from '../../main';
-import { ComputedMetric, ComputedMetricHistory, AIInsight } from '../api/client';
+import { ComputedMetricHistory, AIInsight } from '../api/client';
 import { createIconEl, ICONS } from '../utils/icons';
 import { tierState } from '../tier';
 import {
@@ -16,7 +16,6 @@ import {
 const SPARK_WIDTH = 80;
 const SPARK_HEIGHT = 20;
 const SPARK_DOT_RADIUS = 2;
-const SPARK_STROKE_WIDTH = 1.5;
 
 export class EMComponent {
 	private plugin: EmraldPlugin;
@@ -57,13 +56,12 @@ export class EMComponent {
 		this.containerEl.addClass('emerald-em-content');
 
 		// Energy check-in banner (placeholder — filled by loadData)
-		this.checkinBannerEl = this.containerEl.createEl('div', { cls: 'emerald-checkin-banner' });
-		this.checkinBannerEl.style.display = 'none';
+		this.checkinBannerEl = this.containerEl.createEl('div', { cls: 'emerald-checkin-banner is-hidden' });
 
 		// Sparklines (Pro only — Pinned Metrics)
 		if (tierState.isPro()) {
 			this.sparklinesEl = this.containerEl.createEl('div', { cls: 'emerald-sparklines' });
-			this.sparklinesEl.createEl('div', { cls: 'emerald-sparklines-title', text: 'Pinned Metrics' });
+			this.sparklinesEl.createEl('div', { cls: 'emerald-sparklines-title', text: 'Pinned metrics' });
 			this.renderSparklinePlaceholders();
 		} else {
 			this.sparklinesEl = null;
@@ -98,12 +96,12 @@ export class EMComponent {
 		}
 		this.insightAckListener = () => {
 			// Reload insights from API to sync state, then re-render bulletin + badge
-			this.loadData();
+			void this.loadData();
 		};
 		window.addEventListener('emrald:insight-acknowledged', this.insightAckListener as EventListener);
 
 		// Load real data
-		this.loadData();
+		void this.loadData();
 	}
 
 	// ── Energy Check-in Banner ──────────────────────────────
@@ -113,41 +111,44 @@ export class EMComponent {
 		this.checkinBannerEl.empty();
 
 		if (this.checkinDone) {
-			this.checkinBannerEl.style.display = 'none';
+			this.checkinBannerEl.addClass('is-hidden');
 			return;
 		}
 
-		this.checkinBannerEl.style.display = 'block';
+		this.checkinBannerEl.removeClass('is-hidden');
 
 		const inner = this.checkinBannerEl.createEl('div', { cls: 'emerald-checkin-inner' });
 		createIconEl(inner, ICONS.sun, 'emerald-checkin-icon');
 		const textCol = inner.createEl('div', { cls: 'emerald-checkin-text' });
-		textCol.createEl('div', { cls: 'emerald-checkin-title', text: 'Daily Check-in' });
+		textCol.createEl('div', { cls: 'emerald-checkin-title', text: 'Daily check-in' });
 		textCol.createEl('div', { cls: 'emerald-checkin-desc', text: 'How are you feeling today?' });
 
 		const btn = inner.createEl('button', { cls: 'emerald-btn emerald-btn-primary emerald-checkin-btn', text: 'Check in' });
 		btn.setAttribute('aria-label', 'Open daily energy check-in');
-		btn.addEventListener('click', async () => {
-			const { EnergyCheckinModal } = await import('../modals/energy-checkin');
-			const modal = new EnergyCheckinModal(
-				this.plugin.app,
-				this.plugin,
-				async (checkin) => {
-					const resp = await this.plugin.apiClient.submitEnergyCheckin(checkin);
-					if (resp.queued) {
-						this.checkinDone = true;
-						this.renderCheckinBanner();
-						new Notice('Energy check-in queued — will sync when online');
-					} else if (!resp.error) {
-						this.checkinDone = true;
-						this.renderCheckinBanner();
-						new Notice('Energy check-in recorded ✓');
-					} else {
-						new Notice(`Check-in failed: ${resp.error}`);
+		btn.addEventListener('click', () => {
+			void (async () => {
+				const { EnergyCheckinModal } = await import('../modals/energy-checkin');
+				const modal = new EnergyCheckinModal(
+					this.plugin.app,
+					this.plugin,
+					(checkin) => {
+						void this.plugin.apiClient.submitEnergyCheckin(checkin).then((resp) => {
+							if (resp.queued) {
+								this.checkinDone = true;
+								this.renderCheckinBanner();
+								new Notice('Energy check-in queued — will sync when online');
+							} else if (!resp.error) {
+								this.checkinDone = true;
+								this.renderCheckinBanner();
+								new Notice('Energy check-in recorded ✓');
+							} else {
+								new Notice(`Check-in failed: ${resp.error}`);
+							}
+						});
 					}
-				}
-			);
-			modal.open();
+				);
+				modal.open();
+			})();
 		});
 	}
 
@@ -186,7 +187,7 @@ export class EMComponent {
 				const values = normalized.map(h => h.value ?? 0);
 
 				if (graphEl) {
-					graphEl.textContent = '';
+					graphEl.empty();
 					graphEl.appendChild(this.buildSparklineSVG(values));
 				}
 
@@ -196,7 +197,7 @@ export class EMComponent {
 				}
 			} else {
 				if (graphEl) {
-					graphEl.textContent = '';
+					graphEl.empty();
 					graphEl.appendChild(this.buildSparklineSVG([]));
 				}
 				const currentResp = await this.plugin.apiClient.getMetrics([key]);
@@ -330,7 +331,7 @@ export class EMComponent {
 		const container = this.insightEl.createEl('div', { cls: 'emerald-insight-container' });
 
 		// Header
-		container.createEl('div', { cls: 'emerald-insight-header', text: 'Latest Insights' });
+		container.createEl('div', { cls: 'emerald-insight-header', text: 'Latest insights' });
 
 		// Clamp index
 		this.currentInsightIndex = Math.min(this.currentInsightIndex, Math.max(unread.length - 1, 0));
@@ -359,7 +360,7 @@ export class EMComponent {
 		const actions = container.createEl('div', { cls: 'emerald-insight-actions' });
 		const gotItBtn = actions.createEl('button', { cls: 'emerald-btn-tiny', text: 'Got it' });
 		gotItBtn.setAttribute('aria-label', 'Dismiss insight');
-		gotItBtn.addEventListener('click', () => this.acknowledgeInsight(insight.id, 'dismissed'));
+		gotItBtn.addEventListener('click', () => void this.acknowledgeInsight(insight.id, 'dismissed'));
 
 		// Start auto-rotation
 		this.startInsightRotation();
@@ -391,14 +392,14 @@ export class EMComponent {
 
 	private renderWorkspaceButtons() {
 		const section = this.containerEl.createEl('div', { cls: 'emerald-workspace-buttons' });
-		section.createEl('div', { cls: 'emerald-workspace-title', text: 'Workspace Views' });
+		section.createEl('div', { cls: 'emerald-workspace-title', text: 'Workspace views' });
 
 		const buttons = [
-			{ icon: ICONS.barChart, label: 'E-Level Overview', view: VIEW_ELEVEL_OVERVIEW },
-			{ icon: ICONS.lightbulb, label: 'Insight Log', view: VIEW_INSIGHT_LOG, badge: this.insights.filter(i => !i.acknowledged_at).length },
-			{ icon: ICONS.trendingUp, label: 'Data Center', view: VIEW_DATA_CENTER },
-			{ icon: ICONS.user, label: 'Effort Profile', view: VIEW_EFFORT_PROFILE },
-			{ icon: ICONS.flame, label: 'Burnout Monitor', view: VIEW_BURNOUT_MONITOR },
+			{ icon: ICONS.barChart, label: 'E-level overview', view: VIEW_ELEVEL_OVERVIEW },
+			{ icon: ICONS.lightbulb, label: 'Insight log', view: VIEW_INSIGHT_LOG, badge: this.insights.filter(i => !i.acknowledged_at).length },
+			{ icon: ICONS.trendingUp, label: 'Data center', view: VIEW_DATA_CENTER },
+			{ icon: ICONS.user, label: 'Effort profile', view: VIEW_EFFORT_PROFILE },
+			{ icon: ICONS.flame, label: 'Burnout monitor', view: VIEW_BURNOUT_MONITOR },
 			{ icon: ICONS.clipboardList, label: 'Digest', view: VIEW_DIGEST },
 			{ icon: ICONS.gem, label: 'About EMRALD', view: VIEW_ABOUT }
 		];
@@ -424,7 +425,7 @@ export class EMComponent {
 				row.createEl('span', { cls: 'emerald-pro-pill', text: 'PRO' });
 			}
 
-			row.addEventListener('click', () => this.openWorkspaceView(btn.view));
+			row.addEventListener('click', () => void this.openWorkspaceView(btn.view));
 			row.addEventListener('keydown', (e: KeyboardEvent) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
@@ -458,7 +459,7 @@ export class EMComponent {
 		const headerRow = card.createEl('div', { cls: 'emerald-upgrade-header' });
 		const upgradeIcon = createIconEl(headerRow, 'sparkles', 'emerald-upgrade-icon-svg');
 		upgradeIcon.setAttribute('aria-hidden', 'true');
-		headerRow.createEl('span', { cls: 'emerald-upgrade-title', text: 'Unlock Full Intelligence' });
+		headerRow.createEl('span', { cls: 'emerald-upgrade-title', text: 'Unlock full intelligence' });
 
 		card.createEl('p', {
 			cls: 'emerald-upgrade-desc',
@@ -481,7 +482,7 @@ export class EMComponent {
 		try {
 			const checkinResp = await this.plugin.apiClient.getTodayCheckin();
 			this.checkinDone = !!(checkinResp.data);
-		} catch {
+		} catch { /* non-fatal */
 			this.checkinDone = false;
 		}
 		this.renderCheckinBanner();
@@ -490,7 +491,7 @@ export class EMComponent {
 		if (tierState.isPro()) {
 			try {
 				await this.loadSparklineData();
-			} catch {
+			} catch { /* non-fatal */
 				// Sparklines stay as placeholders
 			}
 		}
@@ -502,7 +503,7 @@ export class EMComponent {
 				if (insightsResp.data) {
 					this.insights = insightsResp.data;
 				}
-			} catch {
+			} catch { /* non-fatal */
 				// Insights stay empty
 			}
 			this.renderInsightBulletin();
@@ -551,6 +552,6 @@ export class EMComponent {
 	}
 
 	private openWorkspaceView(viewType: string) {
-		this.plugin.openWorkspaceView(viewType);
+		void this.plugin.openWorkspaceView(viewType);
 	}
 }

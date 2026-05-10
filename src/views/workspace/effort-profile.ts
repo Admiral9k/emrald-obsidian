@@ -140,14 +140,14 @@ const ENUM_DISPLAY: Record<string, string> = {
 
 export class EffortProfileView extends EmraldWorkspaceView {
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Effort Profile');
+		super(leaf, plugin, 'Effort profile');
 	}
 
 	getViewType(): string { return VIEW_EFFORT_PROFILE; }
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Effort Profile', 'How EMRALD sees you', 'user');
+		this.renderHeader(container, 'Effort profile', 'How EMRALD sees you', 'user');
 
 		// Fetch data concurrently
 		let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
@@ -258,12 +258,14 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		const btn = empty.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Start Calibration'
+			text: 'Start calibration'
 		});
-		btn.addEventListener('click', async () => {
-			await this.plugin.apiClient.triggerReassessment();
-			new Notice('Calibration started');
-		});
+		btn.addEventListener('click', () => { void (async () => {
+			try {
+				await this.plugin.apiClient.triggerReassessment();
+				new Notice('Calibration started');
+			} catch { /* non-fatal */ }
+		})(); });
 	}
 
 	// ── D19 Drift Indicator ─────────────────────────────
@@ -369,7 +371,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
-			this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
+			void this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
 		});
 	}
 
@@ -392,11 +394,13 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				cls: 'emerald-btn emerald-btn-subtle emerald-btn-sm',
 				text: 'Upgrade to Advanced'
 			});
-			upgradeBtn.addEventListener('click', async () => {
-				await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
-				new Notice('Advanced mode enabled! Questions will appear before your next session.');
-				this.onOpen(); // Refresh
-			});
+			upgradeBtn.addEventListener('click', () => { void (async () => {
+				try {
+					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
+					new Notice('Advanced mode enabled! Questions will appear before your next session.');
+					void this.onOpen(); // Refresh
+				} catch { /* non-fatal */ }
+			})(); });
 		}
 
 		// Show advanced question progress
@@ -427,7 +431,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'sliders');
-		headerRow.createEl('h3', { text: 'Core Traits' });
+		headerRow.createEl('h3', { text: 'Core traits' });
 
 		const traitsEl = section.createEl('div', { cls: 'emerald-wv-traits' });
 
@@ -468,7 +472,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'heart-pulse');
-		headerRow.createEl('h3', { text: 'What Recharges You?' });
+		headerRow.createEl('h3', { text: 'What recharges you?' });
 
 		const placeholders = [
 			'A walk without your phone...',
@@ -513,8 +517,8 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		});
 	}
 
-	private async addRecoveryProtocol(card: Element, placeholder: string) {
-		const modal = new RecoveryInputModal(this.plugin.app, 'Add Recovery Activity', '', async (name) => {
+	private addRecoveryProtocol(card: Element, placeholder: string) {
+		const modal = new RecoveryInputModal(this.plugin.app, 'Add recovery activity', '', async (name) => {
 			const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
 			if (resp.queued) {
 				new Notice('Recovery activity queued — will sync when online');
@@ -528,8 +532,8 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		modal.open();
 	}
 
-	private async editRecoveryProtocol(protocol: RecoveryProtocol, card: Element) {
-		const modal = new RecoveryInputModal(this.plugin.app, 'Edit Recovery Activity', protocol.name, async (name) => {
+	private editRecoveryProtocol(protocol: RecoveryProtocol, card: Element) {
+		const modal = new RecoveryInputModal(this.plugin.app, 'Edit recovery activity', protocol.name, async (name) => {
 			if (name.trim() === '') {
 				// Empty = delete
 				const delResp = await this.plugin.apiClient.deleteRecoveryProtocol(protocol.id);
@@ -557,7 +561,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'target');
-		headerRow.createEl('h3', { text: 'Calibration Score' });
+		headerRow.createEl('h3', { text: 'Calibration score' });
 
 		const scoreRow = section.createEl('div', { cls: 'emerald-wv-cal-score-row' });
 		scoreRow.createEl('span', { cls: 'emerald-wv-cal-score-value', text: (profile.calibration_score as number).toFixed(1) });
@@ -696,16 +700,16 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const arrowEl = headerRow.createEl('span', { cls: 'emerald-section-arrow', text: '▸' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'history');
-		headerRow.createEl('h3', { text: 'Calibration History' });
+		headerRow.createEl('h3', { text: 'Calibration history' });
 
 		// Collapsible content (hidden by default)
 		const content = section.createEl('div', { cls: 'emerald-wv-collapsible-content' });
-		content.style.display = 'none';
+		content.addClass('emrald-hidden');
 
-		headerRow.style.cursor = 'pointer';
+		headerRow.addClass('emrald-clickable');
 		headerRow.addEventListener('click', () => {
-			const isHidden = content.style.display === 'none';
-			content.style.display = isHidden ? 'block' : 'none';
+			const isHidden = content.hasClass('emrald-hidden');
+			isHidden ? content.removeClass('emrald-hidden') : content.addClass('emrald-hidden');
 			arrowEl.textContent = isHidden ? '▼' : '▸';
 		});
 
@@ -796,20 +800,22 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const reassessBtn = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-secondary' });
 		const reassessIcon = reassessBtn.createEl('span', { cls: 'emerald-btn-icon' });
 		setIcon(reassessIcon, 'refresh-cw');
-		reassessBtn.createEl('span', { text: 'Reassess Profile' });
-		reassessBtn.addEventListener('click', async () => {
-			const { ReassessmentModal } = await import('../../modals/reassessment');
-			new ReassessmentModal(this.app, this.plugin).open();
-		});
+		reassessBtn.createEl('span', { text: 'Reassess profile' });
+		reassessBtn.addEventListener('click', () => { void (async () => {
+			try {
+				const { ReassessmentModal } = await import('../../modals/reassessment');
+				new ReassessmentModal(this.app, this.plugin).open();
+			} catch { /* non-fatal */ }
+		})(); });
 
 		// Export data placeholder
 		const exportBtn = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-subtle' });
 		const exportIcon = exportBtn.createEl('span', { cls: 'emerald-btn-icon' });
 		setIcon(exportIcon, 'download');
-		exportBtn.createEl('span', { text: 'Export Data (coming soon)' });
+		exportBtn.createEl('span', { text: 'Export data (coming soon)' });
 		exportBtn.setAttribute('disabled', 'true');
-		exportBtn.style.opacity = '0.5';
-		exportBtn.style.cursor = 'default';
+		exportBtn.addClass('emrald-dim');
+		exportBtn.addClass('emrald-not-clickable');
 	}
 
 	// ── Data Center Cross-Link ─────────────────────────
@@ -822,7 +828,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
-			this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
+			void this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
 		});
 	}
 

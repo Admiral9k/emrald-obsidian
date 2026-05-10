@@ -2,7 +2,7 @@
 // First-time plugin experience. Goal: user feels productive by the end.
 // Steps: Welcome → API Connection → Profile Setup → Calibration → Recovery → Schedule → Projects → Tour
 
-import { App, Modal, Notice, Setting, TFile, FuzzySuggestModal, setIcon } from 'obsidian';
+import { App, Modal, Notice, TFile, FuzzySuggestModal, setIcon } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { VIEW_ABOUT } from '../views/workspace/base';
 
@@ -44,9 +44,9 @@ export class OnboardingModal extends Modal {
 		// (finish() already handles the completed path)
 		if (!this.plugin.settings.onboardingComplete) {
 			this.plugin.settings.onboardingComplete = true;
-			this.plugin.saveSettings();
+			void this.plugin.saveSettings();
 			setTimeout(() => {
-				this.plugin.openWorkspaceView(VIEW_ABOUT);
+				void this.plugin.openWorkspaceView(VIEW_ABOUT);
 				this.onComplete();
 			}, 300);
 		}
@@ -127,7 +127,7 @@ export class OnboardingModal extends Modal {
 		const actions = container.createEl('div', { cls: 'emerald-modal-actions emerald-onboard-actions' });
 		const startBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Get Started'
+			text: 'Get started'
 		});
 		startBtn.addEventListener('click', () => this.goTo('connect'));
 	}
@@ -168,11 +168,11 @@ export class OnboardingModal extends Modal {
 		const advGroup = form.createEl('div', { cls: 'emerald-form-group' });
 		const advToggle = advGroup.createEl('div', { cls: 'emerald-onboard-advanced-toggle', text: '▸ Advanced' });
 		const advContent = advGroup.createEl('div', { cls: 'emerald-onboard-advanced-content' });
-		advContent.style.display = 'none';
+		advContent.addClass('emrald-hidden');
 
 		advToggle.addEventListener('click', () => {
-			const visible = advContent.style.display !== 'none';
-			advContent.style.display = visible ? 'none' : 'block';
+			const visible = !advContent.hasClass('emrald-hidden');
+			visible ? advContent.addClass('emrald-hidden') : advContent.removeClass('emrald-hidden');
 			advToggle.textContent = visible ? '▸ Advanced' : '▾ Advanced';
 		});
 
@@ -191,44 +191,46 @@ export class OnboardingModal extends Modal {
 
 		const testBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Test Connection'
+			text: 'Test connection'
 		});
-		testBtn.addEventListener('click', async () => {
-			if (!this.apiKey.trim()) {
-				statusEl.textContent = 'Please enter an API key';
-				statusEl.className = 'emerald-onboard-status is-error';
-				return;
-			}
+		testBtn.addEventListener('click', () => { void (async () => {
+			try {
+				if (!this.apiKey.trim()) {
+					statusEl.textContent = 'Please enter an API key';
+					statusEl.className = 'emerald-onboard-status is-error';
+					return;
+				}
 
-			statusEl.textContent = 'Testing...';
-			statusEl.className = 'emerald-onboard-status is-loading';
+				statusEl.textContent = 'Testing...';
+				statusEl.className = 'emerald-onboard-status is-loading';
 
-			// Temporarily update client
-			const apiUrl = urlInput.value || this.plugin.settings.apiUrl;
-			this.plugin.apiClient.updateCredentials(this.apiKey, apiUrl);
+				// Temporarily update client
+				const apiUrl = urlInput.value || this.plugin.settings.apiUrl;
+				this.plugin.apiClient.updateCredentials(this.apiKey, apiUrl);
 
-			const result = await this.plugin.apiClient.testConnection();
+				const result = await this.plugin.apiClient.testConnection();
 
-			if (result.error) {
-				statusEl.textContent = `Connection failed: ${result.error}`;
-				statusEl.className = 'emerald-onboard-status is-error';
-			} else {
-				statusEl.textContent = 'Connected!';
-				statusEl.className = 'emerald-onboard-status is-success';
+				if (result.error) {
+					statusEl.textContent = `Connection failed: ${result.error}`;
+					statusEl.className = 'emerald-onboard-status is-error';
+				} else {
+					statusEl.textContent = 'Connected!';
+					statusEl.className = 'emerald-onboard-status is-success';
 
-				// Save credentials
-				this.plugin.settings.apiKey = this.apiKey;
-				this.plugin.settings.apiUrl = apiUrl;
-				await this.plugin.saveSettings();
+					// Save credentials
+					this.plugin.settings.apiKey = this.apiKey;
+					this.plugin.settings.apiUrl = apiUrl;
+					await this.plugin.saveSettings();
 
-				// Check if new user (no items yet)
-				const itemsResp = await this.plugin.apiClient.getItems();
-				this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
+					// Check if new user (no items yet)
+					const itemsResp = await this.plugin.apiClient.getItems();
+					this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
 
-				// New users get full flow; returning users skip profile/availability but see calibration
-				setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
-			}
-		});
+					// New users get full flow; returning users skip profile/availability but see calibration
+					setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
+				}
+			} catch { /* non-fatal */ }
+		})(); });
 
 		const skipBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
@@ -246,7 +248,7 @@ export class OnboardingModal extends Modal {
 	// ── Step 3: Profile Setup ────────────────────────────
 
 	private renderProfile(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick Profile' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'Tell EMRALD a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
@@ -279,17 +281,19 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-primary',
 			text: 'Next'
 		});
-		nextBtn.addEventListener('click', async () => {
-			// Save availability — set same hours for all 7 days
-			const hours = parseInt(slider.value) || 4;
+		nextBtn.addEventListener('click', () => { void (async () => {
 			try {
-				await this.plugin.apiClient.setWeeklyAvailability(hours);
-			} catch {
-				// Non-fatal — user can always set this in settings
-			}
+				// Save availability — set same hours for all 7 days
+				const hours = parseInt(slider.value) || 4;
+				try {
+					await this.plugin.apiClient.setWeeklyAvailability(hours);
+				} catch { /* non-fatal */
+					// Non-fatal — user can always set this in settings
+				}
 
-			this.goTo('calibration');
-		});
+				this.goTo('calibration');
+			} catch { /* non-fatal */ }
+		})(); });
 
 	}
 
@@ -427,7 +431,7 @@ export class OnboardingModal extends Modal {
 			(this.calibrationPage + 1) * perPage
 		);
 
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort Profile' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
@@ -521,20 +525,22 @@ export class OnboardingModal extends Modal {
 			// Last page — show Save & Continue
 			const saveBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Save & Continue'
+				text: 'Save & continue'
 			});
-			saveBtn.addEventListener('click', async () => {
-				// Save all calibration answers to API
-				if (Object.keys(this.calibrationAnswers).length > 0) {
-					try {
-						await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-						new Notice('Effort Profile saved ✓');
-					} catch {
-						new Notice('Profile saved locally — will sync later.');
+			saveBtn.addEventListener('click', () => { void (async () => {
+				try {
+					// Save all calibration answers to API
+					if (Object.keys(this.calibrationAnswers).length > 0) {
+						try {
+							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
+							new Notice('Effort Profile saved ✓');
+						} catch { /* non-fatal */
+							new Notice('Profile saved locally — will sync later.');
+						}
 					}
-				}
-				this.goTo('recovery');
-			});
+					this.goTo('recovery');
+				} catch { /* non-fatal */ }
+			})(); });
 		}
 	}
 
@@ -542,7 +548,7 @@ export class OnboardingModal extends Modal {
 	// ── Step 5: Recovery Protocols ─────────────────────
 
 	private renderRecovery(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What Recharges You?' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
@@ -588,25 +594,27 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-primary',
 			text: 'Next'
 		});
-		saveBtn.addEventListener('click', async () => {
-			const inputs = protocolGroup.querySelectorAll('input');
-			const activities: string[] = [];
-			inputs.forEach(input => {
-				const val = (input as HTMLInputElement).value.trim();
-				if (val) activities.push(val);
-			});
-			if (activities.length > 0) {
-				try {
-					for (const activity of activities) {
-						await this.plugin.apiClient.createRecoveryProtocol(activity);
+		saveBtn.addEventListener('click', () => { void (async () => {
+			try {
+				const inputs = protocolGroup.querySelectorAll('input');
+				const activities: string[] = [];
+				inputs.forEach(input => {
+					const val = (input as HTMLInputElement).value.trim();
+					if (val) activities.push(val);
+				});
+				if (activities.length > 0) {
+					try {
+						for (const activity of activities) {
+							await this.plugin.apiClient.createRecoveryProtocol(activity);
+						}
+						new Notice('Recharge processes saved');
+					} catch { /* non-fatal */
+						new Notice('Saved locally — will sync later.');
 					}
-					new Notice('Recharge processes saved');
-				} catch {
-					new Notice('Saved locally — will sync later.');
 				}
-			}
-			this.goTo('schedule');
-		});
+				this.goTo('schedule');
+			} catch { /* non-fatal */ }
+		})(); });
 
 
 		const backBtn = actions.createEl('button', {
@@ -619,7 +627,7 @@ export class OnboardingModal extends Modal {
 	// ── Step 5: Weekly Schedule ──────────────────────────
 
 	private renderSchedule(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Your Weekly Schedule' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Your weekly schedule' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'How many hours per day do you typically devote to tracked projects?'
@@ -675,18 +683,20 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-primary',
 			text: 'Next'
 		});
-		nextBtn.addEventListener('click', async () => {
-			const schedule = this.dailyHours.map((hours, day) => ({
-				day,
-				available_hours: hours
-			}));
+		nextBtn.addEventListener('click', () => { void (async () => {
 			try {
-				await this.plugin.apiClient.setDailyAvailability(schedule);
-			} catch {
-				// Non-fatal
-			}
-			this.goTo('projects');
-		});
+				const schedule = this.dailyHours.map((hours, day) => ({
+					day,
+					available_hours: hours
+				}));
+				try {
+					await this.plugin.apiClient.setDailyAvailability(schedule);
+				} catch { /* non-fatal */
+					// Non-fatal
+				}
+				this.goTo('projects');
+			} catch { /* non-fatal */ }
+		})(); });
 
 
 		const backBtn = actions.createEl('button', {
@@ -699,7 +709,7 @@ export class OnboardingModal extends Modal {
 	// ── Step 6: Projects ─────────────────────────────
 
 	private renderProjects(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add Your First Projects' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add your first projects' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'What are you working on? Give each project an effort level — EMRALD uses this to measure what your day actually costs you.'
@@ -817,28 +827,30 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-primary',
 			text: 'Next'
 		});
-		nextBtn.addEventListener('click', async () => {
-			// Create projects via API, including the linked note path now that the
-			// production schema has the obsidian_note_path column.
-			for (const proj of this.projects) {
-				const resp = await this.plugin.apiClient.createItem({
-					name: proj.name,
-					effort_level: proj.effortLevel,
-					obsidian_note_path: proj.notePath
-				});
-				if (resp.error) {
-					new Notice(`Failed to create project "${proj.name}": ${resp.error}`);
+		nextBtn.addEventListener('click', () => { void (async () => {
+			try {
+				// Create projects via API, including the linked note path now that the
+				// production schema has the obsidian_note_path column.
+				for (const proj of this.projects) {
+					const resp = await this.plugin.apiClient.createItem({
+						name: proj.name,
+						effort_level: proj.effortLevel,
+						obsidian_note_path: proj.notePath
+					});
+					if (resp.error) {
+						new Notice(`Failed to create project "${proj.name}": ${resp.error}`);
+					}
 				}
-			}
-			this.goTo('tour');
-		});
+				this.goTo('tour');
+			} catch { /* non-fatal */ }
+		})(); });
 
 	}
 
 	// ── Step 7: Tour & Done ──────────────────────────
 
 	private renderTour(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick Tour' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick tour' });
 
 		const steps = [
 			{
@@ -853,7 +865,7 @@ export class OnboardingModal extends Modal {
 			},
 			{
 				icon: 'bar-chart-2',
-				title: 'Effort Management',
+				title: 'Effort management',
 				desc: 'Seven sections break down the ins and outs of your effort levels. Each one opens a detailed workspace view for you to analyze and track. If you\'re a PRO user, read effort insights and pinnable sparklines at a glance.'
 			},
 			{
@@ -905,13 +917,15 @@ export class OnboardingModal extends Modal {
 		const researchToggle = researchRow.createEl('label', { cls: 'emerald-onboard-research-label' });
 		const checkbox = researchToggle.createEl('input', { type: 'checkbox' }) as HTMLInputElement;
 		checkbox.checked = this.plugin.settings.researchOptIn;
-		checkbox.addEventListener('change', async () => {
-			this.plugin.settings.researchOptIn = checkbox.checked;
-			await this.plugin.saveSettings();
+		checkbox.addEventListener('change', () => { void (async () => {
 			try {
-				await this.plugin.apiClient.updatePreferences({ research_opt_in: checkbox.checked });
+				this.plugin.settings.researchOptIn = checkbox.checked;
+				await this.plugin.saveSettings();
+				try {
+					await this.plugin.apiClient.updatePreferences({ research_opt_in: checkbox.checked });
+				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
-		});
+		})(); });
 		researchToggle.appendText(' Help improve EMRALD — contribute anonymous usage data to build smarter features and advance effort management research. ');
 		const detailsLink = researchToggle.createEl('span', {
 			cls: 'emerald-link',
@@ -924,24 +938,26 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
 			text: 'Enable Advanced Profile'
 		});
-		profileBtn.addEventListener('click', async () => {
-			// Show the Advanced mode upgrade modal
-			const { AdvancedUpgradeModal } = await import('../modals/advanced-upgrade');
-			const modal = new AdvancedUpgradeModal(
-				this.app,
-				this.plugin,
-				() => {
-					// Accepted — finish onboarding, questions will appear at session start
-					this.finish();
-				},
-				() => {
-					// Declined — finish onboarding in Simple mode
-					this.finish();
-				}
-			);
-			this.close();
-			modal.open();
-		});
+		profileBtn.addEventListener('click', () => { void (async () => {
+			try {
+				// Show the Advanced mode upgrade modal
+				const { AdvancedUpgradeModal } = await import('../modals/advanced-upgrade');
+				const modal = new AdvancedUpgradeModal(
+					this.app,
+					this.plugin,
+					() => {
+						// Accepted — finish onboarding, questions will appear at session start
+						void this.finish();
+					},
+					() => {
+						// Declined — finish onboarding in Simple mode
+						void this.finish();
+					}
+				);
+				this.close();
+				modal.open();
+			} catch { /* non-fatal */ }
+		})(); });
 
 		const laterBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
@@ -967,7 +983,7 @@ export class OnboardingModal extends Modal {
 		const aboutViewType = VIEW_ABOUT;
 		this.close();
 		setTimeout(() => {
-			this.plugin.openWorkspaceView(aboutViewType);
+			void this.plugin.openWorkspaceView(aboutViewType);
 			this.onComplete();
 		}, 300);
 	}

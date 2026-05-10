@@ -3,7 +3,7 @@
 // → Recovery sparkline (collapsed). Episodes tucked at bottom.
 // Warm language, minimal data, emotionally effective.
 
-import { WorkspaceLeaf, Notice, Modal, setIcon } from 'obsidian';
+import { WorkspaceLeaf, setIcon } from 'obsidian';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_BURNOUT_MONITOR, VIEW_EFFORT_PROFILE } from './base';
 import { RecoveryProtocol } from '../../api/client';
@@ -42,14 +42,14 @@ const SPARK_H = 32;
 
 export class BurnoutMonitorView extends EmraldWorkspaceView {
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Burnout Monitor');
+		super(leaf, plugin, 'Burnout monitor');
 	}
 
 	getViewType(): string { return VIEW_BURNOUT_MONITOR; }
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Burnout Monitor', 'How you\'re really doing', 'flame');
+		this.renderHeader(container, 'Burnout monitor', 'How you\'re really doing', 'flame');
 
 		// Fetch data concurrently
 		let burnoutResp, metricsResp, historyResp, recoveryResp, d8CurrentResp;
@@ -177,7 +177,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
-			this.plugin.openWorkspaceView(VIEW_EFFORT_PROFILE);
+			void this.plugin.openWorkspaceView(VIEW_EFFORT_PROFILE);
 		});
 	}
 
@@ -190,7 +190,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'Not enough data yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'The Burnout Monitor needs session data and effort receipts to understand your patterns. Complete a few work sessions and this dashboard will come alive.'
+			text: 'The burnout monitor needs session data and effort receipts to understand your patterns. Complete a few work sessions and this dashboard will come alive.'
 		});
 	}
 
@@ -228,11 +228,11 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			cls: 'emerald-wv-burnout-score-explainer',
 			text: '0 = no risk signals detected. 100 = multiple burnout indicators active. Combines rising effort, declining enjoyment, low flow, emotional strain, and demand imbalance over the past 14 days.'
 		});
-		infoDetail.style.display = 'none';
+		infoDetail.addClass('emrald-hidden');
 		infoBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
-			const visible = infoDetail.style.display !== 'none';
-			infoDetail.style.display = visible ? 'none' : 'block';
+			const visible = !infoDetail.hasClass('emrald-hidden');
+			visible ? infoDetail.addClass('emrald-hidden') : infoDetail.removeClass('emrald-hidden');
 		});
 		const barOuter = scoreRow.createEl('div', { cls: 'emerald-wv-burnout-score-bar' });
 		const barFill = barOuter.createEl('div', {
@@ -257,7 +257,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		for (const factor of factors) {
 			const row = list.createEl('div', { cls: 'emerald-wv-factor-row' });
 			const dot = row.createEl('span', { cls: 'emerald-wv-factor-indicator' });
-			dot.style.background = this.getPhaseColor(phase);
+			dot.dataset.phase = phase;
 			row.createEl('span', { text: factor });
 		}
 	}
@@ -364,11 +364,11 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			cls: 'emerald-wv-burnout-score-explainer',
 			text: 'This tracks your D8 Burnout Risk Score over time. Each point is the daily score (0–100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating.'
 		});
-		sparkExplainer.style.display = 'none';
+		sparkExplainer.addClass('emrald-hidden');
 		sparkInfo.addEventListener('click', (e) => {
 			e.stopPropagation();
-			const visible = sparkExplainer.style.display !== 'none';
-			sparkExplainer.style.display = visible ? 'none' : 'block';
+			const visible = !sparkExplainer.hasClass('emrald-hidden');
+			visible ? sparkExplainer.addClass('emrald-hidden') : sparkExplainer.removeClass('emrald-hidden');
 		});
 
 		// Toggle to expand
@@ -379,11 +379,11 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 		let expanded = false;
 		const chartContainer = section.createEl('div', { cls: 'emerald-wv-burnout-full-chart' });
-		chartContainer.style.display = 'none';
+		chartContainer.addClass('emrald-hidden');
 
 		toggleBtn.addEventListener('click', () => {
 			expanded = !expanded;
-			chartContainer.style.display = expanded ? 'block' : 'none';
+			expanded ? chartContainer.removeClass('emrald-hidden') : chartContainer.addClass('emrald-hidden');
 			toggleBtn.textContent = expanded ? 'Hide trendline ▲' : 'Show full trendline ▼';
 
 			if (expanded && chartContainer.childElementCount === 0) {
@@ -504,12 +504,12 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		});
 
 		const listContainer = section.createEl('div', { cls: 'emerald-wv-burnout-episodes-list' });
-		listContainer.style.display = 'none';
+		listContainer.addClass('emrald-hidden');
 
 		let expanded = false;
 		toggleBtn.addEventListener('click', () => {
 			expanded = !expanded;
-			listContainer.style.display = expanded ? 'block' : 'none';
+			expanded ? listContainer.removeClass('emrald-hidden') : listContainer.addClass('emrald-hidden');
 			toggleBtn.textContent = expanded
 				? `Past Episodes (${episodes.length}) ▲`
 				: `Past Episodes (${episodes.length}) ▼`;
@@ -551,15 +551,6 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 	// ── Helpers ──────────────────────────────────────────
 
-	private getPhaseColor(phase: string): string {
-		switch (phase) {
-			case 'green': return 'var(--text-success)';
-			case 'yellow': return 'var(--text-warning)';
-			case 'orange': return '#e68a00';
-			case 'red': return 'var(--text-error)';
-			default: return 'var(--text-muted)';
-		}
-	}
 
 	private formatDateShort(iso: string | null | undefined): string | null {
 		if (!iso || typeof iso !== 'string') return null;

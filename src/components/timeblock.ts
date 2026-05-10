@@ -14,14 +14,6 @@ const E_LEVEL_PERCENT: Record<string, number> = {
 	E4: 1.00
 };
 
-// E-level colors — AP(E)CS design system palette
-const E_LEVEL_COLORS: Record<string, string> = {
-	E1: '#2D7A4A',
-	E2: '#B8912E',
-	E3: '#C06A30',
-	E4: '#B54545'
-};
-
 export interface TimeblockState {
 	availableHours: number;       // Today's available hours (from availability or override)
 	workedMinutes: number;        // Total minutes worked today (all projects)
@@ -82,7 +74,7 @@ export class TimeblockComponent {
 
 		// Timer display (visible during active session)
 		this.timerEl = this.containerEl.createEl('div', { cls: 'emerald-timer' });
-		this.timerEl.style.display = this.state.activeSession ? 'flex' : 'none';
+		if (!this.state.activeSession) this.timerEl.addClass('emrald-hidden');
 
 		// Tick bar container
 		const barWrapper = this.containerEl.createEl('div', { cls: 'emerald-bar-wrapper' });
@@ -90,7 +82,7 @@ export class TimeblockComponent {
 		this.greenBarEl = barWrapper.createEl('div', { cls: 'emerald-green-bar' });
 		this.overtimeBarEl = barWrapper.createEl('div', { cls: 'emerald-overtime-bar' });
 		this.eLevelMarkerEl = barWrapper.createEl('div', { cls: 'emerald-elevel-marker' });
-		this.eLevelMarkerEl.style.display = 'none';
+		this.eLevelMarkerEl.addClass('emrald-hidden');
 		this.dailyHoursMarkerEl = barWrapper.createEl('div', { cls: 'emerald-dh-marker' });
 		this.updateDailyHoursMarker();
 
@@ -157,8 +149,8 @@ export class TimeblockComponent {
 		this.renderControls();
 		this.updateBars();
 
-		if (this.timerEl) this.timerEl.style.display = 'flex';
-		if (this.eLevelMarkerEl) this.eLevelMarkerEl.style.display = 'block';
+		if (this.timerEl) this.timerEl.removeClass('emrald-hidden');
+		if (this.eLevelMarkerEl) this.eLevelMarkerEl.removeClass('emrald-hidden');
 		if (this.greenBarEl) this.greenBarEl.addClass('is-active');
 	}
 
@@ -185,8 +177,8 @@ export class TimeblockComponent {
 		this.renderControls();
 		this.updateBars();
 
-		if (this.timerEl) this.timerEl.style.display = 'flex';
-		if (this.eLevelMarkerEl) this.eLevelMarkerEl.style.display = 'block';
+		if (this.timerEl) this.timerEl.removeClass('emrald-hidden');
+		if (this.eLevelMarkerEl) this.eLevelMarkerEl.removeClass('emrald-hidden');
 		if (this.greenBarEl) this.greenBarEl.addClass('is-active');
 	}
 
@@ -232,8 +224,8 @@ export class TimeblockComponent {
 		this.renderControls();
 		this.updateBars();
 
-		if (this.timerEl) this.timerEl.style.display = 'flex';
-		if (this.eLevelMarkerEl) this.eLevelMarkerEl.style.display = 'block';
+		if (this.timerEl) this.timerEl.removeClass('emrald-hidden');
+		if (this.eLevelMarkerEl) this.eLevelMarkerEl.removeClass('emrald-hidden');
 		if (this.greenBarEl) this.greenBarEl.addClass('is-active');
 	}
 	pauseSession() {
@@ -279,8 +271,8 @@ export class TimeblockComponent {
 		this.renderSummary();
 		this.updateBars();
 
-		if (this.timerEl) this.timerEl.style.display = 'none';
-		if (this.eLevelMarkerEl) this.eLevelMarkerEl.style.display = 'none';
+		if (this.timerEl) this.timerEl.addClass('emrald-hidden');
+		if (this.eLevelMarkerEl) this.eLevelMarkerEl.addClass('emrald-hidden');
 		if (this.greenBarEl) this.greenBarEl.removeClass('is-active');
 
 		return elapsedMinutes;
@@ -408,7 +400,7 @@ export class TimeblockComponent {
 			const pad = (n: number) => String(n).padStart(2, '0');
 			const timeStr = `${pad(h)}:${pad(m)}:${pad(s)}`;
 
-			this.timerEl.innerHTML = '';
+			this.timerEl.empty();
 			const dot = this.timerEl.createEl('span', { cls: 'emerald-timer-dot is-recording' });
 			dot.setAttribute('aria-hidden', 'true');
 			this.timerEl.createEl('span', { cls: 'emerald-timer-text', text: timeStr });
@@ -442,7 +434,7 @@ export class TimeblockComponent {
 			const overtimePx = (overtimeMin / 60) * hourWidth;
 			this.overtimeBarEl.style.width = `${overtimePx}px`;
 			this.overtimeBarEl.style.left = `${greenPx}px`;
-			this.overtimeBarEl.style.display = 'block';
+			this.overtimeBarEl.removeClass('emrald-hidden');
 
 			// Add/update overtime counter text
 			let counterEl = this.overtimeBarEl.querySelector('.emerald-overtime-counter') as HTMLElement | null;
@@ -453,7 +445,7 @@ export class TimeblockComponent {
 			const otM = Math.round(overtimeMin % 60);
 			counterEl.textContent = otH > 0 ? `+${otH}h${otM}m` : `+${otM}m`;
 		} else if (this.overtimeBarEl) {
-			this.overtimeBarEl.style.display = 'none';
+			this.overtimeBarEl.addClass('emrald-hidden');
 		}
 	}
 
@@ -477,10 +469,10 @@ export class TimeblockComponent {
 		const markerPx = markerHours * hourWidth;
 
 		this.eLevelMarkerEl.style.left = `${markerPx}px`;
-		this.eLevelMarkerEl.style.display = 'block';
+		this.eLevelMarkerEl.removeClass('emrald-hidden');
 		this.eLevelMarkerEl.textContent = session.effortLevel;
-		this.eLevelMarkerEl.style.backgroundColor = E_LEVEL_COLORS[session.effortLevel] ?? 'var(--interactive-accent)';
-		this.eLevelMarkerEl.style.color = '#fff';
+		this.eLevelMarkerEl.dataset.level = session.effortLevel;
+		this.eLevelMarkerEl.addClass('is-active');
 	}
 
 	/**
@@ -580,7 +572,7 @@ export class TimeblockComponent {
 			// Idle controls — Start Session button
 			const startBtn = this.controlsEl.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Start Session'
+				text: 'Start session'
 			});
 			startBtn.setAttribute('aria-label', 'Start a new session');
 			const startIcon = createIconEl(startBtn, ICONS.play, 'emerald-btn-icon');
@@ -638,7 +630,7 @@ export class TimeblockComponent {
 		if (!this.state.activeSession && !this.state.dayIsClosed && totalWorkedMin > 0) {
 			const closeBtn = this.summaryEl.createEl('button', {
 				cls: 'emerald-btn emerald-btn-subtle',
-				text: 'Close Day ✓'
+				text: 'Close day ✓'
 			});
 			closeBtn.addEventListener('click', () => this.onCloseDay());
 		}

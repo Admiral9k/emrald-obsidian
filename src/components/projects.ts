@@ -2,17 +2,10 @@
 // Renders the project list with active/inactive sections, context menus,
 // and session start integration.
 
-import { Menu, Notice, setIcon } from 'obsidian';
+import { Menu, Notice, setIcon, TFile } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { TrackedItem, Session } from '../api/client';
 
-// E-level color mapping — AP(E)CS design system palette
-const E_LEVEL_COLORS: Record<string, string> = {
-	E1: '#2D7A4A',     // Deep forest green — light effort
-	E2: '#B8912E',     // Warm amber-gold — moderate effort
-	E3: '#C06A30',     // Muted burnt orange — demanding effort
-	E4: '#B54545'      // Muted brick red — maximum effort
-};
 
 // E-level prescribed duration as percentage of daily available hours
 const E_LEVEL_PERCENT: Record<string, number> = {
@@ -155,14 +148,14 @@ export class ProjectsComponent {
 			text: item.effort_level,
 			attr: { 'aria-label': `Effort level ${item.effort_level}` }
 		});
-		badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
+		badge.dataset.level = item.effort_level ?? '';
 
 		// Bottom row: today's time
 		const bottomRow = card.createEl('div', { cls: 'emerald-project-bottom' });
 
 		if (isInSession) {
 			// In-session state with live elapsed / prescribed time
-			bottomRow.createEl('span', { cls: 'emerald-in-session-label', text: '┄┄ IN SESSION ┄┄' });
+			bottomRow.createEl('span', { cls: 'emerald-in-session-label', text: '┄┄ In session ┄┄' });
 			const progressEl = bottomRow.createEl('span', { cls: 'emerald-in-session-progress emerald-project-time' });
 			progressEl.dataset.itemId = item.id;
 			this.updateSessionProgressEl(progressEl, item);
@@ -174,7 +167,7 @@ export class ProjectsComponent {
 		}
 
 		// Whole card opens context menu on click (except name which opens note)
-		card.style.cursor = 'pointer';
+		card.addClass('emrald-clickable');
 		card.addEventListener('click', (e) => {
 			// Don't trigger if they clicked the project name (that opens the note)
 			if ((e.target as HTMLElement).closest('.emerald-project-name')) return;
@@ -203,11 +196,11 @@ export class ProjectsComponent {
 		header.createEl('span', { text: `▸ ${label} (${items.length})` });
 
 		const content = accordion.createEl('div', { cls: 'emerald-inactive-content' });
-		content.style.display = 'none';
+		content.addClass('emrald-hidden');
 
 		const toggle = () => {
-			const isHidden = content.style.display === 'none';
-			content.style.display = isHidden ? 'block' : 'none';
+			const isHidden = content.hasClass('emrald-hidden');
+			isHidden ? content.removeClass('emrald-hidden') : content.addClass('emrald-hidden');
 			header.setAttribute('aria-expanded', String(isHidden));
 			header.empty();
 			header.createEl('span', { text: `${isHidden ? '▼' : '▸'} ${label} (${items.length})` });
@@ -236,9 +229,9 @@ export class ProjectsComponent {
 			const nameEl = row.createEl('span', { text: item.name });
 			nameEl.setAttribute('aria-hidden', 'true');
 			const badge = row.createEl('span', { cls: 'emerald-elevel-badge-small', text: item.effort_level });
-			badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
+			badge.dataset.level = item.effort_level ?? '';
 
-			row.style.cursor = 'pointer';
+			row.addClass('emrald-clickable');
 			row.addEventListener('click', (e) => {
 				this.showCollapsibleContextMenu(e, item, sectionStatus);
 			});
@@ -256,15 +249,15 @@ export class ProjectsComponent {
 	private showCollapsibleContextMenu(e: Event, item: TrackedItem, sectionStatus: 'paused' | 'completed') {
 		const menu = new Menu();
 
-		menu.addItem(i => i.setTitle('Set Active').setIcon('play-circle').onClick(() => this.reactivateItem(item)));
+		menu.addItem(i => i.setTitle('Set active').setIcon('play-circle').onClick(() => this.reactivateItem(item)));
 
 		if (sectionStatus === 'paused') {
-			menu.addItem(i => i.setTitle('Mark Complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
+			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		} else {
-			menu.addItem(i => i.setTitle('Set Inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 		}
 
-		menu.addItem(i => i.setTitle('Open Note').setIcon('file-text').onClick(() => this.openNote(item)));
+		menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 
 		menu.showAtMouseEvent(e as MouseEvent);
 	}
@@ -277,22 +270,22 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Pause').setIcon('pause').onClick(() => this.onPauseSession()));
 			menu.addItem(i => i.setTitle('Stop').setIcon('square').onClick(() => this.onStopSession()));
 			menu.addSeparator();
-			menu.addItem(i => i.setTitle('Open Note').setIcon('file-text').onClick(() => this.openNote(item)));
+			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 		} else if (this.state.activeSessionItemId) {
 			// Another session is active — show management options too
-			menu.addItem(i => i.setTitle('Open Note').setIcon('file-text').onClick(() => this.openNote(item)));
-			menu.addItem(i => i.setTitle('Change E-Level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+			menu.addItem(i => i.setTitle('Change E-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
 			menu.addSeparator();
-			menu.addItem(i => i.setTitle('Set Inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
-			menu.addItem(i => i.setTitle('Mark Complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
+			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		} else {
 			// No active session — full menu
-			menu.addItem(i => i.setTitle('Start Session').setIcon('play').onClick(() => this.onStartSession(item)));
+			menu.addItem(i => i.setTitle('Start session').setIcon('play').onClick(() => this.onStartSession(item)));
 			menu.addSeparator();
-			menu.addItem(i => i.setTitle('Open Note').setIcon('file-text').onClick(() => this.openNote(item)));
-			menu.addItem(i => i.setTitle('Change E-Level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
-			menu.addItem(i => i.setTitle('Set Inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
-			menu.addItem(i => i.setTitle('Mark Complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
+			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+			menu.addItem(i => i.setTitle('Change E-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		}
 
 		menu.showAtMouseEvent(e as MouseEvent);
@@ -303,8 +296,8 @@ export class ProjectsComponent {
 	private openNote(item: TrackedItem) {
 		if (item.obsidian_note_path) {
 			const file = this.plugin.app.vault.getAbstractFileByPath(item.obsidian_note_path);
-			if (file) {
-				this.plugin.app.workspace.getLeaf(false).openFile(file as import('obsidian').TFile);
+			if (file instanceof TFile) {
+				void this.plugin.app.workspace.getLeaf(false).openFile(file);
 			} else {
 				new Notice(`Note not found: "${item.obsidian_note_path}" — it may have been moved or deleted.`);
 			}

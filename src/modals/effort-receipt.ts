@@ -3,7 +3,7 @@
 // demand-investment balance, effort source, and optional notes.
 // ~20 seconds to complete. Fast, tactile, not a chore.
 
-import { App, Modal, Notice } from 'obsidian';
+import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { CreateReceiptPayload } from '../api/client';
 
@@ -52,7 +52,7 @@ export class EffortReceiptModal extends Modal {
 		contentEl.addClass('emerald-modal', 'emerald-receipt-modal');
 
 		// Title with E-level and duration
-		contentEl.createEl('h2', { text: 'Effort Receipt' });
+		contentEl.createEl('h2', { text: 'Effort receipt' });
 		const subtitle = this.effortLevel
 			? `${this.itemName} (${this.effortLevel})  •  ${this.formatDuration(this.sessionMinutes)}`
 			: `${this.itemName}  •  ${this.formatDuration(this.sessionMinutes)}`;
@@ -105,13 +105,13 @@ export class EffortReceiptModal extends Modal {
 		if (this.metPrescribedEffort) {
 			const completeBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Submit & Complete'
+				text: 'Submit & complete'
 			});
 			completeBtn.addEventListener('click', () => this.submit(true));
 
 			const notYetBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-secondary',
-				text: 'Submit (Not Yet)'
+				text: 'Submit (not yet)'
 			});
 			notYetBtn.addEventListener('click', () => this.submit(false));
 		} else {

@@ -106,7 +106,7 @@ class TierState {
 		this._tier = tier;
 		if (old !== tier) {
 			for (const listener of this._listeners) {
-				try { listener(tier); } catch {}
+				try { listener(tier); } catch { /* listener errors are non-fatal */ }
 			}
 		}
 	}

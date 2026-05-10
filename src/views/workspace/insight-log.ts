@@ -24,7 +24,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 	private expandedIds: Set<string> = new Set();
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Insight Log');
+		super(leaf, plugin, 'Insight log');
 	}
 
 	getViewType(): string { return VIEW_INSIGHT_LOG; }
@@ -34,7 +34,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Insight Log', 'Everything EMRALD has noticed', 'lightbulb');
+		this.renderHeader(container, 'Insight log', 'Everything EMRALD has noticed', 'lightbulb');
 
 		// Listen for insight acknowledgements from sidebar bulletin (bind once)
 		if (!this._ackListener) {
@@ -45,7 +45,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		// Pro gate — show upgrade pitch for free users
 		if (this.renderUpgradeGate(container, {
 			icon: 'lightbulb',
-			title: 'Insight Log',
+			title: 'Insight log',
 			description: 'AI-powered observations, suggestions, and discoveries about your effort patterns — all in one place.',
 			features: [
 				'5 insight categories: observations, suggestions, warnings, celebrations, discoveries',
@@ -220,7 +220,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		// ── Title (clickable to expand) ──
 		const titleRow = card.createEl('div', { cls: 'emerald-wv-insight-title-row' });
 		const titleEl = titleRow.createEl('div', { cls: 'emerald-wv-insight-title' });
-		titleEl.style.cursor = 'pointer';
+		titleEl.addClass('emrald-clickable');
 		titleEl.createEl('span', { text: insight.title });
 		if (!isRead) {
 			titleRow.createEl('span', { cls: 'emerald-wv-insight-new-pill', text: 'NEW' });
@@ -230,8 +230,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 			cls: 'emerald-wv-insight-chevron',
 			text: isExpanded ? ' ▾' : ' ▸'
 		});
-		chevron.style.color = 'var(--text-faint)';
-		chevron.style.marginLeft = '6px';
+		chevron.addClass('emrald-insight-chevron-style');
 
 		titleRow.addEventListener('click', () => {
 			if (this.expandedIds.has(insight.id)) {
@@ -272,19 +271,21 @@ export class InsightLogView extends EmraldWorkspaceView {
 
 		if (!isRead) {
 			const gotItBtn = actions.createEl('button', { cls: 'emerald-btn-tiny', text: '✓ Got it' });
-			gotItBtn.addEventListener('click', async (e) => {
-				e.stopPropagation();
-				const resp = await this.plugin.apiClient.acknowledgeInsight(insight.id, 'dismissed');
-				if (!resp.error) {
-					insight.acknowledged_at = new Date().toISOString();
-					new Notice('Insight acknowledged');
-					this.refreshView();
-					// Notify sidebar EM component to refresh badge + bulletin
-					this._ackSelf = true;
-					window.dispatchEvent(new CustomEvent('emrald:insight-acknowledged', { detail: { id: insight.id } }));
-					this._ackSelf = false;
-				}
-			});
+			gotItBtn.addEventListener('click', (e) => { void (async () => {
+				try {
+					e.stopPropagation();
+					const resp = await this.plugin.apiClient.acknowledgeInsight(insight.id, 'dismissed');
+					if (!resp.error) {
+						insight.acknowledged_at = new Date().toISOString();
+						new Notice('Insight acknowledged');
+						this.refreshView();
+						// Notify sidebar EM component to refresh badge + bulletin
+						this._ackSelf = true;
+						window.dispatchEvent(new CustomEvent('emrald:insight-acknowledged', { detail: { id: insight.id } }));
+						this._ackSelf = false;
+					}
+				} catch { /* non-fatal */ }
+			})(); });
 		}
 	}
 

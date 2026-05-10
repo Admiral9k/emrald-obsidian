@@ -33,7 +33,7 @@ export class ELevelModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-elevel-modal');
 
-		contentEl.createEl('h2', { text: 'Set E-Level' });
+		contentEl.createEl('h2', { text: 'Set E-level' });
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: this.itemName });
 
 		// Current level indicator

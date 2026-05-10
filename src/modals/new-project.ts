@@ -28,7 +28,7 @@ export class NewProjectModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-elevel-modal');
 
-		contentEl.createEl('h2', { text: 'Create New Project' });
+		contentEl.createEl('h2', { text: 'Create new project' });
 
 		// Editable project name — same green-bordered input as ELevelModal's subtitle area
 		this.nameInput = contentEl.createEl('input', {

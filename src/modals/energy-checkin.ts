@@ -3,7 +3,7 @@
 // Opens once per day — duplicate guard via API 409 + local check.
 // Spec: all scales 1-10 except hours.
 
-import { App, Modal, Notice } from 'obsidian';
+import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { CreateEnergyCheckinPayload } from '../api/client';
 
@@ -50,7 +50,7 @@ export class EnergyCheckinModal extends Modal {
 		loadingEl.remove();
 
 		if (todayResp.data) {
-			contentEl.createEl('h2', { text: 'Already Checked In ✓' });
+			contentEl.createEl('h2', { text: 'Already checked in ✓' });
 			contentEl.createEl('p', {
 				cls: 'emerald-modal-subtitle',
 				text: 'You\'ve already submitted your energy check-in today. Come back tomorrow!'
@@ -61,7 +61,7 @@ export class EnergyCheckinModal extends Modal {
 			return;
 		}
 
-		contentEl.createEl('h2', { text: 'Daily Check-in' });
+		contentEl.createEl('h2', { text: 'Daily check-in' });
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: 'How are you feeling today?' });
 
 		const form = contentEl.createEl('div', { cls: 'emerald-form' });
@@ -117,7 +117,7 @@ export class EnergyCheckinModal extends Modal {
 			this.recoveryYesterday = !this.recoveryYesterday;
 			recoveryToggle.toggleClass('is-enabled', this.recoveryYesterday);
 			recoveryToggle.setAttribute('aria-checked', String(this.recoveryYesterday));
-			effectivenessGroup.style.display = this.recoveryYesterday ? 'block' : 'none';
+			this.recoveryYesterday ? effectivenessGroup.removeClass('emrald-hidden') : effectivenessGroup.addClass('emrald-hidden');
 		});
 		recoveryToggle.addEventListener('keydown', (e: KeyboardEvent) => {
 			if (e.key === 'Enter' || e.key === ' ') {
@@ -132,7 +132,7 @@ export class EnergyCheckinModal extends Modal {
 		});
 
 		const effectivenessGroup = form.createEl('div', { cls: 'emerald-form-group' });
-		effectivenessGroup.style.display = 'none';
+		effectivenessGroup.addClass('emrald-hidden');
 		effectivenessGroup.createEl('label', { text: 'How effective was it?' });
 
 		const effRow = effectivenessGroup.createEl('div', { cls: 'emerald-radio-group' });
@@ -225,7 +225,7 @@ export class EnergyCheckinModal extends Modal {
 		});
 	}
 
-	private async submit() {
+	private submit() {
 		const checkin: CheckinWithRecovery = {
 			sleep_quality: this.sleepQuality,
 			sleep_hours: this.sleepHours,

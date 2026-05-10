@@ -46,6 +46,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	async onClose() {
+		await Promise.resolve();
 		this.containerEl.children[1].empty();
 	}
 
@@ -71,7 +72,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 		const refreshIcon = refreshBtn.createEl('span', { cls: 'emerald-btn-icon' });
 		setIcon(refreshIcon, 'refresh-cw');
 		refreshBtn.createEl('span', { text: 'Refresh' });
-		refreshBtn.addEventListener('click', () => this.onOpen());
+		refreshBtn.addEventListener('click', () => { void this.onOpen(); });
 
 		if (subtitle) {
 			header.createEl('p', { cls: 'emerald-wv-subtitle', text: subtitle });

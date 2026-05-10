@@ -63,7 +63,7 @@ const D_METRICS: Record<string, MetricInfo> = {
 	D14: { name: 'Flow Quality',             unit: '/10',  category: 'Effort',       goodDirection: 'up',
 	       desc: 'How enjoyable your flow sessions are',
 	       explainer: 'Average enjoyment (hedonic valence) during flow sessions. High flow + low enjoyment = "grinding" — technically focused but not fulfilling. Watch for that pattern.' },
-	D15: { name: 'Effort Sources',           unit: '',     category: 'Effort',       goodDirection: 'varies',
+	D15: { name: 'Effort sources',           unit: '',     category: 'Effort',       goodDirection: 'varies',
 	       desc: 'Where your effort comes from (complexity, emotional, etc.)',
 	       explainer: 'Shows the breakdown of what makes your work effortful. If one source dominates (e.g., emotional drain), it\'s worth investigating why. Balanced = healthy diversity.' },
 	D16: { name: 'Disengagement Risk',       unit: '/10',  category: 'Energy',       goodDirection: 'down',
@@ -92,13 +92,6 @@ const CATEGORY_ICONS: Record<string, string> = {
 	Calibration: 'sliders'
 };
 
-const CATEGORY_BORDER_COLORS: Record<string, string> = {
-	Effort: '#C06A30',
-	Energy: '#4A8AB5',
-	Productivity: '#2D7A4A',
-	Calibration: '#7B61A3'
-};
-
 // SVG chart constants
 const CHART_WIDTH = 360;
 const CHART_HEIGHT = 104;
@@ -114,7 +107,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	private gridContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Data Center');
+		super(leaf, plugin, 'Data center');
 		this.pinnedKeys = new Set(plugin.settings?.pinnedMetricKeys ?? ['D1', 'D8', 'D12', 'D3']);
 	}
 
@@ -122,7 +115,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Data Center', 'All 20 D-metrics — your effort fingerprint', 'trending-up');
+		this.renderHeader(container, 'Data center', 'All 20 D-metrics — your effort fingerprint', 'trending-up');
 
 		// Pinned metrics note
 		const pinnedNote = container.createEl('div', { cls: 'emerald-wv-dc-pinned-note' });
@@ -206,7 +199,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const headerRow = card.createEl('div', { cls: 'emerald-wv-story-header' });
 		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-story-icon' });
 		setIcon(iconEl, 'book-open');
-		headerRow.createEl('span', { cls: 'emerald-wv-story-title', text: 'Your Story' });
+		headerRow.createEl('span', { cls: 'emerald-wv-story-title', text: 'Your story' });
 
 		const body = card.createEl('div', { cls: 'emerald-wv-story-body' });
 
@@ -348,9 +341,8 @@ export class DataCenterView extends EmraldWorkspaceView {
 		});
 
 		// Category color border
-		const borderColor = CATEGORY_BORDER_COLORS[info.category];
-		if (borderColor) {
-			card.style.borderLeftColor = borderColor;
+		if (info.category) {
+			card.dataset.category = info.category.toLowerCase();
 		}
 
 		// ── Header Row: key + pin + value ──
@@ -368,7 +360,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			pinBtn.title = isPinned ? 'Unpin from sidebar' : 'Pin to sidebar sparklines';
 			pinBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
-				this.togglePin(key, pinBtn);
+				void this.togglePin(key, pinBtn);
 			});
 		}
 
@@ -442,16 +434,16 @@ export class DataCenterView extends EmraldWorkspaceView {
 			const lockIcon = overlay.createEl('span', { cls: 'emerald-wv-metric-lock-icon' });
 			setIcon(lockIcon, 'lock');
 			overlay.createEl('span', { cls: 'emerald-wv-metric-lock-text', text: 'Pro' });
-			card.style.cursor = 'default';
+			card.addClass('emrald-not-clickable');
 		} else {
 			// Click to expand/collapse (free metrics only)
-			card.style.cursor = 'pointer';
+			card.addClass('emrald-clickable');
 			card.addEventListener('click', () => this.toggleExpand(key));
 		}
 
 		// ── Expanded Section ──
 		if (isExpanded && !isLocked) {
-			this.renderExpandedSection(card, key, info, metric);
+			void this.renderExpandedSection(card, key, info, metric);
 		}
 	}
 
@@ -623,8 +615,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	}
 
 	private buildEffortSourceChart(metric: ComputedMetric | undefined, entry: ComputedMetricHistory): HTMLElement {
-		const wrap = document.createElement('div');
-		wrap.className = 'emerald-wv-dist-chart';
+		const wrap = createDiv({ cls: 'emerald-wv-dist-chart' });
 
 		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {}) as Record<string, unknown>;
 		const rows = [
@@ -638,28 +629,20 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const dominantLabel = rows[0]?.label;
 
 		for (const row of rows) {
-			const item = wrap.appendChild(document.createElement('div')) as HTMLDivElement;
-			item.className = 'emerald-wv-dist-row';
-			if (row.label === dominantLabel && row.value > 0) item.classList.add('is-dominant');
-			const label = item.appendChild(document.createElement('div')) as HTMLDivElement;
-			label.className = 'emerald-wv-dist-label';
-			label.textContent = row.label;
-			const bar = item.appendChild(document.createElement('div')) as HTMLDivElement;
-			bar.className = 'emerald-wv-dist-bar';
-			const fill = bar.appendChild(document.createElement('div')) as HTMLDivElement;
-			fill.className = 'emerald-wv-dist-fill';
+			const item = wrap.createDiv({ cls: 'emerald-wv-dist-row' });
+			if (row.label === dominantLabel && row.value > 0) item.addClass('is-dominant');
+			item.createDiv({ cls: 'emerald-wv-dist-label', text: row.label });
+			const bar = item.createDiv({ cls: 'emerald-wv-dist-bar' });
+			const fill = bar.createDiv({ cls: 'emerald-wv-dist-fill' });
 			fill.style.width = `${Math.max(row.value * 100, 4)}%`;
-			const value = item.appendChild(document.createElement('div')) as HTMLDivElement;
-			value.className = 'emerald-wv-dist-value';
-			value.textContent = `${Math.round(row.value * 100)}%`;
+			item.createDiv({ cls: 'emerald-wv-dist-value', text: `${Math.round(row.value * 100)}%` });
 		}
 
 		return wrap;
 	}
 
 	private buildTimeOfDayChart(metric: ComputedMetric | undefined, entry: ComputedMetricHistory): HTMLElement {
-		const wrap = document.createElement('div');
-		wrap.className = 'emerald-wv-time-chart';
+		const wrap = createDiv({ cls: 'emerald-wv-time-chart' });
 
 		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {}) as Record<string, unknown>;
 		const byHour = (meta.by_hour ?? {}) as Record<string, { avg_valence?: number; flow_rate?: number; count?: number }>;
@@ -668,20 +651,16 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		for (let hour = 0; hour < 24; hour++) {
 			const stats = byHour[String(hour)] ?? byHour[hour as unknown as keyof typeof byHour];
-			const bucket = wrap.appendChild(document.createElement('div')) as HTMLDivElement;
-			bucket.className = 'emerald-wv-time-bucket';
-			if (bestHours.has(hour)) bucket.classList.add('is-best');
-			if (worstHours.has(hour)) bucket.classList.add('is-worst');
-			if (!stats) bucket.classList.add('is-empty');
+			const bucket = wrap.createDiv({ cls: 'emerald-wv-time-bucket' });
+			if (bestHours.has(hour)) bucket.addClass('is-best');
+			if (worstHours.has(hour)) bucket.addClass('is-worst');
+			if (!stats) bucket.addClass('is-empty');
 
 			const score = stats ? ((Number(stats.avg_valence ?? 5) * 0.6) + (Number(stats.flow_rate ?? 0) * 10 * 0.4)) / 10 : 0;
-			const fill = bucket.appendChild(document.createElement('div')) as HTMLDivElement;
-			fill.className = 'emerald-wv-time-bucket-fill';
+			const fill = bucket.createDiv({ cls: 'emerald-wv-time-bucket-fill' });
 			fill.style.height = `${Math.max(score * 100, stats ? 10 : 4)}%`;
 
-			const label = bucket.appendChild(document.createElement('div')) as HTMLDivElement;
-			label.className = 'emerald-wv-time-bucket-label';
-			label.textContent = hour % 6 === 0 ? `${hour}` : '·';
+			bucket.createDiv({ cls: 'emerald-wv-time-bucket-label', text: hour % 6 === 0 ? `${hour}` : '·' });
 		}
 
 		return wrap;

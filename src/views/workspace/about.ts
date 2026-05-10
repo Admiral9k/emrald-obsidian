@@ -31,10 +31,10 @@ export class AboutView extends EmraldWorkspaceView {
 		const arrow = header.createEl('span', { cls: 'emerald-wv-about-section-arrow', text: '\u25B8' });
 		header.createEl('h3', { attr: { id }, cls: 'emerald-wv-about-section-title', text: title });
 		const content = section.createEl('div', { cls: 'emerald-wv-about-section-content' });
-		content.style.display = 'none';
+		content.addClass('emrald-hidden');
 		header.addEventListener('click', () => {
-			const visible = content.style.display !== 'none';
-			content.style.display = visible ? 'none' : 'block';
+			const visible = !content.hasClass('emrald-hidden');
+			visible ? content.addClass('emrald-hidden') : content.removeClass('emrald-hidden');
 			arrow.textContent = visible ? '\u25B8' : '\u25BE';
 		});
 		children(content);
@@ -220,8 +220,8 @@ export class AboutView extends EmraldWorkspaceView {
 
 			const featureGrid = proContent.createEl('div', { cls: 'emerald-wv-pro-feature-grid' });
 			const features = [
-				{ icon: 'lightbulb', text: 'AI-powered Insight Logs across 5 distinct categories' },
-				{ icon: 'trending-up', text: 'Supercharged Data Center with 11 additional metrics (D9–D20)' },
+				{ icon: 'lightbulb', text: 'AI-powered insight logs across 5 distinct categories' },
+				{ icon: 'trending-up', text: 'Supercharged data center with 11 additional metrics (D9–D20)' },
 				{ icon: 'calendar-range', text: 'Weekly + monthly digests' },
 				{ icon: 'target', text: 'Personalized AI suggestions' },
 				{ icon: 'pin', text: 'Pinned sidebar sparklines' },

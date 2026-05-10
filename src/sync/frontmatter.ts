@@ -150,7 +150,7 @@ export function buildNotePathMap(app: App): Map<string, string> {
 			if (id) {
 				map.set(id, file.path);
 			}
-		} catch {
+		} catch { /* non-fatal */
 			// Skip files with malformed frontmatter — don't crash the whole scan
 		}
 	}

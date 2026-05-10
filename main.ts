@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf, Notice } from 'obsidian';
+import { Plugin, WorkspaceLeaf, Notice, requestUrl } from 'obsidian';
 import { EmraldSettingTab, EmraldSettings, DEFAULT_SETTINGS } from './src/settings';
 import { EmraldSidebarView, VIEW_TYPE_EMRALD } from './src/views/sidebar';
 import { tierState } from './src/tier';
@@ -53,9 +53,9 @@ export default class EmraldPlugin extends Plugin {
 
 		// Persist queue on changes + auto-refresh sidebar on reconnection
 		let wasOffline = false;
-		this.offlineQueue.setOnStateChange(async () => {
+		this.offlineQueue.setOnStateChange(() => {
 			(this.settings as unknown as Record<string, unknown>)._offlineQueue = this.offlineQueue.toJSON();
-			await this.saveData(this.settings);
+			void this.saveData(this.settings);
 
 			// Sync cache staleness with online status — serve stale data while offline
 			const isNowOnline = this.offlineQueue.isOnline;
@@ -67,11 +67,10 @@ export default class EmraldPlugin extends Plugin {
 			// state is consistent when the sidebar calls getActiveSession().
 			// Falls back to a 5s max wait to avoid hanging forever (P17 fix).
 			if (wasOffline && isNowOnline) {
-				const waitForSync = Promise.race([
+				void Promise.race([
 					this.apiClient.waitForReconciliation(),
 					new Promise<void>(r => setTimeout(r, 5000))
-				]);
-				waitForSync.then(() => this.refreshSidebar());
+				]).then(() => { void this.refreshSidebar(); });
 			}
 			wasOffline = !isNowOnline;
 		});
@@ -99,20 +98,20 @@ export default class EmraldPlugin extends Plugin {
 
 		// Add ribbon icon to open sidebar
 		this.addRibbonIcon('zap', 'EMRALD', () => {
-			this.activateView();
+			void this.activateView();
 		});
 
 		// ── Keyboard Shortcuts (D.9b) ──────────────────────────
 
 		// Cmd/Ctrl+Shift+S — Start a session (opens project picker)
 		this.addCommand({
-			id: 'emrald-start-session',
-			name: 'Start EMRALD Session',
+			id: 'start-session',
+			name: 'Start session',
 			checkCallback: (checking) => {
 				if (!this.settings.apiKey) return false;
 				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
 				if (leaves.length === 0) return false;
-				const view = leaves[0].view as any;
+				const view = leaves[0].view as EmraldSidebarView;
 				if (checking) return !!view.handleStartSessionRequest;
 				view.handleStartSessionRequest?.();
 			}
@@ -120,27 +119,27 @@ export default class EmraldPlugin extends Plugin {
 
 		// Cmd/Ctrl+Shift+. — Stop the active session
 		this.addCommand({
-			id: 'emrald-stop-session',
-			name: 'Stop EMRALD Session',
+			id: 'stop-session',
+			name: 'Stop session',
 			checkCallback: (checking) => {
 				if (!this.settings.apiKey) return false;
 				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
 				if (leaves.length === 0) return false;
-				const view = leaves[0].view as any;
+				const view = leaves[0].view as EmraldSidebarView;
 				if (checking) {
 					// Only available when a session is actually active
 					return view.timeblock?.state?.activeSession != null;
 				}
-				view.handleStopSession?.();
+				void view.handleStopSession?.();
 			}
 		});
 
 		// Cmd/Ctrl+Shift+, — Open EMRALD sidebar
 		this.addCommand({
-			id: 'emrald-open-sidebar',
-			name: 'Open EMRALD Sidebar',
+			id: 'open-sidebar',
+			name: 'Open sidebar',
 			callback: () => {
-				this.activateView();
+				void this.activateView();
 			}
 		});
 
@@ -156,11 +155,11 @@ export default class EmraldPlugin extends Plugin {
 			// During onload(), getRightLeaf/getLeaf('tab') can fail because
 			// the workspace DOM isn't fully initialized yet.
 			this.app.workspace.onLayoutReady(() => {
-				this.activateView();
+				void this.activateView();
 
 				// Auto-open E-Level Overview as "home screen" for returning users
 				if (this.settings.onboardingComplete) {
-					this.openWorkspaceView(VIEW_ELEVEL_OVERVIEW);
+					void this.openWorkspaceView(VIEW_ELEVEL_OVERVIEW);
 				}
 			});
 		}
@@ -168,30 +167,32 @@ export default class EmraldPlugin extends Plugin {
 		// Show onboarding if not completed
 		if (!this.settings.onboardingComplete) {
 			// Delay to let Obsidian fully load
-			setTimeout(async () => {
-				const { OnboardingModal } = await import('./src/onboarding/onboarding');
-				const modal = new OnboardingModal(this.app, this, () => {
-					// After onboarding completes, activate sidebar + start sync
-					this.activateView();
-					if (this.settings.apiKey) {
-						this.startSync();
-					}
-				});
-				modal.open();
+			setTimeout(() => {
+				void (async () => {
+					const { OnboardingModal } = await import('./src/onboarding/onboarding');
+					const modal = new OnboardingModal(this.app, this, () => {
+						// After onboarding completes, activate sidebar + start sync
+						void this.activateView();
+						if (this.settings.apiKey) {
+							this.startSync();
+						}
+					});
+					modal.open();
+				})();
 			}, 1000);
 		}
 
 		// Install tracking ping (fire-and-forget, no auth required).
 		// Only pings once per install (installPinged flag persists across sessions).
-		this.pingInstallTracking();
+		void this.pingInstallTracking();
 
 		// Reconcile digest preferences with API on startup (one-shot).
 		// Pre-launch fix: existing installs had local digestDay/digestTime that never
 		// reached the API, so cron was using the Sunday 18:00 default. This pushes
 		// the local truth to the database so the cron uses the right schedule.
 		if (this.settings.apiKey) {
-			this.syncDigestPreferences(true); // silent on startup
-			this.reconcileResearchOptIn(); // pull API truth into local settings
+			void this.syncDigestPreferences(true); // silent on startup
+			void this.reconcileResearchOptIn(); // pull API truth into local settings
 		}
 	}
 
@@ -213,11 +214,12 @@ export default class EmraldPlugin extends Plugin {
 			// Skip if already pinged successfully
 			if (this.settings.installPinged) return;
 
-			const manifestVersion = (this.manifest as any)?.version ?? '0.0.0';
-			const obsidianVersion = (this.app as any)?.version ?? 'unknown';
+			const manifestVersion = this.manifest.version ?? '0.0.0';
+			const obsidianVersion = (this.app as unknown as Record<string, string>)?.version ?? 'unknown';
 			const apiUrl = this.settings.apiUrl || 'https://api.effortmastery.com/v1';
 
-			const resp = await fetch(`${apiUrl}/plugins/install`, {
+			const resp = await requestUrl({
+				url: `${apiUrl}/plugins/install`,
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -228,7 +230,7 @@ export default class EmraldPlugin extends Plugin {
 				})
 			});
 
-			if (resp.ok) {
+			if (resp.status >= 200 && resp.status < 300) {
 				this.settings.installPinged = true;
 				await this.saveData(this.settings);
 			}
@@ -241,10 +243,6 @@ export default class EmraldPlugin extends Plugin {
 		this.stopSync();
 		this.stopMidnightCheck();
 		this.offlineQueue.destroy();
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_EMRALD);
-		for (const viewType of ALL_WORKSPACE_VIEWS) {
-			this.app.workspace.detachLeavesOfType(viewType);
-		}
 	}
 
 	async loadSettings() {
@@ -272,7 +270,7 @@ export default class EmraldPlugin extends Plugin {
 					await this.saveData(this.settings);
 				}
 			}
-		} catch {
+		} catch { /* non-fatal */
 			// Non-fatal
 		}
 	}
@@ -291,14 +289,14 @@ export default class EmraldPlugin extends Plugin {
 			const resp = await this.apiClient.updatePreferences({ digest_day, digest_time });
 			if (!silent) {
 				if (resp.error) {
-					const msg = typeof resp.error === 'string' ? resp.error : ((resp.error as any)?.message ?? 'unknown error');
+					const msg = typeof resp.error === 'string' ? resp.error : (((resp.error as Record<string, unknown>)?.message) ?? 'unknown error');
 					new Notice(`Digest schedule sync failed: ${msg}`);
 				} else {
 					new Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
 				}
 			}
 		} catch (err) {
-			if (!silent) new Notice(`Digest schedule sync failed: ${(err as any)?.message ?? String(err)}`);
+			if (!silent) new Notice(`Digest schedule sync failed: ${((err as Record<string, unknown>)?.message) ?? String(err)}`);
 			if (this.settings.debugLogging) console.warn('[EMRALD] syncDigestPreferences failed:', err);
 		}
 	}
@@ -327,7 +325,7 @@ export default class EmraldPlugin extends Plugin {
 		this.folderSync.start();
 
 		// Run initial full sync
-		this.folderSync.fullSync();
+		void this.folderSync.fullSync();
 
 		// Periodic sync — tier-aware interval (Pro: 1 min, Free: 5 min minimum)
 		const userSetting = this.settings.syncIntervalMinutes || 5;
@@ -335,10 +333,10 @@ export default class EmraldPlugin extends Plugin {
 		const effectiveMinutes = Math.max(userSetting, minInterval);
 		const intervalMs = effectiveMinutes * 60 * 1000;
 		this.syncIntervalId = window.setInterval(() => {
-			this.folderSync.fullSync();
+			void this.folderSync.fullSync();
 			// Persist data cache periodically
 			(this.settings as unknown as Record<string, unknown>)._dataCache = this.dataCache.toJSON();
-			this.saveData(this.settings);
+			void this.saveData(this.settings);
 		}, intervalMs);
 	}
 
@@ -384,8 +382,8 @@ export default class EmraldPlugin extends Plugin {
 		} else {
 			try {
 				leaf = workspace.getRightLeaf(false);
-			} catch (e) {
-				console.warn('[EMRALD] Failed to get right sidebar leaf, falling back to tab leaf:', e);
+			} catch { /* non-fatal */
+				console.warn('[EMRALD] Failed to get right sidebar leaf, falling back to tab leaf');
 				leaf = null;
 			}
 
@@ -398,7 +396,7 @@ export default class EmraldPlugin extends Plugin {
 
 		if (leaf) {
 			workspace.revealLeaf(leaf);
-			const view = leaf.view as any;
+			const view = leaf.view as EmraldSidebarView;
 			if (typeof view.refresh === 'function') {
 				await view.refresh();
 			}
@@ -412,7 +410,7 @@ export default class EmraldPlugin extends Plugin {
 	private refreshSidebar() {
 		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
 		if (leaves.length > 0) {
-			const view = leaves[0].view as any;
+			const view = leaves[0].view as EmraldSidebarView;
 			// P17 fix: don't rebuild the sidebar while a stop is in progress.
 			// The stop handler will reload data itself when it finishes.
 			if (view._stoppingSession) {
@@ -420,7 +418,7 @@ export default class EmraldPlugin extends Plugin {
 				return;
 			}
 			if (typeof view.refresh === 'function') {
-				view.refresh();
+				void (view.refresh as () => Promise<void>)();
 			}
 		}
 	}

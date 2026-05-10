@@ -20,7 +20,7 @@ export class AdvancedCompleteModal extends Modal {
 		const iconEl = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
 		setIcon(iconEl, 'sparkles');
 
-		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile Complete!' });
+		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile complete!' });
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',

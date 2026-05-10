@@ -294,7 +294,7 @@ export class AdvancedCalibrationModal extends Modal {
 		// If showAll, use all unanswered; otherwise use the batch
 		const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
 
-		contentEl.createEl('h2', { text: 'Effort Profile — Advanced' });
+		contentEl.createEl('h2', { text: 'Effort profile — Advanced' });
 
 		const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
 		if (this.showAll) {
@@ -400,38 +400,36 @@ export class AdvancedCalibrationModal extends Modal {
 
 		const submitBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Save & Continue'
+			text: 'Save & continue'
 		});
-		submitBtn.addEventListener('click', async () => {
-			const answeredCount = Object.keys(this.answers).length;
-			if (answeredCount > 0) {
-				try {
-					await this.plugin.apiClient.updateCalibration(this.answers);
-					new Notice(`${answeredCount} answers saved ✓`);
-				} catch {
-					// Non-fatal — answers saved locally at least
+		submitBtn.addEventListener('click', () => { void (async () => {
+			try {
+				const answeredCount = Object.keys(this.answers).length;
+				if (answeredCount > 0) {
+					try {
+						await this.plugin.apiClient.updateCalibration(this.answers);
+						new Notice(`${answeredCount} answers saved ✓`);
+					} catch { /* non-fatal — answers saved locally */ }
 				}
-			}
 
-			// If all required questions are now answered, show completion celebration.
-			// Optional import questions (MBTI / Enneagram / Clifton) should not block completion.
-			const remainingRequired = this.allUnanswered.filter(q => !q.optional);
-			const answeredRequired = remainingRequired.filter(q => this.answers[q.key] !== undefined);
-			if (remainingRequired.length > 0 && answeredRequired.length === remainingRequired.length) {
-				this.plugin.settings.advancedProfileCompleted = true;
-				await this.plugin.saveSettings();
+				const remainingRequired = this.allUnanswered.filter(q => !q.optional);
+				const answeredRequired = remainingRequired.filter(q => this.answers[q.key] !== undefined);
+				if (remainingRequired.length > 0 && answeredRequired.length === remainingRequired.length) {
+					this.plugin.settings.advancedProfileCompleted = true;
+					await this.plugin.saveSettings();
+					this.close();
+					const { AdvancedCompleteModal } = await import('./advanced-complete');
+					const completeModal = new AdvancedCompleteModal(this.app, () => {
+						this.onComplete();
+					});
+					completeModal.open();
+					return;
+				}
+
 				this.close();
-				const { AdvancedCompleteModal } = await import('./advanced-complete');
-				const completeModal = new AdvancedCompleteModal(this.app, () => {
-					this.onComplete();
-				});
-				completeModal.open();
-				return;
-			}
-
-			this.close();
-			this.onComplete();
-		});
+				this.onComplete();
+			} catch { /* non-fatal */ }
+		})(); });
 
 		const skipBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
@@ -461,7 +459,7 @@ export async function checkAdvancedCalibrationNeeded(
 		const profileResp = await plugin.apiClient.getProfile();
 		if (!profileResp.data) return null;
 
-		const profile = profileResp.data as any;
+		const profile = profileResp.data as Record<string, unknown>;
 
 		// Only show if user has opted into Advanced mode
 		if (profile.question_mode !== 'advanced') return null;
@@ -478,7 +476,7 @@ export async function checkAdvancedCalibrationNeeded(
 		if (actualRemaining <= 0) return null;
 
 		return { answeredKeys, remaining: actualRemaining };
-	} catch {
+	} catch { /* non-fatal */
 		return null;
 	}
 }

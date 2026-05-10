@@ -1,5 +1,12 @@
 /* EMRALD Obsidian Plugin Styles */
 
+/* Utility classes */
+.emrald-hidden,
+.is-hidden { display: none !important; }
+.emrald-clickable { cursor: pointer; }
+.emrald-not-clickable { cursor: default; }
+.emrald-dim { opacity: 0.5; }
+
 /* AP(E)CS E-Level Color Palette — fixed, not theme-dependent */
 :root {
 	--emerald-e1: #2D7A4A;  /* Deep forest green — light effort */
@@ -342,13 +349,19 @@
 	width: 2px;
 	background: var(--interactive-accent);
 	z-index: 2;
-	display: none;
 	font-size: 9px;
 	font-weight: 700;
 	color: var(--interactive-accent);
 	padding-top: 2px;
 	text-align: center;
 }
+.emerald-elevel-marker.is-active {
+	color: #fff;
+}
+.emerald-elevel-marker[data-level="E1"] { background-color: var(--emerald-e1); }
+.emerald-elevel-marker[data-level="E2"] { background-color: var(--emerald-e2); }
+.emerald-elevel-marker[data-level="E3"] { background-color: var(--emerald-e3); }
+.emerald-elevel-marker[data-level="E4"] { background-color: var(--emerald-e4); }
 
 .emerald-dh-marker {
 	position: absolute;
@@ -563,7 +576,12 @@
 	font-size: 11px;
 	font-weight: 700;
 	flex-shrink: 0;
+	color: var(--text-muted);
 }
+.emerald-elevel-badge[data-level="E1"] { color: var(--emerald-e1); }
+.emerald-elevel-badge[data-level="E2"] { color: var(--emerald-e2); }
+.emerald-elevel-badge[data-level="E3"] { color: var(--emerald-e3); }
+.emerald-elevel-badge[data-level="E4"] { color: var(--emerald-e4); }
 
 .emerald-project-chevron {
 	font-size: 12px;
@@ -1815,7 +1833,10 @@
 	border-radius: 50%;
 	display: inline-block;
 	flex-shrink: 0;
+	background: var(--text-muted);
 }
+.emerald-phase-dot[data-status="active"] { background: var(--text-success); }
+.emerald-phase-dot[data-status="completed"] { background: var(--interactive-accent); }
 
 .emerald-wv-icon {
 	display: inline-flex;
@@ -2090,7 +2111,14 @@
 	height: 100%;
 	border-radius: 3px;
 	transition: width 0.3s;
+	background: var(--interactive-accent);
 }
+.emerald-wv-digest-source-fill[data-source="complexity"] { background: var(--interactive-accent); }
+.emerald-wv-digest-source-fill[data-source="emotional-drain"] { background: var(--text-warning); }
+.emerald-wv-digest-source-fill[data-source="high-motivation"] { background: var(--text-success); }
+.emerald-wv-digest-source-fill[data-source="physical"] { background: #8B5CF6; }
+.emerald-wv-digest-source-fill[data-source="monotony"] { background: var(--text-muted); }
+.emerald-wv-digest-source-fill[data-source="time-pressure"] { background: var(--text-error); }
 
 .emerald-wv-digest-pattern-insight {
 	font-size: 12px;
@@ -2365,7 +2393,12 @@
 	height: 6px;
 	border-radius: 50%;
 	flex-shrink: 0;
+	background: var(--text-muted);
 }
+.emerald-wv-factor-indicator[data-phase="green"] { background: var(--text-success); }
+.emerald-wv-factor-indicator[data-phase="yellow"] { background: var(--text-warning); }
+.emerald-wv-factor-indicator[data-phase="orange"] { background: #e68a00; }
+.emerald-wv-factor-indicator[data-phase="red"] { background: var(--text-error); }
 
 /* SVG chart styles */
 .emerald-wv-burnout-chart { display: block; margin: 8px 0; }
@@ -2640,6 +2673,10 @@
 	border-left: 4px solid var(--text-muted);
 	transition: border-color 0.15s, background 0.15s;
 }
+.emerald-wv-elevel-card[data-level="E1"] { border-left-color: var(--emerald-e1); }
+.emerald-wv-elevel-card[data-level="E2"] { border-left-color: var(--emerald-e2); }
+.emerald-wv-elevel-card[data-level="E3"] { border-left-color: var(--emerald-e3); }
+.emerald-wv-elevel-card[data-level="E4"] { border-left-color: var(--emerald-e4); }
 
 .emerald-wv-elevel-card:hover { background: var(--background-modifier-hover); }
 
@@ -2713,7 +2750,11 @@
 	font-style: italic;
 }
 
-.emerald-wv-level-badge { font-weight: 700; }
+.emerald-wv-level-badge { font-weight: 700; color: var(--text-muted); }
+.emerald-wv-level-badge[data-level="E1"] { color: var(--emerald-e1); }
+.emerald-wv-level-badge[data-level="E2"] { color: var(--emerald-e2); }
+.emerald-wv-level-badge[data-level="E3"] { color: var(--emerald-e3); }
+.emerald-wv-level-badge[data-level="E4"] { color: var(--emerald-e4); }
 
 /* Clickable project names in tables */
 .emerald-wv-project-link {
@@ -2921,6 +2962,10 @@
 }
 
 .emerald-wv-metric-card:hover { border-color: var(--interactive-accent); }
+.emerald-wv-metric-card[data-category="effort"] { border-left-color: #C06A30; }
+.emerald-wv-metric-card[data-category="energy"] { border-left-color: #4A8AB5; }
+.emerald-wv-metric-card[data-category="productivity"] { border-left-color: #2D7A4A; }
+.emerald-wv-metric-card[data-category="calibration"] { border-left-color: #7B61A3; }
 
 .emerald-wv-metric-card.is-expanded {
 	grid-column: 1 / -1;
@@ -4306,6 +4351,12 @@ span.emerald-pro-pill {
   padding-bottom: 0 !important;
 }
 
+.emerald-section-content.is-animating {
+  max-height: var(--section-max-height, none);
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
 .emerald-section-arrow {
   display: inline-block;
   transition: transform 0.2s ease;
@@ -4608,3 +4659,4 @@ span.emerald-pro-pill {
 .emerald-welcomeback-actions {
 	justify-content: center;
 }
+.emrald-insight-chevron-style { color: var(--text-faint); margin-left: 6px; }

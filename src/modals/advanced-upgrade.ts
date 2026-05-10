@@ -25,7 +25,7 @@ export class AdvancedUpgradeModal extends Modal {
 		const iconEl = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
 		setIcon(iconEl, 'sparkles');
 
-		contentEl.createEl('h2', { text: 'Go Advanced?' });
+		contentEl.createEl('h2', { text: 'Go advanced?' });
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
@@ -61,37 +61,39 @@ export class AdvancedUpgradeModal extends Modal {
 
 		const acceptBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Enable Advanced Mode'
+			text: 'Enable advanced mode'
 		});
-		acceptBtn.addEventListener('click', async () => {
-			// Update profile mode to advanced
+		acceptBtn.addEventListener('click', () => { void (async () => {
 			try {
-				await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
-				new Notice('Advanced Mode enabled! You\'ll see calibration questions before your next session.');
-			} catch {
-				new Notice('Advanced Mode enabled locally — will sync on next session.');
-			}
-			this.close();
-
-			// Offer to start answering now
-			const { AdvancedCalibrationModal, getAdvancedQuestionCount } = await import('./advanced-calibration');
-			const total = getAdvancedQuestionCount();
-			const startNowModal = new AdvancedCalibrationModal(
-				this.app,
-				this.plugin,
-				[],        // no answered keys yet
-				total,     // all remaining
-				() => {
-					// Done answering first batch
-					this.onAccept();
-				},
-				() => {
-					// Skipped — that's fine, they'll see more at session start
-					this.onAccept();
+				// Update profile mode to advanced
+				try {
+					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
+					new Notice('Advanced Mode enabled! You\'ll see calibration questions before your next session.');
+				} catch { /* non-fatal */
+					new Notice('Advanced Mode enabled locally — will sync on next session.');
 				}
-			);
-			startNowModal.open();
-		});
+				this.close();
+
+				// Offer to start answering now
+				const { AdvancedCalibrationModal, getAdvancedQuestionCount } = await import('./advanced-calibration');
+				const total = getAdvancedQuestionCount();
+				const startNowModal = new AdvancedCalibrationModal(
+					this.app,
+					this.plugin,
+					[],        // no answered keys yet
+					total,     // all remaining
+					() => {
+						// Done answering first batch
+						this.onAccept();
+					},
+					() => {
+						// Skipped — that's fine, they'll see more at session start
+						this.onAccept();
+					}
+				);
+				startNowModal.open();
+			} catch { /* non-fatal */ }
+		})(); });
 
 		const declineBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',

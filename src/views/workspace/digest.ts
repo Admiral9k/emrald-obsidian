@@ -83,7 +83,7 @@ export class DigestView extends EmraldWorkspaceView {
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
-			this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
+			void this.plugin.openWorkspaceView(VIEW_DATA_CENTER);
 		});
 	}
 
@@ -271,7 +271,7 @@ export class DigestView extends EmraldWorkspaceView {
 
 		// ── Metric Movements (legacy shape; kept for forward-compat) ──
 		if (content.metric_movements && content.metric_movements.length > 0) {
-			this.renderSection(this.contentContainer, 'trending-up', 'Metric Movements', (el) => {
+			this.renderSection(this.contentContainer, 'trending-up', 'Metric movements', (el) => {
 				this.renderMetricMovements(el, content.metric_movements!);
 			});
 		}
@@ -279,7 +279,7 @@ export class DigestView extends EmraldWorkspaceView {
 		// ── Key Insights (API: top_insights; legacy: insight_highlights) ──
 		const insights = content.top_insights ?? content.insight_highlights;
 		if (insights && insights.length > 0) {
-			this.renderSection(this.contentContainer, 'lightbulb', 'Key Insights', (el) => {
+			this.renderSection(this.contentContainer, 'lightbulb', 'Key insights', (el) => {
 				for (const highlight of insights) {
 					const row = el.createEl('div', { cls: 'emerald-wv-digest-insight-row' });
 					const bullet = row.createEl('span', { cls: 'emerald-wv-digest-insight-bullet' });
@@ -351,15 +351,6 @@ export class DigestView extends EmraldWorkspaceView {
 			'Time Pressure': 'alarm-clock'
 		};
 
-		const SOURCE_COLORS: Record<string, string> = {
-			'Complexity': 'var(--interactive-accent)',
-			'Emotional Drain': 'var(--text-warning)',
-			'High Motivation': 'var(--text-success)',
-			'Physical': '#8B5CF6',
-			'Monotony': 'var(--text-muted)',
-			'Time Pressure': 'var(--text-error)'
-		};
-
 		// Summary line (like AP(E)CS: "🧠 58%  💭 28%  🔥 14%")
 		const summaryRow = container.createEl('div', { cls: 'emerald-wv-digest-source-summary' });
 		for (const src of sorted) {
@@ -390,7 +381,7 @@ export class DigestView extends EmraldWorkspaceView {
 			const barOuter = row.createEl('div', { cls: 'emerald-wv-digest-source-bar' });
 			const barFill = barOuter.createEl('div', { cls: 'emerald-wv-digest-source-fill' });
 			barFill.style.width = `${src.percentage}%`;
-			barFill.style.background = SOURCE_COLORS[src.source] ?? 'var(--interactive-accent)';
+			barFill.dataset.source = src.source.toLowerCase().replace(/\s+/g, '-');
 		}
 	}
 
@@ -412,8 +403,8 @@ export class DigestView extends EmraldWorkspaceView {
 		changeLink.addEventListener('click', (e) => {
 			e.preventDefault();
 			// Open Obsidian settings to EMRALD tab
-			(this.app as any).setting?.open?.();
-			(this.app as any).setting?.openTabById?.('emrald');
+			((this.app as unknown as Record<string, unknown>).setting as Record<string, (...args: unknown[]) => void> | undefined)?.open?.();
+			((this.app as unknown as Record<string, unknown>).setting as Record<string, (...args: unknown[]) => void> | undefined)?.openTabById?.('emrald');
 		});
 	}
 

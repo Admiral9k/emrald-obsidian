@@ -42,7 +42,7 @@ export class FolderSync {
 		// Watch for file creation in Active folder
 		const createRef = this.app.vault.on('create', (file: TAbstractFile) => {
 			if (file instanceof TFile && file.extension === 'md') {
-				this.handleFileCreate(file);
+				void this.handleFileCreate(file);
 			}
 		});
 		this.eventRefs.push(createRef);
@@ -50,7 +50,7 @@ export class FolderSync {
 		// Watch for file rename/move
 		const renameRef = this.app.vault.on('rename', (file: TAbstractFile, oldPath: string) => {
 			if (file instanceof TFile && file.extension === 'md') {
-				this.handleFileMove(file, oldPath);
+				void this.handleFileMove(file, oldPath);
 			}
 		});
 		this.eventRefs.push(renameRef);
@@ -58,7 +58,7 @@ export class FolderSync {
 		// Watch for frontmatter changes (metadata cache update)
 		const metaRef = this.app.metadataCache.on('changed', (file: TFile) => {
 			if (file.extension === 'md') {
-				this.handleMetadataChange(file);
+				void this.handleMetadataChange(file);
 			}
 		});
 		this.eventRefs.push(metaRef);

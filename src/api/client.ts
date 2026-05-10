@@ -220,7 +220,7 @@ export class EmraldAPIClient {
 
 		} catch (err) {
 			const message = err instanceof Error ? err.message : 'Unknown error';
-			const errAny = err as any;
+			const errAny = err as Record<string, unknown>;
 
 			// Obsidian's requestUrl throws on 4xx/5xx instead of returning a response.
 			// Try to extract the HTTP status from the error to distinguish HTTP errors
@@ -373,7 +373,7 @@ export class EmraldAPIClient {
 							for (const d of deps) this.offlineQueue.remove(d.id);
 						}
 					}
-				} catch {
+				} catch { /* non-fatal */
 					new Notice('Network error during session reconciliation — will retry later');
 				}
 			}
@@ -439,7 +439,7 @@ export class EmraldAPIClient {
 					// Server error — leave for later
 					break;
 				}
-			} catch {
+			} catch { /* non-fatal */
 				// Network error during replay — stop and retry later
 				break;
 			}
@@ -491,7 +491,7 @@ export class EmraldAPIClient {
 				return (json.message ?? json.error ?? JSON.stringify(json)) as string;
 			}
 			return response.text || '';
-		} catch {
+		} catch { /* non-fatal */
 			return '';
 		}
 	}
@@ -601,11 +601,11 @@ export class EmraldAPIClient {
 
 	// ── Preferences ────────────────────────────────
 
-	async getPreferences(): Promise<APIResponse<any>> {
+	async getPreferences(): Promise<APIResponse<Record<string, unknown>>> {
 		return this.request('GET', '/preferences');
 	}
 
-	async updatePreferences(updates: Record<string, any>): Promise<APIResponse<any>> {
+	async updatePreferences(updates: Record<string, unknown>): Promise<APIResponse<Record<string, unknown>>> {
 		return this.request('PATCH', '/preferences', updates);
 	}
 
@@ -685,11 +685,11 @@ export class EmraldAPIClient {
 		return this.request('POST', '/profile/reassessment', { reason: 'manual' });
 	}
 
-	async updateCalibration(answers: Record<string, any>): Promise<APIResponse<any>> {
+	async updateCalibration(answers: Record<string, unknown>): Promise<APIResponse<Record<string, unknown>>> {
 		return this.request('PATCH', '/profile/questions', answers);
 	}
 
-	async updateProfile(updates: Record<string, any>): Promise<APIResponse<any>> {
+	async updateProfile(updates: Record<string, unknown>): Promise<APIResponse<Record<string, unknown>>> {
 		return this.request('PATCH', '/profile', updates);
 	}
 
@@ -729,7 +729,7 @@ export class EmraldAPIClient {
 		const schedule: Array<{ day: number; available_hours: number }> = [];
 		for (let d = 0; d < 7; d++) {
 			const existing = Array.isArray(currentRows)
-				? currentRows.find((e: any) => e.day_of_week === d)
+				? currentRows.find((e: Record<string, unknown>) => e.day_of_week === d)
 				: null;
 			schedule.push({
 				day: d,
