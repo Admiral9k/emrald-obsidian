@@ -161,7 +161,7 @@ export class EmraldAPIClient {
 
 			// 403 Forbidden — free tier limit hit
 			if (response.status === 403) {
-				const msg = this.extractErrorMessage(response) || 'Feature requires emrald Pro';
+				const msg = this.extractErrorMessage(response) || 'Feature requires EMRALD Pro';
 				return {
 					data: null,
 					error: `Free tier limit: ${msg}. Upgrade at effortmastery.com/pro`,
@@ -209,7 +209,7 @@ export class EmraldAPIClient {
 
 				return {
 					data: null,
-					error: 'Emrald is having trouble. Please try again in a moment.',
+					error: 'EMRALD is having trouble. Please try again in a moment.',
 					status: response.status
 				};
 			}
@@ -242,7 +242,7 @@ export class EmraldAPIClient {
 				if (this.offlineQueue) {
 					this.offlineQueue.setOnlineStatus(true);
 				}
-				console.error(`[Emrald API] ${method} ${path} failed`, {
+				console.error(`[EMRALD API] ${method} ${path} failed`, {
 					status: thrownStatus,
 					message,
 					body,
@@ -255,7 +255,7 @@ export class EmraldAPIClient {
 					return { data: null, error: 'Invalid API key — please check your key in Settings.', status: 401 };
 				}
 				if (thrownStatus === 403) {
-					return { data: null, error: 'Feature requires emrald Pro. Upgrade at effortmastery.com/pro', status: 403 };
+					return { data: null, error: 'Feature requires EMRALD Pro. Upgrade at effortmastery.com/pro', status: 403 };
 				}
 				if (thrownStatus === 404) {
 					return { data: null, error: null, status: 404 };
@@ -279,7 +279,7 @@ export class EmraldAPIClient {
 				return { data: null, error: null, status: 0, queued: true };
 			}
 
-			console.error(`[Emrald API] ${method} ${path} network failure`, {
+			console.error(`[EMRALD API] ${method} ${path} network failure`, {
 				message,
 				body,
 				error: errAny
@@ -357,7 +357,7 @@ export class EmraldAPIClient {
 							await this.replayUntilNextStart();
 						} else {
 							this.offlineQueue.removeById(startAction.id);
-							new Notice('Session created but could not extract ID — dependent actions dropped');
+							new Notice('Session created but could not extract id — dependent actions dropped');
 							const deps = this.offlineQueue.getPendingActions()
 								.filter(a => a.path.includes(localId));
 							for (const d of deps) this.offlineQueue.remove(d.id);
@@ -381,7 +381,6 @@ export class EmraldAPIClient {
 
 		// Replay remaining non-session actions (energy check-ins, item status changes, recovery CRUD, etc.)
 		if (this.offlineQueue.pendingCount > 0) {
-			const remaining = this.offlineQueue.pendingCount;
 			await this.offlineQueue.replay((m, p, b) => this.executeQueuedRequest(m, p, b));
 		}
 

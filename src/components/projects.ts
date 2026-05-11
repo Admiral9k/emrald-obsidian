@@ -4,7 +4,7 @@
 
 import { Menu, Notice, setIcon, TFile } from 'obsidian';
 import EmraldPlugin from '../../main';
-import { TrackedItem, Session } from '../api/client';
+import { TrackedItem } from '../api/client';
 
 
 // E-level prescribed duration as percentage of daily available hours

@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/ui/sentence-case, no-useless-escape */
 // EMRALD About View — In-app field guide, explainer, and trust-builder.
 // Replaces the original minimal about page with a rich, marketing-forward
 // onboarding explainer covering: what EMRALD is, what you bring,
@@ -56,6 +55,7 @@ export class AboutView extends EmraldWorkspaceView {
 	// ── Render ──────────────────────
 
 	async onOpen() {
+		await super.onOpen();
 		const container = this.getContainer();
 		this.renderHeader(container, 'About EMRALD', 'Effort Management Recursive AI Learning Driver', 'gem');
 
@@ -94,12 +94,12 @@ export class AboutView extends EmraldWorkspaceView {
 
 			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1–E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
 			const quoteWhatItIs = el.createDiv( { cls: 'emerald-wv-about-thesis' });
-			quoteWhatItIs.createEl('blockquote', { text: "You don\'t burn out from too many tasks. You burn out from too much effort in the wrong places." });
+			quoteWhatItIs.createEl('blockquote', { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
 		});
 
 		// 2. What EMRALD Is Not
 		this.makeSection(container, 'what-it-isnt', 'x-circle', 'What EMRALD Is Not', el => {
-			this.para(el as HTMLElement, "EMRALD won\'t make you more productive in the traditional sense. It isn't built to help you do more, faster, or better than yesterday. Here\'s what it deliberately isn't:");
+			this.para(el as HTMLElement, "EMRALD won't make you more productive in the traditional sense. It isn't built to help you do more, faster, or better than yesterday. Here's what it deliberately isn't:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 			this.bullet(list, 'A checklist or to-do tracker — It doesn\'t tell you what to do');
 			this.bullet(list, 'A calendar or time-blocking app — It doesn\'t schedule your day');
@@ -112,7 +112,7 @@ export class AboutView extends EmraldWorkspaceView {
 		// 3. What You Bring
 		this.makeSection(container, 'what-you-bring', 'play-circle', 'What You Bring', el => {
 			this.para(el as HTMLElement, "EMRALD is deliberately low-friction. There's no new app to learn, no complex setup, and no ongoing habit to build from scratch. Everything you need already exists: your projects live in Obsidian, and EMRALD just starts watching how you work.");
-			this.para(el as HTMLElement, "Here\'s everything EMRALD asks of you:");
+			this.para(el as HTMLElement, "Here's everything EMRALD asks of you:");
 			const list = el.createEl('ol', { cls: 'emerald-wv-about-numbered-list' });
 			const steps = [
 				'Add your projects to EMRALD using the "+Add" button in the sidebar.',
@@ -130,11 +130,11 @@ export class AboutView extends EmraldWorkspaceView {
 
 		// 4. What EMRALD Gives Back
 		this.makeSection(container, 'what-you-get', 'gift', 'What EMRALD Gives Back', el => {
-			this.para(el as HTMLElement, "The more you use EMRALD honestly, the more it gives back. Here\'s what you\'ll see accumulate over time:");
+			this.para(el as HTMLElement, "The more you use EMRALD honestly, the more it gives back. Here's what you'll see accumulate over time:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 			this.bullet(list, 'D-Metrics (D1–D20): Twenty diagnostic measurements of your effort patterns, energy balance, and work rhythm');
 			this.bullet(list, 'AI Insight Logs: Observations, suggestions, and discoveries about your patterns across 5 categories');
-			this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you\'re heading toward exhaustion");
+			this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you're heading toward exhaustion");
 			this.bullet(list, 'Effort Digests: Weekly and monthly summaries of where your energy went');
 			this.bullet(list, 'Completion Rate: Clarity on which projects you finish versus abandon');
 			this.bullet(list, 'Calibration Over Time: EMRALD adjusts its model of you the more data it has, getting smarter and more accurate');
@@ -145,23 +145,23 @@ export class AboutView extends EmraldWorkspaceView {
 		// 5. Why the Guardrails Exist
 		this.makeSection(container, 'guardrails', 'shield', 'Why the Guardrails Exist', el => {
 			this.para(el as HTMLElement, "If you've wondered why EMRALD limits how much E-level work you can assign in a day, or why it nudges you toward balance instead of pushing you to maximize — this is why.");
-			this.para(el as HTMLElement, "The system is built on a simple truth: burnout doesn\'t come from too many tasks. It comes from too much effort in the wrong distribution, for too long, without recovery.");
+			this.para(el as HTMLElement, "The system is built on a simple truth: burnout doesn't come from too many tasks. It comes from too much effort in the wrong distribution, for too long, without recovery.");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 			this.bullet(list, "Your day has a finite capacity, whatever hours you've set in your schedule. EMRALD won't let you pretend you have more.");
 			this.bullet(list, 'E4 work is genuinely exhausting. You can only do so much of it before the quality of everything drops.');
 			this.bullet(list, "Filling your day to 100% with demanding work is a fast path to burnout — EMRALD's allocation system is designed to prevent exactly that.");
-			this.bullet(list, "Early data will look incomplete. Charts won\'t fill in nicely for the first couple weeks. This is normal — the system is learning your baseline before it can tell you meaningful things about deviations.");
+			this.bullet(list, "Early data will look incomplete. Charts won't fill in nicely for the first couple weeks. This is normal — the system is learning your baseline before it can tell you meaningful things about deviations.");
 			const quoteGuardrails = el.createDiv( { cls: 'emerald-wv-about-thesis' });
 			quoteGuardrails.createEl('blockquote', { text: "The promise of EMRALD is not instant insight. It's real insight, earned through consistent, honest use over time." });
 		});
 
 		// 6. Core Systems
 		this.makeSection(container, 'core-systems', 'layers', 'Core Systems', el => {
-			this.para(el as HTMLElement, "Six things make EMRALD work. Here\'s what each one does:");
+			this.para(el as HTMLElement, "Six things make EMRALD work. Here's what each one does:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 			this.bullet(list, 'E-Levels (E1–E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
 			this.bullet(list, 'D-Metrics (D1–D20): Twenty computed measurements of your effort patterns. D1–D8 are available to all users; D9–D20 unlock with Pro.');
-			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you\'re overextended.");
+			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
 			this.bullet(list, 'Data Center: The visual home of all your D-metrics, with charts and context for each measurement.');
 			this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
 			this.bullet(list, 'Daily Check-in & Effort Receipt: The two feedback inputs that power the entire system.');
@@ -190,7 +190,7 @@ export class AboutView extends EmraldWorkspaceView {
 		// 8. How EMRALD Learns
 		this.makeSection(container, 'how-it-learns', 'brain', 'How EMRALD Learns', el => {
 			this.para(el as HTMLElement, "EMRALD is a recursive feedback system. It's only as smart as the signal you give it.");
-			this.para(el as HTMLElement, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you\'re teaching EMRALD what your work actually costs. The more honest and consistent you are, the more accurate its model of you becomes.");
+			this.para(el as HTMLElement, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're teaching EMRALD what your work actually costs. The more honest and consistent you are, the more accurate its model of you becomes.");
 			this.para(el as HTMLElement, "The first few weeks will feel light. Charts won't show much. Insights will be sparse. This isn't the system failing — it's the system learning. EMRALD needs a baseline before it can tell you meaningful things about deviations from it.");
 			this.para(el as HTMLElement, 'Around the 2–3 week mark, you\'ll start seeing real patterns emerge. Around week 4–6, the insights become genuinely personalized. And the longer you use it, the more it adapts to your specific rhythm, strengths, and vulnerability points.');
 			const quoteLearns = el.createDiv( { cls: 'emerald-wv-about-thesis' });
@@ -216,7 +216,7 @@ export class AboutView extends EmraldWorkspaceView {
 			const proContent = proSection.createDiv( { cls: 'emerald-wv-about-section-content' });
 			proContent.createEl('p', {
 				cls: 'emerald-wv-about-p',
-				text: 'EMRALD Pro unlocks the full intelligence layer — 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more.'
+				text: 'EMRALD PRO unlocks the full intelligence layer — 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more.'
 			});
 
 			const featureGrid = proContent.createDiv( { cls: 'emerald-wv-pro-feature-grid' });
@@ -238,7 +238,7 @@ export class AboutView extends EmraldWorkspaceView {
 			const ctaRow = proSection.createDiv( { cls: 'emerald-wv-pro-cta-row' });
 			const cta = ctaRow.createEl('a', {
 				cls: 'emerald-btn emerald-btn-upgrade',
-				text: 'Upgrade to Pro',
+				text: 'Upgrade to PRO',
 				href: 'https://app.effortmastery.com/app/billing'
 			});
 			cta.setAttribute('target', '_blank');

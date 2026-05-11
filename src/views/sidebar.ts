@@ -64,7 +64,7 @@ export class EmraldSidebarView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'Emrald';
+		return 'EMRALD';
 	}
 
 	getIcon(): string {
@@ -118,6 +118,7 @@ export class EmraldSidebarView extends ItemView {
 	}
 
 	async onClose() {
+		await super.onClose();
 		if (this.timeblock) {
 			this.timeblock.destroy();
 			this.timeblock = null;
@@ -149,8 +150,6 @@ export class EmraldSidebarView extends ItemView {
 			if (shownDate === todayStr) return;
 
 			// Fetch recent sessions (last 30 days) to find the most recent one
-			const sessionsResp = await this.plugin.apiClient.getTodaySessions();
-			// getTodaySessions only returns today — we need broader history
 			// Use the list sessions endpoint with a date range
 			const thirtyDaysAgo = new Date();
 			thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -199,7 +198,7 @@ export class EmraldSidebarView extends ItemView {
 			await this.plugin.saveData(this.plugin.settings);
 		} catch (e) {
 			// Non-critical — don't let this break the sidebar
-			console.warn('[Emrald] Welcome-back check failed:', e);
+			console.warn('[EMRALD] Welcome-back check failed:', e);
 		}
 	}
 
@@ -227,7 +226,7 @@ export class EmraldSidebarView extends ItemView {
 		// Header with offline indicator
 		const header = container.createDiv({ cls: 'emerald-header' });
 		const headerRow = header.createDiv({ cls: 'emerald-header-row' });
-		headerRow.createEl('h3', { text: 'Emrald' });
+		headerRow.createEl('h3', { text: 'EMRALD' });
 
 		// Offline indicator (hidden by default, shown by offline queue state)
 		const offlineDot = headerRow.createSpan({ cls: 'emerald-offline-dot' });
@@ -292,7 +291,7 @@ export class EmraldSidebarView extends ItemView {
 		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'timer');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createSpan({ text: dayLabel });
+		headerLeft.createSpan({ text: dayLabel });
 
 		const content = section.createDiv({ cls: 'emerald-section-content' });
 
@@ -341,7 +340,7 @@ export class EmraldSidebarView extends ItemView {
 		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'folder');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createSpan({ text: 'Projects' });
+		headerLeft.createSpan({ text: 'Projects' });
 
 		const addBtn = header.createSpan({ cls: 'emerald-section-action', text: '+ add' });
 		addBtn.setAttribute('role', 'button');
@@ -414,7 +413,7 @@ export class EmraldSidebarView extends ItemView {
 		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'bar-chart-2');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createSpan({ text: 'Effort management' });
+		headerLeft.createSpan({ text: 'Effort management' });
 
 		const content = section.createDiv({ cls: 'emerald-section-content' });
 
@@ -544,13 +543,13 @@ export class EmraldSidebarView extends ItemView {
 					try {
 						const discardResp = await this.plugin.apiClient.discardSession(session.id);
 						if (discardResp.error && !discardResp.queued) {
-							console.warn('[Emrald] Failed to discard stale session:', discardResp.error);
+							console.warn('[EMRALD] Failed to discard stale session:', discardResp.error);
 						}
 						new Notice(discardResp.queued
 							? 'Stale session queued for discard — will sync when online.'
 							: 'Discarded a stale session from yesterday.');
 					} catch (e) {
-						console.error('[Emrald] Error discarding stale session:', e);
+						console.error('[EMRALD] Error discarding stale session:', e);
 						new Notice('Found a stale session but could not discard it — try refreshing.');
 					}
 					// Always return — never render a session older than 24h
@@ -636,7 +635,7 @@ export class EmraldSidebarView extends ItemView {
 		// Show a quick project picker from active projects
 		if (!this.projects) {
 			new Notice('No projects loaded yet.');
-			console.warn('[Emrald] Start button: projects component is null');
+			console.warn('[EMRALD] Start button: projects component is null');
 			return;
 		}
 		const activeItems = this.projects.state.items.filter(i => i.status === 'active');
@@ -855,7 +854,7 @@ export class EmraldSidebarView extends ItemView {
 			// If the API says session is already stopped or not found (400/404),
 			// still clear local state so the user isn't stuck.
 			if (stopResp.status === 400 || stopResp.status === 404) {
-				console.warn(`[Emrald] Stop returned ${stopResp.status} — clearing local state anyway:`, stopResp.error);
+				console.warn(`[EMRALD] Stop returned ${stopResp.status} — clearing local state anyway:`, stopResp.error);
 				new Notice('Session may have already ended — clearing local state.');
 			} else {
 				new Notice(`Failed to stop session: ${stopResp.error}`);

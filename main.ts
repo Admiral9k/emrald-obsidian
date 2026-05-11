@@ -4,10 +4,9 @@ import { EmraldSidebarView, VIEW_TYPE_EMRALD } from './src/views/sidebar';
 import { tierState } from './src/tier';
 import { EmraldAPIClient } from './src/api/client';
 import { FolderSync } from './src/sync/folder-sync';
-import { OfflineQueue } from './src/sync/offline-queue';
+import { OfflineQueue, QueuedAction } from './src/sync/offline-queue';
 import { DataCache } from './src/sync/data-cache';
 import {
-	ALL_WORKSPACE_VIEWS,
 	VIEW_ELEVEL_OVERVIEW, ELevelOverviewView,
 	VIEW_INSIGHT_LOG, InsightLogView,
 	VIEW_DATA_CENTER, DataCenterView,
@@ -34,7 +33,7 @@ export default class EmraldPlugin extends Plugin {
 		this.offlineQueue = new OfflineQueue();
 		const savedQueue = (this.settings as unknown as Record<string, unknown>)._offlineQueue;
 		if (Array.isArray(savedQueue)) {
-			this.offlineQueue.fromJSON(savedQueue);
+			this.offlineQueue.fromJSON(savedQueue as QueuedAction[]);
 		}
 
 		// Initialize data cache (restore persisted cache)
@@ -69,7 +68,7 @@ export default class EmraldPlugin extends Plugin {
 			if (wasOffline && isNowOnline) {
 				void Promise.race([
 					this.apiClient.waitForReconciliation(),
-					new Promise<void>(r => setTimeout(r, 5000))
+					new Promise<void>(r => activeWindow.setTimeout(r, 5000))
 				]).then(() => { void this.refreshSidebar(); });
 			}
 			wasOffline = !isNowOnline;
@@ -167,7 +166,7 @@ export default class EmraldPlugin extends Plugin {
 		// Show onboarding if not completed
 		if (!this.settings.onboardingComplete) {
 			// Delay to let Obsidian fully load
-			setTimeout(() => {
+			activeWindow.setTimeout(() => {
 				void (async () => {
 					const { OnboardingModal } = await import('./src/onboarding/onboarding');
 					const modal = new OnboardingModal(this.app, this, () => {
@@ -234,7 +233,7 @@ export default class EmraldPlugin extends Plugin {
 				this.settings.installPinged = true;
 				await this.saveData(this.settings);
 			}
-		} catch (e) {
+		} catch {
 			// Silent fail — never block UX. Will retry on next launch.
 		}
 	}
@@ -246,7 +245,7 @@ export default class EmraldPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Record<string, unknown>);
 	}
 
 	/**
@@ -289,14 +288,20 @@ export default class EmraldPlugin extends Plugin {
 			const resp = await this.apiClient.updatePreferences({ digest_day, digest_time });
 			if (!silent) {
 				if (resp.error) {
-					const msg = typeof resp.error === 'string' ? resp.error : (((resp.error as Record<string, unknown>)?.message) ?? 'unknown error');
+					let msg: string;
+					if (typeof resp.error === 'string') {
+						msg = resp.error;
+					} else {
+						const rawMsg = (resp.error as unknown as Record<string, unknown>)?.message;
+						msg = typeof rawMsg === 'string' ? rawMsg : 'unknown error';
+					}
 					new Notice(`Digest schedule sync failed: ${msg}`);
 				} else {
 					new Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
 				}
 			}
 		} catch (err) {
-			if (!silent) new Notice(`Digest schedule sync failed: ${((err as Record<string, unknown>)?.message) ?? String(err)}`);
+			if (!silent) new Notice(`Digest schedule sync failed: ${String((err as Record<string, unknown>)?.message ?? err)}`);
 			if (this.settings.debugLogging) console.warn('[EMRALD] syncDigestPreferences failed:', err);
 		}
 	}
@@ -395,7 +400,7 @@ export default class EmraldPlugin extends Plugin {
 		}
 
 		if (leaf) {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 			const view = leaf.view as EmraldSidebarView;
 			if (typeof view.refresh === 'function') {
 				await view.refresh();
@@ -418,7 +423,7 @@ export default class EmraldPlugin extends Plugin {
 				return;
 			}
 			if (typeof view.refresh === 'function') {
-				void (view.refresh as () => Promise<void>)();
+				void view.refresh();
 			}
 		}
 	}
@@ -437,7 +442,7 @@ export default class EmraldPlugin extends Plugin {
 		}
 
 		if (leaf) {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 		}
 	}
 }

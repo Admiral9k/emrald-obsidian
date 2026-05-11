@@ -74,14 +74,14 @@ class TierState {
 						try {
 							listener(this._tier);
 						} catch (e) {
-							console.error('[Emrald] Tier change listener error:', e);
+							console.error('[EMRALD] Tier change listener error:', e);
 						}
 					}
 				}
 			}
 		} catch (e) {
 			// Network error — keep existing tier, don't block plugin functionality
-			console.warn('[Emrald] Failed to refresh tier status:', e);
+			console.warn('[EMRALD] Failed to refresh tier status:', e);
 		} finally {
 			this._refreshing = false;
 		}

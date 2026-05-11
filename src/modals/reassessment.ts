@@ -326,7 +326,7 @@ export class ReassessmentModal extends Modal {
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: isInAdvancedSection
-				? 'Review your advanced calibration answers. These help emrald fine-tune effort predictions.'
+				? 'Review your advanced calibration answers. These help EMRALD fine-tune effort predictions.'
 				: 'Review and update your answers. Your previous responses are pre-filled — change what feels different now.'
 		});
 
@@ -502,8 +502,8 @@ export class ReassessmentModal extends Modal {
 
 			const changedCount = Object.keys(changed).length;
 			const message = changedCount > 0
-				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history, and emrald will recalibrate on the next compute cycle.`
-				: 'No answers changed, but your reassessment counter has been reset. emrald will check in again after your next 60 days of use.';
+				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history, and EMRALD will recalibrate on the next compute cycle.`
+				: 'No answers changed, but your reassessment counter has been reset. EMRALD will check in again after your next 60 days of use.';
 
 			contentEl.createEl('p', { cls: 'emerald-onboard-desc', text: message });
 

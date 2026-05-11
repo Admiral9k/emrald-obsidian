@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/prefer-create-el */
 // EMRALD Data Center — Deep dive into all 20 D-metrics.
 // Features: metric grid with current values, SVG time-series graphs,
 // time range toggle, info popovers, pin management, "need more data" states.
@@ -133,7 +132,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		let resp;
 		try {
 			resp = await this.plugin.apiClient.getMetrics();
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load metric data — check your connection.');
 			return;
 		}
@@ -318,7 +317,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			});
 			const teaserLink = teaser.createEl('a', {
 				cls: 'emerald-wv-dc-pro-teaser-link',
-				text: 'Upgrade to pro \u2192',
+				text: 'Upgrade to PRO \u2192',
 				href: 'https://app.effortmastery.com/app/billing'
 			});
 			teaserLink.setAttribute('target', '_blank');
@@ -512,36 +511,28 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const range = max - min;
 		const zones = this.getMetricZones(info);
 
-		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('width', '100%');
-		svg.setAttribute('height', String(CHART_HEIGHT));
-		svg.setAttribute('viewBox', `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`);
-		svg.classList.add('emerald-wv-metric-svg');
+		const svg = createSvg('svg', {
+			attr: { width: '100%', height: String(CHART_HEIGHT), viewBox: `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}` },
+			cls: 'emerald-wv-metric-svg'
+		});
 
 		// Background semantic zones (good / caution / risk)
 		for (const zone of zones) {
-			const rect = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'rect');
 			const zoneTop = CHART_PAD + (1 - zone.to) * (CHART_HEIGHT - CHART_PAD * 2);
 			const zoneBottom = CHART_PAD + (1 - zone.from) * (CHART_HEIGHT - CHART_PAD * 2);
-			rect.setAttribute('x', '0');
-			rect.setAttribute('y', String(zoneTop));
-			rect.setAttribute('width', String(CHART_WIDTH));
-			rect.setAttribute('height', String(Math.max(zoneBottom - zoneTop, 1)));
-			rect.setAttribute('fill', zone.color);
-			rect.classList.add('emerald-wv-chart-zone');
-			svg.appendChild(rect);
+			svg.createSvg('rect', {
+				attr: { x: '0', y: String(zoneTop), width: String(CHART_WIDTH), height: String(Math.max(zoneBottom - zoneTop, 1)), fill: zone.color },
+				cls: 'emerald-wv-chart-zone'
+			});
 		}
 
 		// Grid lines (3 horizontal)
 		for (let i = 0; i <= 2; i++) {
 			const y = CHART_PAD + ((CHART_HEIGHT - CHART_PAD * 2) / 2) * i;
-			const line = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'line');
-			line.setAttribute('x1', '0');
-			line.setAttribute('y1', String(y));
-			line.setAttribute('x2', String(CHART_WIDTH));
-			line.setAttribute('y2', String(y));
-			line.classList.add('emerald-wv-chart-grid');
-			svg.appendChild(line);
+			svg.createSvg('line', {
+				attr: { x1: '0', y1: String(y), x2: String(CHART_WIDTH), y2: String(y) },
+				cls: 'emerald-wv-chart-grid'
+			});
 		}
 
 		// Build points
@@ -563,54 +554,46 @@ export class DataCenterView extends EmraldWorkspaceView {
 			...points,
 			`${CHART_WIDTH},${CHART_HEIGHT}`
 		];
-		const area = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-		area.setAttribute('points', areaPoints.join(' '));
-		area.classList.add('emerald-wv-chart-area');
-		svg.appendChild(area);
+		svg.createSvg('polygon', {
+			attr: { points: areaPoints.join(' ') },
+			cls: 'emerald-wv-chart-area'
+		});
 
 		// Line
-		const polyline = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-		polyline.setAttribute('points', points.join(' '));
-		polyline.classList.add('emerald-wv-chart-line');
-		svg.appendChild(polyline);
+		svg.createSvg('polyline', {
+			attr: { points: points.join(' ') },
+			cls: 'emerald-wv-chart-line'
+		});
 
 		// Dots at each data point
 		for (const coord of coords) {
-			const circle = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			circle.setAttribute('cx', String(coord.x));
-			circle.setAttribute('cy', String(coord.y));
-			circle.setAttribute('r', '3');
-			circle.classList.add('emerald-wv-chart-dot');
-			svg.appendChild(circle);
+			svg.createSvg('circle', {
+				attr: { cx: String(coord.x), cy: String(coord.y), r: '3' },
+				cls: 'emerald-wv-chart-dot'
+			});
 		}
 
 		// Endpoint dot (larger, accent)
 		const last = coords[coords.length - 1];
 		if (last) {
-			const endDot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			endDot.setAttribute('cx', String(last.x));
-			endDot.setAttribute('cy', String(last.y));
-			endDot.setAttribute('r', '4');
-			endDot.classList.add('emerald-wv-chart-dot-current');
-			svg.appendChild(endDot);
+			svg.createSvg('circle', {
+				attr: { cx: String(last.x), cy: String(last.y), r: '4' },
+				cls: 'emerald-wv-chart-dot-current'
+			});
 		}
 
 		// Min/max labels
-		const maxLabel = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'text');
-		maxLabel.setAttribute('x', String(CHART_WIDTH - 4));
-		maxLabel.setAttribute('y', String(CHART_PAD + 10));
-		maxLabel.setAttribute('text-anchor', 'end');
-		maxLabel.classList.add('emerald-wv-chart-range-label');
+		const maxLabel = svg.createSvg('text', {
+			attr: { x: String(CHART_WIDTH - 4), y: String(CHART_PAD + 10), 'text-anchor': 'end' },
+			cls: 'emerald-wv-chart-range-label'
+		});
 		maxLabel.textContent = max.toFixed(1);
-		svg.appendChild(maxLabel);
 
-		const minLabel = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'text');
-		minLabel.setAttribute('x', String(CHART_WIDTH - 4));
-		minLabel.setAttribute('y', String(CHART_HEIGHT - CHART_PAD));
-		minLabel.setAttribute('text-anchor', 'end');
-		minLabel.classList.add('emerald-wv-chart-range-label');
+		const minLabel = svg.createSvg('text', {
+			attr: { x: String(CHART_WIDTH - 4), y: String(CHART_HEIGHT - CHART_PAD), 'text-anchor': 'end' },
+			cls: 'emerald-wv-chart-range-label'
+		});
 		minLabel.textContent = min.toFixed(1);
-		svg.appendChild(minLabel);
 
 		return svg;
 	}

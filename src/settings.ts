@@ -94,7 +94,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('API key')
-			.setDesc('Your emrald API key from effortmastery.com')
+			.setDesc('Your EMRALD API key from effortmastery.com')
 			.addText(text => text
 				.setPlaceholder('Em_...')
 				.setValue(this.plugin.settings.apiKey)
@@ -106,7 +106,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('API URL')
-			.setDesc('Emrald API endpoint')
+			.setDesc('EMRALD API endpoint')
 			.addText(text => text
 				.setValue(this.plugin.settings.apiUrl)
 				.onChange((value) => {
@@ -256,7 +256,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Frontmatter sync')
-			.setDesc('Write emrald metadata to note frontmatter')
+			.setDesc('Write EMRALD metadata to note frontmatter')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.frontmatterEnabled)
 				.onChange((value) => {
@@ -317,7 +317,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName('Privacy').setHeading();
 
 		new Setting(containerEl)
-			.setName('Help improve emrald')
+			.setName('Help improve EMRALD')
 			.setDesc(
 				'Effort management is a new field, and every data point helps make it better. ' +
 				'Your anonymized usage patterns (never notes, names, or identifiers) help us build smarter ' +
@@ -359,7 +359,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Digest delivery time')
-			.setDesc('Time of day in utc (24h format, e.g. 09:00 = 4am est)')
+			.setDesc('Time of day in UTC (24h format, e.g. 09:00 = 4am est)')
 			.addText(text => {
 				let debounce: number | null = null;
 				text
@@ -403,20 +403,20 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Send feedback')
-			.setDesc('Help us improve emrald — report bugs, request features, or share your experience')
+			.setDesc('Help us improve EMRALD — report bugs, request features, or share your experience')
 			.addButton(btn => btn
 				.setButtonText('Send email')
 				.onClick(() => {
-					window.open('mailto:feedback@effortmastery.com?subject=Emrald%20Feedback', '_blank');
+					window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
 				}));
 
 		new Setting(containerEl)
 			.setName('Website')
-			.setDesc('Learn more about emrald and effort management')
+			.setDesc('Learn more about EMRALD and effort management')
 			.addButton(btn => btn
-				.setButtonText('getemrald.com')
+				.setButtonText('Open website')
 				.onClick(() => {
-					window.open('https://getemrald.com', '_blank');
+					window.open('https://getEMRALD.com', '_blank');
 				}));
 	}
 }

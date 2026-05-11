@@ -10,7 +10,6 @@ import { EmraldAPIClient, TrackedItem } from '../api/client';
 import {
 	readEmraldFrontmatter,
 	writeEmraldFrontmatter,
-	initializeEmraldFrontmatter,
 	isEmraldNote,
 	getEmraldId,
 	getEffortLevel
@@ -93,7 +92,7 @@ export class FolderSync {
 			// Fetch all items from API
 			const response = await this.apiClient.getItems();
 			if (response.error || !response.data) {
-				console.warn('Emrald: Full sync failed —', response.error);
+				console.warn('EMRALD: Full sync failed —', response.error);
 				return;
 			}
 
@@ -183,7 +182,7 @@ export class FolderSync {
 		if (isEmraldNote(this.app, file)) return;
 
 		// Prompt user to track this note
-		new Notice(`New note in Active folder: "${file.basename}". Open emrald sidebar to track it.`);
+		new Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
 	}
 
 	/**

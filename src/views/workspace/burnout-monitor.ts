@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/prefer-create-el */
 // EMRALD Burnout Monitor — Caring coach, not clinical report.
 // Structure: NOW (hero) → PAST (what's driving this) → FUTURE (suggestions)
 // → Recovery sparkline (collapsed). Episodes tucked at bottom.
@@ -7,7 +6,6 @@
 import { WorkspaceLeaf, setIcon } from 'obsidian';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_BURNOUT_MONITOR, VIEW_EFFORT_PROFILE } from './base';
-import { RecoveryProtocol } from '../../api/client';
 
 // Phase descriptions — qualitative, warm, human
 const PHASE_META: Record<string, { label: string; icon: string; message: string; tone: string }> = {
@@ -62,7 +60,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getRecoveryProtocols(),
 				this.plugin.apiClient.getMetrics(['D8'])
 			]);
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load burnout data — check your connection.');
 			return;
 		}
@@ -250,7 +248,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		section.createEl('h3', { text: "What's driving this" });
 
 		const intro = phase === 'green'
-			? 'These are the factors emrald is watching — all looking fine right now.'
+			? 'These are the factors EMRALD is watching — all looking fine right now.'
 			: 'These factors are contributing to your current state:';
 		section.createEl('p', { cls: 'emerald-wv-factors-intro', text: intro });
 
@@ -282,7 +280,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		if (phase === 'green') {
 			section.createEl('p', {
 				cls: 'emerald-wv-suggestion-note',
-				text: 'No action needed right now. These suggestions will become more specific as emrald learns your patterns.'
+				text: 'No action needed right now. These suggestions will become more specific as EMRALD learns your patterns.'
 			});
 		}
 	}
@@ -291,8 +289,8 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		switch (phase) {
 			case 'green': {
 				const recoverySuggestion = hasRecoveryActivities
-					? { icon: 'check-circle', text: 'Your recharge activities are being tracked — emrald is learning what recharges you.' }
-					: { icon: 'calendar', text: 'Consider logging recharge activities so emrald can learn what recharges you.' };
+					? { icon: 'check-circle', text: 'Your recharge activities are being tracked — EMRALD is learning what recharges you.' }
+					: { icon: 'calendar', text: 'Consider logging recharge activities so EMRALD can learn what recharges you.' };
 				return [
 					{ icon: 'check', text: "Keep your current rhythm — it's working." },
 					recoverySuggestion
@@ -394,11 +392,10 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	}
 
 	private buildSparklineSVG(values: number[]): SVGElement {
-		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('width', String(SPARK_W));
-		svg.setAttribute('height', String(SPARK_H));
-		svg.setAttribute('viewBox', `0 0 ${SPARK_W} ${SPARK_H}`);
-		svg.classList.add('emerald-wv-burnout-spark-svg');
+		const svg = createSvg('svg', {
+			attr: { width: String(SPARK_W), height: String(SPARK_H), viewBox: `0 0 ${SPARK_W} ${SPARK_H}` },
+			cls: 'emerald-wv-burnout-spark-svg'
+		});
 
 		if (values.length < 2) return svg;
 
@@ -416,19 +413,17 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
 		}
 
-		const polyline = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-		polyline.setAttribute('points', points.join(' '));
-		polyline.classList.add('emerald-sparkline-line');
-		svg.appendChild(polyline);
+		svg.createSvg('polyline', {
+			attr: { points: points.join(' ') },
+			cls: 'emerald-sparkline-line'
+		});
 
 		// Endpoint dot
 		const lastPt = points[points.length - 1].split(',');
-		const dot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
-		dot.setAttribute('cx', lastPt[0]);
-		dot.setAttribute('cy', lastPt[1]);
-		dot.setAttribute('r', '2.5');
-		dot.classList.add('emerald-sparkline-dot');
-		svg.appendChild(dot);
+		svg.createSvg('circle', {
+			attr: { cx: lastPt[0], cy: lastPt[1], r: '2.5' },
+			cls: 'emerald-sparkline-dot'
+		});
 
 		return svg;
 	}
@@ -440,11 +435,10 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const barWidth = Math.max(Math.floor(chartWidth / entries.length) - 6, 8);
 		const maxVal = Math.max(...entries.map(e => e.value ?? 0), 10);
 
-		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('width', String(chartWidth));
-		svg.setAttribute('height', String(chartHeight + 24));
-		svg.setAttribute('viewBox', `0 0 ${chartWidth} ${chartHeight + 24}`);
-		svg.classList.add('emerald-wv-burnout-chart');
+		const svg = createSvg('svg', {
+			attr: { width: String(chartWidth), height: String(chartHeight + 24), viewBox: `0 0 ${chartWidth} ${chartHeight + 24}` },
+			cls: 'emerald-wv-burnout-chart'
+		});
 
 		for (let i = 0; i < entries.length; i++) {
 			const val = entries[i].value ?? 0;
@@ -452,27 +446,23 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			const x = i * (chartWidth / entries.length) + (chartWidth / entries.length - barWidth) / 2;
 			const y = chartHeight - barH;
 
-			const rect = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'rect');
-			rect.setAttribute('x', String(x));
-			rect.setAttribute('y', String(y));
-			rect.setAttribute('width', String(barWidth));
-			rect.setAttribute('height', String(Math.max(barH, 1)));
-			rect.setAttribute('rx', '2');
+			let barCls: string;
+			if (val >= 70) barCls = 'emerald-chart-bar-red';
+			else if (val >= 50) barCls = 'emerald-chart-bar-orange';
+			else if (val >= 30) barCls = 'emerald-chart-bar-yellow';
+			else barCls = 'emerald-chart-bar-green';
 
-			if (val >= 70) rect.classList.add('emerald-chart-bar-red');
-			else if (val >= 50) rect.classList.add('emerald-chart-bar-orange');
-			else if (val >= 30) rect.classList.add('emerald-chart-bar-yellow');
-			else rect.classList.add('emerald-chart-bar-green');
-			svg.appendChild(rect);
+			svg.createSvg('rect', {
+				attr: { x: String(x), y: String(y), width: String(barWidth), height: String(Math.max(barH, 1)), rx: '2' },
+				cls: barCls
+			});
 
-			const label = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'text');
-			label.setAttribute('x', String(x + barWidth / 2));
-			label.setAttribute('y', String(chartHeight + 16));
-			label.setAttribute('text-anchor', 'middle');
-			label.classList.add('emerald-chart-label');
 			const date = new Date(entries[i].computed_at);
+			const label = svg.createSvg('text', {
+				attr: { x: String(x + barWidth / 2), y: String(chartHeight + 16), 'text-anchor': 'middle' },
+				cls: 'emerald-chart-label'
+			});
 			label.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
-			svg.appendChild(label);
 		}
 
 		container.appendChild(svg);

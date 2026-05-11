@@ -62,7 +62,7 @@ export class WelcomeBackModal extends Modal {
 		// Encouragement — gentle nudge, not guilt
 		body.createEl('p', {
 			cls: 'emerald-welcomeback-encouragement',
-			text: 'Every session — even a short one — gives emrald better data to work with. Start small if you need to.'
+			text: 'Every session — even a short one — gives EMRALD better data to work with. Start small if you need to.'
 		});
 
 		// Single dismiss button

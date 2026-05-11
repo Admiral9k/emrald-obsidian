@@ -24,12 +24,12 @@ export class AdvancedCompleteModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Emrald now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate.'
+			text: 'EMRALD now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate.'
 		});
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'You can revisit and update your answers anytime in the effort profile workspace view. Emrald will also prompt you to re-calibrate when it detects your patterns have shifted.'
+			text: 'You can revisit and update your answers anytime in the effort profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted.'
 		});
 
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

@@ -81,13 +81,13 @@ var init_tier = __esm({
                 try {
                   listener(this._tier);
                 } catch (e) {
-                  console.error("[Emrald] Tier change listener error:", e);
+                  console.error("[EMRALD] Tier change listener error:", e);
                 }
               }
             }
           }
         } catch (e) {
-          console.warn("[Emrald] Failed to refresh tier status:", e);
+          console.warn("[EMRALD] Failed to refresh tier status:", e);
         } finally {
           this._refreshing = false;
         }
@@ -249,7 +249,7 @@ var init_base = __esm({
         }
         const cta = gate.createEl("a", {
           cls: "emerald-btn emerald-btn-upgrade",
-          text: "Upgrade to pro",
+          text: "Upgrade to PRO",
           href: "https://app.effortmastery.com/app/billing"
         });
         cta.setAttribute("target", "_blank");
@@ -282,11 +282,11 @@ var init_advanced_complete = __esm({
         contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile complete!" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Emrald now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate."
+          text: "EMRALD now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate."
         });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "You can revisit and update your answers anytime in the effort profile workspace view. Emrald will also prompt you to re-calibrate when it detects your patterns have shifted."
+          text: "You can revisit and update your answers anytime in the effort profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted."
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
         const goBtn = actions.createEl("button", {
@@ -811,11 +811,11 @@ var init_advanced_upgrade = __esm({
         contentEl.createEl("h2", { text: "Go advanced?" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "You've completed your basic effort profile \u2014 emrald is already working for you."
+          text: "You've completed your basic effort profile \u2014 EMRALD is already working for you."
         });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Advanced mode unlocks 30 additional calibration questions that help emrald understand your work style at a deeper level. They're presented gradually \u2014 just 3-4 questions before each session, over about 8 sessions."
+          text: "Advanced mode unlocks 30 additional calibration questions that help EMRALD understand your work style at a deeper level. They're presented gradually \u2014 just 3-4 questions before each session, over about 8 sessions."
         });
         const benefits = contentEl.createDiv({ cls: "emerald-onboard-features" });
         const items = [
@@ -967,7 +967,7 @@ var init_onboarding = __esm({
         const total = STEP_ORDER.length - 1;
         const bar = container.createDiv({ cls: "emerald-onboard-progress" });
         for (let i = 0; i < total; i++) {
-          const dot = bar.createDiv({
+          bar.createDiv({
             cls: `emerald-onboard-dot ${i < stepIndex ? "is-done" : ""} ${i === stepIndex ? "is-active" : ""}`
           });
           if (i < total - 1) {
@@ -987,10 +987,10 @@ var init_onboarding = __esm({
       renderWelcome(container) {
         const welcomeIcon = container.createDiv({ cls: "emerald-onboard-icon" });
         (0, import_obsidian5.setIcon)(welcomeIcon, "gem");
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Welcome to emrald" });
+        container.createEl("h2", { cls: "emerald-onboard-title", text: "Welcome to EMRALD" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Track your work sessions, measure effort in real time, and let emrald surface patterns you might otherwise miss."
+          text: "Track your work sessions, measure effort in real time, and let EMRALD surface patterns you might otherwise miss."
         });
         const features = container.createDiv({ cls: "emerald-onboard-features" });
         const items = [
@@ -1014,10 +1014,10 @@ var init_onboarding = __esm({
       }
       // ── Step 2: API Connection ───────────────────────────
       renderConnect(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Connect to emrald" });
+        container.createEl("h2", { cls: "emerald-onboard-title", text: "Connect to EMRALD" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Enter your API key to connect. You can get one from your emrald dashboard."
+          text: "Enter your API key to connect. You can get one from your EMRALD dashboard."
         });
         const linkEl = container.createDiv({ cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
@@ -1110,7 +1110,7 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "Quick profile" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Tell emrald a bit about your work capacity. This helps calibrate effort levels. You can always update these later."
+          text: "Tell EMRALD a bit about your work capacity. This helps calibrate effort levels. You can always update these later."
         });
         const form = container.createDiv({ cls: "emerald-form" });
         const availGroup = form.createDiv({ cls: "emerald-form-group" });
@@ -1157,7 +1157,7 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "Effort profile" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "These questions help emrald calibrate effort levels to your personal style. Be honest \u2014 there are no wrong answers."
+          text: "These questions help EMRALD calibrate effort levels to your personal style. Be honest \u2014 there are no wrong answers."
         });
         container.createDiv({
           cls: "emerald-onboard-step-label",
@@ -1253,14 +1253,14 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "What recharges you?" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Recharge processes are activities that restore your energy \u2014 like walking, piano, or reading. When emrald detects burnout risk, it will suggest these as a gentle nudge, not a prescription."
+          text: "Recharge processes are activities that restore your energy \u2014 like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription."
         });
         const form = container.createDiv({ cls: "emerald-form" });
         const protocolGroup = form.createDiv({ cls: "emerald-form-group" });
         protocolGroup.createEl("label", { text: "Add up to 3 recharge processes" });
         const hintEl = protocolGroup.createDiv({
           cls: "emerald-form-desc",
-          text: "Press Enter to add another. These help emrald suggest recovery when it matters."
+          text: "Press Enter to add another. These help EMRALD suggest recovery when it matters."
         });
         let rowCount = 0;
         const MAX_ROWS = 3;
@@ -1395,7 +1395,7 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "Add your first projects" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "What are you working on? Give each project an effort level \u2014 emrald uses this to measure what your day actually costs you."
+          text: "What are you working on? Give each project an effort level \u2014 EMRALD uses this to measure what your day actually costs you."
         });
         container.createDiv({
           cls: "emerald-onboard-hint emerald-onboard-hint-top",
@@ -1408,7 +1408,7 @@ var init_onboarding = __esm({
         explainer.createDiv({ text: "E4 = Maximum (100% of your daily work time)" });
         container.createDiv({
           cls: "emerald-onboard-hint",
-          text: "Tip: click the link icon to connect a project to an existing note \u2014 emrald will sync session data directly to that note. Without a link, the project lives only in your project list."
+          text: "Tip: click the link icon to connect a project to an existing note \u2014 EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list."
         });
         const form = container.createDiv({ cls: "emerald-form" });
         const listEl = form.createDiv({ cls: "emerald-onboard-project-list" });
@@ -1527,7 +1527,7 @@ var init_onboarding = __esm({
           {
             icon: "flame",
             title: "Burnout Protection",
-            desc: "Emrald watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
+            desc: "EMRALD watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
           }
         ];
         const tourList = container.createDiv({ cls: "emerald-onboard-tour" });
@@ -1553,11 +1553,11 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "You're all set!" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Emrald has enough data to start working for you. Track your sessions, check your metrics, and if you're a pro user, get insights right away."
+          text: "EMRALD has enough data to start working for you. Track your sessions, check your metrics, and if you're a PRO user, get insights right away."
         });
         container.createEl("p", {
           cls: "emerald-onboard-desc emerald-onboard-profile-nudge",
-          text: "Want even smarter insights? Complete your effort profile \u2014 it helps emrald understand your work style, calibrate effort levels, and catch burnout patterns earlier."
+          text: "Want even smarter insights? Complete your effort profile \u2014 it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier."
         });
         const researchRow = container.createDiv({ cls: "emerald-onboard-research" });
         const researchToggle = researchRow.createEl("label", { cls: "emerald-onboard-research-label" });
@@ -1576,8 +1576,8 @@ var init_onboarding = __esm({
             }
           })();
         });
-        researchToggle.appendText(" Help improve emrald \u2014 contribute anonymous usage data to build smarter features and advance effort management research. ");
-        const detailsLink = researchToggle.createSpan({
+        researchToggle.appendText(" Help improve EMRALD \u2014 contribute anonymous usage data to build smarter features and advance effort management research. ");
+        researchToggle.createSpan({
           cls: "emerald-link",
           text: "Change anytime in Settings \u2192 Privacy."
         });
@@ -2095,7 +2095,7 @@ var init_reassessment = __esm({
         contentEl.createEl("h2", { cls: "emerald-onboard-title", text: isInAdvancedSection ? "Reassess \u2014 advanced profile" : "Reassess your profile" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: isInAdvancedSection ? "Review your advanced calibration answers. These help emrald fine-tune effort predictions." : "Review and update your answers. Your previous responses are pre-filled \u2014 change what feels different now."
+          text: isInAdvancedSection ? "Review your advanced calibration answers. These help EMRALD fine-tune effort predictions." : "Review and update your answers. Your previous responses are pre-filled \u2014 change what feels different now."
         });
         contentEl.createDiv({
           cls: "emerald-onboard-step-label",
@@ -2234,7 +2234,7 @@ var init_reassessment = __esm({
           (0, import_obsidian12.setIcon)(doneIcon, "check-circle");
           contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile updated!" });
           const changedCount = Object.keys(changed).length;
-          const message = changedCount > 0 ? `${changedCount} answer${changedCount > 1 ? "s" : ""} updated. Your previous profile has been saved to history, and emrald will recalibrate on the next compute cycle.` : "No answers changed, but your reassessment counter has been reset. emrald will check in again after your next 60 days of use.";
+          const message = changedCount > 0 ? `${changedCount} answer${changedCount > 1 ? "s" : ""} updated. Your previous profile has been saved to history, and EMRALD will recalibrate on the next compute cycle.` : "No answers changed, but your reassessment counter has been reset. EMRALD will check in again after your next 60 days of use.";
           contentEl.createEl("p", { cls: "emerald-onboard-desc", text: message });
           const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
           const doneBtn = actions.createEl("button", {
@@ -2491,7 +2491,7 @@ var init_welcome_back = __esm({
         }
         body.createEl("p", {
           cls: "emerald-welcomeback-encouragement",
-          text: "Every session \u2014 even a short one \u2014 gives emrald better data to work with. Start small if you need to."
+          text: "Every session \u2014 even a short one \u2014 gives EMRALD better data to work with. Start small if you need to."
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions emerald-welcomeback-actions" });
         const btn = actions.createEl("button", {
@@ -2750,7 +2750,7 @@ var init_celebration = __esm({
         }
         body.createEl("p", {
           cls: "emerald-celebration-encouragement",
-          text: "Every receipt you submit makes emrald smarter about your effort patterns. Keep going \u2014 your data tells a story no task list ever could."
+          text: "Every receipt you submit makes EMRALD smarter about your effort patterns. Keep going \u2014 your data tells a story no task list ever could."
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions emerald-celebration-actions" });
         const btn = actions.createEl("button", {
@@ -2773,7 +2773,7 @@ var init_celebration = __esm({
         if (percentUsed >= 100) {
           return `That session covered your full ${this.effortLevel} budget for ${this.itemName} today. Well spent.`;
         } else {
-          return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. emrald tracks this so you don't have to guess.`;
+          return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
         }
       }
       formatDuration(minutes) {
@@ -2815,7 +2815,6 @@ var init_close_day = __esm({
         contentEl.addClass("emerald-modal", "emerald-closeday-modal");
         contentEl.createEl("h2", { text: "Close your work day?" });
         const statsEl = contentEl.createDiv({ cls: "emerald-closeday-stats" });
-        const workedHours = summary.workedMinutes / 60;
         const deltaMinutes = summary.workedMinutes - summary.plannedHours * 60;
         const deltaAbs = Math.abs(deltaMinutes);
         const deltaHours = Math.floor(deltaAbs / 60);
@@ -3149,11 +3148,11 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
     containerEl.empty();
     ;
     new import_obsidian6.Setting(containerEl).setName("Account").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("API key").setDesc("Your emrald API key from effortmastery.com").addText((text) => text.setPlaceholder("Em_...").setValue(this.plugin.settings.apiKey).onChange((value) => {
+    new import_obsidian6.Setting(containerEl).setName("API key").setDesc("Your EMRALD API key from effortmastery.com").addText((text) => text.setPlaceholder("Em_...").setValue(this.plugin.settings.apiKey).onChange((value) => {
       this.plugin.settings.apiKey = value;
       void this.plugin.saveSettings();
     }).inputEl.type = "password");
-    new import_obsidian6.Setting(containerEl).setName("API URL").setDesc("Emrald API endpoint").addText((text) => text.setValue(this.plugin.settings.apiUrl).onChange((value) => {
+    new import_obsidian6.Setting(containerEl).setName("API URL").setDesc("EMRALD API endpoint").addText((text) => text.setValue(this.plugin.settings.apiUrl).onChange((value) => {
       this.plugin.settings.apiUrl = value;
       void this.plugin.saveSettings();
     }));
@@ -3211,7 +3210,7 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       this.plugin.settings.syncIntervalMinutes = value;
       void this.plugin.saveSettings();
     }));
-    new import_obsidian6.Setting(containerEl).setName("Frontmatter sync").setDesc("Write emrald metadata to note frontmatter").addToggle((toggle) => toggle.setValue(this.plugin.settings.frontmatterEnabled).onChange((value) => {
+    new import_obsidian6.Setting(containerEl).setName("Frontmatter sync").setDesc("Write EMRALD metadata to note frontmatter").addToggle((toggle) => toggle.setValue(this.plugin.settings.frontmatterEnabled).onChange((value) => {
       this.plugin.settings.frontmatterEnabled = value;
       void this.plugin.saveSettings();
     }));
@@ -3240,7 +3239,7 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       }
     }
     new import_obsidian6.Setting(containerEl).setName("Privacy").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("Help improve emrald").setDesc(
+    new import_obsidian6.Setting(containerEl).setName("Help improve EMRALD").setDesc(
       "Effort management is a new field, and every data point helps make it better. Your anonymized usage patterns (never notes, names, or identifiers) help us build smarter features and may be used in published research by Effort Mastery LLC. You can change this anytime."
     ).addToggle((toggle) => toggle.setValue(this.plugin.settings.researchOptIn).onChange((value) => {
       this.plugin.settings.researchOptIn = value;
@@ -3257,7 +3256,7 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       void this.plugin.saveSettings();
       void this.plugin.syncDigestPreferences();
     }));
-    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Time of day in utc (24h format, e.g. 09:00 = 4am est)").addText((text) => {
+    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Time of day in UTC (24h format, e.g. 09:00 = 4am est)").addText((text) => {
       let debounce = null;
       text.setPlaceholder("09:00").setValue(this.plugin.settings.digestTime).onChange((value) => {
         this.plugin.settings.digestTime = value;
@@ -3283,11 +3282,11 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       });
     }));
     new import_obsidian6.Setting(containerEl).setName("Feedback & support").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("Send feedback").setDesc("Help us improve emrald \u2014 report bugs, request features, or share your experience").addButton((btn) => btn.setButtonText("Send email").onClick(() => {
-      window.open("mailto:feedback@effortmastery.com?subject=Emrald%20Feedback", "_blank");
+    new import_obsidian6.Setting(containerEl).setName("Send feedback").setDesc("Help us improve EMRALD \u2014 report bugs, request features, or share your experience").addButton((btn) => btn.setButtonText("Send email").onClick(() => {
+      window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
     }));
-    new import_obsidian6.Setting(containerEl).setName("Website").setDesc("Learn more about emrald and effort management").addButton((btn) => btn.setButtonText("getemrald.com").onClick(() => {
-      window.open("https://getemrald.com", "_blank");
+    new import_obsidian6.Setting(containerEl).setName("Website").setDesc("Learn more about EMRALD and effort management").addButton((btn) => btn.setButtonText("Open website").onClick(() => {
+      window.open("https://getEMRALD.com", "_blank");
     }));
   }
 };
@@ -4493,7 +4492,6 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
         });
       }
       const levelCell = row.createEl("td");
-      const levelMeta = E_LEVEL_META[item.effort_level];
       const levelBadge = levelCell.createSpan({ cls: "emerald-wv-level-badge", text: item.effort_level });
       levelBadge.dataset.level = (_b = item.effort_level) != null ? _b : "";
       const todayMin = (_c = this.minutesByItem.get(item.id)) != null ? _c : 0;
@@ -4569,7 +4567,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
   }
   async onOpen() {
     const container = this.getContainer();
-    this.renderHeader(container, "Insight log", "Everything emrald has noticed", "lightbulb");
+    this.renderHeader(container, "Insight log", "Everything EMRALD has noticed", "lightbulb");
     if (!this._ackListener) {
       this._ackListener = () => {
         if (!this._ackSelf)
@@ -4625,7 +4623,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
     empty.createEl("h3", { text: "No insights yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
-      text: "Emrald generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets."
+      text: "EMRALD generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets."
     });
     const checklist = empty.createDiv({ cls: "emerald-wv-empty-checklist" });
     checklist.createDiv({ cls: "emerald-wv-empty-check", text: "\u2022 Complete work sessions with effort receipts" });
@@ -5128,7 +5126,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
       });
       const teaserLink = teaser.createEl("a", {
         cls: "emerald-wv-dc-pro-teaser-link",
-        text: "Upgrade to pro \u2192",
+        text: "Upgrade to PRO \u2192",
         href: "https://app.effortmastery.com/app/billing"
       });
       teaserLink.setAttribute("target", "_blank");
@@ -5263,32 +5261,24 @@ var DataCenterView = class extends EmraldWorkspaceView {
     const max = info.unit === "/100" ? 100 : 10;
     const range = max - min;
     const zones = this.getMetricZones(info);
-    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "100%");
-    svg.setAttribute("height", String(CHART_HEIGHT));
-    svg.setAttribute("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`);
-    svg.classList.add("emerald-wv-metric-svg");
+    const svg = createSvg("svg", {
+      attr: { width: "100%", height: String(CHART_HEIGHT), viewBox: `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}` },
+      cls: "emerald-wv-metric-svg"
+    });
     for (const zone of zones) {
-      const rect = activeDocument.createElementNS("http://www.w3.org/2000/svg", "rect");
       const zoneTop = CHART_PAD + (1 - zone.to) * (CHART_HEIGHT - CHART_PAD * 2);
       const zoneBottom = CHART_PAD + (1 - zone.from) * (CHART_HEIGHT - CHART_PAD * 2);
-      rect.setAttribute("x", "0");
-      rect.setAttribute("y", String(zoneTop));
-      rect.setAttribute("width", String(CHART_WIDTH));
-      rect.setAttribute("height", String(Math.max(zoneBottom - zoneTop, 1)));
-      rect.setAttribute("fill", zone.color);
-      rect.classList.add("emerald-wv-chart-zone");
-      svg.appendChild(rect);
+      svg.createSvg("rect", {
+        attr: { x: "0", y: String(zoneTop), width: String(CHART_WIDTH), height: String(Math.max(zoneBottom - zoneTop, 1)), fill: zone.color },
+        cls: "emerald-wv-chart-zone"
+      });
     }
     for (let i = 0; i <= 2; i++) {
       const y = CHART_PAD + (CHART_HEIGHT - CHART_PAD * 2) / 2 * i;
-      const line = activeDocument.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", "0");
-      line.setAttribute("y1", String(y));
-      line.setAttribute("x2", String(CHART_WIDTH));
-      line.setAttribute("y2", String(y));
-      line.classList.add("emerald-wv-chart-grid");
-      svg.appendChild(line);
+      svg.createSvg("line", {
+        attr: { x1: "0", y1: String(y), x2: String(CHART_WIDTH), y2: String(y) },
+        cls: "emerald-wv-chart-grid"
+      });
     }
     const step = values.length > 1 ? CHART_WIDTH / (values.length - 1) : 0;
     const points = [];
@@ -5305,45 +5295,37 @@ var DataCenterView = class extends EmraldWorkspaceView {
       ...points,
       `${CHART_WIDTH},${CHART_HEIGHT}`
     ];
-    const area = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polygon");
-    area.setAttribute("points", areaPoints.join(" "));
-    area.classList.add("emerald-wv-chart-area");
-    svg.appendChild(area);
-    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    polyline.setAttribute("points", points.join(" "));
-    polyline.classList.add("emerald-wv-chart-line");
-    svg.appendChild(polyline);
+    svg.createSvg("polygon", {
+      attr: { points: areaPoints.join(" ") },
+      cls: "emerald-wv-chart-area"
+    });
+    svg.createSvg("polyline", {
+      attr: { points: points.join(" ") },
+      cls: "emerald-wv-chart-line"
+    });
     for (const coord of coords) {
-      const circle = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
-      circle.setAttribute("cx", String(coord.x));
-      circle.setAttribute("cy", String(coord.y));
-      circle.setAttribute("r", "3");
-      circle.classList.add("emerald-wv-chart-dot");
-      svg.appendChild(circle);
+      svg.createSvg("circle", {
+        attr: { cx: String(coord.x), cy: String(coord.y), r: "3" },
+        cls: "emerald-wv-chart-dot"
+      });
     }
     const last = coords[coords.length - 1];
     if (last) {
-      const endDot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
-      endDot.setAttribute("cx", String(last.x));
-      endDot.setAttribute("cy", String(last.y));
-      endDot.setAttribute("r", "4");
-      endDot.classList.add("emerald-wv-chart-dot-current");
-      svg.appendChild(endDot);
+      svg.createSvg("circle", {
+        attr: { cx: String(last.x), cy: String(last.y), r: "4" },
+        cls: "emerald-wv-chart-dot-current"
+      });
     }
-    const maxLabel = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
-    maxLabel.setAttribute("x", String(CHART_WIDTH - 4));
-    maxLabel.setAttribute("y", String(CHART_PAD + 10));
-    maxLabel.setAttribute("text-anchor", "end");
-    maxLabel.classList.add("emerald-wv-chart-range-label");
+    const maxLabel = svg.createSvg("text", {
+      attr: { x: String(CHART_WIDTH - 4), y: String(CHART_PAD + 10), "text-anchor": "end" },
+      cls: "emerald-wv-chart-range-label"
+    });
     maxLabel.textContent = max.toFixed(1);
-    svg.appendChild(maxLabel);
-    const minLabel = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
-    minLabel.setAttribute("x", String(CHART_WIDTH - 4));
-    minLabel.setAttribute("y", String(CHART_HEIGHT - CHART_PAD));
-    minLabel.setAttribute("text-anchor", "end");
-    minLabel.classList.add("emerald-wv-chart-range-label");
+    const minLabel = svg.createSvg("text", {
+      attr: { x: String(CHART_WIDTH - 4), y: String(CHART_HEIGHT - CHART_PAD), "text-anchor": "end" },
+      cls: "emerald-wv-chart-range-label"
+    });
     minLabel.textContent = min.toFixed(1);
-    svg.appendChild(minLabel);
     return svg;
   }
   buildEffortSourceChart(metric, entry) {
@@ -5696,9 +5678,9 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     return VIEW_EFFORT_PROFILE;
   }
   async onOpen() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f;
     const container = this.getContainer();
-    this.renderHeader(container, "Effort profile", "How emrald sees you", "user");
+    this.renderHeader(container, "Effort profile", "How EMRALD sees you", "user");
     let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
     try {
       const forceFresh = !this.isOffline();
@@ -5724,11 +5706,10 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       this.renderStaleBanner(container);
     }
     const d19 = (_b = metricsResp.data) == null ? void 0 : _b.find((m) => m.metric_key === "D19");
-    const d19History = (_c = d19HistoryResp == null ? void 0 : d19HistoryResp.data) != null ? _c : [];
-    const d19Metadata = (_d = d19 == null ? void 0 : d19.metadata) != null ? _d : {};
-    const confidenceStageD19 = (_e = d19Metadata.confidence_stage) != null ? _e : null;
+    const d19Metadata = (_c = d19 == null ? void 0 : d19.metadata) != null ? _c : {};
+    const confidenceStageD19 = (_d = d19Metadata.confidence_stage) != null ? _d : null;
     const lastReassessmentAt = typeof (profile == null ? void 0 : profile.last_reassessment_at) === "string" ? profile.last_reassessment_at : null;
-    const d19ComputedAt = (_f = d19 == null ? void 0 : d19.computed_at) != null ? _f : null;
+    const d19ComputedAt = (_e = d19 == null ? void 0 : d19.computed_at) != null ? _e : null;
     const d19StaleAfterReassessment = lastReassessmentAt && d19ComputedAt ? new Date(lastReassessmentAt) > new Date(d19ComputedAt) : false;
     const d19Established = confidenceStageD19 === "established";
     if (d19 && d19.value !== null && d19Established && !d19StaleAfterReassessment) {
@@ -5748,7 +5729,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     if (profile)
       this.renderCalibrationScore(container, profile);
     if (profile) {
-      const driftLevel = d19Established && !d19StaleAfterReassessment ? (_g = d19 == null ? void 0 : d19.value) != null ? _g : 0 : 0;
+      const driftLevel = d19Established && !d19StaleAfterReassessment ? (_f = d19 == null ? void 0 : d19.value) != null ? _f : 0 : 0;
       this.renderAnsweredQuestions(container, profile, driftLevel);
     }
     if (historyResp.data && historyResp.data.length > 0) {
@@ -5766,7 +5747,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     empty.createEl("h3", { text: "No profile data yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
-      text: "Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps emrald calibrate everything to you."
+      text: "Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps EMRALD calibrate everything to you."
     });
     const btn = empty.createEl("button", {
       cls: "emerald-btn emerald-btn-primary",
@@ -5792,18 +5773,18 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     let level, msg, cls, icon;
     if (confidenceStage === "early") {
       level = "Early Signal";
-      msg = "Emrald is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.";
+      msg = "EMRALD is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.";
       cls = "emerald-wv-drift-low";
       icon = "sparkles";
     } else if (confidenceStage === "building") {
       if (driftValue < 1.5) {
         level = "Review Suggested";
-        msg = "Your profile and your recent effort data are showing some mismatch. As more sessions come in, emrald will tighten its expectations.";
+        msg = "Your profile and your recent effort data are showing some mismatch. As more sessions come in, EMRALD will tighten its expectations.";
         cls = "emerald-wv-drift-moderate";
         icon = "alert-circle";
       } else {
         level = "Review Suggested";
-        msg = "Your recent effort patterns are diverging from your calibration enough that a review may help \u2014 but emrald is still building confidence.";
+        msg = "Your recent effort patterns are diverging from your calibration enough that a review may help \u2014 but EMRALD is still building confidence.";
         cls = "emerald-wv-drift-moderate";
         icon = "alert-circle";
       }
@@ -5814,7 +5795,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       icon = "check-circle";
     } else if (driftValue < 2.5) {
       level = "Review Suggested";
-      msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve emrald's recommendations.";
+      msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve EMRALD's recommendations.";
       cls = "emerald-wv-drift-moderate";
       icon = "alert-circle";
     } else {
@@ -5861,7 +5842,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     });
     section.createEl("p", {
       cls: "emerald-wv-drift-msg",
-      text: `Emrald needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? "" : "s"} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
+      text: `EMRALD needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? "" : "s"} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
     });
     section.createEl("p", {
       cls: "emerald-wv-section-note",
@@ -5973,7 +5954,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       const protocol = activeProtocols[i];
       const card = grid.createDiv({ cls: "emerald-wv-recovery-card" });
       if (protocol) {
-        const nameEl = card.createDiv({ cls: "emerald-wv-recovery-name", text: protocol.name });
+        card.createDiv({ cls: "emerald-wv-recovery-name", text: protocol.name });
         if (protocol.description) {
           card.createDiv({ cls: "emerald-wv-recovery-desc", text: protocol.description });
         }
@@ -6202,7 +6183,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const thRow = thead.createEl("tr");
     const columns = [
       { label: "Date", tip: "" },
-      { label: "Score", tip: "Overall calibration confidence score \u2014 higher means emrald knows you better" },
+      { label: "Score", tip: "Overall calibration confidence score \u2014 higher means EMRALD knows you better" },
       { label: "Physical", tip: "Physical capability \u2014 your physical work capacity" },
       { label: "Mental", tip: "Mental capability \u2014 cognitive endurance and processing" },
       { label: "Phys. End.", tip: "Physical endurance \u2014 how long you sustain physical effort" },
@@ -6524,7 +6505,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
   renderFactors(container, factors, phase) {
     const section = container.createDiv({ cls: "emerald-wv-section" });
     section.createEl("h3", { text: "What's driving this" });
-    const intro = phase === "green" ? "These are the factors emrald is watching \u2014 all looking fine right now." : "These factors are contributing to your current state:";
+    const intro = phase === "green" ? "These are the factors EMRALD is watching \u2014 all looking fine right now." : "These factors are contributing to your current state:";
     section.createEl("p", { cls: "emerald-wv-factors-intro", text: intro });
     const list = section.createDiv({ cls: "emerald-wv-factors-list" });
     for (const factor of factors) {
@@ -6548,14 +6529,14 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     if (phase === "green") {
       section.createEl("p", {
         cls: "emerald-wv-suggestion-note",
-        text: "No action needed right now. These suggestions will become more specific as emrald learns your patterns."
+        text: "No action needed right now. These suggestions will become more specific as EMRALD learns your patterns."
       });
     }
   }
   getSuggestionsForPhase(phase, hasRecoveryActivities = false) {
     switch (phase) {
       case "green": {
-        const recoverySuggestion = hasRecoveryActivities ? { icon: "check-circle", text: "Your recharge activities are being tracked \u2014 emrald is learning what recharges you." } : { icon: "calendar", text: "Consider logging recharge activities so emrald can learn what recharges you." };
+        const recoverySuggestion = hasRecoveryActivities ? { icon: "check-circle", text: "Your recharge activities are being tracked \u2014 EMRALD is learning what recharges you." } : { icon: "calendar", text: "Consider logging recharge activities so EMRALD can learn what recharges you." };
         return [
           { icon: "check", text: "Keep your current rhythm \u2014 it's working." },
           recoverySuggestion
@@ -6651,11 +6632,10 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     });
   }
   buildSparklineSVG(values) {
-    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", String(SPARK_W));
-    svg.setAttribute("height", String(SPARK_H));
-    svg.setAttribute("viewBox", `0 0 ${SPARK_W} ${SPARK_H}`);
-    svg.classList.add("emerald-wv-burnout-spark-svg");
+    const svg = createSvg("svg", {
+      attr: { width: String(SPARK_W), height: String(SPARK_H), viewBox: `0 0 ${SPARK_W} ${SPARK_H}` },
+      cls: "emerald-wv-burnout-spark-svg"
+    });
     if (values.length < 2)
       return svg;
     const min = Math.min(...values);
@@ -6670,17 +6650,15 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       const y = SPARK_H - pad - normalized * (SPARK_H - pad * 2);
       points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
     }
-    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    polyline.setAttribute("points", points.join(" "));
-    polyline.classList.add("emerald-sparkline-line");
-    svg.appendChild(polyline);
+    svg.createSvg("polyline", {
+      attr: { points: points.join(" ") },
+      cls: "emerald-sparkline-line"
+    });
     const lastPt = points[points.length - 1].split(",");
-    const dot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
-    dot.setAttribute("cx", lastPt[0]);
-    dot.setAttribute("cy", lastPt[1]);
-    dot.setAttribute("r", "2.5");
-    dot.classList.add("emerald-sparkline-dot");
-    svg.appendChild(dot);
+    svg.createSvg("circle", {
+      attr: { cx: lastPt[0], cy: lastPt[1], r: "2.5" },
+      cls: "emerald-sparkline-dot"
+    });
     return svg;
   }
   renderFullTrendline(container, entries) {
@@ -6692,39 +6670,34 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       var _a2;
       return (_a2 = e.value) != null ? _a2 : 0;
     }), 10);
-    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", String(chartWidth));
-    svg.setAttribute("height", String(chartHeight + 24));
-    svg.setAttribute("viewBox", `0 0 ${chartWidth} ${chartHeight + 24}`);
-    svg.classList.add("emerald-wv-burnout-chart");
+    const svg = createSvg("svg", {
+      attr: { width: String(chartWidth), height: String(chartHeight + 24), viewBox: `0 0 ${chartWidth} ${chartHeight + 24}` },
+      cls: "emerald-wv-burnout-chart"
+    });
     for (let i = 0; i < entries.length; i++) {
       const val = (_a = entries[i].value) != null ? _a : 0;
       const barH = maxVal > 0 ? val / maxVal * (chartHeight - 4) : 0;
       const x = i * (chartWidth / entries.length) + (chartWidth / entries.length - barWidth) / 2;
       const y = chartHeight - barH;
-      const rect = activeDocument.createElementNS("http://www.w3.org/2000/svg", "rect");
-      rect.setAttribute("x", String(x));
-      rect.setAttribute("y", String(y));
-      rect.setAttribute("width", String(barWidth));
-      rect.setAttribute("height", String(Math.max(barH, 1)));
-      rect.setAttribute("rx", "2");
+      let barCls;
       if (val >= 70)
-        rect.classList.add("emerald-chart-bar-red");
+        barCls = "emerald-chart-bar-red";
       else if (val >= 50)
-        rect.classList.add("emerald-chart-bar-orange");
+        barCls = "emerald-chart-bar-orange";
       else if (val >= 30)
-        rect.classList.add("emerald-chart-bar-yellow");
+        barCls = "emerald-chart-bar-yellow";
       else
-        rect.classList.add("emerald-chart-bar-green");
-      svg.appendChild(rect);
-      const label = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
-      label.setAttribute("x", String(x + barWidth / 2));
-      label.setAttribute("y", String(chartHeight + 16));
-      label.setAttribute("text-anchor", "middle");
-      label.classList.add("emerald-chart-label");
+        barCls = "emerald-chart-bar-green";
+      svg.createSvg("rect", {
+        attr: { x: String(x), y: String(y), width: String(barWidth), height: String(Math.max(barH, 1)), rx: "2" },
+        cls: barCls
+      });
       const date = new Date(entries[i].computed_at);
+      const label = svg.createSvg("text", {
+        attr: { x: String(x + barWidth / 2), y: String(chartHeight + 16), "text-anchor": "middle" },
+        cls: "emerald-chart-label"
+      });
       label.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
-      svg.appendChild(label);
     }
     container.appendChild(svg);
     if (entries.length >= 3) {
@@ -6890,7 +6863,7 @@ var DigestView = class extends EmraldWorkspaceView {
     empty.createEl("h3", { text: "No digests yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
-      text: "Emrald generates weekly and monthly summaries automatically as you work. Complete a few sessions and your first digest will appear here."
+      text: "EMRALD generates weekly and monthly summaries automatically as you work. Complete a few sessions and your first digest will appear here."
     });
     const checklist = empty.createDiv({ cls: "emerald-wv-empty-checklist" });
     checklist.createDiv({ cls: "emerald-wv-empty-check", text: "\u2022 Complete at least 3 work sessions" });
@@ -6909,14 +6882,14 @@ var DigestView = class extends EmraldWorkspaceView {
       });
       if (!isPro && (period === "daily" || period === "monthly")) {
         btn.addClass("is-locked");
-        btn.title = "Daily and monthly digests require emrald pro";
+        btn.title = "Daily and monthly digests require EMRALD PRO";
         btn.addEventListener("click", () => {
           if (this.contentContainer) {
             this.contentContainer.empty();
             this.renderUpgradeGate(this.contentContainer, {
               icon: "lock",
               title: period.charAt(0).toUpperCase() + period.slice(1) + " Digest",
-              description: "Daily and monthly digests are available with emrald Pro."
+              description: "Daily and monthly digests are available with EMRALD Pro."
             });
           }
         });
@@ -6995,7 +6968,7 @@ var DigestView = class extends EmraldWorkspaceView {
       return;
     this.contentContainer.empty();
     if (!digest) {
-      this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} digests yet. emrald generates them automatically at your preferred digest hour.`);
+      this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} digests yet. EMRALD generates them automatically at your preferred digest hour.`);
       return;
     }
     const content = digest.content;
@@ -7133,7 +7106,7 @@ var DigestView = class extends EmraldWorkspaceView {
       var _a2, _b2, _c2, _d2;
       e.preventDefault();
       (_b2 = (_a2 = this.app.setting) == null ? void 0 : _a2.open) == null ? void 0 : _b2.call(_a2);
-      (_d2 = (_c2 = this.app.setting) == null ? void 0 : _c2.openTabById) == null ? void 0 : _d2.call(_c2, "emrald");
+      (_d2 = (_c2 = this.app.setting) == null ? void 0 : _c2.openTabById) == null ? void 0 : _d2.call(_c2, "EMRALD");
     });
   }
   // ── Hero Stats ──────────────────────────────────────
@@ -7308,6 +7281,7 @@ var AboutView = class extends EmraldWorkspaceView {
   }
   // ── Render ──────────────────────
   async onOpen() {
+    await super.onOpen();
     const container = this.getContainer();
     this.renderHeader(container, "About EMRALD", "Effort Management Recursive AI Learning Driver", "gem");
     const hero = container.createDiv({ cls: "emerald-wv-about-hero" });
@@ -7445,7 +7419,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const proContent = proSection.createDiv({ cls: "emerald-wv-about-section-content" });
       proContent.createEl("p", {
         cls: "emerald-wv-about-p",
-        text: "EMRALD Pro unlocks the full intelligence layer \u2014 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more."
+        text: "EMRALD PRO unlocks the full intelligence layer \u2014 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more."
       });
       const featureGrid = proContent.createDiv({ cls: "emerald-wv-pro-feature-grid" });
       const features = [
@@ -7465,7 +7439,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const ctaRow = proSection.createDiv({ cls: "emerald-wv-pro-cta-row" });
       const cta = ctaRow.createEl("a", {
         cls: "emerald-btn emerald-btn-upgrade",
-        text: "Upgrade to Pro",
+        text: "Upgrade to PRO",
         href: "https://app.effortmastery.com/app/billing"
       });
       cta.setAttribute("target", "_blank");
@@ -7666,31 +7640,23 @@ var _EMComponent = class {
    * Returns an <svg> element with a polyline and endpoint dot.
    */
   buildSparklineSVG(values) {
-    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", String(SPARK_WIDTH));
-    svg.setAttribute("height", String(SPARK_HEIGHT));
-    svg.setAttribute("viewBox", `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`);
-    svg.setAttribute("role", "img");
-    svg.setAttribute("aria-hidden", "true");
-    svg.classList.add("emerald-sparkline-svg");
+    const svg = createSvg("svg", {
+      attr: { width: String(SPARK_WIDTH), height: String(SPARK_HEIGHT), viewBox: `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`, role: "img", "aria-hidden": "true" },
+      cls: "emerald-sparkline-svg"
+    });
     if (values.length === 0) {
       const midY = SPARK_HEIGHT / 2;
-      const line = activeDocument.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", "0");
-      line.setAttribute("y1", String(midY));
-      line.setAttribute("x2", String(SPARK_WIDTH));
-      line.setAttribute("y2", String(midY));
-      line.classList.add("emerald-sparkline-line-empty");
-      svg.appendChild(line);
+      svg.createSvg("line", {
+        attr: { x1: "0", y1: String(midY), x2: String(SPARK_WIDTH), y2: String(midY) },
+        cls: "emerald-sparkline-line-empty"
+      });
       return svg;
     }
     if (values.length === 1) {
-      const dot2 = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
-      dot2.setAttribute("cx", String(SPARK_WIDTH / 2));
-      dot2.setAttribute("cy", String(SPARK_HEIGHT / 2));
-      dot2.setAttribute("r", String(SPARK_DOT_RADIUS + 0.5));
-      dot2.classList.add("emerald-sparkline-dot");
-      svg.appendChild(dot2);
+      svg.createSvg("circle", {
+        attr: { cx: String(SPARK_WIDTH / 2), cy: String(SPARK_HEIGHT / 2), r: String(SPARK_DOT_RADIUS + 0.5) },
+        cls: "emerald-sparkline-dot"
+      });
       return svg;
     }
     const min = Math.min(...values);
@@ -7710,17 +7676,15 @@ var _EMComponent = class {
       }
       points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
     }
-    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    polyline.setAttribute("points", points.join(" "));
-    polyline.classList.add("emerald-sparkline-line");
-    svg.appendChild(polyline);
+    svg.createSvg("polyline", {
+      attr: { points: points.join(" ") },
+      cls: "emerald-sparkline-line"
+    });
     const lastPoint = points[points.length - 1].split(",");
-    const dot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
-    dot.setAttribute("cx", lastPoint[0]);
-    dot.setAttribute("cy", lastPoint[1]);
-    dot.setAttribute("r", String(SPARK_DOT_RADIUS));
-    dot.classList.add("emerald-sparkline-dot");
-    svg.appendChild(dot);
+    svg.createSvg("circle", {
+      attr: { cx: lastPoint[0], cy: lastPoint[1], r: String(SPARK_DOT_RADIUS) },
+      cls: "emerald-sparkline-dot"
+    });
     return svg;
   }
   // ── Insight Bulletin ────────────────────────────────────
@@ -7821,11 +7785,11 @@ var _EMComponent = class {
       const link = footer.createEl("a", {
         cls: "emerald-feedback-link",
         text: "\u{1F7E2} Early access \xB7 send feedback",
-        href: "mailto:feedback@effortmastery.com?subject=Emrald%20Feedback"
+        href: "mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback"
       });
       link.addEventListener("click", (e) => {
         e.preventDefault();
-        window.open("mailto:feedback@effortmastery.com?subject=Emrald%20Feedback", "_blank");
+        window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
       });
     }
   }
@@ -7838,11 +7802,11 @@ var _EMComponent = class {
     headerRow.createSpan({ cls: "emerald-upgrade-title", text: "Unlock full intelligence" });
     card.createEl("p", {
       cls: "emerald-upgrade-desc",
-      text: "Pinned metrics, AI insights, daily digests, and advanced analytics \u2014 all with pro."
+      text: "Pinned metrics, AI insights, daily digests, and advanced analytics \u2014 all with PRO."
     });
     const btn = card.createEl("a", {
       cls: "emerald-btn emerald-btn-upgrade",
-      text: "Upgrade to pro",
+      text: "Upgrade to PRO",
       href: "https://app.effortmastery.com/app/billing"
     });
     btn.setAttribute("target", "_blank");
@@ -8063,7 +8027,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     return VIEW_TYPE_EMRALD;
   }
   getDisplayText() {
-    return "Emrald";
+    return "EMRALD";
   }
   getIcon() {
     return "zap";
@@ -8096,6 +8060,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     void this.checkWelcomeBack();
   }
   async onClose() {
+    await super.onClose();
     if (this.timeblock) {
       this.timeblock.destroy();
       this.timeblock = null;
@@ -8124,7 +8089,6 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
       const shownDate = this.plugin.settings._welcomeBackShownDate;
       if (shownDate === todayStr)
         return;
-      const sessionsResp = await this.plugin.apiClient.getTodaySessions();
       const thirtyDaysAgo = /* @__PURE__ */ new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const historyResp = await this.plugin.apiClient.listSessions({
@@ -8159,7 +8123,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
       this.plugin.settings._welcomeBackShownDate = todayStr;
       await this.plugin.saveData(this.plugin.settings);
     } catch (e) {
-      console.warn("[Emrald] Welcome-back check failed:", e);
+      console.warn("[EMRALD] Welcome-back check failed:", e);
     }
   }
   renderLoading(container) {
@@ -8184,7 +8148,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
   renderSidebar(container) {
     const header = container.createDiv({ cls: "emerald-header" });
     const headerRow = header.createDiv({ cls: "emerald-header-row" });
-    headerRow.createEl("h3", { text: "Emrald" });
+    headerRow.createEl("h3", { text: "EMRALD" });
     const offlineDot = headerRow.createSpan({ cls: "emerald-offline-dot" });
     offlineDot.addClass("emrald-hidden");
     offlineDot.title = "Offline \u2014 actions are queued";
@@ -8234,7 +8198,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
     (0, import_obsidian26.setIcon)(iconEl, "timer");
     iconEl.setAttribute("aria-hidden", "true");
-    const labelEl = headerLeft.createSpan({ text: dayLabel });
+    headerLeft.createSpan({ text: dayLabel });
     const content = section.createDiv({ cls: "emerald-section-content" });
     header.addEventListener("click", () => {
       this.toggleSection(section, content, arrowEl, header);
@@ -8283,7 +8247,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
     (0, import_obsidian26.setIcon)(iconEl, "folder");
     iconEl.setAttribute("aria-hidden", "true");
-    const labelEl = headerLeft.createSpan({ text: "Projects" });
+    headerLeft.createSpan({ text: "Projects" });
     const addBtn = header.createSpan({ cls: "emerald-section-action", text: "+ add" });
     addBtn.setAttribute("role", "button");
     addBtn.setAttribute("aria-label", "Add project");
@@ -8355,7 +8319,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
     (0, import_obsidian26.setIcon)(iconEl, "bar-chart-2");
     iconEl.setAttribute("aria-hidden", "true");
-    const labelEl = headerLeft.createSpan({ text: "Effort management" });
+    headerLeft.createSpan({ text: "Effort management" });
     const content = section.createDiv({ cls: "emerald-section-content" });
     header.addEventListener("click", () => {
       this.toggleSection(section, content, arrowEl, header);
@@ -8448,11 +8412,11 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
             try {
               const discardResp = await this.plugin.apiClient.discardSession(session.id);
               if (discardResp.error && !discardResp.queued) {
-                console.warn("[Emrald] Failed to discard stale session:", discardResp.error);
+                console.warn("[EMRALD] Failed to discard stale session:", discardResp.error);
               }
               new import_obsidian26.Notice(discardResp.queued ? "Stale session queued for discard \u2014 will sync when online." : "Discarded a stale session from yesterday.");
             } catch (e) {
-              console.error("[Emrald] Error discarding stale session:", e);
+              console.error("[EMRALD] Error discarding stale session:", e);
               new import_obsidian26.Notice("Found a stale session but could not discard it \u2014 try refreshing.");
             }
             return;
@@ -8511,7 +8475,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
   handleStartSessionRequest() {
     if (!this.projects) {
       new import_obsidian26.Notice("No projects loaded yet.");
-      console.warn("[Emrald] Start button: projects component is null");
+      console.warn("[EMRALD] Start button: projects component is null");
       return;
     }
     const activeItems = this.projects.state.items.filter((i) => i.status === "active");
@@ -8708,7 +8672,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
       const stopResp = await this.plugin.apiClient.stopSession(session.sessionId);
       if (stopResp.error && !stopResp.queued) {
         if (stopResp.status === 400 || stopResp.status === 404) {
-          console.warn(`[Emrald] Stop returned ${stopResp.status} \u2014 clearing local state anyway:`, stopResp.error);
+          console.warn(`[EMRALD] Stop returned ${stopResp.status} \u2014 clearing local state anyway:`, stopResp.error);
           new import_obsidian26.Notice("Session may have already ended \u2014 clearing local state.");
         } else {
           new import_obsidian26.Notice(`Failed to stop session: ${stopResp.error}`);
@@ -9267,7 +9231,7 @@ var EmraldAPIClient = class {
         };
       }
       if (response.status === 403) {
-        const msg = this.extractErrorMessage(response) || "Feature requires emrald Pro";
+        const msg = this.extractErrorMessage(response) || "Feature requires EMRALD Pro";
         return {
           data: null,
           error: `Free tier limit: ${msg}. Upgrade at effortmastery.com/pro`,
@@ -9301,7 +9265,7 @@ var EmraldAPIClient = class {
         }
         return {
           data: null,
-          error: "Emrald is having trouble. Please try again in a moment.",
+          error: "EMRALD is having trouble. Please try again in a moment.",
           status: response.status
         };
       }
@@ -9325,7 +9289,7 @@ var EmraldAPIClient = class {
         if (this.offlineQueue) {
           this.offlineQueue.setOnlineStatus(true);
         }
-        console.error(`[Emrald API] ${method} ${path} failed`, {
+        console.error(`[EMRALD API] ${method} ${path} failed`, {
           status: thrownStatus,
           message,
           body,
@@ -9335,7 +9299,7 @@ var EmraldAPIClient = class {
           return { data: null, error: "Invalid API key \u2014 please check your key in Settings.", status: 401 };
         }
         if (thrownStatus === 403) {
-          return { data: null, error: "Feature requires emrald Pro. Upgrade at effortmastery.com/pro", status: 403 };
+          return { data: null, error: "Feature requires EMRALD Pro. Upgrade at effortmastery.com/pro", status: 403 };
         }
         if (thrownStatus === 404) {
           return { data: null, error: null, status: 404 };
@@ -9351,7 +9315,7 @@ var EmraldAPIClient = class {
         this.offlineQueue.setOnlineStatus(false);
         return { data: null, error: null, status: 0, queued: true };
       }
-      console.error(`[Emrald API] ${method} ${path} network failure`, {
+      console.error(`[EMRALD API] ${method} ${path} network failure`, {
         message,
         body,
         error: errAny
@@ -9413,7 +9377,7 @@ var EmraldAPIClient = class {
                 await this.replayUntilNextStart();
               } else {
                 this.offlineQueue.removeById(startAction.id);
-                new import_obsidian27.Notice("Session created but could not extract ID \u2014 dependent actions dropped");
+                new import_obsidian27.Notice("Session created but could not extract id \u2014 dependent actions dropped");
                 const deps = this.offlineQueue.getPendingActions().filter((a) => a.path.includes(localId));
                 for (const d of deps)
                   this.offlineQueue.remove(d.id);
@@ -9434,7 +9398,6 @@ var EmraldAPIClient = class {
         }
       }
       if (this.offlineQueue.pendingCount > 0) {
-        const remaining = this.offlineQueue.pendingCount;
         await this.offlineQueue.replay((m, p, b) => this.executeQueuedRequest(m, p, b));
       }
       if (this.dataCache) {
@@ -9791,7 +9754,7 @@ var FolderSync = class {
     try {
       const response = await this.apiClient.getItems();
       if (response.error || !response.data) {
-        console.warn("Emrald: Full sync failed \u2014", response.error);
+        console.warn("EMRALD: Full sync failed \u2014", response.error);
         return;
       }
       const apiItems = response.data;
@@ -9856,7 +9819,7 @@ var FolderSync = class {
     await sleep(500);
     if (isEmraldNote(this.app, file))
       return;
-    new import_obsidian28.Notice(`New note in Active folder: "${file.basename}". Open emrald sidebar to track it.`);
+    new import_obsidian28.Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
   }
   /**
    * Handle file rename/move between folders.
@@ -10139,7 +10102,6 @@ var OfflineQueue = class {
   removeSessionStart(localId) {
     this.queue = this.queue.filter((action) => {
       if (action.method === "POST" && action.path === "/sessions") {
-        const body = action.body;
         return true;
       }
       return true;
@@ -10428,7 +10390,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       if (wasOffline && isNowOnline) {
         void Promise.race([
           this.apiClient.waitForReconciliation(),
-          new Promise((r) => setTimeout(r, 5e3))
+          new Promise((r) => activeWindow.setTimeout(r, 5e3))
         ]).then(() => {
           void this.refreshSidebar();
         });
@@ -10505,7 +10467,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       });
     }
     if (!this.settings.onboardingComplete) {
-      setTimeout(() => {
+      activeWindow.setTimeout(() => {
         void (async () => {
           const { OnboardingModal: OnboardingModal2 } = await Promise.resolve().then(() => (init_onboarding(), onboarding_exports));
           const modal = new OnboardingModal2(this.app, this, () => {
@@ -10593,7 +10555,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
     }
   }
   async syncDigestPreferences(silent = false) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     try {
       if (!this.settings.apiKey)
         return;
@@ -10612,7 +10574,13 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       const resp = await this.apiClient.updatePreferences({ digest_day, digest_time });
       if (!silent) {
         if (resp.error) {
-          const msg = typeof resp.error === "string" ? resp.error : (_c = (_b = resp.error) == null ? void 0 : _b.message) != null ? _c : "unknown error";
+          let msg;
+          if (typeof resp.error === "string") {
+            msg = resp.error;
+          } else {
+            const rawMsg = (_b = resp.error) == null ? void 0 : _b.message;
+            msg = typeof rawMsg === "string" ? rawMsg : "unknown error";
+          }
           new import_obsidian30.Notice(`Digest schedule sync failed: ${msg}`);
         } else {
           new import_obsidian30.Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
@@ -10620,7 +10588,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       }
     } catch (err) {
       if (!silent)
-        new import_obsidian30.Notice(`Digest schedule sync failed: ${(_d = err == null ? void 0 : err.message) != null ? _d : String(err)}`);
+        new import_obsidian30.Notice(`Digest schedule sync failed: ${String((_c = err == null ? void 0 : err.message) != null ? _c : err)}`);
       if (this.settings.debugLogging)
         console.warn("[EMRALD] syncDigestPreferences failed:", err);
     }
@@ -10696,7 +10664,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       await (leaf == null ? void 0 : leaf.setViewState({ type: VIEW_TYPE_EMRALD, active: true }));
     }
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      await workspace.revealLeaf(leaf);
       const view = leaf.view;
       if (typeof view.refresh === "function") {
         await view.refresh();
@@ -10730,7 +10698,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       await leaf.setViewState({ type: viewType, active: true });
     }
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      await workspace.revealLeaf(leaf);
     }
   }
 };

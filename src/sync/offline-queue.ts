@@ -252,7 +252,6 @@ export class OfflineQueue {
 		this.queue = this.queue.filter(action => {
 			// Remove the POST /sessions action that started this local session
 			if (action.method === 'POST' && action.path === '/sessions') {
-				const body = action.body as Record<string, unknown> | undefined;
 				// We need to match by item_id, but we don't have the local session ID
 				// in the start action's body. The start action is always first chronologically
 				// for a given item, so we check if subsequent actions reference this local ID.

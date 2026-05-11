@@ -61,7 +61,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getAvailability(),
 				this.plugin.apiClient.getSuggestions()
 			]);
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load E-Level data — check your connection.');
 			return;
 		}
@@ -357,7 +357,6 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 			// E-Level (colored)
 			const levelCell = row.createEl('td');
-			const levelMeta = E_LEVEL_META[item.effort_level];
 			const levelBadge = levelCell.createSpan({ cls: 'emerald-wv-level-badge', text: item.effort_level });
 			levelBadge.dataset.level = item.effort_level ?? '';
 

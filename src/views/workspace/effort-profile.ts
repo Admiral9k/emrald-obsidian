@@ -147,7 +147,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Effort profile', 'How emrald sees you', 'user');
+		this.renderHeader(container, 'Effort profile', 'How EMRALD sees you', 'user');
 
 		// Fetch data concurrently
 		let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
@@ -160,7 +160,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh }),
 				this.plugin.apiClient.getMetricHistory('D19', undefined, undefined, 2, { skipCache: forceFresh })
 			]);
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load effort profile — check your connection.');
 			return;
 		}
@@ -185,7 +185,6 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// During early/building stages, show an informational note instead.
 		// Also suppress if user reassessed after D19 was last computed (stale warning).
 		const d19 = metricsResp.data?.find(m => m.metric_key === 'D19');
-		const d19History = d19HistoryResp?.data ?? [];
 		const d19Metadata = (d19?.metadata ?? {});
 		const confidenceStageD19 = (d19Metadata.confidence_stage as string | undefined) ?? null;
 		const lastReassessmentAt = typeof profile?.last_reassessment_at === 'string'
@@ -253,7 +252,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'No profile data yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps emrald calibrate everything to you.'
+			text: 'Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps EMRALD calibrate everything to you.'
 		});
 
 		const btn = empty.createEl('button', {
@@ -280,18 +279,18 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		if (confidenceStage === 'early') {
 			level = 'Early Signal';
-			msg = 'Emrald is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.';
+			msg = 'EMRALD is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.';
 			cls = 'emerald-wv-drift-low';
 			icon = 'sparkles';
 		} else if (confidenceStage === 'building') {
 			if (driftValue < 1.5) {
 				level = 'Review Suggested';
-				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, emrald will tighten its expectations.';
+				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, EMRALD will tighten its expectations.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			} else {
 				level = 'Review Suggested';
-				msg = 'Your recent effort patterns are diverging from your calibration enough that a review may help — but emrald is still building confidence.';
+				msg = 'Your recent effort patterns are diverging from your calibration enough that a review may help — but EMRALD is still building confidence.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			}
@@ -302,7 +301,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			icon = 'check-circle';
 		} else if (driftValue < 2.5) {
 			level = 'Review Suggested';
-			msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve emrald's recommendations.";
+			msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve EMRALD's recommendations.";
 			cls = 'emerald-wv-drift-moderate';
 			icon = 'alert-circle';
 		} else {
@@ -355,7 +354,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		section.createEl('p', {
 			cls: 'emerald-wv-drift-msg',
-			text: `Emrald needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? '' : 's'} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
+			text: `EMRALD needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? '' : 's'} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
 		});
 
 		section.createEl('p', {
@@ -492,7 +491,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 			if (protocol) {
 				// Filled card
-				const nameEl = card.createDiv({ cls: 'emerald-wv-recovery-name', text: protocol.name });
+				card.createDiv({ cls: 'emerald-wv-recovery-name', text: protocol.name });
 				if (protocol.description) {
 					card.createDiv({ cls: 'emerald-wv-recovery-desc', text: protocol.description });
 				}
@@ -731,7 +730,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// Column headers with explainer tooltips
 		const columns = [
 			{ label: 'Date', tip: '' },
-			{ label: 'Score', tip: 'Overall calibration confidence score — higher means emrald knows you better' },
+			{ label: 'Score', tip: 'Overall calibration confidence score — higher means EMRALD knows you better' },
 			{ label: 'Physical', tip: 'Physical capability — your physical work capacity' },
 			{ label: 'Mental', tip: 'Mental capability — cognitive endurance and processing' },
 			{ label: 'Phys. End.', tip: 'Physical endurance — how long you sustain physical effort' },

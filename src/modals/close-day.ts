@@ -41,7 +41,6 @@ export class CloseDayModal extends Modal {
 		// Summary stats
 		const statsEl = contentEl.createDiv({ cls: 'emerald-closeday-stats' });
 
-		const workedHours = summary.workedMinutes / 60;
 		const deltaMinutes = summary.workedMinutes - (summary.plannedHours * 60);
 		const deltaAbs = Math.abs(deltaMinutes);
 		const deltaHours = Math.floor(deltaAbs / 60);

@@ -5,7 +5,7 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 export default [
   ...obsidianmd.configs.recommended,
   {
-    files: ["src/**/*.ts"],
+    files: ["src/**/*.ts", "main.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
@@ -21,6 +21,10 @@ export default [
       "@typescript-eslint/await-thenable": "error",
       "@typescript-eslint/no-misused-promises": "error",
       "no-unused-expressions": "error",
+      "obsidianmd/ui/sentence-case": ["error", {
+        brands: ["EMRALD", "Effort Mastery"],
+        acronyms: ["EMRALD", "API", "AI", "UTC", "URL", "PRO"]
+      }],
     },
   },
 ];

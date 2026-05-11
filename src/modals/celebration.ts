@@ -62,7 +62,7 @@ export class CelebrationModal extends Modal {
 		// Encouragement
 		body.createEl('p', {
 			cls: 'emerald-celebration-encouragement',
-			text: 'Every receipt you submit makes emrald smarter about your effort patterns. Keep going — your data tells a story no task list ever could.'
+			text: 'Every receipt you submit makes EMRALD smarter about your effort patterns. Keep going — your data tells a story no task list ever could.'
 		});
 
 		// Single dismiss button
@@ -85,7 +85,7 @@ export class CelebrationModal extends Modal {
 		if (percentUsed >= 100) {
 			return `That session covered your full ${this.effortLevel} budget for ${this.itemName} today. Well spent.`;
 		} else {
-			return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. emrald tracks this so you don't have to guess.`;
+			return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
 		}
 	}
 

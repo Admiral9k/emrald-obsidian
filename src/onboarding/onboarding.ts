@@ -80,7 +80,7 @@ export class OnboardingModal extends Modal {
 		const bar = container.createDiv({ cls: 'emerald-onboard-progress' });
 
 		for (let i = 0; i < total; i++) {
-			const dot = bar.createDiv({
+			bar.createDiv({
 				cls: `emerald-onboard-dot ${i < stepIndex ? 'is-done' : ''} ${i === stepIndex ? 'is-active' : ''}`
 			});
 			if (i < total - 1) {
@@ -103,10 +103,10 @@ export class OnboardingModal extends Modal {
 	private renderWelcome(container: HTMLElement) {
 		const welcomeIcon = container.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(welcomeIcon, 'gem');
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Welcome to emrald' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Welcome to EMRALD' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Track your work sessions, measure effort in real time, and let emrald surface patterns you might otherwise miss.'
+			text: 'Track your work sessions, measure effort in real time, and let EMRALD surface patterns you might otherwise miss.'
 		});
 
 		const features = container.createDiv({ cls: 'emerald-onboard-features' });
@@ -135,10 +135,10 @@ export class OnboardingModal extends Modal {
 	// ── Step 2: API Connection ───────────────────────────
 
 	private renderConnect(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Connect to emrald' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Connect to EMRALD' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Enter your API key to connect. You can get one from your emrald dashboard.'
+			text: 'Enter your API key to connect. You can get one from your EMRALD dashboard.'
 		});
 
 		// "Get an API key" link for community plugin store users
@@ -251,7 +251,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Tell emrald a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
+			text: 'Tell EMRALD a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -434,7 +434,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'These questions help emrald calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
+			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
 		});
 
 		// Page counter
@@ -551,7 +551,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When emrald detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
+			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -561,7 +561,7 @@ export class OnboardingModal extends Modal {
 
 		const hintEl = protocolGroup.createDiv({
 			cls: 'emerald-form-desc',
-			text: 'Press Enter to add another. These help emrald suggest recovery when it matters.'
+			text: 'Press Enter to add another. These help EMRALD suggest recovery when it matters.'
 		});
 
 		let rowCount = 0;
@@ -712,7 +712,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add your first projects' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'What are you working on? Give each project an effort level — emrald uses this to measure what your day actually costs you.'
+			text: 'What are you working on? Give each project an effort level — EMRALD uses this to measure what your day actually costs you.'
 		});
 
 		// Active limit guidance (P2.6)
@@ -731,7 +731,7 @@ export class OnboardingModal extends Modal {
 		// Note linking hint
 		container.createDiv({
 			cls: 'emerald-onboard-hint',
-			text: 'Tip: click the link icon to connect a project to an existing note — emrald will sync session data directly to that note. Without a link, the project lives only in your project list.'
+			text: 'Tip: click the link icon to connect a project to an existing note — EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -871,7 +871,7 @@ export class OnboardingModal extends Modal {
 			{
 				icon: 'flame',
 				title: 'Burnout Protection',
-				desc: "Emrald watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
+				desc: "EMRALD watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
 			}
 		];
 
@@ -904,12 +904,12 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: "You're all set!" });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "Emrald has enough data to start working for you. Track your sessions, check your metrics, and if you're a pro user, get insights right away."
+			text: "EMRALD has enough data to start working for you. Track your sessions, check your metrics, and if you're a PRO user, get insights right away."
 		});
 
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want even smarter insights? Complete your effort profile — it helps emrald understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
+			text: 'Want even smarter insights? Complete your effort profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
 		});
 
 		// Research opt-in
@@ -926,8 +926,8 @@ export class OnboardingModal extends Modal {
 				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
 		})(); });
-		researchToggle.appendText(' Help improve emrald — contribute anonymous usage data to build smarter features and advance effort management research. ');
-		const detailsLink = researchToggle.createSpan({
+		researchToggle.appendText(' Help improve EMRALD — contribute anonymous usage data to build smarter features and advance effort management research. ');
+		researchToggle.createSpan({
 			cls: 'emerald-link',
 			text: 'Change anytime in Settings → Privacy.'
 		});

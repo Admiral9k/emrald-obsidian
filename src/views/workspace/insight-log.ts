@@ -34,7 +34,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Insight log', 'Everything emrald has noticed', 'lightbulb');
+		this.renderHeader(container, 'Insight log', 'Everything EMRALD has noticed', 'lightbulb');
 
 		// Listen for insight acknowledgements from sidebar bulletin (bind once)
 		if (!this._ackListener) {
@@ -59,7 +59,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		let resp;
 		try {
 			resp = await this.plugin.apiClient.getInsights(200);
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load insights — check your connection.');
 			return;
 		}
@@ -108,7 +108,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'No insights yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'Emrald generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets.'
+			text: 'EMRALD generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets.'
 		});
 
 		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });

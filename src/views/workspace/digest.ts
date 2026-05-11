@@ -34,7 +34,7 @@ export class DigestView extends EmraldWorkspaceView {
 		let resp;
 		try {
 			resp = await this.plugin.apiClient.getDigests();
-		} catch (e) {
+		} catch {
 			this.renderError(container, 'Could not load digests — check your connection.');
 			return;
 		}
@@ -98,7 +98,7 @@ export class DigestView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'No digests yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'Emrald generates weekly and monthly summaries automatically as you work. Complete a few sessions and your first digest will appear here.'
+			text: 'EMRALD generates weekly and monthly summaries automatically as you work. Complete a few sessions and your first digest will appear here.'
 		});
 
 		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });
@@ -123,14 +123,14 @@ export class DigestView extends EmraldWorkspaceView {
 			// Free users: daily/monthly are Pro-only — show lock tooltip, don't switch
 			if (!isPro && (period === 'daily' || period === 'monthly')) {
 				btn.addClass('is-locked');
-				btn.title = 'Daily and monthly digests require emrald pro';
+				btn.title = 'Daily and monthly digests require EMRALD PRO';
 				btn.addEventListener('click', () => {
 					if (this.contentContainer) {
 						this.contentContainer.empty();
 						this.renderUpgradeGate(this.contentContainer, {
 							icon: 'lock',
 							title: period.charAt(0).toUpperCase() + period.slice(1) + ' Digest',
-							description: 'Daily and monthly digests are available with emrald Pro.',
+							description: 'Daily and monthly digests are available with EMRALD Pro.',
 						});
 					}
 				});
@@ -220,7 +220,7 @@ export class DigestView extends EmraldWorkspaceView {
 		this.contentContainer.empty();
 
 		if (!digest) {
-			this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} digests yet. emrald generates them automatically at your preferred digest hour.`);
+			this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} digests yet. EMRALD generates them automatically at your preferred digest hour.`);
 			return;
 		}
 
@@ -404,7 +404,7 @@ export class DigestView extends EmraldWorkspaceView {
 			e.preventDefault();
 			// Open Obsidian settings to EMRALD tab
 			((this.app as unknown as Record<string, unknown>).setting as Record<string, (...args: unknown[]) => void> | undefined)?.open?.();
-			((this.app as unknown as Record<string, unknown>).setting as Record<string, (...args: unknown[]) => void> | undefined)?.openTabById?.('emrald');
+			((this.app as unknown as Record<string, unknown>).setting as Record<string, (...args: unknown[]) => void> | undefined)?.openTabById?.('EMRALD');
 		});
 	}
 

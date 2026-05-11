@@ -29,12 +29,12 @@ export class AdvancedUpgradeModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "You've completed your basic effort profile — emrald is already working for you."
+			text: "You've completed your basic effort profile — EMRALD is already working for you."
 		});
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "Advanced mode unlocks 30 additional calibration questions that help emrald understand your work style at a deeper level. They're presented gradually — just 3-4 questions before each session, over about 8 sessions."
+			text: "Advanced mode unlocks 30 additional calibration questions that help EMRALD understand your work style at a deeper level. They're presented gradually — just 3-4 questions before each session, over about 8 sessions."
 		});
 
 		const benefits = contentEl.createDiv({ cls: 'emerald-onboard-features' });

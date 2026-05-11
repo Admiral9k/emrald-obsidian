@@ -1,4 +1,3 @@
-/* eslint-disable obsidianmd/prefer-create-el */
 // EMRALD EM Section Component
 // Displays: energy check-in banner (if not submitted today), pinned sparklines
 // with real 14-day history data, rotating insights, and workspace view buttons.
@@ -244,35 +243,27 @@ export class EMComponent {
 	 * Returns an <svg> element with a polyline and endpoint dot.
 	 */
 	private buildSparklineSVG(values: number[]): SVGElement {
-		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		svg.setAttribute('width', String(SPARK_WIDTH));
-		svg.setAttribute('height', String(SPARK_HEIGHT));
-		svg.setAttribute('viewBox', `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`);
-		svg.setAttribute('role', 'img');
-		svg.setAttribute('aria-hidden', 'true');
-		svg.classList.add('emerald-sparkline-svg');
+		const svg = createSvg('svg', {
+			attr: { width: String(SPARK_WIDTH), height: String(SPARK_HEIGHT), viewBox: `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`, role: 'img', 'aria-hidden': 'true' },
+			cls: 'emerald-sparkline-svg'
+		});
 
 		// No data — render a flat dashed line at midpoint
 		if (values.length === 0) {
 			const midY = SPARK_HEIGHT / 2;
-			const line = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'line');
-			line.setAttribute('x1', '0');
-			line.setAttribute('y1', String(midY));
-			line.setAttribute('x2', String(SPARK_WIDTH));
-			line.setAttribute('y2', String(midY));
-			line.classList.add('emerald-sparkline-line-empty');
-			svg.appendChild(line);
+			svg.createSvg('line', {
+				attr: { x1: '0', y1: String(midY), x2: String(SPARK_WIDTH), y2: String(midY) },
+				cls: 'emerald-sparkline-line-empty'
+			});
 			return svg;
 		}
 
 		// Single value — render a dot at center
 		if (values.length === 1) {
-			const dot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
-			dot.setAttribute('cx', String(SPARK_WIDTH / 2));
-			dot.setAttribute('cy', String(SPARK_HEIGHT / 2));
-			dot.setAttribute('r', String(SPARK_DOT_RADIUS + 0.5));
-			dot.classList.add('emerald-sparkline-dot');
-			svg.appendChild(dot);
+			svg.createSvg('circle', {
+				attr: { cx: String(SPARK_WIDTH / 2), cy: String(SPARK_HEIGHT / 2), r: String(SPARK_DOT_RADIUS + 0.5) },
+				cls: 'emerald-sparkline-dot'
+			});
 			return svg;
 		}
 
@@ -298,19 +289,17 @@ export class EMComponent {
 		}
 
 		// Polyline for the sparkline path
-		const polyline = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-		polyline.setAttribute('points', points.join(' '));
-		polyline.classList.add('emerald-sparkline-line');
-		svg.appendChild(polyline);
+		svg.createSvg('polyline', {
+			attr: { points: points.join(' ') },
+			cls: 'emerald-sparkline-line'
+		});
 
 		// Endpoint dot on the most recent value (last point)
 		const lastPoint = points[points.length - 1].split(',');
-		const dot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
-		dot.setAttribute('cx', lastPoint[0]);
-		dot.setAttribute('cy', lastPoint[1]);
-		dot.setAttribute('r', String(SPARK_DOT_RADIUS));
-		dot.classList.add('emerald-sparkline-dot');
-		svg.appendChild(dot);
+		svg.createSvg('circle', {
+			attr: { cx: lastPoint[0], cy: lastPoint[1], r: String(SPARK_DOT_RADIUS) },
+			cls: 'emerald-sparkline-dot'
+		});
 
 		return svg;
 	}
@@ -443,11 +432,11 @@ export class EMComponent {
 			const link = footer.createEl('a', {
 				cls: 'emerald-feedback-link',
 				text: '🟢 Early access · send feedback',
-				href: 'mailto:feedback@effortmastery.com?subject=Emrald%20Feedback'
+				href: 'mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback'
 			});
 			link.addEventListener('click', (e) => {
 				e.preventDefault();
-				window.open('mailto:feedback@effortmastery.com?subject=Emrald%20Feedback', '_blank');
+				window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
 			});
 		}
 	}
@@ -464,12 +453,12 @@ export class EMComponent {
 
 		card.createEl('p', {
 			cls: 'emerald-upgrade-desc',
-			text: 'Pinned metrics, AI insights, daily digests, and advanced analytics — all with pro.'
+			text: 'Pinned metrics, AI insights, daily digests, and advanced analytics — all with PRO.'
 		});
 
 		const btn = card.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to pro',
+			text: 'Upgrade to PRO',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		btn.setAttribute('target', '_blank');
