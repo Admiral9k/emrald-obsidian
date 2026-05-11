@@ -1,3 +1,4 @@
+/* eslint-disable obsidianmd/prefer-create-el */
 // EMRALD Data Center — Deep dive into all 20 D-metrics.
 // Features: metric grid with current values, SVG time-series graphs,
 // time range toggle, info popovers, pin management, "need more data" states.
@@ -511,7 +512,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const range = max - min;
 		const zones = this.getMetricZones(info);
 
-		const svg = activeDocument.createSvg('svg');
+		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		svg.setAttribute('width', '100%');
 		svg.setAttribute('height', String(CHART_HEIGHT));
 		svg.setAttribute('viewBox', `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`);
@@ -519,7 +520,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		// Background semantic zones (good / caution / risk)
 		for (const zone of zones) {
-			const rect = activeDocument.createSvg('rect');
+			const rect = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'rect');
 			const zoneTop = CHART_PAD + (1 - zone.to) * (CHART_HEIGHT - CHART_PAD * 2);
 			const zoneBottom = CHART_PAD + (1 - zone.from) * (CHART_HEIGHT - CHART_PAD * 2);
 			rect.setAttribute('x', '0');
@@ -534,7 +535,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Grid lines (3 horizontal)
 		for (let i = 0; i <= 2; i++) {
 			const y = CHART_PAD + ((CHART_HEIGHT - CHART_PAD * 2) / 2) * i;
-			const line = activeDocument.createSvg('line');
+			const line = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'line');
 			line.setAttribute('x1', '0');
 			line.setAttribute('y1', String(y));
 			line.setAttribute('x2', String(CHART_WIDTH));
@@ -562,20 +563,20 @@ export class DataCenterView extends EmraldWorkspaceView {
 			...points,
 			`${CHART_WIDTH},${CHART_HEIGHT}`
 		];
-		const area = activeDocument.createSvg('polygon');
+		const area = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polygon');
 		area.setAttribute('points', areaPoints.join(' '));
 		area.classList.add('emerald-wv-chart-area');
 		svg.appendChild(area);
 
 		// Line
-		const polyline = activeDocument.createSvg('polyline');
+		const polyline = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polyline');
 		polyline.setAttribute('points', points.join(' '));
 		polyline.classList.add('emerald-wv-chart-line');
 		svg.appendChild(polyline);
 
 		// Dots at each data point
 		for (const coord of coords) {
-			const circle = activeDocument.createSvg('circle');
+			const circle = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
 			circle.setAttribute('cx', String(coord.x));
 			circle.setAttribute('cy', String(coord.y));
 			circle.setAttribute('r', '3');
@@ -586,7 +587,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Endpoint dot (larger, accent)
 		const last = coords[coords.length - 1];
 		if (last) {
-			const endDot = activeDocument.createSvg('circle');
+			const endDot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
 			endDot.setAttribute('cx', String(last.x));
 			endDot.setAttribute('cy', String(last.y));
 			endDot.setAttribute('r', '4');
@@ -595,7 +596,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		}
 
 		// Min/max labels
-		const maxLabel = activeDocument.createSvg('text');
+		const maxLabel = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'text');
 		maxLabel.setAttribute('x', String(CHART_WIDTH - 4));
 		maxLabel.setAttribute('y', String(CHART_PAD + 10));
 		maxLabel.setAttribute('text-anchor', 'end');
@@ -603,7 +604,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		maxLabel.textContent = max.toFixed(1);
 		svg.appendChild(maxLabel);
 
-		const minLabel = activeDocument.createSvg('text');
+		const minLabel = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'text');
 		minLabel.setAttribute('x', String(CHART_WIDTH - 4));
 		minLabel.setAttribute('y', String(CHART_HEIGHT - CHART_PAD));
 		minLabel.setAttribute('text-anchor', 'end');

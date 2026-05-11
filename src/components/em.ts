@@ -1,3 +1,4 @@
+/* eslint-disable obsidianmd/prefer-create-el */
 // EMRALD EM Section Component
 // Displays: energy check-in banner (if not submitted today), pinned sparklines
 // with real 14-day history data, rotating insights, and workspace view buttons.
@@ -243,7 +244,7 @@ export class EMComponent {
 	 * Returns an <svg> element with a polyline and endpoint dot.
 	 */
 	private buildSparklineSVG(values: number[]): SVGElement {
-		const svg = activeDocument.createSvg('svg');
+		const svg = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		svg.setAttribute('width', String(SPARK_WIDTH));
 		svg.setAttribute('height', String(SPARK_HEIGHT));
 		svg.setAttribute('viewBox', `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`);
@@ -254,7 +255,7 @@ export class EMComponent {
 		// No data — render a flat dashed line at midpoint
 		if (values.length === 0) {
 			const midY = SPARK_HEIGHT / 2;
-			const line = activeDocument.createSvg('line');
+			const line = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'line');
 			line.setAttribute('x1', '0');
 			line.setAttribute('y1', String(midY));
 			line.setAttribute('x2', String(SPARK_WIDTH));
@@ -266,7 +267,7 @@ export class EMComponent {
 
 		// Single value — render a dot at center
 		if (values.length === 1) {
-			const dot = activeDocument.createSvg('circle');
+			const dot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
 			dot.setAttribute('cx', String(SPARK_WIDTH / 2));
 			dot.setAttribute('cy', String(SPARK_HEIGHT / 2));
 			dot.setAttribute('r', String(SPARK_DOT_RADIUS + 0.5));
@@ -297,14 +298,14 @@ export class EMComponent {
 		}
 
 		// Polyline for the sparkline path
-		const polyline = activeDocument.createSvg('polyline');
+		const polyline = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'polyline');
 		polyline.setAttribute('points', points.join(' '));
 		polyline.classList.add('emerald-sparkline-line');
 		svg.appendChild(polyline);
 
 		// Endpoint dot on the most recent value (last point)
 		const lastPoint = points[points.length - 1].split(',');
-		const dot = activeDocument.createSvg('circle');
+		const dot = activeDocument.createElementNS('http://www.w3.org/2000/svg', 'circle');
 		dot.setAttribute('cx', lastPoint[0]);
 		dot.setAttribute('cy', lastPoint[1]);
 		dot.setAttribute('r', String(SPARK_DOT_RADIUS));

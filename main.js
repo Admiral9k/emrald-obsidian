@@ -5263,13 +5263,13 @@ var DataCenterView = class extends EmraldWorkspaceView {
     const max = info.unit === "/100" ? 100 : 10;
     const range = max - min;
     const zones = this.getMetricZones(info);
-    const svg = activeDocument.createSvg("svg");
+    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", "100%");
     svg.setAttribute("height", String(CHART_HEIGHT));
     svg.setAttribute("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`);
     svg.classList.add("emerald-wv-metric-svg");
     for (const zone of zones) {
-      const rect = activeDocument.createSvg("rect");
+      const rect = activeDocument.createElementNS("http://www.w3.org/2000/svg", "rect");
       const zoneTop = CHART_PAD + (1 - zone.to) * (CHART_HEIGHT - CHART_PAD * 2);
       const zoneBottom = CHART_PAD + (1 - zone.from) * (CHART_HEIGHT - CHART_PAD * 2);
       rect.setAttribute("x", "0");
@@ -5282,7 +5282,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     }
     for (let i = 0; i <= 2; i++) {
       const y = CHART_PAD + (CHART_HEIGHT - CHART_PAD * 2) / 2 * i;
-      const line = activeDocument.createSvg("line");
+      const line = activeDocument.createElementNS("http://www.w3.org/2000/svg", "line");
       line.setAttribute("x1", "0");
       line.setAttribute("y1", String(y));
       line.setAttribute("x2", String(CHART_WIDTH));
@@ -5305,16 +5305,16 @@ var DataCenterView = class extends EmraldWorkspaceView {
       ...points,
       `${CHART_WIDTH},${CHART_HEIGHT}`
     ];
-    const area = activeDocument.createSvg("polygon");
+    const area = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polygon");
     area.setAttribute("points", areaPoints.join(" "));
     area.classList.add("emerald-wv-chart-area");
     svg.appendChild(area);
-    const polyline = activeDocument.createSvg("polyline");
+    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
     polyline.setAttribute("points", points.join(" "));
     polyline.classList.add("emerald-wv-chart-line");
     svg.appendChild(polyline);
     for (const coord of coords) {
-      const circle = activeDocument.createSvg("circle");
+      const circle = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
       circle.setAttribute("cx", String(coord.x));
       circle.setAttribute("cy", String(coord.y));
       circle.setAttribute("r", "3");
@@ -5323,21 +5323,21 @@ var DataCenterView = class extends EmraldWorkspaceView {
     }
     const last = coords[coords.length - 1];
     if (last) {
-      const endDot = activeDocument.createSvg("circle");
+      const endDot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
       endDot.setAttribute("cx", String(last.x));
       endDot.setAttribute("cy", String(last.y));
       endDot.setAttribute("r", "4");
       endDot.classList.add("emerald-wv-chart-dot-current");
       svg.appendChild(endDot);
     }
-    const maxLabel = activeDocument.createSvg("text");
+    const maxLabel = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
     maxLabel.setAttribute("x", String(CHART_WIDTH - 4));
     maxLabel.setAttribute("y", String(CHART_PAD + 10));
     maxLabel.setAttribute("text-anchor", "end");
     maxLabel.classList.add("emerald-wv-chart-range-label");
     maxLabel.textContent = max.toFixed(1);
     svg.appendChild(maxLabel);
-    const minLabel = activeDocument.createSvg("text");
+    const minLabel = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
     minLabel.setAttribute("x", String(CHART_WIDTH - 4));
     minLabel.setAttribute("y", String(CHART_HEIGHT - CHART_PAD));
     minLabel.setAttribute("text-anchor", "end");
@@ -6651,7 +6651,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     });
   }
   buildSparklineSVG(values) {
-    const svg = activeDocument.createSvg("svg");
+    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", String(SPARK_W));
     svg.setAttribute("height", String(SPARK_H));
     svg.setAttribute("viewBox", `0 0 ${SPARK_W} ${SPARK_H}`);
@@ -6670,12 +6670,12 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       const y = SPARK_H - pad - normalized * (SPARK_H - pad * 2);
       points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
     }
-    const polyline = activeDocument.createSvg("polyline");
+    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
     polyline.setAttribute("points", points.join(" "));
     polyline.classList.add("emerald-sparkline-line");
     svg.appendChild(polyline);
     const lastPt = points[points.length - 1].split(",");
-    const dot = activeDocument.createSvg("circle");
+    const dot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
     dot.setAttribute("cx", lastPt[0]);
     dot.setAttribute("cy", lastPt[1]);
     dot.setAttribute("r", "2.5");
@@ -6692,7 +6692,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       var _a2;
       return (_a2 = e.value) != null ? _a2 : 0;
     }), 10);
-    const svg = activeDocument.createSvg("svg");
+    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", String(chartWidth));
     svg.setAttribute("height", String(chartHeight + 24));
     svg.setAttribute("viewBox", `0 0 ${chartWidth} ${chartHeight + 24}`);
@@ -6702,7 +6702,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       const barH = maxVal > 0 ? val / maxVal * (chartHeight - 4) : 0;
       const x = i * (chartWidth / entries.length) + (chartWidth / entries.length - barWidth) / 2;
       const y = chartHeight - barH;
-      const rect = activeDocument.createSvg("rect");
+      const rect = activeDocument.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttribute("x", String(x));
       rect.setAttribute("y", String(y));
       rect.setAttribute("width", String(barWidth));
@@ -6717,7 +6717,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       else
         rect.classList.add("emerald-chart-bar-green");
       svg.appendChild(rect);
-      const label = activeDocument.createSvg("text");
+      const label = activeDocument.createElementNS("http://www.w3.org/2000/svg", "text");
       label.setAttribute("x", String(x + barWidth / 2));
       label.setAttribute("y", String(chartHeight + 16));
       label.setAttribute("text-anchor", "middle");
@@ -7271,7 +7271,7 @@ init_base();
 init_tier();
 var AboutView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "About emrald");
+    super(leaf, plugin, "About EMRALD");
   }
   getViewType() {
     return VIEW_ABOUT;
@@ -7309,11 +7309,11 @@ var AboutView = class extends EmraldWorkspaceView {
   // ── Render ──────────────────────
   async onOpen() {
     const container = this.getContainer();
-    this.renderHeader(container, "About emrald", "Effort Management Recursive AI Learning Driver", "gem");
+    this.renderHeader(container, "About EMRALD", "Effort Management Recursive AI Learning Driver", "gem");
     const hero = container.createDiv({ cls: "emerald-wv-about-hero" });
     hero.createEl("p", {
       cls: "emerald-wv-about-hero-tagline",
-      text: "Emrald helps you manage the effort of your life, not just your tasks."
+      text: "EMRALD helps you manage the effort of your life, not just your tasks."
     });
     hero.createEl("p", {
       cls: "emerald-wv-about-hero-sub",
@@ -7321,7 +7321,7 @@ var AboutView = class extends EmraldWorkspaceView {
     });
     hero.createEl("p", {
       cls: "emerald-wv-about-hero-mission",
-      text: "Emrald exists to make the invisible cost of your work visible, enabling you to protect your energy, spot burnout before it hits, and make honest decisions about where your effort goes."
+      text: "EMRALD exists to make the invisible cost of your work visible, enabling you to protect your energy, spot burnout before it hits, and make honest decisions about where your effort goes."
     });
     const specs = hero.createDiv({ cls: "emerald-wv-about-specstrip" });
     const specItems = [
@@ -7337,68 +7337,68 @@ var AboutView = class extends EmraldWorkspaceView {
       (0, import_obsidian16.setIcon)(chip.createSpan({ cls: "emerald-wv-about-speckchip-icon" }), s.icon);
       chip.createSpan({ cls: "emerald-wv-about-speckchip-label", text: s.label });
     }
-    this.makeSection(container, "what-it-is", "zap", "What emrald Is", (el) => {
-      this.para(el, "Emrald is an effort tracker that lives inside Obsidian. While other tools count tasks completed or hours logged, emrald asks a different question: what did that work actually cost you?");
+    this.makeSection(container, "what-it-is", "zap", "What EMRALD Is", (el) => {
+      this.para(el, "EMRALD is an effort tracker that lives inside Obsidian. While other tools count tasks completed or hours logged, EMRALD asks a different question: what did that work actually cost you?");
       const callout = el.createDiv({ cls: "emerald-wv-about-callout" });
       callout.createDiv({ cls: "emerald-wv-about-callout-title", text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
-      callout.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. Emrald tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
+      callout.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. EMRALD tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
       this.para(el, "It works by asking you to assign effort levels (E1\u2013E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.");
       const quoteWhatItIs = el.createDiv({ cls: "emerald-wv-about-thesis" });
       quoteWhatItIs.createEl("blockquote", { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
     });
-    this.makeSection(container, "what-it-isnt", "x-circle", "What emrald Is Not", (el) => {
-      this.para(el, "Emrald won't make you more productive in the traditional sense. It isn't built to help you do more, faster, or better than yesterday. Here's what it deliberately isn't:");
+    this.makeSection(container, "what-it-isnt", "x-circle", "What EMRALD Is Not", (el) => {
+      this.para(el, "EMRALD won't make you more productive in the traditional sense. It isn't built to help you do more, faster, or better than yesterday. Here's what it deliberately isn't:");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
       this.bullet(list, "A checklist or to-do tracker \u2014 It doesn't tell you what to do");
       this.bullet(list, "A calendar or time-blocking app \u2014 It doesn't schedule your day");
       this.bullet(list, "A deliverables manager \u2014 It doesn't track whether things got done");
       this.bullet(list, "A hustle optimizer \u2014 It won't push you to do more with less");
       this.bullet(list, "A replacement for your brain \u2014 It works with your existing projects in Obsidian");
-      this.para(el, "Emrald is a mirror for your effort. It shows you where your energy is going, whether that's sustainable, and what's really driving the patterns you live with every day.");
+      this.para(el, "EMRALD is a mirror for your effort. It shows you where your energy is going, whether that's sustainable, and what's really driving the patterns you live with every day.");
     });
     this.makeSection(container, "what-you-bring", "play-circle", "What You Bring", (el) => {
-      this.para(el, "Emrald is deliberately low-friction. There's no new app to learn, no complex setup, and no ongoing habit to build from scratch. Everything you need already exists: your projects live in Obsidian, and emrald just starts watching how you work.");
-      this.para(el, "Here's everything emrald asks of you:");
+      this.para(el, "EMRALD is deliberately low-friction. There's no new app to learn, no complex setup, and no ongoing habit to build from scratch. Everything you need already exists: your projects live in Obsidian, and EMRALD just starts watching how you work.");
+      this.para(el, "Here's everything EMRALD asks of you:");
       const list = el.createEl("ol", { cls: "emerald-wv-about-numbered-list" });
       const steps = [
-        'Add your projects to emrald using the "+Add" button in the sidebar.',
+        'Add your projects to EMRALD using the "+Add" button in the sidebar.',
         "Assign an E-level to each project, based on the percentage of your daily work day you think it deserves.",
         "Click Start Session when you begin working on a project.",
         "Click Stop Session when you're done.",
         "Complete the 15-second effort receipt at the end of each session. Just be honest about how hard it felt.",
         "Once a day, take 15 seconds for the Daily Check-in: how is your energy level today?",
-        "If you finish your planned work before the day ends, click Close Day. It helps emrald calibrate faster."
+        "If you finish your planned work before the day ends, click Close Day. It helps EMRALD calibrate faster."
       ];
       for (const s of steps)
         this.bullet(list, s);
       const quoteYouBring = el.createDiv({ cls: "emerald-wv-about-thesis" });
       quoteYouBring.createEl("blockquote", { text: "Honest data in, honest insights out." });
     });
-    this.makeSection(container, "what-you-get", "gift", "What emrald Gives Back", (el) => {
-      this.para(el, "The more you use emrald honestly, the more it gives back. Here's what you'll see accumulate over time:");
+    this.makeSection(container, "what-you-get", "gift", "What EMRALD Gives Back", (el) => {
+      this.para(el, "The more you use EMRALD honestly, the more it gives back. Here's what you'll see accumulate over time:");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
       this.bullet(list, "D-Metrics (D1\u2013D20): Twenty diagnostic measurements of your effort patterns, energy balance, and work rhythm");
       this.bullet(list, "AI Insight Logs: Observations, suggestions, and discoveries about your patterns across 5 categories");
       this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you're heading toward exhaustion");
       this.bullet(list, "Effort Digests: Weekly and monthly summaries of where your energy went");
       this.bullet(list, "Completion Rate: Clarity on which projects you finish versus abandon");
-      this.bullet(list, "Calibration Over Time: emrald adjusts its model of you the more data it has, getting smarter and more accurate");
-      this.bullet(list, "75+ data points feed into every metric: emrald processes your sessions, energy, and calibration data across 20 D-metrics and layered internal measurements to surface patterns you'd never catch on your own.");
-      this.para(el, "Early on, some views will be sparse. That's normal. The system needs weeks of real data to unlock its full value. This isn't a flaw, it's how emrald learns your specific rhythm.");
+      this.bullet(list, "Calibration Over Time: EMRALD adjusts its model of you the more data it has, getting smarter and more accurate");
+      this.bullet(list, "75+ data points feed into every metric: EMRALD processes your sessions, energy, and calibration data across 20 D-metrics and layered internal measurements to surface patterns you'd never catch on your own.");
+      this.para(el, "Early on, some views will be sparse. That's normal. The system needs weeks of real data to unlock its full value. This isn't a flaw, it's how EMRALD learns your specific rhythm.");
     });
     this.makeSection(container, "guardrails", "shield", "Why the Guardrails Exist", (el) => {
-      this.para(el, "If you've wondered why emrald limits how much E-level work you can assign in a day, or why it nudges you toward balance instead of pushing you to maximize \u2014 this is why.");
+      this.para(el, "If you've wondered why EMRALD limits how much E-level work you can assign in a day, or why it nudges you toward balance instead of pushing you to maximize \u2014 this is why.");
       this.para(el, "The system is built on a simple truth: burnout doesn't come from too many tasks. It comes from too much effort in the wrong distribution, for too long, without recovery.");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
-      this.bullet(list, "Your day has a finite capacity, whatever hours you've set in your schedule. emrald won't let you pretend you have more.");
+      this.bullet(list, "Your day has a finite capacity, whatever hours you've set in your schedule. EMRALD won't let you pretend you have more.");
       this.bullet(list, "E4 work is genuinely exhausting. You can only do so much of it before the quality of everything drops.");
-      this.bullet(list, "Filling your day to 100% with demanding work is a fast path to burnout \u2014 emrald's allocation system is designed to prevent exactly that.");
+      this.bullet(list, "Filling your day to 100% with demanding work is a fast path to burnout \u2014 EMRALD's allocation system is designed to prevent exactly that.");
       this.bullet(list, "Early data will look incomplete. Charts won't fill in nicely for the first couple weeks. This is normal \u2014 the system is learning your baseline before it can tell you meaningful things about deviations.");
       const quoteGuardrails = el.createDiv({ cls: "emerald-wv-about-thesis" });
-      quoteGuardrails.createEl("blockquote", { text: "The promise of emrald is not instant insight. It's real insight, earned through consistent, honest use over time." });
+      quoteGuardrails.createEl("blockquote", { text: "The promise of EMRALD is not instant insight. It's real insight, earned through consistent, honest use over time." });
     });
     this.makeSection(container, "core-systems", "layers", "Core Systems", (el) => {
-      this.para(el, "Six things make emrald work. Here's what each one does:");
+      this.para(el, "Six things make EMRALD work. Here's what each one does:");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
       this.bullet(list, "E-Levels (E1\u2013E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.");
       this.bullet(list, "D-Metrics (D1\u2013D20): Twenty computed measurements of your effort patterns. D1\u2013D8 are available to all users; D9\u2013D20 unlock with Pro.");
@@ -7406,10 +7406,10 @@ var AboutView = class extends EmraldWorkspaceView {
       this.bullet(list, "Data Center: The visual home of all your D-metrics, with charts and context for each measurement.");
       this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
       this.bullet(list, "Daily Check-in & Effort Receipt: The two feedback inputs that power the entire system.");
-      this.para(el, "Effort management is a growing field in academic research, practical application, and everyday awareness. emrald is built to grow with it. Future integrations and capability expansions are already planned as the field continues to mature.");
+      this.para(el, "Effort management is a growing field in academic research, practical application, and everyday awareness. EMRALD is built to grow with it. Future integrations and capability expansions are already planned as the field continues to mature.");
     });
-    this.makeSection(container, "who-its-for", "users", "Who emrald Helps", (el) => {
-      this.para(el, "Emrald was designed for people who refuse to simplify their lives to fit a productivity system. If any of these describe you, emrald was probably built for you:");
+    this.makeSection(container, "who-its-for", "users", "Who EMRALD Helps", (el) => {
+      this.para(el, "EMRALD was designed for people who refuse to simplify their lives to fit a productivity system. If any of these describe you, EMRALD was probably built for you:");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
       this.bullet(list, "Polymath Operators \u2014 people who run multiple creative or professional projects simultaneously and need to understand how their energy divides across them");
       this.bullet(list, "Neurodivergent Individuals \u2014 people who experience energy and focus differently and need a system that adapts to them, not the other way around");
@@ -7419,22 +7419,22 @@ var AboutView = class extends EmraldWorkspaceView {
       this.bullet(list, "Anyone Juggling Multiple Identities \u2014 parent, professional, hobbyist, student \u2014 all in the same person, all with legitimate energy claims on your day");
       const wholeLife = el.createDiv({ cls: "emerald-wv-about-callout" });
       wholeLife.createDiv({ cls: "emerald-wv-about-callout-title", text: "EMRALD works across your whole life" });
-      wholeLife.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Your novel. Learning piano. A home renovation. Family commitments. Side projects. Emrald doesn\u2019t care if it\u2019s a work task or a personal one \u2014 if it takes focused time and costs you something, it belongs here." });
-      this.para(el, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes \u2014 you're probably the person emrald was made for.");
+      wholeLife.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Your novel. Learning piano. A home renovation. Family commitments. Side projects. EMRALD doesn\u2019t care if it\u2019s a work task or a personal one \u2014 if it takes focused time and costs you something, it belongs here." });
+      this.para(el, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes \u2014 you're probably the person EMRALD was made for.");
     });
-    this.makeSection(container, "how-it-learns", "brain", "How emrald Learns", (el) => {
-      this.para(el, "Emrald is a recursive feedback system. It's only as smart as the signal you give it.");
-      this.para(el, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're teaching emrald what your work actually costs. The more honest and consistent you are, the more accurate its model of you becomes.");
-      this.para(el, "The first few weeks will feel light. Charts won't show much. Insights will be sparse. This isn't the system failing \u2014 it's the system learning. emrald needs a baseline before it can tell you meaningful things about deviations from it.");
+    this.makeSection(container, "how-it-learns", "brain", "How EMRALD Learns", (el) => {
+      this.para(el, "EMRALD is a recursive feedback system. It's only as smart as the signal you give it.");
+      this.para(el, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're teaching EMRALD what your work actually costs. The more honest and consistent you are, the more accurate its model of you becomes.");
+      this.para(el, "The first few weeks will feel light. Charts won't show much. Insights will be sparse. This isn't the system failing \u2014 it's the system learning. EMRALD needs a baseline before it can tell you meaningful things about deviations from it.");
       this.para(el, "Around the 2\u20133 week mark, you'll start seeing real patterns emerge. Around week 4\u20136, the insights become genuinely personalized. And the longer you use it, the more it adapts to your specific rhythm, strengths, and vulnerability points.");
       const quoteLearns = el.createDiv({ cls: "emerald-wv-about-thesis" });
-      quoteLearns.createEl("blockquote", { text: "Emrald isn't going to dazzle you on day one. But if you stick with it, it will show you things about yourself that no other system can." });
+      quoteLearns.createEl("blockquote", { text: "EMRALD isn't going to dazzle you on day one. But if you stick with it, it will show you things about yourself that no other system can." });
     });
     this.makeSection(container, "learn-more", "book-open", "Learn More", (el) => {
       this.para(el, "This page is the field guide. The full story of effort management \u2014 the research behind it, the sources, the methodology, and the reasoning \u2014 lives online.");
       const linkWrap = el.createDiv({ cls: "emerald-wv-about-link-row" });
       this.link(linkWrap, "https://effortmastery.com", "effortmastery.com \u2014 deeper reading on effort management");
-      this.link(linkWrap, "https://app.effortmastery.com", "app.effortmastery.com \u2014 manage your emrald account");
+      this.link(linkWrap, "https://app.effortmastery.com", "app.effortmastery.com \u2014 manage your EMRALD account");
     });
     if (tierState.isFree()) {
       const proSection = container.createDiv({ cls: "emerald-wv-section emerald-wv-about-section emerald-wv-pro-teaser" });
@@ -7445,7 +7445,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const proContent = proSection.createDiv({ cls: "emerald-wv-about-section-content" });
       proContent.createEl("p", {
         cls: "emerald-wv-about-p",
-        text: "Emrald pro unlocks the full intelligence layer \u2014 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more."
+        text: "EMRALD Pro unlocks the full intelligence layer \u2014 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more."
       });
       const featureGrid = proContent.createDiv({ cls: "emerald-wv-pro-feature-grid" });
       const features = [
@@ -7465,7 +7465,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const ctaRow = proSection.createDiv({ cls: "emerald-wv-pro-cta-row" });
       const cta = ctaRow.createEl("a", {
         cls: "emerald-btn emerald-btn-upgrade",
-        text: "Upgrade to pro",
+        text: "Upgrade to Pro",
         href: "https://app.effortmastery.com/app/billing"
       });
       cta.setAttribute("target", "_blank");
@@ -7666,7 +7666,7 @@ var _EMComponent = class {
    * Returns an <svg> element with a polyline and endpoint dot.
    */
   buildSparklineSVG(values) {
-    const svg = activeDocument.createSvg("svg");
+    const svg = activeDocument.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", String(SPARK_WIDTH));
     svg.setAttribute("height", String(SPARK_HEIGHT));
     svg.setAttribute("viewBox", `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`);
@@ -7675,7 +7675,7 @@ var _EMComponent = class {
     svg.classList.add("emerald-sparkline-svg");
     if (values.length === 0) {
       const midY = SPARK_HEIGHT / 2;
-      const line = activeDocument.createSvg("line");
+      const line = activeDocument.createElementNS("http://www.w3.org/2000/svg", "line");
       line.setAttribute("x1", "0");
       line.setAttribute("y1", String(midY));
       line.setAttribute("x2", String(SPARK_WIDTH));
@@ -7685,7 +7685,7 @@ var _EMComponent = class {
       return svg;
     }
     if (values.length === 1) {
-      const dot2 = activeDocument.createSvg("circle");
+      const dot2 = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
       dot2.setAttribute("cx", String(SPARK_WIDTH / 2));
       dot2.setAttribute("cy", String(SPARK_HEIGHT / 2));
       dot2.setAttribute("r", String(SPARK_DOT_RADIUS + 0.5));
@@ -7710,12 +7710,12 @@ var _EMComponent = class {
       }
       points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
     }
-    const polyline = activeDocument.createSvg("polyline");
+    const polyline = activeDocument.createElementNS("http://www.w3.org/2000/svg", "polyline");
     polyline.setAttribute("points", points.join(" "));
     polyline.classList.add("emerald-sparkline-line");
     svg.appendChild(polyline);
     const lastPoint = points[points.length - 1].split(",");
-    const dot = activeDocument.createSvg("circle");
+    const dot = activeDocument.createElementNS("http://www.w3.org/2000/svg", "circle");
     dot.setAttribute("cx", lastPoint[0]);
     dot.setAttribute("cy", lastPoint[1]);
     dot.setAttribute("r", String(SPARK_DOT_RADIUS));
