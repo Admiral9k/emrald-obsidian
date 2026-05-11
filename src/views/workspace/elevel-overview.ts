@@ -125,7 +125,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		this.renderProjectTable();
 
 		// ── Suggestions ──
-		const suggestions = suggestionsResp.data ?? [];
+		const suggestions = (suggestionsResp.data ?? []).filter(s => s.message?.trim());
 		if (suggestions.length > 0) {
 			this.renderSuggestions(container, suggestions);
 		}

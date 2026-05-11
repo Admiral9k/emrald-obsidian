@@ -4297,7 +4297,10 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
     this.renderAllocationSummary(container, totalAllocatedPct, activeItems.length);
     this.projectContainer = container.createDiv({ cls: "emerald-wv-project-table-wrap" });
     this.renderProjectTable();
-    const suggestions = (_f = suggestionsResp.data) != null ? _f : [];
+    const suggestions = ((_f = suggestionsResp.data) != null ? _f : []).filter((s) => {
+      var _a2;
+      return (_a2 = s.message) == null ? void 0 : _a2.trim();
+    });
     if (suggestions.length > 0) {
       this.renderSuggestions(container, suggestions);
     }
@@ -7502,16 +7505,7 @@ var _EMComponent = class {
     if (tierState.isFree()) {
       this.renderUpgradeCard();
     }
-    const feedbackFooter = this.containerEl.createDiv({ cls: "emerald-feedback-footer" });
-    const feedbackLink = feedbackFooter.createEl("a", {
-      cls: "emerald-feedback-link",
-      text: "\u{1F7E2} Send feedback",
-      href: "mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback"
-    });
-    feedbackLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
-    });
+    this.renderFeedbackFooter();
     if (this.pinnedMetricsListener) {
       window.removeEventListener("emrald:pinned-metrics-changed", this.pinnedMetricsListener);
     }
@@ -7844,6 +7838,23 @@ var _EMComponent = class {
     if (tierState.isFree()) {
       this.renderUpgradeCard();
     }
+    this.renderFeedbackFooter();
+  }
+  // ── Feedback Footer ───────────────────────────────────────
+  renderFeedbackFooter() {
+    const old = this.containerEl.querySelector(".emerald-feedback-footer");
+    if (old)
+      old.remove();
+    const footer = this.containerEl.createDiv({ cls: "emerald-feedback-footer" });
+    const link = footer.createEl("a", {
+      cls: "emerald-feedback-link",
+      text: "\u{1F7E2} Send feedback",
+      href: "mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback"
+    });
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
+    });
   }
   // ── Actions ─────────────────────────────────────────────
   async acknowledgeInsight(id, action) {
@@ -7864,6 +7875,7 @@ var _EMComponent = class {
           oldUpgrade.remove();
         this.renderUpgradeCard();
       }
+      this.renderFeedbackFooter();
       new import_obsidian18.Notice("Insight acknowledged");
       window.dispatchEvent(new CustomEvent("emrald:insight-acknowledged", { detail: { id } }));
     }

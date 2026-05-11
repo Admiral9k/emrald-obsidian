@@ -83,17 +83,8 @@ export class EMComponent {
 			this.renderUpgradeCard();
 		}
 
-		// Feedback link (below upgrade card for free, below buttons for pro)
-		const feedbackFooter = this.containerEl.createDiv({ cls: 'emerald-feedback-footer' });
-		const feedbackLink = feedbackFooter.createEl('a', {
-			cls: 'emerald-feedback-link',
-			text: '🟢 Send feedback',
-			href: 'mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback'
-		});
-		feedbackLink.addEventListener('click', (e) => {
-			e.preventDefault();
-			window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
-		});
+		// Feedback link (always last in the EM section)
+		this.renderFeedbackFooter();
 
 		// Listen for live pin changes from Data Center
 		if (this.pinnedMetricsListener) {
@@ -509,6 +500,26 @@ export class EMComponent {
 		if (tierState.isFree()) {
 			this.renderUpgradeCard();
 		}
+		this.renderFeedbackFooter();
+	}
+
+	// ── Feedback Footer ───────────────────────────────────────
+
+	private renderFeedbackFooter() {
+		// Remove old footer if re-rendering
+		const old = this.containerEl.querySelector('.emerald-feedback-footer');
+		if (old) old.remove();
+
+		const footer = this.containerEl.createDiv({ cls: 'emerald-feedback-footer' });
+		const link = footer.createEl('a', {
+			cls: 'emerald-feedback-link',
+			text: '🟢 Send feedback',
+			href: 'mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback'
+		});
+		link.addEventListener('click', (e) => {
+			e.preventDefault();
+			window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
+		});
 	}
 
 	// ── Actions ─────────────────────────────────────────────
@@ -531,6 +542,7 @@ export class EMComponent {
 				if (oldUpgrade) oldUpgrade.remove();
 				this.renderUpgradeCard();
 			}
+			this.renderFeedbackFooter();
 
 			new Notice('Insight acknowledged');
 			// Notify Insight Log workspace view to refresh if open
