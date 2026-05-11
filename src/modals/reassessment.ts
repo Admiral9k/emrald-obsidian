@@ -16,7 +16,7 @@ interface CalibrationQuestion {
 	options?: Array<{ value: string; label: string }>;
 	min?: number;
 	max?: number;
-	default?: any;
+	default?: unknown;
 	endpointLeft?: string;
 	endpointRight?: string;
 	optional?: boolean;
@@ -222,8 +222,8 @@ const CORE_FIELDS = [
 
 export class ReassessmentModal extends Modal {
 	private plugin: EmraldPlugin;
-	private answers: Record<string, any> = {};
-	private originalAnswers: Record<string, any> = {};
+	private answers: Record<string, unknown> = {};
+	private originalAnswers: Record<string, unknown> = {};
 	private page: number = 0;
 	private loaded: boolean = false;
 	private isAdvancedMode: boolean = false;
@@ -251,9 +251,9 @@ export class ReassessmentModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal');
 
-		const loadingEl = contentEl.createEl('div', { cls: 'emerald-loading' });
-		loadingEl.createEl('div', { cls: 'emerald-spinner' });
-		loadingEl.createEl('div', { cls: 'emerald-loading-text', text: 'Loading your current profile...' });
+		const loadingEl = contentEl.createDiv({ cls: 'emerald-loading' });
+		loadingEl.createDiv({ cls: 'emerald-spinner' });
+		loadingEl.createDiv({ cls: 'emerald-loading-text', text: 'Loading your current profile...' });
 
 		const resp = await this.plugin.apiClient.getProfile();
 
@@ -265,15 +265,15 @@ export class ReassessmentModal extends Modal {
 				cls: 'emerald-modal-subtitle',
 				text: resp.error || 'No profile data found. Complete onboarding first.'
 			});
-			const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+			const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 			const closeBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Close' });
 			closeBtn.addEventListener('click', () => this.close());
 			return;
 		}
 
 		// Extract current answers from profile data
-		const profile = resp.data as Record<string, any>;
-		const advancedAnswers = (profile.advanced_answers || {}) as Record<string, any>;
+		const profile = resp.data as Record<string, unknown>;
+		const advancedAnswers = (profile.advanced_answers || {}) as Record<string, unknown>;
 
 		// Detect advanced mode
 		this.isAdvancedMode = profile.question_mode === 'advanced';
@@ -320,23 +320,23 @@ export class ReassessmentModal extends Modal {
 		const isInAdvancedSection = this.isAdvancedMode && pageStart >= basicCount;
 
 		// Header
-		const headerIcon = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
+		const headerIcon = contentEl.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(headerIcon, 'refresh-cw');
 		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: isInAdvancedSection ? 'Reassess — advanced profile' : 'Reassess your profile' });
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: isInAdvancedSection
-				? 'Review your advanced calibration answers. These help EMRALD fine-tune effort predictions.'
+				? 'Review your advanced calibration answers. These help emrald fine-tune effort predictions.'
 				: 'Review and update your answers. Your previous responses are pre-filled — change what feels different now.'
 		});
 
 		// Page counter
-		contentEl.createEl('div', {
+		contentEl.createDiv({
 			cls: 'emerald-onboard-step-label',
 			text: `Page ${this.page + 1} of ${totalPages}  •  Question ${this.page * QUESTIONS_PER_PAGE + 1}–${Math.min((this.page + 1) * QUESTIONS_PER_PAGE, this.allQuestions.length)} of ${this.allQuestions.length}`
 		});
 
-		const form = contentEl.createEl('div', { cls: 'emerald-form' });
+		const form = contentEl.createDiv({ cls: 'emerald-form' });
 
 		// Show optional separator if first question on this page is optional
 		let optionalSeparatorShown = false;
@@ -346,24 +346,24 @@ export class ReassessmentModal extends Modal {
 			if (q.optional && !optionalSeparatorShown) {
 				optionalSeparatorShown = true;
 				form.createEl('hr', { cls: 'emerald-form-separator' });
-				form.createEl('div', {
+				form.createDiv({
 					cls: 'emerald-form-desc emerald-text-muted',
 					text: 'Questions below are optional — for future integrations.'
 				});
 			}
 
-			const group = form.createEl('div', { cls: 'emerald-form-group' });
+			const group = form.createDiv({ cls: 'emerald-form-group' });
 			group.createEl('label', { text: q.question });
 
 			if (q.type === 'slider') {
-				const currentVal = this.answers[q.key] ?? q.default ?? 3;
+				const currentVal = (this.answers[q.key] as number) ?? (q.default as number) ?? 3;
 
-				const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
-				const valueEl = labelRow.createEl('span', { cls: 'emerald-slider-value', text: `${currentVal}/5` });
+				const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
+				const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: `${currentVal}/5` });
 
-				const endpoints = group.createEl('div', { cls: 'emerald-slider-endpoints' });
-				endpoints.createEl('span', { cls: 'emerald-slider-endpoint-left', text: q.endpointLeft ?? 'Not at all' });
-				endpoints.createEl('span', { cls: 'emerald-slider-endpoint-right', text: q.endpointRight ?? 'Very much' });
+				const endpoints = group.createDiv({ cls: 'emerald-slider-endpoints' });
+				endpoints.createSpan({ cls: 'emerald-slider-endpoint-left', text: q.endpointLeft ?? 'Not at all' });
+				endpoints.createSpan({ cls: 'emerald-slider-endpoint-right', text: q.endpointRight ?? 'Very much' });
 
 				const slider = group.createEl('input', { cls: 'emerald-slider' });
 				slider.type = 'range';
@@ -383,7 +383,7 @@ export class ReassessmentModal extends Modal {
 				}
 			} else if (q.type === 'enum' && q.options) {
 				const currentVal = this.answers[q.key] ?? null;
-				const btnColumn = group.createEl('div', { cls: 'emerald-onboard-enum-group' });
+				const btnColumn = group.createDiv({ cls: 'emerald-onboard-enum-group' });
 
 				for (const opt of q.options) {
 					const btn = btnColumn.createEl('button', {
@@ -399,7 +399,7 @@ export class ReassessmentModal extends Modal {
 					});
 				}
 			} else if (q.type === 'text') {
-				const currentVal = this.answers[q.key] ?? '';
+				const currentVal = (this.answers[q.key] as string) ?? '';
 				const input = group.createEl('input', {
 					cls: 'emerald-onboard-input',
 					type: 'text',
@@ -420,7 +420,7 @@ export class ReassessmentModal extends Modal {
 		}
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions emerald-calibration-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions emerald-calibration-actions' });
 
 		if (this.page > 0) {
 			const backBtn = actions.createEl('button', {
@@ -466,13 +466,13 @@ export class ReassessmentModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal');
 
-		const loadingEl = contentEl.createEl('div', { cls: 'emerald-loading' });
-		loadingEl.createEl('div', { cls: 'emerald-spinner' });
-		loadingEl.createEl('div', { cls: 'emerald-loading-text', text: 'Saving your updated profile...' });
+		const loadingEl = contentEl.createDiv({ cls: 'emerald-loading' });
+		loadingEl.createDiv({ cls: 'emerald-spinner' });
+		loadingEl.createDiv({ cls: 'emerald-loading-text', text: 'Saving your updated profile...' });
 
 		try {
 			// Only send changed answers
-			const changed: Record<string, any> = {};
+			const changed: Record<string, unknown> = {};
 			for (const [key, value] of Object.entries(this.answers)) {
 				if (this.originalAnswers[key] !== value) {
 					changed[key] = value;
@@ -496,32 +496,32 @@ export class ReassessmentModal extends Modal {
 			loadingEl.remove();
 
 			// Success screen
-			const doneIcon = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
+			const doneIcon = contentEl.createDiv({ cls: 'emerald-onboard-icon' });
 			setIcon(doneIcon, 'check-circle');
 			contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile updated!' });
 
 			const changedCount = Object.keys(changed).length;
 			const message = changedCount > 0
-				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history, and EMRALD will recalibrate on the next compute cycle.`
-				: 'No answers changed, but your reassessment counter has been reset. EMRALD will check in again after your next 60 days of use.';
+				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history, and emrald will recalibrate on the next compute cycle.`
+				: 'No answers changed, but your reassessment counter has been reset. emrald will check in again after your next 60 days of use.';
 
 			contentEl.createEl('p', { cls: 'emerald-onboard-desc', text: message });
 
-			const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+			const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 			const doneBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
 				text: 'Done'
 			});
 			doneBtn.addEventListener('click', () => this.close());
 
-		} catch (err: any) {
+		} catch (err: unknown) {
 			loadingEl.remove();
 			contentEl.createEl('h2', { text: 'Something went wrong' });
 			contentEl.createEl('p', {
 				cls: 'emerald-modal-subtitle',
-				text: err.message || 'Failed to update profile. Try again later.'
+			text: (err instanceof Error ? err.message : null) || 'Failed to update profile. Try again later.'
 			});
-			const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+			const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 			const retryBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Retry' });
 			retryBtn.addEventListener('click', () => {
 				this.page = Math.ceil(CALIBRATION_QUESTIONS.length / QUESTIONS_PER_PAGE) - 1;

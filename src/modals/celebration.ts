@@ -37,14 +37,14 @@ export class CelebrationModal extends Modal {
 		contentEl.addClass('emerald-modal', 'emerald-celebration-modal');
 
 		// Celebration icon
-		const iconEl = contentEl.createEl('div', { cls: 'emerald-celebration-icon' });
+		const iconEl = contentEl.createDiv({ cls: 'emerald-celebration-icon' });
 		iconEl.textContent = '🎉';
 
 		// Title
 		contentEl.createEl('h2', { text: 'Your first effort receipt!' });
 
 		// Body — contextualizes against E-level budget
-		const body = contentEl.createEl('div', { cls: 'emerald-celebration-body' });
+		const body = contentEl.createDiv({ cls: 'emerald-celebration-body' });
 
 		body.createEl('p', {
 			text: `You just logged ${this.formatDuration(this.sessionMinutes)} on ${this.itemName}. That's real data about how you spend your effort.`
@@ -62,11 +62,11 @@ export class CelebrationModal extends Modal {
 		// Encouragement
 		body.createEl('p', {
 			cls: 'emerald-celebration-encouragement',
-			text: 'Every receipt you submit makes EMRALD smarter about your effort patterns. Keep going — your data tells a story no task list ever could.'
+			text: 'Every receipt you submit makes emrald smarter about your effort patterns. Keep going — your data tells a story no task list ever could.'
 		});
 
 		// Single dismiss button
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions emerald-celebration-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions emerald-celebration-actions' });
 		const btn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
 			text: 'Got it!'
@@ -85,7 +85,7 @@ export class CelebrationModal extends Modal {
 		if (percentUsed >= 100) {
 			return `That session covered your full ${this.effortLevel} budget for ${this.itemName} today. Well spent.`;
 		} else {
-			return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
+			return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. emrald tracks this so you don't have to guess.`;
 		}
 	}
 

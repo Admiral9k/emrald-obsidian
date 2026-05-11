@@ -33,19 +33,19 @@ export class ELevelModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-elevel-modal');
 
-		contentEl.createEl('h2', { text: 'Set E-level' });
+		contentEl.createEl('h2', { text: 'Set e-level' });
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: this.itemName });
 
 		// Current level indicator
-		const currentEl = contentEl.createEl('div', { cls: 'emerald-elevel-current' });
-		currentEl.createEl('span', { text: `Current: ${this.currentLevel}` });
+		const currentEl = contentEl.createDiv({ cls: 'emerald-elevel-current' });
+		currentEl.createSpan({ text: `Current: ${this.currentLevel}` });
 
 		// Available hours context
-		const contextEl = contentEl.createEl('div', { cls: 'emerald-elevel-context' });
-		contextEl.createEl('span', { text: `Today you have: ${this.availableHours}h available` });
+		const contextEl = contentEl.createDiv({ cls: 'emerald-elevel-context' });
+		contextEl.createSpan({ text: `Today you have: ${this.availableHours}h available` });
 
 		// E-level options
-		const form = contentEl.createEl('div', { cls: 'emerald-form emerald-elevel-options' });
+		const form = contentEl.createDiv({ cls: 'emerald-form emerald-elevel-options' });
 
 		const levels: Array<{ level: 'E1' | 'E2' | 'E3' | 'E4'; desc: string; pct: number }> = [
 			{ level: 'E1', desc: 'Light — 25% of your daily work time', pct: 25 },
@@ -60,11 +60,11 @@ export class ELevelModal extends Modal {
 				cls: `emerald-elevel-option ${level === this.currentLevel ? 'is-active' : ''}`,
 			});
 
-			const labelRow = btn.createEl('div', { cls: 'emerald-elevel-option-label' });
-			labelRow.createEl('span', { cls: 'emerald-elevel-option-level', text: level });
-			labelRow.createEl('span', { cls: 'emerald-elevel-option-desc', text: `${desc} (${pct}%)` });
+			const labelRow = btn.createDiv({ cls: 'emerald-elevel-option-label' });
+			labelRow.createSpan({ cls: 'emerald-elevel-option-level', text: level });
+			labelRow.createSpan({ cls: 'emerald-elevel-option-desc', text: `${desc} (${pct}%)` });
 
-			btn.createEl('div', { cls: 'emerald-elevel-option-time', text: `~${prescribedHours}h on a ${this.availableHours}h day` });
+			btn.createDiv({ cls: 'emerald-elevel-option-time', text: `~${prescribedHours}h on a ${this.availableHours}h day` });
 
 			btn.addEventListener('click', () => {
 				this.onSubmit(level);
@@ -73,7 +73,7 @@ export class ELevelModal extends Modal {
 		}
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const cancelBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',

@@ -98,7 +98,7 @@ export function isEmraldNote(app: App, file: TFile): boolean {
  */
 export function getEmraldId(app: App, file: TFile): string | null {
 	const cache = app.metadataCache.getFileCache(file);
-	return cache?.frontmatter?.['emrald-id'] ?? null;
+	return (cache?.frontmatter?.['emrald-id'] as string | undefined) ?? null;
 }
 
 /**
@@ -106,7 +106,7 @@ export function getEmraldId(app: App, file: TFile): string | null {
  */
 export function getEffortLevel(app: App, file: TFile): 'E1' | 'E2' | 'E3' | 'E4' | null {
 	const cache = app.metadataCache.getFileCache(file);
-	const level = cache?.frontmatter?.['effort-level'];
+	const level = cache?.frontmatter?.['effort-level'] as string | undefined;
 	if (level && ['E1', 'E2', 'E3', 'E4'].includes(level)) {
 		return level as 'E1' | 'E2' | 'E3' | 'E4';
 	}

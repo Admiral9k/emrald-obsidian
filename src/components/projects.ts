@@ -61,8 +61,8 @@ export class ProjectsComponent {
 		this.renderActiveProjects(activeItems);
 
 		// Divider with count
-		const divider = this.containerEl.createEl('div', { cls: 'emerald-projects-divider' });
-		divider.createEl('span', { text: `Active: ${activeItems.length}/5` });
+		const divider = this.containerEl.createDiv({ cls: 'emerald-projects-divider' });
+		divider.createSpan({ text: `Active: ${activeItems.length}/5` });
 
 		// Inactive accordion
 		this.renderCollapsibleSection('Inactive', inactiveItems, 'paused');
@@ -109,7 +109,7 @@ export class ProjectsComponent {
 		}
 
 		if (items.length === 0) {
-			this.containerEl.createEl('div', {
+			this.containerEl.createDiv({
 				cls: 'emerald-projects-empty',
 				text: 'No active projects. Add one to get started.'
 			});
@@ -120,7 +120,7 @@ export class ProjectsComponent {
 		const isInSession = this.state.activeSessionItemId === item.id;
 		const todayMin = this.state.todayMinutesByItem.get(item.id) ?? 0;
 
-		const card = this.containerEl.createEl('div', {
+		const card = this.containerEl.createDiv({
 			cls: `emerald-project-card ${isInSession ? 'is-in-session' : ''}`
 		});
 		card.dataset.itemId = item.id;
@@ -129,10 +129,10 @@ export class ProjectsComponent {
 		card.setAttribute('aria-label', `${item.name}, ${item.effort_level}${isInSession ? ', in session' : ''}. Press Enter for options.`);
 
 		// Top row: name + E-level badge
-		const topRow = card.createEl('div', { cls: 'emerald-project-top' });
+		const topRow = card.createDiv({ cls: 'emerald-project-top' });
 
 		// Project name — opens note, stops propagation so card context menu doesn't fire
-		const nameEl = topRow.createEl('span', {
+		const nameEl = topRow.createSpan({
 			cls: 'emerald-project-name',
 			text: item.name,
 			attr: { 'aria-label': `Open ${item.name} note` }
@@ -143,7 +143,7 @@ export class ProjectsComponent {
 		});
 
 		// E-level badge
-		const badge = topRow.createEl('span', {
+		const badge = topRow.createSpan({
 			cls: 'emerald-elevel-badge',
 			text: item.effort_level,
 			attr: { 'aria-label': `Effort level ${item.effort_level}` }
@@ -151,19 +151,19 @@ export class ProjectsComponent {
 		badge.dataset.level = item.effort_level ?? '';
 
 		// Bottom row: today's time
-		const bottomRow = card.createEl('div', { cls: 'emerald-project-bottom' });
+		const bottomRow = card.createDiv({ cls: 'emerald-project-bottom' });
 
 		if (isInSession) {
 			// In-session state with live elapsed / prescribed time
-			bottomRow.createEl('span', { cls: 'emerald-in-session-label', text: '┄┄ In session ┄┄' });
-			const progressEl = bottomRow.createEl('span', { cls: 'emerald-in-session-progress emerald-project-time' });
+			bottomRow.createSpan({ cls: 'emerald-in-session-label', text: '┄┄ In session ┄┄' });
+			const progressEl = bottomRow.createSpan({ cls: 'emerald-in-session-progress emerald-project-time' });
 			progressEl.dataset.itemId = item.id;
 			this.updateSessionProgressEl(progressEl, item);
 		} else {
 			const timeStr = todayMin > 0
 				? `${Math.floor(todayMin / 60)}h ${Math.round(todayMin % 60)}m today`
 				: '0m today';
-			bottomRow.createEl('span', { cls: 'emerald-project-time', text: timeStr });
+			bottomRow.createSpan({ cls: 'emerald-project-time', text: timeStr });
 		}
 
 		// Whole card opens context menu on click (except name which opens note)
@@ -176,7 +176,7 @@ export class ProjectsComponent {
 		card.addEventListener('keydown', (e: KeyboardEvent) => {
 			if (e.key === 'Enter' || e.key === ' ') {
 				// Name already handled via click stopPropagation, card gets context menu
-				this.showContextMenu(e as unknown as MouseEvent, item, isInSession);
+				this.showContextMenu(e, item, isInSession);
 			}
 		});
 	}
@@ -186,24 +186,24 @@ export class ProjectsComponent {
 	private renderCollapsibleSection(label: string, items: TrackedItem[], sectionStatus: 'paused' | 'completed') {
 		if (items.length === 0) return;
 
-		const accordion = this.containerEl.createEl('div', { cls: 'emerald-inactive-accordion' });
+		const accordion = this.containerEl.createDiv({ cls: 'emerald-inactive-accordion' });
 
-		const header = accordion.createEl('div', { cls: 'emerald-inactive-header' });
+		const header = accordion.createDiv({ cls: 'emerald-inactive-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'false');
 		header.setAttribute('aria-label', `${label} section (click to expand)`);
 		header.tabIndex = 0;
-		header.createEl('span', { text: `▸ ${label} (${items.length})` });
+		header.createSpan({ text: `▸ ${label} (${items.length})` });
 
-		const content = accordion.createEl('div', { cls: 'emerald-inactive-content' });
+		const content = accordion.createDiv({ cls: 'emerald-inactive-content' });
 		content.addClass('emrald-hidden');
 
 		const toggle = () => {
 			const isHidden = content.hasClass('emrald-hidden');
-			isHidden ? content.removeClass('emrald-hidden') : content.addClass('emrald-hidden');
+			if (isHidden) { content.removeClass('emrald-hidden'); } else { content.addClass('emrald-hidden'); }
 			header.setAttribute('aria-expanded', String(isHidden));
 			header.empty();
-			header.createEl('span', { text: `${isHidden ? '▼' : '▸'} ${label} (${items.length})` });
+			header.createSpan({ text: `${isHidden ? '▼' : '▸'} ${label} (${items.length})` });
 		};
 
 		header.addEventListener('click', toggle);
@@ -215,20 +215,20 @@ export class ProjectsComponent {
 		});
 
 		for (const item of items) {
-			const row = content.createEl('div', { cls: 'emerald-inactive-item' });
+			const row = content.createDiv({ cls: 'emerald-inactive-item' });
 			row.setAttribute('role', 'button');
 			row.setAttribute('aria-label', `${item.name} — ${item.effort_level}`);
 			row.tabIndex = 0;
-			const iconEl = row.createEl('span', { cls: 'emerald-inactive-icon' });
+			const iconEl = row.createSpan({ cls: 'emerald-inactive-icon' });
 			iconEl.setAttribute('aria-hidden', 'true');
 			if (sectionStatus === 'completed') {
 				setIcon(iconEl, 'check-circle-2');
 			} else {
 				setIcon(iconEl, 'circle-dot');
 			}
-			const nameEl = row.createEl('span', { text: item.name });
+			const nameEl = row.createSpan({ text: item.name });
 			nameEl.setAttribute('aria-hidden', 'true');
-			const badge = row.createEl('span', { cls: 'emerald-elevel-badge-small', text: item.effort_level });
+			const badge = row.createSpan({ cls: 'emerald-elevel-badge-small', text: item.effort_level });
 			badge.dataset.level = item.effort_level ?? '';
 
 			row.addClass('emrald-clickable');
@@ -238,7 +238,7 @@ export class ProjectsComponent {
 			row.addEventListener('keydown', (e: KeyboardEvent) => {
 				if (e.key === 'Enter' || e.key === ' ') {
 					e.preventDefault();
-					this.showCollapsibleContextMenu(e as unknown as MouseEvent, item, sectionStatus);
+					this.showCollapsibleContextMenu(e, item, sectionStatus);
 				}
 			});
 		}
@@ -274,7 +274,7 @@ export class ProjectsComponent {
 		} else if (this.state.activeSessionItemId) {
 			// Another session is active — show management options too
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
-			menu.addItem(i => i.setTitle('Change E-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
@@ -283,7 +283,7 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Start session').setIcon('play').onClick(() => this.onStartSession(item)));
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
-			menu.addItem(i => i.setTitle('Change E-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		}
@@ -315,7 +315,7 @@ export class ProjectsComponent {
 			this.render();
 		}
 
-		const resp = await this.plugin.apiClient.updateItem(item.id, { status } as Partial<TrackedItem>);
+		const resp = await this.plugin.apiClient.updateItem(item.id, { status });
 		if (resp.error && !resp.queued) {
 			// Revert optimistic update on real error (not queued)
 			if (idx >= 0) {
@@ -353,7 +353,7 @@ export class ProjectsComponent {
 			this.render();
 		}
 
-		const resp = await this.plugin.apiClient.updateItem(item.id, { status: 'active' } as Partial<TrackedItem>);
+		const resp = await this.plugin.apiClient.updateItem(item.id, { status: 'active' });
 		if (resp.error && !resp.queued) {
 			// Revert on real error
 			if (idx >= 0) {
@@ -386,7 +386,7 @@ export class ProjectsComponent {
 		this.state.activeSessionElapsedMin = elapsedMin;
 
 		// Find the in-session progress element and update it
-		const progressEl = this.containerEl.querySelector('.emerald-in-session-progress') as HTMLElement | null;
+		const progressEl = this.containerEl.querySelector<HTMLElement>('.emerald-in-session-progress');
 		if (!progressEl) return;
 
 		const itemId = progressEl.dataset.itemId;

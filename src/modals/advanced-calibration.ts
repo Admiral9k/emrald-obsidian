@@ -13,7 +13,7 @@ interface CalibrationQuestion {
 	options?: Array<{ value: string; label: string }>;
 	min?: number;
 	max?: number;
-	default?: any;
+	default?: unknown;
 	endpointLeft?: string;
 	endpointRight?: string;
 	optional?: boolean;
@@ -60,11 +60,11 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	},
 	{
 		key: 'core_motivation',
-		question: 'I\'m driven by a desire for...',
+		question: "I'm driven by a desire for...",
 		type: 'enum',
 		options: [
 			{ value: 'correctness', label: 'Correctness — doing things right' },
-			{ value: 'helping', label: 'Helping — making others\' lives better' },
+			{ value: 'helping', label: "Helping — making others' lives better" },
 			{ value: 'achievement', label: 'Achievement — accomplishing goals' },
 			{ value: 'authenticity', label: 'Authenticity — being true to myself' },
 			{ value: 'understanding', label: 'Understanding — knowing how things work' },
@@ -105,13 +105,13 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	// Batch 3 (Sessions 4-5): Tolerance & needs
 	{
 		key: 'ambiguity_tolerance',
-		question: 'I\'m comfortable with ambiguity and undefined outcomes.',
+		question: "I'm comfortable with ambiguity and undefined outcomes.",
 		type: 'slider', min: 1, max: 5, default: 3,
 		endpointLeft: 'Very uncomfortable', endpointRight: 'Very comfortable'
 	},
 	{
 		key: 'enablement_tendency',
-		question: 'I find helping and supporting others\' projects genuinely fulfilling.',
+		question: "I find helping and supporting others' projects genuinely fulfilling.",
 		type: 'slider', min: 1, max: 5, default: 3,
 		endpointLeft: 'Not really', endpointRight: 'Absolutely'
 	},
@@ -136,7 +136,7 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	// Batch 4 (Sessions 5-6): Capacity & patterns
 	{
 		key: 'max_sustained_project_duration',
-		question: 'Longest project you\'ve sustained consistent effort on?',
+		question: "Longest project you've sustained consistent effort on?",
 		type: 'enum',
 		options: [
 			{ value: 'days', label: 'Days' },
@@ -181,7 +181,7 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	},
 	{
 		key: 'overcommitment_tendency',
-		question: 'How often do you feel like you\'re juggling too many projects?',
+		question: "How often do you feel like you're juggling too many projects?",
 		type: 'slider', min: 1, max: 5, default: 3,
 		endpointLeft: 'Never', endpointRight: 'Constantly'
 	},
@@ -223,7 +223,7 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	},
 	{
 		key: 'current_frustration',
-		question: 'What\'s your biggest productivity frustration right now?',
+		question: "What's your biggest productivity frustration right now?",
 		type: 'text',
 		optional: true
 	},
@@ -254,7 +254,7 @@ export class AdvancedCalibrationModal extends Modal {
 	private plugin: EmraldPlugin;
 	private questions: CalibrationQuestion[];
 	private allUnanswered: CalibrationQuestion[];
-	private answers: Record<string, any> = {};
+	private answers: Record<string, unknown> = {};
 	private onComplete: () => void;
 	private onSkip: () => void;
 	private remaining: number;
@@ -294,7 +294,7 @@ export class AdvancedCalibrationModal extends Modal {
 		// If showAll, use all unanswered; otherwise use the batch
 		const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
 
-		contentEl.createEl('h2', { text: 'Effort profile — Advanced' });
+		contentEl.createEl('h2', { text: 'Effort profile — advanced' });
 
 		const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
 		if (this.showAll) {
@@ -321,7 +321,7 @@ export class AdvancedCalibrationModal extends Modal {
 			}
 		}
 
-		const form = contentEl.createEl('div', { cls: 'emerald-form' });
+		const form = contentEl.createDiv({ cls: 'emerald-form' });
 
 		let optionalSeparatorShown = false;
 		for (const q of displayQuestions) {
@@ -329,23 +329,23 @@ export class AdvancedCalibrationModal extends Modal {
 			if (q.optional && !optionalSeparatorShown) {
 				optionalSeparatorShown = true;
 				form.createEl('hr', { cls: 'emerald-form-separator' });
-				form.createEl('div', {
+				form.createDiv({
 					cls: 'emerald-form-desc emerald-text-muted',
 					text: 'Questions below are for future integrations, answers optional.'
 				});
 			}
-			const group = form.createEl('div', { cls: 'emerald-form-group' });
+			const group = form.createDiv({ cls: 'emerald-form-group' });
 			group.createEl('label', { text: q.question });
 
 			if (q.type === 'slider') {
-				const currentVal = q.default ?? 3;
-				const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
-				const valueEl = labelRow.createEl('span', { cls: 'emerald-slider-value', text: `${currentVal}/5` });
+				const currentVal = (q.default as number) ?? 3;
+				const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
+				const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: `${currentVal}/5` });
 
 				if (q.endpointLeft || q.endpointRight) {
-					const endpoints = group.createEl('div', { cls: 'emerald-slider-endpoints' });
-					endpoints.createEl('span', { cls: 'emerald-slider-endpoint-left', text: q.endpointLeft ?? '' });
-					endpoints.createEl('span', { cls: 'emerald-slider-endpoint-right', text: q.endpointRight ?? '' });
+					const endpoints = group.createDiv({ cls: 'emerald-slider-endpoints' });
+					endpoints.createSpan({ cls: 'emerald-slider-endpoint-left', text: q.endpointLeft ?? '' });
+					endpoints.createSpan({ cls: 'emerald-slider-endpoint-right', text: q.endpointRight ?? '' });
 				}
 
 				const slider = group.createEl('input', { cls: 'emerald-slider' });
@@ -363,7 +363,7 @@ export class AdvancedCalibrationModal extends Modal {
 				});
 
 			} else if (q.type === 'enum' && q.options) {
-				const btnColumn = group.createEl('div', { cls: 'emerald-onboard-enum-group' });
+				const btnColumn = group.createDiv({ cls: 'emerald-onboard-enum-group' });
 				for (const opt of q.options) {
 					const btn = btnColumn.createEl('button', {
 						cls: 'emerald-onboard-enum-btn',
@@ -396,7 +396,7 @@ export class AdvancedCalibrationModal extends Modal {
 		}
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const submitBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',

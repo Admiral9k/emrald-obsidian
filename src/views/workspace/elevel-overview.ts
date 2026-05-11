@@ -2,7 +2,7 @@
 // Shows: E-level filter cards, project table, allocation summary, suggestions.
 // Click an E-level card to filter the project list.
 // Expandable ⓘ info on each card, clickable project names → open note,
-// "What is Effort Management?" link → About EMRALD view.
+// "What is effort management?" link → About EMRALD view.
 
 import { WorkspaceLeaf, setIcon, Notice, TFile } from 'obsidian';
 import EmraldPlugin from '../../../main';
@@ -89,7 +89,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const availData = availResp.data;
 		if (Array.isArray(availData) && availData.length > 0) {
 			const todayDow = new Date().getDay(); // 0=Sun, 6=Sat
-			const todayRow = availData.find((r: any) => r.day_of_week === todayDow);
+			const todayRow = (availData as unknown as Array<{day_of_week: number; available_hours: number}>).find((r) => r.day_of_week === todayDow);
 			this.availableHours = todayRow?.available_hours ?? 4;
 		} else if (availData && typeof availData === 'object' && 'effective_today' in availData) {
 			// Future-proof: if API ever returns the structured Availability object
@@ -121,7 +121,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		this.renderAllocationSummary(container, totalAllocatedPct, activeItems.length);
 
 		// ── Project Table (filterable) ──
-		this.projectContainer = container.createEl('div', { cls: 'emerald-wv-project-table-wrap' });
+		this.projectContainer = container.createDiv({ cls: 'emerald-wv-project-table-wrap' });
 		this.renderProjectTable();
 
 		// ── Suggestions ──
@@ -130,10 +130,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			this.renderSuggestions(container, suggestions);
 		}
 
-		// ── "What is Effort Management?" link → About EMRALD ──
-		const emLink = container.createEl('div', { cls: 'emerald-wv-em-link' });
-		const linkEl = emLink.createEl('a', { cls: 'emerald-wv-text-link', text: 'What is Effort Management?' });
-		const linkIcon = emLink.createEl('span', { cls: 'emerald-wv-link-arrow' });
+		// ── "What is effort management?" link → About EMRALD ──
+		const emLink = container.createDiv({ cls: 'emerald-wv-em-link' });
+		const linkEl = emLink.createEl('a', { cls: 'emerald-wv-text-link', text: 'What is effort management?' });
+		const linkIcon = emLink.createSpan({ cls: 'emerald-wv-link-arrow' });
 		setIcon(linkIcon, 'arrow-right');
 		linkEl.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -144,9 +144,9 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	// ── Empty State ─────────────────────────────────────
 
 	private renderEmptyState(container: Element) {
-		const empty = container.createEl('div', { cls: 'emerald-wv-empty-state' });
+		const empty = container.createDiv({ cls: 'emerald-wv-empty-state' });
 
-		const iconEl = empty.createEl('div', { cls: 'emerald-wv-empty-icon' });
+		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'bar-chart-2');
 
 		empty.createEl('h3', { text: 'No projects yet' });
@@ -159,7 +159,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	// ── E-Level Cards ───────────────────────────────────
 
 	private renderELevelCards(container: Element, activeItems: TrackedItem[]) {
-		const grid = container.createEl('div', { cls: 'emerald-wv-elevel-grid' });
+		const grid = container.createDiv({ cls: 'emerald-wv-elevel-grid' });
 
 		for (const level of ['E1', 'E2', 'E3', 'E4']) {
 			const meta = E_LEVEL_META[level];
@@ -171,44 +171,44 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const prescribedMin = this.availableHours * 60 * (E_LEVEL_PCT[level] / 100);
 			const totalPrescribed = count * prescribedMin;
 
-			const card = grid.createEl('div', {
+			const card = grid.createDiv({
 				cls: `emerald-wv-elevel-card ${this.activeFilter === level ? 'is-active' : ''}`
 			});
 			card.dataset.level = level;
 
 			// Left side: level info
-			const info = card.createEl('div', { cls: 'emerald-wv-elevel-info' });
-			const levelLabel = info.createEl('div', { cls: 'emerald-wv-elevel-label' });
-			levelLabel.createEl('span', { cls: 'emerald-wv-elevel-name', text: level });
-			levelLabel.createEl('span', { cls: 'emerald-wv-elevel-desc', text: meta.desc });
+			const info = card.createDiv({ cls: 'emerald-wv-elevel-info' });
+			const levelLabel = info.createDiv({ cls: 'emerald-wv-elevel-label' });
+			levelLabel.createSpan({ cls: 'emerald-wv-elevel-name', text: level });
+			levelLabel.createSpan({ cls: 'emerald-wv-elevel-desc', text: meta.desc });
 
 			// Expandable ⓘ info button
-			const infoBtn = levelLabel.createEl('span', { cls: 'emerald-wv-elevel-info-btn', attr: { 'aria-label': `About ${level}` } });
+			const infoBtn = levelLabel.createSpan({ cls: 'emerald-wv-elevel-info-btn', attr: { 'aria-label': `About ${level}` } });
 			setIcon(infoBtn, 'info');
-			const detailEl = info.createEl('div', { cls: 'emerald-wv-elevel-detail', text: meta.detail });
+			const detailEl = info.createDiv({ cls: 'emerald-wv-elevel-detail', text: meta.detail });
 			detailEl.addClass('emrald-hidden');
 			infoBtn.addEventListener('click', (e) => {
 				e.stopPropagation(); // Don't trigger card filter
 				const isVisible = !detailEl.hasClass('emrald-hidden');
-				isVisible ? detailEl.addClass('emrald-hidden') : detailEl.removeClass('emrald-hidden');
+				if (isVisible) { detailEl.addClass('emrald-hidden'); } else { detailEl.removeClass('emrald-hidden'); }
 				infoBtn.toggleClass('is-expanded', !isVisible);
 			});
 
-			const countRow = info.createEl('div', { cls: 'emerald-wv-elevel-count' });
-			countRow.createEl('span', {
+			const countRow = info.createDiv({ cls: 'emerald-wv-elevel-count' });
+			countRow.createSpan({
 				cls: 'emerald-wv-elevel-count-num',
 				text: String(count)
 			});
-			countRow.createEl('span', { text: ` active project${count !== 1 ? 's' : ''}` });
+			countRow.createSpan({ text: ` active project${count !== 1 ? 's' : ''}` });
 
 			// Right side: today's progress (if any work done)
-			const progress = card.createEl('div', { cls: 'emerald-wv-elevel-progress' });
+			const progress = card.createDiv({ cls: 'emerald-wv-elevel-progress' });
 			if (todayMin > 0 && totalPrescribed > 0) {
 				const pct = Math.min(Math.round((todayMin / totalPrescribed) * 100), 999);
-				progress.createEl('div', { cls: 'emerald-wv-elevel-pct', text: `${pct}%` });
-				progress.createEl('div', { cls: 'emerald-wv-elevel-time', text: `${this.formatDuration(todayMin)} today` });
+				progress.createDiv({ cls: 'emerald-wv-elevel-pct', text: `${pct}%` });
+				progress.createDiv({ cls: 'emerald-wv-elevel-time', text: `${this.formatDuration(todayMin)} today` });
 			} else if (count > 0) {
-				progress.createEl('div', { cls: 'emerald-wv-elevel-time emerald-wv-elevel-no-work', text: 'No work yet' });
+				progress.createDiv({ cls: 'emerald-wv-elevel-time emerald-wv-elevel-no-work', text: 'No work yet' });
 			}
 
 			// Click to filter
@@ -233,40 +233,40 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	// ── Allocation Summary ──────────────────────────────
 
 	private renderAllocationSummary(container: Element, totalPct: number, activeCount: number) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-alloc-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-alloc-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'pie-chart');
 		headerRow.createEl('h3', { text: 'Daily allocation' });
 
 		// Bar
-		const barOuter = section.createEl('div', { cls: 'emerald-wv-alloc-bar-outer' });
-		const barFill = barOuter.createEl('div', { cls: 'emerald-wv-alloc-bar-fill' });
+		const barOuter = section.createDiv({ cls: 'emerald-wv-alloc-bar-outer' });
+		const barFill = barOuter.createDiv({ cls: 'emerald-wv-alloc-bar-fill' });
 
 		barFill.style.width = `${Math.min(totalPct, 100)}%`;
 		if (totalPct > 100) barFill.addClass('is-over');
 		else if (totalPct < 50) barFill.addClass('is-under');
 
 		// Label
-		const label = section.createEl('div', { cls: 'emerald-wv-alloc-label' });
+		const label = section.createDiv({ cls: 'emerald-wv-alloc-label' });
 		if (totalPct > 100) {
-			label.createEl('span', {
+			label.createSpan({
 				cls: 'emerald-wv-alloc-warn',
 				text: `⚠ Over-committed: ${totalPct}% across ${activeCount} project${activeCount !== 1 ? 's' : ''} (${this.availableHours}h available)`
 			});
-			label.createEl('div', {
+			label.createDiv({
 				cls: 'emerald-wv-alloc-hint',
 				text: 'Consider reducing effort levels or deactivating a project.'
 			});
 		} else if (totalPct < 50 && activeCount > 0) {
-			label.createEl('span', {
+			label.createSpan({
 				text: `${totalPct}% allocated — you have room for more projects (${this.availableHours}h available)`
 			});
 		} else if (activeCount === 0) {
-			label.createEl('span', { text: 'No active projects' });
+			label.createSpan({ text: 'No active projects' });
 		} else {
-			label.createEl('span', {
+			label.createSpan({
 				text: `${totalPct}% of ${this.availableHours}h allocated across ${activeCount} project${activeCount !== 1 ? 's' : ''}`
 			});
 		}
@@ -278,10 +278,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		if (!this.projectContainer) return;
 		this.projectContainer.empty();
 
-		const section = this.projectContainer.createEl('div', { cls: 'emerald-wv-section' });
+		const section = this.projectContainer.createDiv({ cls: 'emerald-wv-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'folder');
 
 		const title = this.activeFilter
@@ -292,7 +292,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		if (this.activeFilter) {
 			const clearBtn = headerRow.createEl('button', {
 				cls: 'emerald-btn emerald-btn-subtle emerald-btn-sm',
-				text: '✕ Clear filter'
+				text: '✕ clear filter'
 			});
 			clearBtn.addEventListener('click', () => {
 				this.activeFilter = null;
@@ -335,12 +335,12 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 			// Status dot
 			const dotCell = row.createEl('td');
-			const dot = dotCell.createEl('span', { cls: 'emerald-phase-dot' });
+			const dot = dotCell.createSpan({ cls: 'emerald-phase-dot' });
 			dot.dataset.status = item.status ?? 'unknown';
 
 			// Name (clickable → opens note in Obsidian)
 			const nameCell = row.createEl('td');
-			const nameEl = nameCell.createEl('span', {
+			const nameEl = nameCell.createSpan({
 				cls: 'emerald-wv-project-name emerald-wv-project-link',
 				text: item.name
 			});
@@ -349,7 +349,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				this.openNote(item);
 			});
 			if (item.status !== 'active') {
-				nameCell.createEl('span', {
+				nameCell.createSpan({
 					cls: 'emerald-wv-project-status',
 					text: ` (${item.status})`
 				});
@@ -358,7 +358,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// E-Level (colored)
 			const levelCell = row.createEl('td');
 			const levelMeta = E_LEVEL_META[item.effort_level];
-			const levelBadge = levelCell.createEl('span', { cls: 'emerald-wv-level-badge', text: item.effort_level });
+			const levelBadge = levelCell.createSpan({ cls: 'emerald-wv-level-badge', text: item.effort_level });
 			levelBadge.dataset.level = item.effort_level ?? '';
 
 			// Today's time
@@ -374,13 +374,13 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const progressCell = row.createEl('td');
 			if (item.status === 'active') {
 				const pctComplete = prescribedMin > 0 ? Math.min(Math.round((todayMin / prescribedMin) * 100), 999) : 0;
-				const barOuter = progressCell.createEl('div', { cls: 'emerald-wv-pct-bar' });
-				const barFill = barOuter.createEl('div', { cls: 'emerald-wv-pct-fill' });
+				const barOuter = progressCell.createDiv({ cls: 'emerald-wv-pct-bar' });
+				const barFill = barOuter.createDiv({ cls: 'emerald-wv-pct-fill' });
 				barFill.style.width = `${Math.min(pctComplete, 100)}%`;
 				if (pctComplete >= 100) barFill.addClass('is-complete');
-				barOuter.createEl('span', { cls: 'emerald-wv-pct-text', text: `${pctComplete}%` });
+				barOuter.createSpan({ cls: 'emerald-wv-pct-text', text: `${pctComplete}%` });
 			} else {
-				progressCell.createEl('span', { cls: 'emerald-wv-empty', text: '—' });
+				progressCell.createSpan({ cls: 'emerald-wv-empty', text: '—' });
 			}
 		}
 	}
@@ -403,20 +403,20 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	}
 
 	private renderSuggestions(container: Element, suggestions: Array<{ message: string; type: string }>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'message-circle');
 		headerRow.createEl('h3', { text: 'Suggestions' });
 
 		for (const sug of suggestions) {
-			const card = section.createEl('div', { cls: 'emerald-wv-suggestion-card' });
+			const card = section.createDiv({ cls: 'emerald-wv-suggestion-card' });
 
-			const sugIcon = card.createEl('span', { cls: 'emerald-wv-suggestion-icon' });
+			const sugIcon = card.createSpan({ cls: 'emerald-wv-suggestion-icon' });
 			setIcon(sugIcon, sug.type === 'effort_adjustment' ? 'sliders' : 'lightbulb');
 
-			card.createEl('span', { text: sug.message });
+			card.createSpan({ text: sug.message });
 		}
 	}
 }

@@ -34,15 +34,15 @@ export class NewProjectModal extends Modal {
 		this.nameInput = contentEl.createEl('input', {
 			cls: 'emerald-modal-name-input',
 			placeholder: 'Project name'
-		}) as HTMLInputElement;
+		});
 		this.nameInput.focus();
 
 		// Available hours context (same as ELevelModal)
-		const contextEl = contentEl.createEl('div', { cls: 'emerald-elevel-context' });
-		contextEl.createEl('span', { text: `Today you have: ${this.availableHours}h available` });
+		const contextEl = contentEl.createDiv({ cls: 'emerald-elevel-context' });
+		contextEl.createSpan({ text: `Today you have: ${this.availableHours}h available` });
 
 		// E-level options — clicking one submits immediately (same UX as ELevelModal)
-		const form = contentEl.createEl('div', { cls: 'emerald-form emerald-elevel-options' });
+		const form = contentEl.createDiv({ cls: 'emerald-form emerald-elevel-options' });
 
 		const levels: Array<{ level: 'E1' | 'E2' | 'E3' | 'E4'; desc: string; pct: number }> = [
 			{ level: 'E1', desc: 'Light — 25% of your daily work time', pct: 25 },
@@ -57,10 +57,10 @@ export class NewProjectModal extends Modal {
 				cls: 'emerald-elevel-option'
 			});
 
-			const labelRow = btn.createEl('div', { cls: 'emerald-elevel-option-label' });
-			labelRow.createEl('span', { cls: 'emerald-elevel-option-level', text: level });
-			labelRow.createEl('span', { cls: 'emerald-elevel-option-desc', text: `${desc} (${pct}%)` });
-			btn.createEl('div', { cls: 'emerald-elevel-option-time', text: `~${prescribedHours}h on a ${this.availableHours}h day` });
+			const labelRow = btn.createDiv({ cls: 'emerald-elevel-option-label' });
+			labelRow.createSpan({ cls: 'emerald-elevel-option-level', text: level });
+			labelRow.createSpan({ cls: 'emerald-elevel-option-desc', text: `${desc} (${pct}%)` });
+			btn.createDiv({ cls: 'emerald-elevel-option-time', text: `~${prescribedHours}h on a ${this.availableHours}h day` });
 
 			btn.addEventListener('click', () => {
 				const name = this.nameInput?.value.trim() ?? '';
@@ -75,7 +75,7 @@ export class NewProjectModal extends Modal {
 		}
 
 		// Cancel only — confirming happens by clicking an E-level row
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 		const cancelBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',
 			text: 'Cancel'

@@ -3,7 +3,7 @@
 // profile history timeline, D19 drift indicator, reassessment trigger.
 // Obsidian-native: ungrouped answer cards, clean trait bars, warm language.
 
-import { WorkspaceLeaf, Notice, Modal, Setting, setIcon } from 'obsidian';
+import { WorkspaceLeaf, Notice, Modal, Setting, setIcon, App } from 'obsidian';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_EFFORT_PROFILE, VIEW_DATA_CENTER } from './base';
 import { RecoveryProtocol } from '../../api/client';
@@ -29,12 +29,12 @@ const QUESTION_LABELS: Record<string, { label: string; format: 'slider' | 'enum'
 	work_pace_style:             { label: 'Do you prefer intense bursts or steady work?', format: 'enum' },
 	social_energy_direction:     { label: 'After socializing, I feel...', format: 'enum' },
 	sleep_quality_baseline:      { label: 'In general, how well do you sleep?', format: 'slider' },
-	conscientiousness:           { label: 'I\'m organized and follow through', format: 'slider' },
+	conscientiousness:           { label: "I'm organized and follow through", format: 'slider' },
 	stress_vulnerability:        { label: 'I get stressed easily', format: 'slider' },
-	novelty_tolerance:           { label: 'I\'m energized by new challenges', format: 'slider' },
+	novelty_tolerance:           { label: "I'm energized by new challenges", format: 'slider' },
 	routine_tolerance:           { label: 'I can do routine work for long stretches', format: 'slider' },
 	procrastination_tendency:    { label: 'How often do you delay starting tasks?', format: 'slider' },
-	procrastination_trigger:     { label: 'When you procrastinate, it\'s usually because...', format: 'enum' },
+	procrastination_trigger:     { label: "When you procrastinate, it's usually because...", format: 'enum' },
 	working_genius_primary:      { label: 'Which type of work energizes you most?', format: 'enum' },
 	working_frustration_primary: { label: 'Which type of work drains you most?', format: 'enum' },
 	autonomy_satisfaction:       { label: 'How much control over your daily choices?', format: 'slider' },
@@ -45,20 +45,20 @@ const QUESTION_LABELS: Record<string, { label: string; format: 'slider' | 'enum'
 	structure_preference:        { label: 'I prefer clear plans over flexible situations', format: 'slider' },
 	delegation_comfort:          { label: 'I find it easy to delegate work', format: 'slider' },
 	decision_style:              { label: 'I prioritize logical consistency over impact on people', format: 'slider' },
-	core_motivation:             { label: 'I\'m driven by a desire for...', format: 'enum' },
+	core_motivation:             { label: "I'm driven by a desire for...", format: 'enum' },
 	stress_pattern_primary:      { label: 'When overwhelmed, my first response is to...', format: 'enum' },
 	competition_response:        { label: 'Competitive situations make me...', format: 'enum' },
 	stimulation_need:            { label: 'I need regular variety to stay engaged', format: 'slider' },
-	ambiguity_tolerance:         { label: 'I\'m comfortable with ambiguity', format: 'slider' },
-	enablement_tendency:         { label: 'I find supporting others\' projects fulfilling', format: 'slider' },
+	ambiguity_tolerance:         { label: "I'm comfortable with ambiguity", format: 'slider' },
+	enablement_tendency:         { label: "I find supporting others' projects fulfilling", format: 'slider' },
 	competence_satisfaction:     { label: 'How confident with unfamiliar challenges?', format: 'slider' },
 	relatedness_satisfaction:    { label: 'How connected to people who depend on your work?', format: 'slider' },
 	physical_fitness_baseline:   { label: 'How would you rate your physical fitness?', format: 'slider' },
-	max_sustained_project_duration: { label: 'Longest project you\'ve sustained consistent effort on?', format: 'enum' },
+	max_sustained_project_duration: { label: "Longest project you've sustained consistent effort on?", format: 'enum' },
 	focus_session_capacity:      { label: 'Hours of focused work before quality drops?', format: 'enum' },
 	recovery_rate:               { label: 'After intense 90-min session, recharge time?', format: 'enum' },
 	life_domains_count:          { label: 'How many life areas do you actively manage?', format: 'enum' },
-	overcommitment_tendency:     { label: 'How often do you feel like you\'re juggling too much?', format: 'slider' },
+	overcommitment_tendency:     { label: "How often do you feel like you're juggling too much?", format: 'slider' },
 	task_switching_preference:   { label: '4 different tasks or 1 deep task?', format: 'enum' },
 	purpose_sensitivity:         { label: 'How important is it that work feels meaningful?', format: 'slider' },
 	flow_activities:             { label: 'Activities that put you in deep focus most easily', format: 'text' },
@@ -79,7 +79,7 @@ const SLIDER_SCALES: Record<string, [string, string, string, string, string]> = 
 	conscientiousness:           ['Rarely', 'Sometimes', 'Often', 'Usually', 'Always'],
 	stress_vulnerability:        ['Rarely', 'Occasionally', 'Sometimes', 'Easily', 'Very easily'],
 	novelty_tolerance:           ['Not at all', 'A little', 'Moderately', 'Quite a bit', 'Very much'],
-	routine_tolerance:           ['Really struggle', 'Struggle', 'It\'s okay', 'Fairly easily', 'Easily'],
+	routine_tolerance:           ['Really struggle', 'Struggle', "It's okay", 'Fairly easily', 'Easily'],
 	procrastination_tendency:    ['Rarely', 'Occasionally', 'Sometimes', 'Often', 'Very often'],
 	autonomy_satisfaction:       ['Very little', 'Some', 'Moderate', 'A lot', 'Complete'],
 	interest_consistency:        ['Rarely', 'Occasionally', 'Sometimes', 'Often', 'Very often'],
@@ -147,7 +147,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Effort profile', 'How EMRALD sees you', 'user');
+		this.renderHeader(container, 'Effort profile', 'How emrald sees you', 'user');
 
 		// Fetch data concurrently
 		let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
@@ -166,7 +166,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		}
 
 		const profile = profileResp.data as Record<string, unknown> | null;
-		const recoveryProtocols = (recoveryResp.data ?? []) as RecoveryProtocol[];
+		const recoveryProtocols = (recoveryResp.data ?? []);
 
 		// Offline: if profile fetch failed with no data and no cache, show offline message (P15 fix)
 		if (profile === null && (profileResp.status === 0 || profileResp.error)) {
@@ -186,7 +186,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// Also suppress if user reassessed after D19 was last computed (stale warning).
 		const d19 = metricsResp.data?.find(m => m.metric_key === 'D19');
 		const d19History = d19HistoryResp?.data ?? [];
-		const d19Metadata = (d19?.metadata ?? {}) as Record<string, unknown>;
+		const d19Metadata = (d19?.metadata ?? {});
 		const confidenceStageD19 = (d19Metadata.confidence_stage as string | undefined) ?? null;
 		const lastReassessmentAt = typeof profile?.last_reassessment_at === 'string'
 			? profile.last_reassessment_at
@@ -245,15 +245,15 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Empty State ─────────────────────────────────────
 
 	private renderEmptyState(container: Element) {
-		const empty = container.createEl('div', { cls: 'emerald-wv-empty-state' });
+		const empty = container.createDiv({ cls: 'emerald-wv-empty-state' });
 
-		const iconEl = empty.createEl('div', { cls: 'emerald-wv-empty-icon' });
+		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'user');
 
 		empty.createEl('h3', { text: 'No profile data yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'Complete the calibration questions during onboarding or at the start of your next session. Your Effort Profile helps EMRALD calibrate everything to you.'
+			text: 'Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps emrald calibrate everything to you.'
 		});
 
 		const btn = empty.createEl('button', {
@@ -280,18 +280,18 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		if (confidenceStage === 'early') {
 			level = 'Early Signal';
-			msg = 'EMRALD is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.';
+			msg = 'Emrald is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.';
 			cls = 'emerald-wv-drift-low';
 			icon = 'sparkles';
 		} else if (confidenceStage === 'building') {
 			if (driftValue < 1.5) {
 				level = 'Review Suggested';
-				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, EMRALD will tighten its expectations.';
+				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, emrald will tighten its expectations.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			} else {
 				level = 'Review Suggested';
-				msg = 'Your recent effort patterns are diverging from your calibration enough that a review may help — but EMRALD is still building confidence.';
+				msg = 'Your recent effort patterns are diverging from your calibration enough that a review may help — but emrald is still building confidence.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			}
@@ -302,7 +302,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			icon = 'check-circle';
 		} else if (driftValue < 2.5) {
 			level = 'Review Suggested';
-			msg = 'Your profile and your actual effort patterns may be drifting apart. A review could improve EMRALD\'s recommendations.';
+			msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve emrald's recommendations.";
 			cls = 'emerald-wv-drift-moderate';
 			icon = 'alert-circle';
 		} else {
@@ -312,16 +312,16 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			icon = 'alert-triangle';
 		}
 
-		const indicator = container.createEl('div', { cls: `emerald-wv-section emerald-wv-drift-indicator ${cls}` });
+		const indicator = container.createDiv({ cls: `emerald-wv-section emerald-wv-drift-indicator ${cls}` });
 
-		const headerRow = indicator.createEl('div', { cls: 'emerald-wv-drift-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-drift-icon' });
+		const headerRow = indicator.createDiv({ cls: 'emerald-wv-drift-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-drift-icon' });
 		setIcon(iconEl, icon);
-		headerRow.createEl('span', {
+		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
 			text: `D19 Calibration Drift: ${level}`
 		});
-		headerRow.createEl('span', { cls: 'emerald-wv-drift-value', text: `(${driftValue.toFixed(2)})` });
+		headerRow.createSpan({ cls: 'emerald-wv-drift-value', text: `(${driftValue.toFixed(2)})` });
 
 		indicator.createEl('p', { cls: 'emerald-wv-drift-msg', text: msg });
 
@@ -343,19 +343,19 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const sessionCount = typeof metadata.session_count === 'number' ? metadata.session_count : 0;
 		const sessionsNeeded = Math.max(0, 16 - sessionCount);
 
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-drift-indicator emerald-wv-drift-pending' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-drift-indicator emerald-wv-drift-pending' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-drift-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-drift-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-drift-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-drift-icon' });
 		setIcon(iconEl, 'sparkles');
-		headerRow.createEl('span', {
+		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
 			text: 'Calibration Drift (D19) — Collecting Data'
 		});
 
 		section.createEl('p', {
 			cls: 'emerald-wv-drift-msg',
-			text: `EMRALD needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? '' : 's'} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
+			text: `Emrald needs about ${sessionsNeeded} more session${sessionsNeeded === 1 ? '' : 's'} before it can meaningfully compare your profile against real-world effort patterns. This typically takes a couple of weeks of regular use.`
 		});
 
 		section.createEl('p', {
@@ -364,10 +364,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		});
 
 		// Still show the Data Center link
-		const link = section.createEl('div', { cls: 'emerald-wv-cross-link' });
+		const link = section.createDiv({ cls: 'emerald-wv-cross-link' });
 		const anchor = link.createEl('a', {
 			cls: 'emerald-wv-cross-link-text',
-			text: 'View raw D19 data in Data Center \u2192'
+			text: 'View raw d19 data in data center \u2192'
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -379,12 +379,12 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	private renderModeBanner(container: Element, profile: Record<string, unknown>) {
 		const mode = (profile.question_mode as string) ?? 'simple';
-		const banner = container.createEl('div', { cls: 'emerald-wv-profile-mode' });
+		const banner = container.createDiv({ cls: 'emerald-wv-profile-mode' });
 
-		const modeIcon = banner.createEl('span', { cls: 'emerald-wv-profile-mode-icon' });
+		const modeIcon = banner.createSpan({ cls: 'emerald-wv-profile-mode-icon' });
 		setIcon(modeIcon, mode === 'advanced' ? 'sparkles' : 'circle');
 
-		banner.createEl('span', {
+		banner.createSpan({
 			cls: 'emerald-wv-profile-mode-label',
 			text: mode === 'advanced' ? 'Advanced Profile' : 'Simple Profile'
 		});
@@ -392,7 +392,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		if (mode === 'simple') {
 			const upgradeBtn = banner.createEl('button', {
 				cls: 'emerald-btn emerald-btn-subtle emerald-btn-sm',
-				text: 'Upgrade to Advanced'
+				text: 'Upgrade to advanced'
 			});
 			upgradeBtn.addEventListener('click', () => { void (async () => {
 				try {
@@ -410,12 +410,12 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			const answered = total - remaining;
 
 			if (remaining > 0) {
-				banner.createEl('span', {
+				banner.createSpan({
 					cls: 'emerald-wv-profile-progress-text',
 					text: `${answered}/${total} advanced questions answered`
 				});
 			} else {
-				banner.createEl('span', {
+				banner.createSpan({
 					cls: 'emerald-wv-profile-progress-text emerald-wv-profile-complete',
 					text: 'All questions answered ✓'
 				});
@@ -426,37 +426,37 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Core Trait Bars ─────────────────────────────────
 
 	private renderCoreTraits(container: Element, profile: Record<string, unknown>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'sliders');
 		headerRow.createEl('h3', { text: 'Core traits' });
 
-		const traitsEl = section.createEl('div', { cls: 'emerald-wv-traits' });
+		const traitsEl = section.createDiv({ cls: 'emerald-wv-traits' });
 
 		for (const trait of CORE_TRAITS) {
 			const value = typeof profile[trait.key] === 'number' ? profile[trait.key] as number : null;
 
-			const row = traitsEl.createEl('div', { cls: 'emerald-wv-trait-row' });
+			const row = traitsEl.createDiv({ cls: 'emerald-wv-trait-row' });
 
-			const labelCol = row.createEl('div', { cls: 'emerald-wv-trait-label' });
-			const nameRow = labelCol.createEl('div', { cls: 'emerald-wv-trait-name-row' });
-			const traitIcon = nameRow.createEl('span', { cls: 'emerald-wv-trait-icon' });
+			const labelCol = row.createDiv({ cls: 'emerald-wv-trait-label' });
+			const nameRow = labelCol.createDiv({ cls: 'emerald-wv-trait-name-row' });
+			const traitIcon = nameRow.createSpan({ cls: 'emerald-wv-trait-icon' });
 			setIcon(traitIcon, trait.icon);
-			nameRow.createEl('span', { cls: 'emerald-wv-trait-name', text: trait.label });
-			labelCol.createEl('span', { cls: 'emerald-wv-trait-desc', text: trait.desc });
+			nameRow.createSpan({ cls: 'emerald-wv-trait-name', text: trait.label });
+			labelCol.createSpan({ cls: 'emerald-wv-trait-desc', text: trait.desc });
 
-			const barContainer = row.createEl('div', { cls: 'emerald-wv-trait-bar-container' });
+			const barContainer = row.createDiv({ cls: 'emerald-wv-trait-bar-container' });
 
 			if (value !== null) {
-				const bar = barContainer.createEl('div', { cls: 'emerald-wv-trait-bar' });
-				const fill = bar.createEl('div', { cls: 'emerald-wv-trait-bar-fill' });
+				const bar = barContainer.createDiv({ cls: 'emerald-wv-trait-bar' });
+				const fill = bar.createDiv({ cls: 'emerald-wv-trait-bar-fill' });
 				fill.style.width = `${Math.min(value * 10, 100)}%`;
-				barContainer.createEl('span', { cls: 'emerald-wv-trait-value', text: value.toFixed(1) });
+				barContainer.createSpan({ cls: 'emerald-wv-trait-value', text: value.toFixed(1) });
 			} else {
-				barContainer.createEl('span', { cls: 'emerald-wv-empty', text: 'Not yet calibrated' });
-				barContainer.createEl('span', {
+				barContainer.createSpan({ cls: 'emerald-wv-empty', text: 'Not yet calibrated' });
+				barContainer.createSpan({
 					cls: 'emerald-wv-trait-hint',
 					text: 'Builds after ~1 week of sessions and check-ins'
 				});
@@ -467,10 +467,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Recharge Activities ─────────────────────────────
 
 	private renderRecoveryActivities(container: Element, protocols: RecoveryProtocol[]) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-recovery-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-recovery-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'heart-pulse');
 		headerRow.createEl('h3', { text: 'What recharges you?' });
 
@@ -484,17 +484,17 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const slots = 3;
 		const activeProtocols = protocols.filter(p => p.is_active !== false);
 
-		const grid = section.createEl('div', { cls: 'emerald-wv-recovery-grid' });
+		const grid = section.createDiv({ cls: 'emerald-wv-recovery-grid' });
 
 		for (let i = 0; i < slots; i++) {
 			const protocol = activeProtocols[i];
-			const card = grid.createEl('div', { cls: 'emerald-wv-recovery-card' });
+			const card = grid.createDiv({ cls: 'emerald-wv-recovery-card' });
 
 			if (protocol) {
 				// Filled card
-				const nameEl = card.createEl('div', { cls: 'emerald-wv-recovery-name', text: protocol.name });
+				const nameEl = card.createDiv({ cls: 'emerald-wv-recovery-name', text: protocol.name });
 				if (protocol.description) {
-					card.createEl('div', { cls: 'emerald-wv-recovery-desc', text: protocol.description });
+					card.createDiv({ cls: 'emerald-wv-recovery-desc', text: protocol.description });
 				}
 
 				// Edit on click
@@ -503,9 +503,9 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			} else {
 				// Empty slot
 				card.addClass('emerald-wv-recovery-card-empty');
-				const addIcon = card.createEl('span', { cls: 'emerald-wv-recovery-add-icon' });
+				const addIcon = card.createSpan({ cls: 'emerald-wv-recovery-add-icon' });
 				setIcon(addIcon, 'plus');
-				card.createEl('div', { cls: 'emerald-wv-recovery-placeholder', text: placeholders[i] ?? 'Add an activity...' });
+				card.createDiv({ cls: 'emerald-wv-recovery-placeholder', text: placeholders[i] ?? 'Add an activity...' });
 
 				card.addEventListener('click', () => this.addRecoveryProtocol(card, placeholders[i]));
 			}
@@ -518,35 +518,39 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	}
 
 	private addRecoveryProtocol(card: Element, placeholder: string) {
-		const modal = new RecoveryInputModal(this.plugin.app, 'Add recovery activity', '', async (name) => {
-			const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
-			if (resp.queued) {
-				new Notice('Recovery activity queued — will sync when online');
-			} else if (resp.data) {
-				new Notice('Recovery activity saved.');
-				await this.onOpen();
-			} else {
-				new Notice('Failed to save — try again.');
-			}
+		const modal = new RecoveryInputModal(this.plugin.app, 'Add recovery activity', '', (name) => {
+			void (async () => {
+				const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
+				if (resp.queued) {
+					new Notice('Recovery activity queued — will sync when online');
+				} else if (resp.data) {
+					new Notice('Recovery activity saved.');
+					await this.onOpen();
+				} else {
+					new Notice('Failed to save — try again.');
+				}
+			})();
 		});
 		modal.open();
 	}
 
 	private editRecoveryProtocol(protocol: RecoveryProtocol, card: Element) {
-		const modal = new RecoveryInputModal(this.plugin.app, 'Edit recovery activity', protocol.name, async (name) => {
-			if (name.trim() === '') {
-				// Empty = delete
-				const delResp = await this.plugin.apiClient.deleteRecoveryProtocol(protocol.id);
-				new Notice(delResp.queued ? 'Deletion queued — will sync when online' : 'Recovery activity removed.');
-				if (!delResp.queued) await this.onOpen();
-				return;
-			}
+		const modal = new RecoveryInputModal(this.plugin.app, 'Edit recovery activity', protocol.name, (name) => {
+			void (async () => {
+				if (name.trim() === '') {
+					// Empty = delete
+					const delResp = await this.plugin.apiClient.deleteRecoveryProtocol(protocol.id);
+					new Notice(delResp.queued ? 'Deletion queued — will sync when online' : 'Recovery activity removed.');
+					if (!delResp.queued) await this.onOpen();
+					return;
+				}
 
-			if (name.trim() !== protocol.name) {
-				const updResp = await this.plugin.apiClient.updateRecoveryProtocol(protocol.id, { name: name.trim() });
-				new Notice(updResp.queued ? 'Update queued — will sync when online' : 'Recovery activity updated.');
-				if (!updResp.queued) await this.onOpen();
-			}
+				if (name.trim() !== protocol.name) {
+					const updResp = await this.plugin.apiClient.updateRecoveryProtocol(protocol.id, { name: name.trim() });
+					new Notice(updResp.queued ? 'Update queued — will sync when online' : 'Recovery activity updated.');
+					if (!updResp.queued) await this.onOpen();
+				}
+			})();
 		});
 		modal.open();
 	}
@@ -556,21 +560,21 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	private renderCalibrationScore(container: Element, profile: Record<string, unknown>) {
 		if (typeof profile.calibration_score !== 'number') return;
 
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-cal-score-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-cal-score-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'target');
 		headerRow.createEl('h3', { text: 'Calibration score' });
 
-		const scoreRow = section.createEl('div', { cls: 'emerald-wv-cal-score-row' });
-		scoreRow.createEl('span', { cls: 'emerald-wv-cal-score-value', text: (profile.calibration_score as number).toFixed(1) });
-		scoreRow.createEl('span', { cls: 'emerald-wv-cal-score-desc', text: 'Higher = EMRALD knows you better' });
+		const scoreRow = section.createDiv({ cls: 'emerald-wv-cal-score-row' });
+		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-value', text: (profile.calibration_score).toFixed(1) });
+		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-desc', text: 'Higher = EMRALD knows you better' });
 
 		if (typeof profile.last_calibrated_at === 'string') {
-			section.createEl('div', {
+			section.createDiv({
 				cls: 'emerald-wv-cal-last',
-				text: `Last calibrated: ${this.formatRelativeTime(profile.last_calibrated_at as string)}`
+				text: `Last calibrated: ${this.formatRelativeTime(profile.last_calibrated_at)}`
 			});
 		}
 	}
@@ -599,10 +603,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			'task_switching_preference', 'avoidance_pattern', 'natural_gravitation'
 		]);
 
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'list');
 		headerRow.createEl('h3', { text: `Your Answers (${answeredKeys.length})` });
 
@@ -610,7 +614,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// (per spec: prevents reverse-engineering the assessment system)
 		const shuffled = this.pseudoShuffleKeys(answeredKeys);
 
-		const grid = section.createEl('div', { cls: 'emerald-wv-answers-grid' });
+		const grid = section.createDiv({ cls: 'emerald-wv-answers-grid' });
 
 		for (const key of shuffled) {
 			const info = QUESTION_LABELS[key];
@@ -621,17 +625,17 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				? 'emerald-wv-answer-card emerald-wv-answer-card-nudge'
 				: 'emerald-wv-answer-card';
 
-			const card = grid.createEl('div', { cls: cardCls });
-			card.createEl('div', { cls: 'emerald-wv-answer-question', text: info.label });
+			const card = grid.createDiv({ cls: cardCls });
+			card.createDiv({ cls: 'emerald-wv-answer-question', text: info.label });
 
 			const valueText = this.formatAnswerValue(value, info.format, key);
-			card.createEl('div', { cls: 'emerald-wv-answer-value', text: valueText });
+			card.createDiv({ cls: 'emerald-wv-answer-value', text: valueText });
 
 			if (shouldNudge) {
-				const nudge = card.createEl('div', { cls: 'emerald-wv-answer-nudge' });
-				const nudgeIcon = nudge.createEl('span', { cls: 'emerald-wv-answer-nudge-icon' });
+				const nudge = card.createDiv({ cls: 'emerald-wv-answer-nudge' });
+				const nudgeIcon = nudge.createSpan({ cls: 'emerald-wv-answer-nudge-icon' });
 				setIcon(nudgeIcon, 'refresh-cw');
-				nudge.createEl('span', { text: 'Review suggested' });
+				nudge.createSpan({ text: 'Review suggested' });
 			}
 		}
 	}
@@ -671,7 +675,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		if (value === null || value === undefined) return '—';
 
 		if (format === 'slider') {
-			if (typeof value !== 'number') return String(value);
+			if (typeof value !== 'number') return typeof value === 'string' ? value : '—';
 			// Use explicit 5-point scale if defined for this question
 			if (key && SLIDER_SCALES[key]) {
 				const scale = SLIDER_SCALES[key];
@@ -682,11 +686,13 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		}
 
 		if (format === 'text') {
-			return String(value);
+			if (typeof value === 'string') return value;
+			if (typeof value === 'number') return String(value);
+			return '—';
 		}
 
 		// Enum: use display map first, fall back to readable transform
-		const str = String(value);
+		const str = typeof value === 'string' ? value : (typeof value === 'number' ? String(value) : '—');
 		if (ENUM_DISPLAY[str]) return ENUM_DISPLAY[str];
 		return str.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 	}
@@ -694,22 +700,22 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Profile History Timeline ────────────────────────
 
 	private renderHistory(container: Element, history: Array<Record<string, unknown>>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row emerald-wv-collapsible-header' });
-		const arrowEl = headerRow.createEl('span', { cls: 'emerald-section-arrow', text: '▸' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row emerald-wv-collapsible-header' });
+		const arrowEl = headerRow.createSpan({ cls: 'emerald-section-arrow', text: '▸' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'history');
 		headerRow.createEl('h3', { text: 'Calibration history' });
 
 		// Collapsible content (hidden by default)
-		const content = section.createEl('div', { cls: 'emerald-wv-collapsible-content' });
+		const content = section.createDiv({ cls: 'emerald-wv-collapsible-content' });
 		content.addClass('emrald-hidden');
 
 		headerRow.addClass('emrald-clickable');
 		headerRow.addEventListener('click', () => {
 			const isHidden = content.hasClass('emrald-hidden');
-			isHidden ? content.removeClass('emrald-hidden') : content.addClass('emrald-hidden');
+			if (isHidden) { content.removeClass('emrald-hidden'); } else { content.addClass('emrald-hidden'); }
 			arrowEl.textContent = isHidden ? '▼' : '▸';
 		});
 
@@ -725,7 +731,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// Column headers with explainer tooltips
 		const columns = [
 			{ label: 'Date', tip: '' },
-			{ label: 'Score', tip: 'Overall calibration confidence score — higher means EMRALD knows you better' },
+			{ label: 'Score', tip: 'Overall calibration confidence score — higher means emrald knows you better' },
 			{ label: 'Physical', tip: 'Physical capability — your physical work capacity' },
 			{ label: 'Mental', tip: 'Mental capability — cognitive endurance and processing' },
 			{ label: 'Phys. End.', tip: 'Physical endurance — how long you sustain physical effort' },
@@ -734,9 +740,9 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		for (const col of columns) {
 			const th = thRow.createEl('th');
-			th.createEl('span', { text: col.label });
+			th.createSpan({ text: col.label });
 			if (col.tip) {
-				const infoIcon = th.createEl('span', { cls: 'emerald-wv-col-info', attr: { title: col.tip } });
+				const infoIcon = th.createSpan({ cls: 'emerald-wv-col-info', attr: { title: col.tip } });
 				setIcon(infoIcon, 'info');
 			}
 		}
@@ -751,34 +757,34 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 			row.createEl('td', {
 				text: typeof entry.recorded_at === 'string'
-					? this.formatDateShort(entry.recorded_at as string)
+					? this.formatDateShort(entry.recorded_at)
 					: typeof entry.created_at === 'string'
-						? this.formatDateShort(entry.created_at as string)
+						? this.formatDateShort(entry.created_at)
 						: '—'
 			});
 			row.createEl('td', {
 				text: typeof snap.calibration_score === 'number'
-					? (snap.calibration_score as number).toFixed(1)
+					? (snap.calibration_score).toFixed(1)
 					: '—'
 			});
 			row.createEl('td', {
 				text: typeof snap.physical_capability === 'number'
-					? (snap.physical_capability as number).toFixed(1)
+					? (snap.physical_capability).toFixed(1)
 					: '—'
 			});
 			row.createEl('td', {
 				text: typeof snap.mental_capability === 'number'
-					? (snap.mental_capability as number).toFixed(1)
+					? (snap.mental_capability).toFixed(1)
 					: '—'
 			});
 			row.createEl('td', {
 				text: typeof snap.physical_novel_endurance === 'number'
-					? (snap.physical_novel_endurance as number).toFixed(1)
+					? (snap.physical_novel_endurance).toFixed(1)
 					: '—'
 			});
 			row.createEl('td', {
 				text: typeof snap.mental_abstract_endurance === 'number'
-					? (snap.mental_abstract_endurance as number).toFixed(1)
+					? (snap.mental_abstract_endurance).toFixed(1)
 					: '—'
 			});
 		}
@@ -787,20 +793,20 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Actions ─────────────────────────────────────────
 
 	private renderActions(container: Element, profile: Record<string, unknown>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-profile-actions-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-profile-actions-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'settings');
 		headerRow.createEl('h3', { text: 'Actions' });
 
-		const btnRow = section.createEl('div', { cls: 'emerald-wv-profile-btn-row' });
+		const btnRow = section.createDiv({ cls: 'emerald-wv-profile-btn-row' });
 
 		// Reassess
 		const reassessBtn = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-secondary' });
-		const reassessIcon = reassessBtn.createEl('span', { cls: 'emerald-btn-icon' });
+		const reassessIcon = reassessBtn.createSpan({ cls: 'emerald-btn-icon' });
 		setIcon(reassessIcon, 'refresh-cw');
-		reassessBtn.createEl('span', { text: 'Reassess profile' });
+		reassessBtn.createSpan({ text: 'Reassess profile' });
 		reassessBtn.addEventListener('click', () => { void (async () => {
 			try {
 				const { ReassessmentModal } = await import('../../modals/reassessment');
@@ -810,9 +816,9 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		// Export data placeholder
 		const exportBtn = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-subtle' });
-		const exportIcon = exportBtn.createEl('span', { cls: 'emerald-btn-icon' });
+		const exportIcon = exportBtn.createSpan({ cls: 'emerald-btn-icon' });
 		setIcon(exportIcon, 'download');
-		exportBtn.createEl('span', { text: 'Export data (coming soon)' });
+		exportBtn.createSpan({ text: 'Export data (coming soon)' });
 		exportBtn.setAttribute('disabled', 'true');
 		exportBtn.addClass('emrald-dim');
 		exportBtn.addClass('emrald-not-clickable');
@@ -821,10 +827,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	// ── Data Center Cross-Link ─────────────────────────
 
 	private renderDataCenterLink(container: Element) {
-		const link = container.createEl('div', { cls: 'emerald-wv-cross-link' });
+		const link = container.createDiv({ cls: 'emerald-wv-cross-link' });
 		const anchor = link.createEl('a', {
 			cls: 'emerald-wv-cross-link-text',
-			text: 'See your calibration data (D19) in Data Center \u2192'
+			text: 'See your calibration data (d19) in data center \u2192'
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -854,7 +860,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 class RecoveryInputModal extends Modal {
 	constructor(
-		app: any,
+		app: App,
 		private title: string,
 		private initialValue: string,
 		private onSubmit: (value: string) => void

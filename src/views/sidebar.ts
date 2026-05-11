@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Notice, TFile, SuggestModal, FuzzySuggestModal, Modal, setIcon, Menu } from 'obsidian';
+import { ItemView, WorkspaceLeaf, Notice, TFile, SuggestModal, FuzzySuggestModal, Modal, setIcon, Menu, App } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { TimeblockComponent } from '../components/timeblock';
 import { ProjectsComponent } from '../components/projects';
@@ -64,7 +64,7 @@ export class EmraldSidebarView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'EMRALD';
+		return 'Emrald';
 	}
 
 	getIcon(): string {
@@ -107,14 +107,14 @@ export class EmraldSidebarView extends ItemView {
 		}
 
 		// Refresh tier state (non-blocking — UI renders immediately, re-renders on change)
-		tierState.refresh(this.plugin.apiClient);
+		void tierState.refresh(this.plugin.apiClient);
 
 		// Always render the full sidebar — cached data + offline queue handle the rest
 		container.empty();
 		this.renderSidebar(container);
 
 		// Welcome-back check (non-blocking): show modal if 3+ days since last session
-		this.checkWelcomeBack();
+		void this.checkWelcomeBack();
 	}
 
 	async onClose() {
@@ -166,8 +166,8 @@ export class EmraldSidebarView extends ItemView {
 
 			// Find the most recent completed session
 			const completed = historyResp.data
-				.filter((s: any) => s.status === 'completed' && s.started_at)
-				.sort((a: any, b: any) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
+				.filter((s) => s.status === 'completed' && s.started_at)
+				.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime());
 
 			if (completed.length === 0) return;
 
@@ -199,23 +199,23 @@ export class EmraldSidebarView extends ItemView {
 			await this.plugin.saveData(this.plugin.settings);
 		} catch (e) {
 			// Non-critical — don't let this break the sidebar
-			console.warn('[EMRALD] Welcome-back check failed:', e);
+			console.warn('[Emrald] Welcome-back check failed:', e);
 		}
 	}
 
 	private renderLoading(container: Element) {
-		const wrap = container.createEl('div', { cls: 'emerald-loading' });
-		wrap.createEl('div', { cls: 'emerald-spinner' });
-		wrap.createEl('div', { cls: 'emerald-loading-text', text: 'Connecting to EMRALD...' });
+		const wrap = container.createDiv({ cls: 'emerald-loading' });
+		wrap.createDiv({ cls: 'emerald-spinner' });
+		wrap.createDiv({ cls: 'emerald-loading-text', text: 'Connecting to EMRALD...' });
 	}
 
 	private renderUnconfigured(container: Element) {
-		container.createEl('div', { cls: 'emerald-unconfigured', text: 'EMRALD is not configured. Please add your API key in settings.' });
+		container.createDiv({ cls: 'emerald-unconfigured', text: 'EMRALD is not configured. Please add your API key in settings.' });
 	}
 
 	private renderError(container: Element, error: string) {
-		const wrap = container.createEl('div', { cls: 'emerald-error' });
-		wrap.createEl('div', { text: `Connection error: ${error}` });
+		const wrap = container.createDiv({ cls: 'emerald-error' });
+		wrap.createDiv({ text: `Connection error: ${error}` });
 		const retryBtn = wrap.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary emerald-retry-btn',
 			text: 'Retry'
@@ -225,12 +225,12 @@ export class EmraldSidebarView extends ItemView {
 
 	private renderSidebar(container: Element) {
 		// Header with offline indicator
-		const header = container.createEl('div', { cls: 'emerald-header' });
-		const headerRow = header.createEl('div', { cls: 'emerald-header-row' });
-		headerRow.createEl('h3', { text: 'EMRALD' });
+		const header = container.createDiv({ cls: 'emerald-header' });
+		const headerRow = header.createDiv({ cls: 'emerald-header-row' });
+		headerRow.createEl('h3', { text: 'Emrald' });
 
 		// Offline indicator (hidden by default, shown by offline queue state)
-		const offlineDot = headerRow.createEl('span', { cls: 'emerald-offline-dot' });
+		const offlineDot = headerRow.createSpan({ cls: 'emerald-offline-dot' });
 		offlineDot.addClass('emrald-hidden');
 		offlineDot.title = 'Offline — actions are queued';
 
@@ -240,7 +240,7 @@ export class EmraldSidebarView extends ItemView {
 		}
 
 		// Notification banner (populated by loadNotifications)
-		const notifBanner = container.createEl('div', { cls: 'emerald-notif-banner' });
+		const notifBanner = container.createDiv({ cls: 'emerald-notif-banner' });
 		notifBanner.addClass('emrald-hidden');
 
 		// Three collapsible sections
@@ -249,7 +249,7 @@ export class EmraldSidebarView extends ItemView {
 		this.renderEMSection(container);
 
 		// Load notifications
-		this.loadNotifications(notifBanner);
+		void this.loadNotifications(notifBanner);
 	}
 
 	private async loadNotifications(bannerEl: HTMLElement) {
@@ -257,44 +257,44 @@ export class EmraldSidebarView extends ItemView {
 		if (!resp.data || resp.data.length === 0) return;
 
 		// Filter to notifications that actually have content
-		const valid = resp.data.filter((n: any) => n.title?.trim() || n.body?.trim());
+		const valid = resp.data.filter((n) => n.title?.trim() || n.body?.trim());
 		if (valid.length === 0) return;
 
 		bannerEl.removeClass('emrald-hidden');
 		bannerEl.empty();
 
 		for (const notif of valid.slice(0, 3)) {
-			const row = bannerEl.createEl('div', { cls: 'emerald-notif-row' });
-			row.createEl('span', { cls: 'emerald-notif-title', text: notif.title });
-			row.createEl('span', { cls: 'emerald-notif-body', text: notif.body });
+			const row = bannerEl.createDiv({ cls: 'emerald-notif-row' });
+			row.createSpan({ cls: 'emerald-notif-title', text: notif.title });
+			row.createSpan({ cls: 'emerald-notif-body', text: notif.body });
 		}
 
 		if (valid.length > 3) {
-			bannerEl.createEl('div', { cls: 'emerald-notif-more', text: `+${valid.length - 3} more` });
+			bannerEl.createDiv({ cls: 'emerald-notif-more', text: `+${valid.length - 3} more` });
 		}
 	}
 
 	private renderTimeblockSection(container: Element) {
-		const section = container.createEl('div', { cls: 'emerald-section emerald-timeblock' });
+		const section = container.createDiv({ cls: 'emerald-section emerald-timeblock' });
 
 		// Format today's date like "Tuesday, April 1"
 		const today = new Date();
 		const dayLabel = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-		const header = section.createEl('div', { cls: 'emerald-section-header' });
+		const header = section.createDiv({ cls: 'emerald-section-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'true');
 		header.setAttribute('aria-label', `Timeblock — ${dayLabel}`);
 		header.tabIndex = 0;
-		const headerLeft = header.createEl('span', { cls: 'emerald-section-header-left' });
-		const arrowEl = headerLeft.createEl('span', { cls: 'emerald-section-arrow', text: '▼' });
+		const headerLeft = header.createSpan({ cls: 'emerald-section-header-left' });
+		const arrowEl = headerLeft.createSpan({ cls: 'emerald-section-arrow', text: '▼' });
 		arrowEl.setAttribute('aria-hidden', 'true');
-		const iconEl = headerLeft.createEl('span', { cls: 'emerald-section-icon' });
+		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'timer');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createEl('span', { text: dayLabel });
+		const labelEl = headerLeft.createSpan({ text: dayLabel });
 
-		const content = section.createEl('div', { cls: 'emerald-section-content' });
+		const content = section.createDiv({ cls: 'emerald-section-content' });
 
 		header.addEventListener('click', () => {
 			this.toggleSection(section, content, arrowEl, header);
@@ -328,22 +328,22 @@ export class EmraldSidebarView extends ItemView {
 	}
 
 	private renderProjectsSection(container: Element) {
-		const section = container.createEl('div', { cls: 'emerald-section emerald-projects' });
+		const section = container.createDiv({ cls: 'emerald-section emerald-projects' });
 
-		const header = section.createEl('div', { cls: 'emerald-section-header' });
+		const header = section.createDiv({ cls: 'emerald-section-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'true');
 		header.setAttribute('aria-label', 'Projects');
 		header.tabIndex = 0;
-		const headerLeft = header.createEl('span', { cls: 'emerald-section-header-left' });
-		const arrowEl = headerLeft.createEl('span', { cls: 'emerald-section-arrow', text: '▼' });
+		const headerLeft = header.createSpan({ cls: 'emerald-section-header-left' });
+		const arrowEl = headerLeft.createSpan({ cls: 'emerald-section-arrow', text: '▼' });
 		arrowEl.setAttribute('aria-hidden', 'true');
-		const iconEl = headerLeft.createEl('span', { cls: 'emerald-section-icon' });
+		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'folder');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createEl('span', { text: 'Projects' });
+		const labelEl = headerLeft.createSpan({ text: 'Projects' });
 
-		const addBtn = header.createEl('span', { cls: 'emerald-section-action', text: '+ Add' });
+		const addBtn = header.createSpan({ cls: 'emerald-section-action', text: '+ add' });
 		addBtn.setAttribute('role', 'button');
 		addBtn.setAttribute('aria-label', 'Add project');
 		addBtn.tabIndex = 0;
@@ -351,16 +351,16 @@ export class EmraldSidebarView extends ItemView {
 			e.stopPropagation();
 			const menu = new Menu();
 			menu.addItem(i => i
-				.setTitle('+ New project')
+				.setTitle('+ new project')
 				.setIcon('file-plus')
 				.onClick(() => { void this.handleAddNewProject(); })
 			);
 			menu.addItem(i => i
-				.setTitle('+ Link existing note')
+				.setTitle('+ link existing note')
 				.setIcon('link')
 				.onClick(() => { this.handleLinkExistingNote(); })
 			);
-			menu.showAtMouseEvent(e as MouseEvent);
+			menu.showAtMouseEvent(e);
 		});
 		addBtn.addEventListener('keydown', (e: KeyboardEvent) => {
 			if (e.key === 'Enter' || e.key === ' ') {
@@ -384,7 +384,7 @@ export class EmraldSidebarView extends ItemView {
 			}
 		});
 
-		const content = section.createEl('div', { cls: 'emerald-section-content' });
+		const content = section.createDiv({ cls: 'emerald-section-content' });
 
 		// Initialize projects component
 		this.projects = new ProjectsComponent(this.plugin, content);
@@ -394,29 +394,29 @@ export class EmraldSidebarView extends ItemView {
 		this.projects.onStartSession = (item: TrackedItem) => { void this.handleStartSession(item); };
 		this.projects.onPauseSession = () => { void this.handlePauseSession(); };
 		this.projects.onStopSession = () => { void this.handleStopSession(); };
-		this.projects.onChangeELevel = (item: TrackedItem) => this.handleChangeELevel(item);
+		this.projects.onChangeELevel = (item: TrackedItem) => { void this.handleChangeELevel(item); };
 
 		// Load projects
 		void this.loadProjects();
 	}
 
 	private renderEMSection(container: Element) {
-		const section = container.createEl('div', { cls: 'emerald-section emerald-em' });
+		const section = container.createDiv({ cls: 'emerald-section emerald-em' });
 
-		const header = section.createEl('div', { cls: 'emerald-section-header' });
+		const header = section.createDiv({ cls: 'emerald-section-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'true');
 		header.setAttribute('aria-label', 'Effort management');
 		header.tabIndex = 0;
-		const headerLeft = header.createEl('span', { cls: 'emerald-section-header-left' });
-		const arrowEl = headerLeft.createEl('span', { cls: 'emerald-section-arrow', text: '▼' });
+		const headerLeft = header.createSpan({ cls: 'emerald-section-header-left' });
+		const arrowEl = headerLeft.createSpan({ cls: 'emerald-section-arrow', text: '▼' });
 		arrowEl.setAttribute('aria-hidden', 'true');
-		const iconEl = headerLeft.createEl('span', { cls: 'emerald-section-icon' });
+		const iconEl = headerLeft.createSpan({ cls: 'emerald-section-icon' });
 		setIcon(iconEl, 'bar-chart-2');
 		iconEl.setAttribute('aria-hidden', 'true');
-		const labelEl = headerLeft.createEl('span', { text: 'Effort management' });
+		const labelEl = headerLeft.createSpan({ text: 'Effort management' });
 
-		const content = section.createEl('div', { cls: 'emerald-section-content' });
+		const content = section.createDiv({ cls: 'emerald-section-content' });
 
 		header.addEventListener('click', () => {
 			this.toggleSection(section, content, arrowEl, header);
@@ -456,9 +456,10 @@ export class EmraldSidebarView extends ItemView {
 		// Load today's available hours from API
 		// API returns a flat array: [{day_of_week, available_hours, user_id}, ...]
 		const availResp = await this.plugin.apiClient.getAvailability();
-		if (availResp.data && Array.isArray(availResp.data) && availResp.data.length > 0) {
+		const availData = availResp.data as unknown as Array<{day_of_week: number; available_hours: number}>;
+		if (availData && Array.isArray(availData) && availData.length > 0) {
 			const todayDow = new Date().getDay(); // 0=Sun, 6=Sat
-			const todayRow = availResp.data.find((r: any) => r.day_of_week === todayDow);
+			const todayRow = availData.find((r) => r.day_of_week === todayDow);
 			const hours = todayRow?.available_hours ?? 0;
 			this.timeblock.updateState({ availableHours: hours });
 			if (this.projects) this.projects.updateState({ availableHours: hours });
@@ -543,13 +544,13 @@ export class EmraldSidebarView extends ItemView {
 					try {
 						const discardResp = await this.plugin.apiClient.discardSession(session.id);
 						if (discardResp.error && !discardResp.queued) {
-							console.warn('[EMRALD] Failed to discard stale session:', discardResp.error);
+							console.warn('[Emrald] Failed to discard stale session:', discardResp.error);
 						}
 						new Notice(discardResp.queued
 							? 'Stale session queued for discard — will sync when online.'
 							: 'Discarded a stale session from yesterday.');
 					} catch (e) {
-						console.error('[EMRALD] Error discarding stale session:', e);
+						console.error('[Emrald] Error discarding stale session:', e);
 						new Notice('Found a stale session but could not discard it — try refreshing.');
 					}
 					// Always return — never render a session older than 24h
@@ -635,7 +636,7 @@ export class EmraldSidebarView extends ItemView {
 		// Show a quick project picker from active projects
 		if (!this.projects) {
 			new Notice('No projects loaded yet.');
-			console.warn('[EMRALD] Start button: projects component is null');
+			console.warn('[Emrald] Start button: projects component is null');
 			return;
 		}
 		const activeItems = this.projects.state.items.filter(i => i.status === 'active');
@@ -802,7 +803,7 @@ export class EmraldSidebarView extends ItemView {
 						if (this.projects) {
 							this.projects.updateState({ activeSessionItemId: null });
 						}
-						await void this.loadTodayData();
+						await this.loadTodayData();
 						void this.loadProjects();
 					} else {
 						// 'keep' — stop on API flagged as recovered, then show effort receipt
@@ -811,7 +812,7 @@ export class EmraldSidebarView extends ItemView {
 						if (this.projects) {
 							this.projects.updateState({ activeSessionItemId: null });
 						}
-						await void this.loadTodayData();
+						await this.loadTodayData();
 						void this.clearPersistedProvisionalSession();
 						// Open effort receipt (same as normal stop flow)
 						const { EffortReceiptModal } = await import('../modals/effort-receipt');
@@ -830,7 +831,7 @@ export class EmraldSidebarView extends ItemView {
 								if (!resp.error || resp.queued) {
 									new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
 									if (markComplete) {
-										await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' } as Partial<import('../api/client').TrackedItem>);
+										await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' });
 										new Notice(`${session.itemName} marked complete`);
 									}
 									void this.loadTodayData();
@@ -854,7 +855,7 @@ export class EmraldSidebarView extends ItemView {
 			// If the API says session is already stopped or not found (400/404),
 			// still clear local state so the user isn't stuck.
 			if (stopResp.status === 400 || stopResp.status === 404) {
-				console.warn(`[EMRALD] Stop returned ${stopResp.status} — clearing local state anyway:`, stopResp.error);
+				console.warn(`[Emrald] Stop returned ${stopResp.status} — clearing local state anyway:`, stopResp.error);
 				new Notice('Session may have already ended — clearing local state.');
 			} else {
 				new Notice(`Failed to stop session: ${stopResp.error}`);
@@ -871,7 +872,7 @@ export class EmraldSidebarView extends ItemView {
 		// Reload today's data from API as single source of truth for minutes.
 		// This replaces the old manual todayMinutesByItem patch that caused
 		// oscillating timers when the API refresh raced with local state.
-		await void this.loadTodayData();
+		await this.loadTodayData();
 
 		// Clear persisted provisional session
 		void this.clearPersistedProvisionalSession();
@@ -909,7 +910,7 @@ export class EmraldSidebarView extends ItemView {
 
 					// Mark complete if requested
 					if (markComplete) {
-						await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' } as Partial<import('../api/client').TrackedItem>);
+						await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' });
 						new Notice(`${session.itemName} marked complete`);
 					}
 
@@ -1004,9 +1005,10 @@ export class EmraldSidebarView extends ItemView {
 		// API returns flat array: [{day_of_week, available_hours}, ...]
 		let baseScheduleHours: number | null = null;
 		const availResp = await this.plugin.apiClient.getAvailability();
-		if (availResp.data && Array.isArray(availResp.data)) {
+		const availArr = availResp.data as unknown as Array<{day_of_week: number; available_hours: number}>;
+		if (availArr && Array.isArray(availArr)) {
 			const dow = new Date().getDay();
-			const todayRow = availResp.data.find((r: any) => r.day_of_week === dow);
+			const todayRow = availArr.find((r) => r.day_of_week === dow);
 			baseScheduleHours = todayRow?.available_hours ?? null;
 		}
 
@@ -1020,7 +1022,7 @@ export class EmraldSidebarView extends ItemView {
 				// Persist override to API
 				const today = new Date().toISOString().split('T')[0];
 				await this.plugin.apiClient.setAvailabilityOverride(today, hours);
-				this.timeblock?.updateState({ availableHours: hours });
+			this.timeblock?.updateState({ availableHours: hours });
 				// Recalculate E-level marker position with new hours
 				if (this.timeblock?.state?.activeSession) {
 					this.timeblock.updateELevelMarker();
@@ -1142,7 +1144,7 @@ export class EmraldSidebarView extends ItemView {
 			item.effort_level,
 			availableHours,
 			(level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
-				const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level } as Partial<TrackedItem>);
+				const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level });
 				if (!resp.error) {
 					new Notice(`${item.name} → ${level}`);
 					void this.loadProjects();
@@ -1307,7 +1309,7 @@ class AddProjectSuggestModal extends SuggestModal<TFile> {
 	}
 
 	renderSuggestion(file: TFile, el: HTMLElement): void {
-		el.createEl('div', { text: file.basename });
+		el.createDiv({ text: file.basename });
 		el.createEl('small', { text: file.path, cls: 'emerald-suggest-path' });
 	}
 
@@ -1320,7 +1322,7 @@ class AddProjectSuggestModal extends SuggestModal<TFile> {
 
 class RunawaySessionModal extends Modal {
 	constructor(
-		app: any,
+		app: App,
 		private itemName: string,
 		private sessionMinutes: number,
 		private onAction: (action: 'discard' | 'keep') => void
@@ -1334,7 +1336,7 @@ class RunawaySessionModal extends Modal {
 		const hours = Math.floor(this.sessionMinutes / 60);
 		const mins = Math.round(this.sessionMinutes % 60);
 
-		contentEl.createEl('h2', { text: '⚠ Runaway Session Detected' });
+		contentEl.createEl('h2', { text: '⚠ Runaway session detected' });
 		contentEl.createEl('p', {
 			text: `"${this.itemName}" has been running for ${hours}h ${mins}m — that's over 24 hours. This usually means the session was left running accidentally.`
 		});
@@ -1343,7 +1345,7 @@ class RunawaySessionModal extends Modal {
 			cls: 'emerald-modal-subtitle'
 		});
 
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const discardBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',

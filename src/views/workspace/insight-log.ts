@@ -34,12 +34,12 @@ export class InsightLogView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Insight log', 'Everything EMRALD has noticed', 'lightbulb');
+		this.renderHeader(container, 'Insight log', 'Everything emrald has noticed', 'lightbulb');
 
 		// Listen for insight acknowledgements from sidebar bulletin (bind once)
 		if (!this._ackListener) {
 			this._ackListener = () => { if (!this._ackSelf) this.refreshView(); };
-			window.addEventListener('emrald:insight-acknowledged', this._ackListener as EventListener);
+			window.addEventListener('emrald:insight-acknowledged', this._ackListener);
 		}
 
 		// Pro gate — show upgrade pitch for free users
@@ -93,28 +93,28 @@ export class InsightLogView extends EmraldWorkspaceView {
 		this.renderFilterBar(container);
 
 		// Content area
-		this.contentContainer = container.createEl('div', { cls: 'emerald-wv-insight-list' });
+		this.contentContainer = container.createDiv({ cls: 'emerald-wv-insight-list' });
 		this.renderInsights();
 	}
 
 	// ── Empty State ─────────────────────────────────────
 
 	private renderEmptyState(container: Element) {
-		const empty = container.createEl('div', { cls: 'emerald-wv-empty-state' });
+		const empty = container.createDiv({ cls: 'emerald-wv-empty-state' });
 
-		const iconEl = empty.createEl('div', { cls: 'emerald-wv-empty-icon' });
+		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'lightbulb');
 
 		empty.createEl('h3', { text: 'No insights yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'EMRALD generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets.'
+			text: 'Emrald generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets.'
 		});
 
-		const checklist = empty.createEl('div', { cls: 'emerald-wv-empty-checklist' });
-		checklist.createEl('div', { cls: 'emerald-wv-empty-check', text: '• Complete work sessions with effort receipts' });
-		checklist.createEl('div', { cls: 'emerald-wv-empty-check', text: '• Do energy check-ins' });
-		checklist.createEl('div', { cls: 'emerald-wv-empty-check', text: '• Use the system for a few days — patterns take time' });
+		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });
+		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Complete work sessions with effort receipts' });
+		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Do energy check-ins' });
+		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Use the system for a few days — patterns take time' });
 	}
 
 	// ── Summary Bar ─────────────────────────────────────
@@ -124,8 +124,8 @@ export class InsightLogView extends EmraldWorkspaceView {
 		const acknowledged = this.allInsights.filter(i => i.acknowledged_at).length;
 		const unread = totalInsights - acknowledged;
 
-		const bar = container.createEl('div', { cls: 'emerald-wv-insight-summary' });
-		bar.createEl('span', { text: `${totalInsights} insight${totalInsights !== 1 ? 's' : ''} · ${unread} new · ${acknowledged} reviewed` });
+		const bar = container.createDiv({ cls: 'emerald-wv-insight-summary' });
+		bar.createSpan({ text: `${totalInsights} insight${totalInsights !== 1 ? 's' : ''} · ${unread} new · ${acknowledged} reviewed` });
 	}
 
 	private refreshView() {
@@ -137,7 +137,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 	// ── Filter Bar ──────────────────────────────────────
 
 	private renderFilterBar(container: Element) {
-		const bar = container.createEl('div', { cls: 'emerald-wv-filter-bar' });
+		const bar = container.createDiv({ cls: 'emerald-wv-filter-bar' });
 
 		for (const type of INSIGHT_TYPES) {
 			const meta = type === 'all' ? null : INSIGHT_TYPE_META[type];
@@ -178,7 +178,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		}
 
 		// Count display
-		this.contentContainer.createEl('div', {
+		this.contentContainer.createDiv({
 			cls: 'emerald-wv-count',
 			text: `${filtered.length} insight${filtered.length !== 1 ? 's' : ''}`
 		});
@@ -193,7 +193,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		const isRead = !!insight.acknowledged_at;
 		const isDismissed = insight.action_taken === 'acted';
 
-		const card = container.createEl('div', {
+		const card = container.createDiv({
 			cls: `emerald-wv-insight-card emerald-fade-in ${isRead ? 'is-read' : 'is-unread'} ${isDismissed ? 'is-dismissed' : ''} ${isExpanded ? 'is-expanded' : ''}`
 		});
 		// Stagger animation based on position in list
@@ -203,30 +203,30 @@ export class InsightLogView extends EmraldWorkspaceView {
 		const meta = INSIGHT_TYPE_META[insight.type] ?? INSIGHT_TYPE_META.observation;
 
 		// ── Top Row: type badge + metric tag + date ──
-		const topRow = card.createEl('div', { cls: 'emerald-wv-insight-top' });
+		const topRow = card.createDiv({ cls: 'emerald-wv-insight-top' });
 
-		const typeBadge = topRow.createEl('span', { cls: 'emerald-wv-insight-type-badge' });
-		const typeIcon = typeBadge.createEl('span', { cls: 'emerald-wv-insight-type-icon' });
+		const typeBadge = topRow.createSpan({ cls: 'emerald-wv-insight-type-badge' });
+		const typeIcon = typeBadge.createSpan({ cls: 'emerald-wv-insight-type-icon' });
 		setIcon(typeIcon, meta.icon);
-		typeBadge.createEl('span', { text: meta.label });
+		typeBadge.createSpan({ text: meta.label });
 
 		// Removed D-metric tag from top row per feedback (it stays in source line below)
 
-		topRow.createEl('span', {
+		topRow.createSpan({
 			cls: 'emerald-wv-insight-date',
 			text: this.formatRelativeTime(insight.created_at)
 		});
 
 		// ── Title (clickable to expand) ──
-		const titleRow = card.createEl('div', { cls: 'emerald-wv-insight-title-row' });
-		const titleEl = titleRow.createEl('div', { cls: 'emerald-wv-insight-title' });
+		const titleRow = card.createDiv({ cls: 'emerald-wv-insight-title-row' });
+		const titleEl = titleRow.createDiv({ cls: 'emerald-wv-insight-title' });
 		titleEl.addClass('emrald-clickable');
-		titleEl.createEl('span', { text: insight.title });
+		titleEl.createSpan({ text: insight.title });
 		if (!isRead) {
-			titleRow.createEl('span', { cls: 'emerald-wv-insight-new-pill', text: 'NEW' });
+			titleRow.createSpan({ cls: 'emerald-wv-insight-new-pill', text: 'NEW' });
 		}
 		
-		const chevron = titleEl.createEl('span', { 
+		const chevron = titleEl.createSpan({ 
 			cls: 'emerald-wv-insight-chevron',
 			text: isExpanded ? ' ▾' : ' ▸'
 		});
@@ -247,30 +247,30 @@ export class InsightLogView extends EmraldWorkspaceView {
 		if (isExpanded) {
 			// Full body
 			if (insight.body) {
-				card.createEl('div', { cls: 'emerald-wv-insight-body', text: insight.body });
+				card.createDiv({ cls: 'emerald-wv-insight-body', text: insight.body });
 			}
 
 			// Source line
 			if (insight.related_metric) {
-				const sourceEl = card.createEl('div', { cls: 'emerald-wv-insight-source' });
-				sourceEl.createEl('span', { text: `Source: ${insight.related_metric} analysis` });
+				const sourceEl = card.createDiv({ cls: 'emerald-wv-insight-source' });
+				sourceEl.createSpan({ text: `Source: ${insight.related_metric} analysis` });
 				if (insight.related_item_id) {
-					sourceEl.createEl('span', { text: ' · Project-specific' });
+					sourceEl.createSpan({ text: ' · Project-specific' });
 				}
 			}
 
 			// Full timestamp
-			card.createEl('div', {
+			card.createDiv({
 				cls: 'emerald-wv-insight-timestamp',
 				text: this.formatDateTime(insight.created_at)
 			});
 		}
 
 		// ── Actions ──
-		const actions = card.createEl('div', { cls: 'emerald-wv-insight-actions' });
+		const actions = card.createDiv({ cls: 'emerald-wv-insight-actions' });
 
 		if (!isRead) {
-			const gotItBtn = actions.createEl('button', { cls: 'emerald-btn-tiny', text: '✓ Got it' });
+			const gotItBtn = actions.createEl('button', { cls: 'emerald-btn-tiny', text: '✓ got it' });
 			gotItBtn.addEventListener('click', (e) => { void (async () => {
 				try {
 					e.stopPropagation();

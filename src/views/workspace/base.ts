@@ -58,20 +58,20 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	protected renderHeader(container: Element, title: string, subtitle?: string, iconId?: string) {
-		const header = container.createEl('div', { cls: 'emerald-wv-header' });
+		const header = container.createDiv({ cls: 'emerald-wv-header' });
 
-		const titleRow = header.createEl('div', { cls: 'emerald-wv-title-row' });
+		const titleRow = header.createDiv({ cls: 'emerald-wv-title-row' });
 		if (iconId) {
-			const iconEl = titleRow.createEl('span', { cls: 'emerald-wv-icon' });
+			const iconEl = titleRow.createSpan({ cls: 'emerald-wv-icon' });
 			setIcon(iconEl, iconId);
 		}
 		titleRow.createEl('h2', { text: title });
 
 		// Refresh button
 		const refreshBtn = titleRow.createEl('button', { cls: 'emerald-btn emerald-btn-subtle emerald-wv-refresh' });
-		const refreshIcon = refreshBtn.createEl('span', { cls: 'emerald-btn-icon' });
+		const refreshIcon = refreshBtn.createSpan({ cls: 'emerald-btn-icon' });
 		setIcon(refreshIcon, 'refresh-cw');
-		refreshBtn.createEl('span', { text: 'Refresh' });
+		refreshBtn.createSpan({ text: 'Refresh' });
 		refreshBtn.addEventListener('click', () => { void this.onOpen(); });
 
 		if (subtitle) {
@@ -80,14 +80,14 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	protected renderPlaceholder(container: Element, message: string) {
-		container.createEl('div', { cls: 'emerald-wv-placeholder', text: message });
+		container.createDiv({ cls: 'emerald-wv-placeholder', text: message });
 	}
 
 	protected renderError(container: Element, message: string) {
-		const errEl = container.createEl('div', { cls: 'emerald-wv-error' });
-		const iconEl = errEl.createEl('span', { cls: 'emerald-icon' });
+		const errEl = container.createDiv({ cls: 'emerald-wv-error' });
+		const iconEl = errEl.createSpan({ cls: 'emerald-icon' });
 		setIcon(iconEl, 'alert-triangle');
-		errEl.createEl('span', { text: ` ${message}` });
+		errEl.createSpan({ text: ` ${message}` });
 	}
 
 	/**
@@ -95,10 +95,10 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	 * P15 fix: users should know when they're seeing cached data.
 	 */
 	protected renderStaleBanner(container: Element) {
-		const banner = container.createEl('div', { cls: 'emerald-wv-stale-banner' });
-		const iconEl = banner.createEl('span', { cls: 'emerald-icon' });
+		const banner = container.createDiv({ cls: 'emerald-wv-stale-banner' });
+		const iconEl = banner.createSpan({ cls: 'emerald-icon' });
 		setIcon(iconEl, 'wifi-off');
-		banner.createEl('span', { text: ' Offline \u2014 showing cached data' });
+		banner.createSpan({ text: ' Offline \u2014 showing cached data' });
 	}
 
 	/**
@@ -109,7 +109,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	protected renderLoading(container: Element) {
-		container.createEl('div', { cls: 'emerald-wv-loading', text: 'Loading...' });
+		container.createDiv({ cls: 'emerald-wv-loading', text: 'Loading...' });
 	}
 
 	protected formatDuration(minutes: number): string {
@@ -140,9 +140,9 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}): boolean {
 		if (tierState.isPro()) return false;
 
-		const gate = container.createEl('div', { cls: 'emerald-wv-upgrade-gate' });
+		const gate = container.createDiv({ cls: 'emerald-wv-upgrade-gate' });
 
-		const iconEl = gate.createEl('div', { cls: 'emerald-wv-upgrade-icon' });
+		const iconEl = gate.createDiv({ cls: 'emerald-wv-upgrade-icon' });
 		setIcon(iconEl, opts.icon);
 
 		gate.createEl('h3', { cls: 'emerald-wv-upgrade-title', text: opts.title });
@@ -157,7 +157,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 
 		const cta = gate.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to Pro',
+			text: 'Upgrade to pro',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		cta.setAttribute('target', '_blank');

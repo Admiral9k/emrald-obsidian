@@ -35,7 +35,7 @@ const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Higher = more switching. Some variety is healthy, but frequent switching fragments focus and increases cognitive load. Look at this alongside D7 (Flow Frequency).' },
 	D5:  { name: 'Task Initiation',          unit: '/10',  category: 'Productivity', goodDirection: 'down',
 	       desc: 'How long before you start working on new projects',
-	       explainer: 'Measures days between creating a project and starting your first session. Higher = longer delays. Persistent high values may signal procrastination or overwhelm. Only counts active projects — set projects to Inactive if they\'re intentionally "on deck" so they don\'t inflate this metric.' },
+	       explainer: `Measures days between creating a project and starting your first session. Higher = longer delays. Persistent high values may signal procrastination or overwhelm. Only counts active projects — set projects to Inactive if they're intentionally "on deck" so they don't inflate this metric.` },
 	D6:  { name: 'Avoidance Pattern',        unit: '/10',  category: 'Effort',       goodDirection: 'down',
 	       desc: 'Projects showing signs of avoidance',
 	       explainer: 'Flags projects with no sessions, very short sessions, discarded sessions, or long gaps since last session. Higher = more avoidance signals detected.' },
@@ -56,7 +56,7 @@ const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Maps session quality (enjoyment + flow) to time of day over 60 days. Helps identify your peak hours and dead zones. Use this to schedule demanding work optimally.' },
 	D12: { name: 'Completion Rate',          unit: '/10',  category: 'Productivity', goodDirection: 'up',
 	       desc: 'Completed vs. abandoned projects',
-	       explainer: 'Ratio of completed projects to completed + abandoned. Higher = you finish what you start. Note: only counts projects you\'ve explicitly marked completed or abandoned.' },
+	       explainer: "Ratio of completed projects to completed + abandoned. Higher = you finish what you start. Note: only counts projects you've explicitly marked completed or abandoned." },
 	D13: { name: 'Energy Oscillation',       unit: '/10',  category: 'Energy',       goodDirection: 'up',
 	       desc: 'E-level variety in your daily sessions',
 	       explainer: 'Measures whether you mix E-levels throughout the day. Higher = more variety (alternating E2 and E4 work). All-E4 days score low — mixing intensity levels is healthier.' },
@@ -65,10 +65,10 @@ const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Average enjoyment (hedonic valence) during flow sessions. High flow + low enjoyment = "grinding" — technically focused but not fulfilling. Watch for that pattern.' },
 	D15: { name: 'Effort sources',           unit: '',     category: 'Effort',       goodDirection: 'varies',
 	       desc: 'Where your effort comes from (complexity, emotional, etc.)',
-	       explainer: 'Shows the breakdown of what makes your work effortful. If one source dominates (e.g., emotional drain), it\'s worth investigating why. Balanced = healthy diversity.' },
+	       explainer: "Shows the breakdown of what makes your work effortful. If one source dominates (e.g., emotional drain), it's worth investigating why. Balanced = healthy diversity." },
 	D16: { name: 'Disengagement Risk',       unit: '/10',  category: 'Energy',       goodDirection: 'down',
 	       desc: 'High effort + low investment pattern',
-	       explainer: 'Detects sessions where you worked hard but weren\'t really invested. This "going through the motions" pattern is a burnout precursor. Higher = more disengagement signals.' },
+	       explainer: `Detects sessions where you worked hard but weren't really invested. This "going through the motions" pattern is a burnout precursor. Higher = more disengagement signals.` },
 	D17: { name: 'Energy-Effort Link',       unit: '/10',  category: 'Energy',       goodDirection: 'up',
 	       desc: 'How starting energy affects your work',
 	       explainer: 'Pearson correlation between your daily energy check-in scores and session effort. Positive = better energy leads to better work. Near zero = your work quality is disconnected from how you feel.' },
@@ -118,10 +118,10 @@ export class DataCenterView extends EmraldWorkspaceView {
 		this.renderHeader(container, 'Data center', 'All 20 D-metrics — your effort fingerprint', 'trending-up');
 
 		// Pinned metrics note
-		const pinnedNote = container.createEl('div', { cls: 'emerald-wv-dc-pinned-note' });
-		const pinIcon = pinnedNote.createEl('span', { cls: 'emerald-wv-dc-pin-icon' });
+		const pinnedNote = container.createDiv({ cls: 'emerald-wv-dc-pinned-note' });
+		const pinIcon = pinnedNote.createSpan({ cls: 'emerald-wv-dc-pin-icon' });
 		setIcon(pinIcon, 'pin');
-		this.pinnedNoteText = pinnedNote.createEl('span', {
+		this.pinnedNoteText = pinnedNote.createSpan({
 			text: `Sidebar sparklines: ${Array.from(this.pinnedKeys).join(', ')}. Click any metric's ★ to change.`
 		});
 
@@ -171,7 +171,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		await Promise.all(trendFetches);
 
 		// Render by category
-		this.gridContainer = container.createEl('div', { cls: 'emerald-wv-dc-categories' });
+		this.gridContainer = container.createDiv({ cls: 'emerald-wv-dc-categories' });
 
 		// "Your Story" summary card at the top
 		this.renderStorySummary(container, this.gridContainer);
@@ -193,15 +193,15 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Only show if we have at least burnout risk data
 		if (!d8 || d8.value === null) return;
 
-		const card = container.createEl('div', { cls: 'emerald-wv-story-card emerald-fade-in' });
+		const card = container.createDiv({ cls: 'emerald-wv-story-card emerald-fade-in' });
 		container.insertBefore(card, insertBefore);
 
-		const headerRow = card.createEl('div', { cls: 'emerald-wv-story-header' });
-		const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-story-icon' });
+		const headerRow = card.createDiv({ cls: 'emerald-wv-story-header' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-story-icon' });
 		setIcon(iconEl, 'book-open');
-		headerRow.createEl('span', { cls: 'emerald-wv-story-title', text: 'Your story' });
+		headerRow.createSpan({ cls: 'emerald-wv-story-title', text: 'Your story' });
 
-		const body = card.createEl('div', { cls: 'emerald-wv-story-body' });
+		const body = card.createDiv({ cls: 'emerald-wv-story-body' });
 
 		// Build narrative sentences
 		const sentences: string[] = [];
@@ -209,30 +209,30 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Burnout risk narrative
 		const burnout = d8.value;
 		if (burnout <= 30) {
-			sentences.push('You\'re in a healthy zone — burnout risk is low.');
+			sentences.push("You're in a healthy zone — burnout risk is low.");
 		} else if (burnout <= 50) {
 			sentences.push('Your burnout risk is moderate. Keep an eye on your energy levels.');
 		} else if (burnout <= 70) {
 			sentences.push('Burnout risk is elevated — consider scaling back or adding recharge time.');
 		} else {
-			sentences.push('Burnout risk is high. Your data strongly suggests it\'s time to recharge.');
+			sentences.push("Burnout risk is high. Your data strongly suggests it's time to recharge.");
 		}
 
 		// Effort balance
 		if (d1 && d1.value !== null) {
 			if (d1.value >= 7) {
-				sentences.push('Your effort balance is strong — you\'re matching effort to demand well.');
+				sentences.push("Your effort balance is strong — you're matching effort to demand well.");
 			} else if (d1.value >= 4) {
-				sentences.push('Effort balance is middling — there\'s a gap between what tasks demand and what you invest.');
+				sentences.push("Effort balance is middling — there's a gap between what tasks demand and what you invest.");
 			} else {
-				sentences.push('Effort balance is low — there\'s a significant mismatch in how you allocate effort.');
+				sentences.push("Effort balance is low — there's a significant mismatch in how you allocate effort.");
 			}
 		}
 
 		// Flow
 		if (d7 && d7.value !== null) {
 			if (d7.value >= 6) {
-				sentences.push('You\'re hitting flow states regularly — that\'s where your best work happens.');
+				sentences.push("You're hitting flow states regularly — that's where your best work happens.");
 			} else if (d7.value >= 3) {
 				sentences.push('Flow is occasional. Check D11 (Peak Hours) to find when focus comes easiest.');
 			} else {
@@ -256,7 +256,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	}
 
 	private renderTimeRange(container: Element) {
-		const bar = container.createEl('div', { cls: 'emerald-wv-filter-bar' });
+		const bar = container.createDiv({ cls: 'emerald-wv-filter-bar' });
 
 		for (const range of ['7d', '14d', '30d', '90d'] as const) {
 			const btn = bar.createEl('button', {
@@ -288,14 +288,14 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 			if (keys.length === 0) continue;
 
-			const section = this.gridContainer.createEl('div', { cls: 'emerald-wv-dc-category' });
+			const section = this.gridContainer.createDiv({ cls: 'emerald-wv-dc-category' });
 
-			const headerRow = section.createEl('div', { cls: 'emerald-wv-section-header-row' });
-			const iconEl = headerRow.createEl('span', { cls: 'emerald-wv-section-icon' });
+			const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
+			const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 			setIcon(iconEl, CATEGORY_ICONS[category] ?? 'hash');
 			headerRow.createEl('h3', { text: category });
 
-			const grid = section.createEl('div', { cls: 'emerald-wv-metric-grid' });
+			const grid = section.createDiv({ cls: 'emerald-wv-metric-grid' });
 
 			for (const key of keys) {
 				const info = D_METRICS[key];
@@ -306,18 +306,18 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		// Pro teaser for free users — compact banner after all categories
 		if (!tierState.isPro()) {
-			const teaser = this.gridContainer.createEl('div', { cls: 'emerald-wv-dc-pro-teaser' });
-			const teaserIcon = teaser.createEl('span', { cls: 'emerald-wv-dc-pro-teaser-icon' });
+			const teaser = this.gridContainer.createDiv({ cls: 'emerald-wv-dc-pro-teaser' });
+			const teaserIcon = teaser.createSpan({ cls: 'emerald-wv-dc-pro-teaser-icon' });
 			setIcon(teaserIcon, 'sparkles');
-			const teaserText = teaser.createEl('span', { cls: 'emerald-wv-dc-pro-teaser-text' });
-			teaserText.createEl('span', { text: 'Unlock D9\u2013D20: ' });
-			teaserText.createEl('span', {
+			const teaserText = teaser.createSpan({ cls: 'emerald-wv-dc-pro-teaser-text' });
+			teaserText.createSpan({ text: 'Unlock D9\u2013D20: ' });
+			teaserText.createSpan({
 				cls: 'emerald-wv-dc-pro-teaser-detail',
 				text: 'recovery effectiveness, effort volatility, calibration drift, project momentum, and more.'
 			});
 			const teaserLink = teaser.createEl('a', {
 				cls: 'emerald-wv-dc-pro-teaser-link',
-				text: 'Upgrade to Pro \u2192',
+				text: 'Upgrade to pro \u2192',
 				href: 'https://app.effortmastery.com/app/billing'
 			});
 			teaserLink.setAttribute('target', '_blank');
@@ -336,7 +336,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const isProMetric = keyNum >= 9;
 		const isLocked = isProMetric && !tierState.isPro();
 
-		const card = grid.createEl('div', {
+		const card = grid.createDiv({
 			cls: `emerald-wv-metric-card ${isExpanded ? 'is-expanded' : ''} ${!hasData ? 'is-no-data' : ''} ${isLocked ? 'is-locked' : ''}`
 		});
 
@@ -346,10 +346,10 @@ export class DataCenterView extends EmraldWorkspaceView {
 		}
 
 		// ── Header Row: key + pin + value ──
-		const header = card.createEl('div', { cls: 'emerald-wv-metric-header' });
+		const header = card.createDiv({ cls: 'emerald-wv-metric-header' });
 
-		const keyRow = header.createEl('div', { cls: 'emerald-wv-metric-key-row' });
-		keyRow.createEl('span', { cls: 'emerald-wv-metric-key', text: key });
+		const keyRow = header.createDiv({ cls: 'emerald-wv-metric-key-row' });
+		keyRow.createSpan({ cls: 'emerald-wv-metric-key', text: key });
 
 		// Pin toggle (not on locked cards)
 		if (!isLocked) {
@@ -365,15 +365,15 @@ export class DataCenterView extends EmraldWorkspaceView {
 		}
 
 		// Value + trend indicator
-		const valueWrap = header.createEl('div', { cls: 'emerald-wv-metric-value-wrap' });
+		const valueWrap = header.createDiv({ cls: 'emerald-wv-metric-value-wrap' });
 		// D8 is stored on 0-10 scale but displayed as 0-100 (matches Burnout Monitor)
 		const displayValue = hasData
-			? (key === 'D8' ? metric!.value! * 10 : metric!.value!)
+			? (key === 'D8' ? metric.value! * 10 : metric.value!)
 			: null;
 		const valueText = displayValue !== null
 			? `${displayValue.toFixed(key === 'D8' ? 0 : 1)}${info.unit}`
 			: '—';
-		valueWrap.createEl('span', {
+		valueWrap.createSpan({
 			cls: `emerald-wv-metric-value ${!hasData ? 'is-no-data' : ''}`,
 			text: valueText
 		});
@@ -382,7 +382,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		if (hasData && this.prevValueMap.has(key)) {
 			const prevVal = this.prevValueMap.get(key)!;
 			// Use display-scaled values for D8 trend comparison
-			const currentDisplay = key === 'D8' ? metric!.value! * 10 : metric!.value!;
+			const currentDisplay = key === 'D8' ? metric.value! * 10 : metric.value!;
 			const prevDisplay = key === 'D8' ? prevVal * 10 : prevVal;
 			const delta = currentDisplay - prevDisplay;
 			const threshold = key === 'D8' ? 0.5 : 0.05; // Wider threshold for 0-100 scale
@@ -405,24 +405,24 @@ export class DataCenterView extends EmraldWorkspaceView {
 				// 'varies' stays neutral
 			}
 
-			valueWrap.createEl('span', { cls: `emerald-wv-trend-arrow ${trendCls}`, text: arrow });
+			valueWrap.createSpan({ cls: `emerald-wv-trend-arrow ${trendCls}`, text: arrow });
 		}
 
 		// ── Name ──
-		card.createEl('div', { cls: 'emerald-wv-metric-name', text: info.name });
+		card.createDiv({ cls: 'emerald-wv-metric-name', text: info.name });
 
 		// ── Description ──
-		card.createEl('div', { cls: 'emerald-wv-metric-desc', text: info.desc });
+		card.createDiv({ cls: 'emerald-wv-metric-desc', text: info.desc });
 
 		// ── No Data State ──
 		if (!hasData && !isLocked) {
-			const noData = card.createEl('div', { cls: 'emerald-wv-metric-nodata' });
-			noData.createEl('span', { text: 'Need more data' });
+			const noData = card.createDiv({ cls: 'emerald-wv-metric-nodata' });
+			noData.createSpan({ text: 'Need more data' });
 		}
 
 		// ── Last computed ──
 		if (metric && !isLocked) {
-			card.createEl('div', {
+			card.createDiv({
 				cls: 'emerald-wv-metric-updated',
 				text: `Updated: ${this.formatRelativeTime(metric.computed_at)}`
 			});
@@ -430,10 +430,10 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		// ── Frosted Pro overlay for locked metrics ──
 		if (isLocked) {
-			const overlay = card.createEl('div', { cls: 'emerald-wv-metric-locked-overlay' });
-			const lockIcon = overlay.createEl('span', { cls: 'emerald-wv-metric-lock-icon' });
+			const overlay = card.createDiv({ cls: 'emerald-wv-metric-locked-overlay' });
+			const lockIcon = overlay.createSpan({ cls: 'emerald-wv-metric-lock-icon' });
 			setIcon(lockIcon, 'lock');
-			overlay.createEl('span', { cls: 'emerald-wv-metric-lock-text', text: 'Pro' });
+			overlay.createSpan({ cls: 'emerald-wv-metric-lock-text', text: 'Pro' });
 			card.addClass('emrald-not-clickable');
 		} else {
 			// Click to expand/collapse (free metrics only)
@@ -450,17 +450,17 @@ export class DataCenterView extends EmraldWorkspaceView {
 	// ── Expanded Section (chart + explainer + history) ──
 
 	private async renderExpandedSection(card: Element, key: string, info: MetricInfo, metric: ComputedMetric | undefined) {
-		const expanded = card.createEl('div', { cls: 'emerald-wv-metric-expanded' });
+		const expanded = card.createDiv({ cls: 'emerald-wv-metric-expanded' });
 
 		// Info explainer
-		const explainerEl = expanded.createEl('div', { cls: 'emerald-wv-metric-explainer' });
-		const infoIcon = explainerEl.createEl('span', { cls: 'emerald-wv-metric-info-icon' });
+		const explainerEl = expanded.createDiv({ cls: 'emerald-wv-metric-explainer' });
+		const infoIcon = explainerEl.createSpan({ cls: 'emerald-wv-metric-info-icon' });
 		setIcon(infoIcon, 'info');
-		explainerEl.createEl('span', { text: info.explainer });
+		explainerEl.createSpan({ text: info.explainer });
 
 		// Loading placeholder for chart
-		const chartArea = expanded.createEl('div', { cls: 'emerald-wv-metric-chart-area' });
-		chartArea.createEl('div', { cls: 'emerald-wv-loading', text: 'Loading history...' });
+		const chartArea = expanded.createDiv({ cls: 'emerald-wv-metric-chart-area' });
+		chartArea.createDiv({ cls: 'emerald-wv-loading', text: 'Loading history...' });
 
 		// Fetch history
 		const daysMap: Record<string, number> = { '7d': 7, '14d': 14, '30d': 30, '90d': 90 };
@@ -472,7 +472,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		const entries = this.normalizeHistory(histResp.data ?? []).slice(-days); // oldest → newest, one per day
 		if (entries.length === 0) {
-			chartArea.createEl('div', { cls: 'emerald-wv-empty', text: `No history data for the last ${this.timeRange}.` });
+			chartArea.createDiv({ cls: 'emerald-wv-empty', text: `No history data for the last ${this.timeRange}.` });
 			return;
 		}
 
@@ -486,7 +486,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		} else if (entries.length >= 2) {
 			chartArea.appendChild(this.buildLineChart(entries, info, key));
 		} else {
-			chartArea.createEl('div', { cls: 'emerald-wv-empty', text: 'Only 1 data point — need at least 2 for a chart.' });
+			chartArea.createDiv({ cls: 'emerald-wv-empty', text: 'Only 1 data point — need at least 2 for a chart.' });
 		}
 
 		// History table (below chart) — skip for D11 and D15 (custom viz IS the data story)
@@ -511,7 +511,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const range = max - min;
 		const zones = this.getMetricZones(info);
 
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		const svg = activeDocument.createSvg('svg');
 		svg.setAttribute('width', '100%');
 		svg.setAttribute('height', String(CHART_HEIGHT));
 		svg.setAttribute('viewBox', `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`);
@@ -519,7 +519,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		// Background semantic zones (good / caution / risk)
 		for (const zone of zones) {
-			const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			const rect = activeDocument.createSvg('rect');
 			const zoneTop = CHART_PAD + (1 - zone.to) * (CHART_HEIGHT - CHART_PAD * 2);
 			const zoneBottom = CHART_PAD + (1 - zone.from) * (CHART_HEIGHT - CHART_PAD * 2);
 			rect.setAttribute('x', '0');
@@ -534,7 +534,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Grid lines (3 horizontal)
 		for (let i = 0; i <= 2; i++) {
 			const y = CHART_PAD + ((CHART_HEIGHT - CHART_PAD * 2) / 2) * i;
-			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			const line = activeDocument.createSvg('line');
 			line.setAttribute('x1', '0');
 			line.setAttribute('y1', String(y));
 			line.setAttribute('x2', String(CHART_WIDTH));
@@ -562,20 +562,20 @@ export class DataCenterView extends EmraldWorkspaceView {
 			...points,
 			`${CHART_WIDTH},${CHART_HEIGHT}`
 		];
-		const area = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+		const area = activeDocument.createSvg('polygon');
 		area.setAttribute('points', areaPoints.join(' '));
 		area.classList.add('emerald-wv-chart-area');
 		svg.appendChild(area);
 
 		// Line
-		const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+		const polyline = activeDocument.createSvg('polyline');
 		polyline.setAttribute('points', points.join(' '));
 		polyline.classList.add('emerald-wv-chart-line');
 		svg.appendChild(polyline);
 
 		// Dots at each data point
 		for (const coord of coords) {
-			const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			const circle = activeDocument.createSvg('circle');
 			circle.setAttribute('cx', String(coord.x));
 			circle.setAttribute('cy', String(coord.y));
 			circle.setAttribute('r', '3');
@@ -586,7 +586,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Endpoint dot (larger, accent)
 		const last = coords[coords.length - 1];
 		if (last) {
-			const endDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			const endDot = activeDocument.createSvg('circle');
 			endDot.setAttribute('cx', String(last.x));
 			endDot.setAttribute('cy', String(last.y));
 			endDot.setAttribute('r', '4');
@@ -595,7 +595,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		}
 
 		// Min/max labels
-		const maxLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		const maxLabel = activeDocument.createSvg('text');
 		maxLabel.setAttribute('x', String(CHART_WIDTH - 4));
 		maxLabel.setAttribute('y', String(CHART_PAD + 10));
 		maxLabel.setAttribute('text-anchor', 'end');
@@ -603,7 +603,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		maxLabel.textContent = max.toFixed(1);
 		svg.appendChild(maxLabel);
 
-		const minLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+		const minLabel = activeDocument.createSvg('text');
 		minLabel.setAttribute('x', String(CHART_WIDTH - 4));
 		minLabel.setAttribute('y', String(CHART_HEIGHT - CHART_PAD));
 		minLabel.setAttribute('text-anchor', 'end');
@@ -617,7 +617,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	private buildEffortSourceChart(metric: ComputedMetric | undefined, entry: ComputedMetricHistory): HTMLElement {
 		const wrap = createDiv({ cls: 'emerald-wv-dist-chart' });
 
-		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {}) as Record<string, unknown>;
+		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {});
 		const rows = [
 			{ label: 'Complexity', value: Number(meta.complexity_pct ?? 0) },
 			{ label: 'Emotional', value: Number(meta.emotional_pct ?? 0) },
@@ -644,7 +644,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	private buildTimeOfDayChart(metric: ComputedMetric | undefined, entry: ComputedMetricHistory): HTMLElement {
 		const wrap = createDiv({ cls: 'emerald-wv-time-chart' });
 
-		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {}) as Record<string, unknown>;
+		const meta = ((metric?.metadata && Object.keys(metric.metadata).length > 0 ? metric.metadata : entry.metadata) ?? {});
 		const byHour = (meta.by_hour ?? {}) as Record<string, { avg_valence?: number; flow_rate?: number; count?: number }>;
 		const bestHours = new Set<number>((meta.best_hours as number[] | undefined) ?? []);
 		const worstHours = new Set<number>((meta.worst_hours as number[] | undefined) ?? []);
@@ -731,7 +731,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 				const rawDelta = entry.value - prevEntry.value;
 				const displayDelta = isD8 ? rawDelta * 10 : rawDelta;
 				if (Math.abs(displayDelta) < (isD8 ? 0.5 : 0.01)) {
-					changeCell.createEl('span', { cls: 'emerald-wv-trend-flat', text: '—' });
+					changeCell.createSpan({ cls: 'emerald-wv-trend-flat', text: '—' });
 				} else {
 					const sign = displayDelta > 0 ? '+' : '';
 					// Color based on whether direction is "good"
@@ -739,7 +739,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 					if (info.goodDirection === 'up') cls = displayDelta > 0 ? 'emerald-wv-trend-up' : 'emerald-wv-trend-down';
 					else if (info.goodDirection === 'down') cls = displayDelta < 0 ? 'emerald-wv-trend-up' : 'emerald-wv-trend-down';
 
-					changeCell.createEl('span', { cls, text: `${sign}${displayDelta.toFixed(isD8 ? 0 : 2)}` });
+					changeCell.createSpan({ cls, text: `${sign}${displayDelta.toFixed(isD8 ? 0 : 2)}` });
 				}
 			}
 		}

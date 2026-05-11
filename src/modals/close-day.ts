@@ -39,7 +39,7 @@ export class CloseDayModal extends Modal {
 		contentEl.createEl('h2', { text: 'Close your work day?' });
 
 		// Summary stats
-		const statsEl = contentEl.createEl('div', { cls: 'emerald-closeday-stats' });
+		const statsEl = contentEl.createDiv({ cls: 'emerald-closeday-stats' });
 
 		const workedHours = summary.workedMinutes / 60;
 		const deltaMinutes = summary.workedMinutes - (summary.plannedHours * 60);
@@ -55,29 +55,29 @@ export class CloseDayModal extends Modal {
 
 		// Session count + project count
 		const projectCount = summary.projectBreakdown.length;
-		statsEl.createEl('div', { cls: 'emerald-closeday-sessions' }).createEl('span', {
+		statsEl.createDiv({ cls: 'emerald-closeday-sessions' }).createSpan({
 			text: `${summary.sessionCount} session${summary.sessionCount !== 1 ? 's' : ''} across ${projectCount} project${projectCount !== 1 ? 's' : ''}`
 		});
 
 		// Project breakdown
 		if (summary.projectBreakdown.length > 0) {
-			const breakdownEl = contentEl.createEl('div', { cls: 'emerald-closeday-breakdown' });
-			breakdownEl.createEl('div', { cls: 'emerald-closeday-breakdown-label', text: 'Breakdown' });
+			const breakdownEl = contentEl.createDiv({ cls: 'emerald-closeday-breakdown' });
+			breakdownEl.createDiv({ cls: 'emerald-closeday-breakdown-label', text: 'Breakdown' });
 
 			for (const proj of summary.projectBreakdown) {
-				const row = breakdownEl.createEl('div', { cls: 'emerald-closeday-proj-row' });
-				row.createEl('span', { cls: 'emerald-closeday-proj-name', text: proj.name });
-				row.createEl('span', { cls: 'emerald-closeday-proj-time', text: `${this.formatDuration(proj.minutes)} (${proj.sessions}×)` });
+				const row = breakdownEl.createDiv({ cls: 'emerald-closeday-proj-row' });
+				row.createSpan({ cls: 'emerald-closeday-proj-name', text: proj.name });
+				row.createSpan({ cls: 'emerald-closeday-proj-time', text: `${this.formatDuration(proj.minutes)} (${proj.sessions}×)` });
 			}
 		}
 
 		// Warning
-		contentEl.createEl('div', { cls: 'emerald-closeday-warning' }).createEl('span', {
-			text: 'This can\'t be undone for today.'
+		contentEl.createDiv({ cls: 'emerald-closeday-warning' }).createSpan({
+			text: "This can't be undone for today."
 		});
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const confirmBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -96,9 +96,9 @@ export class CloseDayModal extends Modal {
 	}
 
 	private renderStatRow(container: HTMLElement, label: string, value: string, valueCls?: string) {
-		const row = container.createEl('div', { cls: 'emerald-closeday-row' });
-		row.createEl('span', { cls: 'emerald-closeday-label', text: label });
-		const val = row.createEl('span', { cls: 'emerald-closeday-value', text: value });
+		const row = container.createDiv({ cls: 'emerald-closeday-row' });
+		row.createSpan({ cls: 'emerald-closeday-label', text: label });
+		const val = row.createSpan({ cls: 'emerald-closeday-value', text: value });
 		if (valueCls) val.addClass(valueCls);
 	}
 

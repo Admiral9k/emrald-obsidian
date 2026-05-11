@@ -17,26 +17,26 @@ export class AdvancedCompleteModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal');
 
-		const iconEl = contentEl.createEl('div', { cls: 'emerald-onboard-icon' });
+		const iconEl = contentEl.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(iconEl, 'sparkles');
 
 		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile complete!' });
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'EMRALD now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate.'
+			text: 'Emrald now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate.'
 		});
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'You can revisit and update your answers anytime in the Effort Profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted.'
+			text: 'You can revisit and update your answers anytime in the effort profile workspace view. Emrald will also prompt you to re-calibrate when it detects your patterns have shifted.'
 		});
 
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const goBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Let\'s go'
+			text: "Let's go"
 		});
 		goBtn.addEventListener('click', () => {
 			this.close();

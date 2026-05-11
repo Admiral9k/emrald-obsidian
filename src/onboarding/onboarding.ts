@@ -23,7 +23,7 @@ export class OnboardingModal extends Modal {
 	private apiKey: string = '';
 	private isNewUser: boolean = false;
 	private projects: Array<{ name: string; effortLevel: 'E1' | 'E2' | 'E3' | 'E4'; notePath?: string }> = [];
-	private calibrationAnswers: Record<string, any> = {};
+	private calibrationAnswers: Record<string, unknown> = {};
 	private calibrationPage: number = 0;
 	private dailyHours: number[] = [4, 4, 4, 4, 4, 4, 4]; // Sun=0 through Sat=6
 
@@ -45,7 +45,7 @@ export class OnboardingModal extends Modal {
 		if (!this.plugin.settings.onboardingComplete) {
 			this.plugin.settings.onboardingComplete = true;
 			void this.plugin.saveSettings();
-			setTimeout(() => {
+			activeWindow.setTimeout(() => {
 				void this.plugin.openWorkspaceView(VIEW_ABOUT);
 				this.onComplete();
 			}, 300);
@@ -77,21 +77,21 @@ export class OnboardingModal extends Modal {
 		const stepIndex = STEP_ORDER.indexOf(this.currentStep);
 		const total = STEP_ORDER.length - 1; // Exclude 'done'
 
-		const bar = container.createEl('div', { cls: 'emerald-onboard-progress' });
+		const bar = container.createDiv({ cls: 'emerald-onboard-progress' });
 
 		for (let i = 0; i < total; i++) {
-			const dot = bar.createEl('div', {
+			const dot = bar.createDiv({
 				cls: `emerald-onboard-dot ${i < stepIndex ? 'is-done' : ''} ${i === stepIndex ? 'is-active' : ''}`
 			});
 			if (i < total - 1) {
-				bar.createEl('div', {
+				bar.createDiv({
 					cls: `emerald-onboard-line ${i < stepIndex ? 'is-done' : ''}`
 				});
 			}
 		}
 
 		if (stepIndex > 0 && this.currentStep !== 'done') {
-			container.createEl('div', {
+			container.createDiv({
 				cls: 'emerald-onboard-step-label',
 				text: `Step ${stepIndex} of ${total - 1}`
 			});
@@ -101,15 +101,15 @@ export class OnboardingModal extends Modal {
 	// ── Step 1: Welcome ──────────────────────────────────
 
 	private renderWelcome(container: HTMLElement) {
-		const welcomeIcon = container.createEl('div', { cls: 'emerald-onboard-icon' });
+		const welcomeIcon = container.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(welcomeIcon, 'gem');
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Welcome to EMRALD' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Welcome to emrald' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Track your work sessions, measure effort in real time, and let EMRALD surface patterns you might otherwise miss.'
+			text: 'Track your work sessions, measure effort in real time, and let emrald surface patterns you might otherwise miss.'
 		});
 
-		const features = container.createEl('div', { cls: 'emerald-onboard-features' });
+		const features = container.createDiv({ cls: 'emerald-onboard-features' });
 		const items = [
 			{ icon: 'timer', text: 'Track work sessions with effort-aware timing' },
 			{ icon: 'bar-chart-2', text: 'See 20 metrics about how you work' },
@@ -118,13 +118,13 @@ export class OnboardingModal extends Modal {
 		];
 
 		for (const item of items) {
-			const row = features.createEl('div', { cls: 'emerald-onboard-feature' });
-			const iconEl = row.createEl('span', { cls: 'emerald-onboard-feature-icon' });
+			const row = features.createDiv({ cls: 'emerald-onboard-feature' });
+			const iconEl = row.createSpan({ cls: 'emerald-onboard-feature-icon' });
 			setIcon(iconEl, item.icon);
-			row.createEl('span', { text: item.text });
+			row.createSpan({ text: item.text });
 		}
 
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions emerald-onboard-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-actions' });
 		const startBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
 			text: 'Get started'
@@ -135,25 +135,25 @@ export class OnboardingModal extends Modal {
 	// ── Step 2: API Connection ───────────────────────────
 
 	private renderConnect(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Connect to EMRALD' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Connect to emrald' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Enter your API key to connect. You can get one from your EMRALD dashboard.'
+			text: 'Enter your API key to connect. You can get one from your emrald dashboard.'
 		});
 
 		// "Get an API key" link for community plugin store users
-		const linkEl = container.createEl('div', { cls: 'emerald-onboard-link' });
+		const linkEl = container.createDiv({ cls: 'emerald-onboard-link' });
 		const anchor = linkEl.createEl('a', { text: "Don't have an API key? Get one at app.effortmastery.com →", href: 'https://app.effortmastery.com' });
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
 			window.open('https://app.effortmastery.com', '_blank');
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
 		// API Key input
-		const keyGroup = form.createEl('div', { cls: 'emerald-form-group' });
-		keyGroup.createEl('label', { text: 'API Key' });
+		const keyGroup = form.createDiv({ cls: 'emerald-form-group' });
+		keyGroup.createEl('label', { text: 'API key' });
 		const keyInput = keyGroup.createEl('input', {
 			cls: 'emerald-onboard-input',
 			type: 'password',
@@ -165,14 +165,14 @@ export class OnboardingModal extends Modal {
 		});
 
 		// API URL (advanced — collapsed)
-		const advGroup = form.createEl('div', { cls: 'emerald-form-group' });
-		const advToggle = advGroup.createEl('div', { cls: 'emerald-onboard-advanced-toggle', text: '▸ Advanced' });
-		const advContent = advGroup.createEl('div', { cls: 'emerald-onboard-advanced-content' });
+		const advGroup = form.createDiv({ cls: 'emerald-form-group' });
+		const advToggle = advGroup.createDiv({ cls: 'emerald-onboard-advanced-toggle', text: '▸ Advanced' });
+		const advContent = advGroup.createDiv({ cls: 'emerald-onboard-advanced-content' });
 		advContent.addClass('emrald-hidden');
 
 		advToggle.addEventListener('click', () => {
 			const visible = !advContent.hasClass('emrald-hidden');
-			visible ? advContent.addClass('emrald-hidden') : advContent.removeClass('emrald-hidden');
+			if (visible) { advContent.addClass('emrald-hidden'); } else { advContent.removeClass('emrald-hidden'); }
 			advToggle.textContent = visible ? '▸ Advanced' : '▾ Advanced';
 		});
 
@@ -184,10 +184,10 @@ export class OnboardingModal extends Modal {
 		urlInput.value = this.plugin.settings.apiUrl;
 
 		// Status indicator
-		const statusEl = form.createEl('div', { cls: 'emerald-onboard-status' });
+		const statusEl = form.createDiv({ cls: 'emerald-onboard-status' });
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const testBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -227,16 +227,16 @@ export class OnboardingModal extends Modal {
 					this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
 
 					// New users get full flow; returning users skip profile/availability but see calibration
-					setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
+					activeWindow.setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
 				}
 			} catch { /* non-fatal */ }
 		})(); });
 
 		const skipBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
-			text: 'Skip — I\'ll configure later'
+			text: "Skip — i'll configure later"
 		});
-		skipBtn.addEventListener('click', () => this.finish());
+		skipBtn.addEventListener('click', () => { void this.finish(); });
 
 		const backBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',
@@ -251,18 +251,18 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Tell EMRALD a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
+			text: 'Tell emrald a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
 		// Availability — simple weekly hours
-		const availGroup = form.createEl('div', { cls: 'emerald-form-group' });
+		const availGroup = form.createDiv({ cls: 'emerald-form-group' });
 		availGroup.createEl('label', { text: 'How many hours per day do you work on projects?' });
-		availGroup.createEl('div', { cls: 'emerald-form-desc', text: 'This sets your daily time budget. You can override it any day.' });
+		availGroup.createDiv({ cls: 'emerald-form-desc', text: 'This sets your daily time budget. You can override it any day.' });
 
-		const sliderRow = availGroup.createEl('div', { cls: 'emerald-form-label-row' });
-		const valueEl = sliderRow.createEl('span', { cls: 'emerald-slider-value', text: '4h' });
+		const sliderRow = availGroup.createDiv({ cls: 'emerald-form-label-row' });
+		const valueEl = sliderRow.createSpan({ cls: 'emerald-slider-value', text: '4h' });
 
 		const slider = availGroup.createEl('input', { cls: 'emerald-slider' });
 		slider.type = 'range';
@@ -275,7 +275,7 @@ export class OnboardingModal extends Modal {
 		});
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const nextBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -306,7 +306,7 @@ export class OnboardingModal extends Modal {
 		options?: Array<{ value: string; label: string }>;
 		min?: number;
 		max?: number;
-		default?: any;
+		default?: unknown;
 	}> = [
 		// Page 1: Work style
 		{
@@ -359,7 +359,7 @@ export class OnboardingModal extends Modal {
 		},
 		{
 			key: 'novelty_tolerance',
-			question: 'I\'m energized by trying new things and tackling unfamiliar challenges.',
+			question: "I'm energized by trying new things and tackling unfamiliar challenges.",
 			type: 'slider', min: 1, max: 5, default: 3
 		},
 		// Page 3: Work patterns
@@ -370,18 +370,18 @@ export class OnboardingModal extends Modal {
 		},
 		{
 			key: 'procrastination_tendency',
-			question: 'How often do you delay starting tasks you\'ve committed to?',
+			question: "How often do you delay starting tasks you've committed to?",
 			type: 'slider', min: 1, max: 5, default: 3
 		},
 		{
 			key: 'procrastination_trigger',
-			question: 'When you procrastinate, it\'s usually because...',
+			question: "When you procrastinate, it's usually because...",
 			type: 'enum',
 			options: [
 				{ value: 'boring', label: 'The task is boring' },
-				{ value: 'uncertain', label: 'I\'m unsure how to start' },
+				{ value: 'uncertain', label: "I'm unsure how to start" },
 				{ value: 'fear', label: 'Fear of failure or judgment' },
-				{ value: 'tired', label: 'I\'m just tired' },
+				{ value: 'tired', label: "I'm just tired" },
 				{ value: 'distracted', label: 'I get distracted easily' },
 				{ value: 'overwhelmed', label: 'It feels too big' }
 			]
@@ -407,9 +407,9 @@ export class OnboardingModal extends Modal {
 			options: [
 				{ value: 'wonder', label: 'Wonder — thinking abstractly without action' },
 				{ value: 'invention', label: 'Invention — having to create from scratch' },
-				{ value: 'discernment', label: 'Discernment — evaluating others\' work' },
+				{ value: 'discernment', label: "Discernment — evaluating others' work" },
 				{ value: 'galvanizing', label: 'Galvanizing — motivating and organizing people' },
-				{ value: 'enablement', label: 'Enablement — supporting others\' priorities' },
+				{ value: 'enablement', label: "Enablement — supporting others' priorities" },
 				{ value: 'tenacity', label: 'Tenacity — grinding through repetitive details' }
 			]
 		},
@@ -434,30 +434,30 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
+			text: 'These questions help emrald calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
 		});
 
 		// Page counter
-		container.createEl('div', {
+		container.createDiv({
 			cls: 'emerald-onboard-step-label',
 			text: `Page ${this.calibrationPage + 1} of ${totalPages}  •  Question ${this.calibrationPage * perPage + 1}–${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
 		for (const q of pageQuestions) {
-			const group = form.createEl('div', { cls: 'emerald-form-group' });
+			const group = form.createDiv({ cls: 'emerald-form-group' });
 			group.createEl('label', { text: q.question });
 
 			if (q.type === 'slider') {
-				const currentVal = this.calibrationAnswers[q.key] ?? q.default ?? 3;
+				const currentVal = (this.calibrationAnswers[q.key] as number) ?? (q.default as number) ?? 3;
 
-				const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
-				const valueEl = labelRow.createEl('span', { cls: 'emerald-slider-value', text: `${currentVal}/5` });
+				const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
+				const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: `${currentVal}/5` });
 
-				const endpoints = group.createEl('div', { cls: 'emerald-slider-endpoints' });
-				endpoints.createEl('span', { cls: 'emerald-slider-endpoint-left', text: 'Not at all' });
-				endpoints.createEl('span', { cls: 'emerald-slider-endpoint-right', text: 'Very much' });
+				const endpoints = group.createDiv({ cls: 'emerald-slider-endpoints' });
+				endpoints.createSpan({ cls: 'emerald-slider-endpoint-left', text: 'Not at all' });
+				endpoints.createSpan({ cls: 'emerald-slider-endpoint-right', text: 'Very much' });
 
 				const slider = group.createEl('input', { cls: 'emerald-slider' });
 				slider.type = 'range';
@@ -478,7 +478,7 @@ export class OnboardingModal extends Modal {
 				}
 			} else if (q.type === 'enum' && q.options) {
 				const currentVal = this.calibrationAnswers[q.key] ?? null;
-				const btnColumn = group.createEl('div', { cls: 'emerald-onboard-enum-group' });
+				const btnColumn = group.createDiv({ cls: 'emerald-onboard-enum-group' });
 
 				for (const opt of q.options) {
 					const btn = btnColumn.createEl('button', {
@@ -498,7 +498,7 @@ export class OnboardingModal extends Modal {
 		}
 
 		// Actions — Back (left), Next/Save (middle), Skip (right with gap)
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions emerald-calibration-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-calibration-actions' });
 
 		if (this.calibrationPage > 0) {
 			const backBtn = actions.createEl('button', {
@@ -533,7 +533,7 @@ export class OnboardingModal extends Modal {
 					if (Object.keys(this.calibrationAnswers).length > 0) {
 						try {
 							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-							new Notice('Effort Profile saved ✓');
+							new Notice('Effort profile saved ✓');
 						} catch { /* non-fatal */
 							new Notice('Profile saved locally — will sync later.');
 						}
@@ -551,17 +551,17 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
+			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When emrald detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
-		const protocolGroup = form.createEl('div', { cls: 'emerald-form-group' });
+		const protocolGroup = form.createDiv({ cls: 'emerald-form-group' });
 		protocolGroup.createEl('label', { text: 'Add up to 3 recharge processes' });
 
-		const hintEl = protocolGroup.createEl('div', {
+		const hintEl = protocolGroup.createDiv({
 			cls: 'emerald-form-desc',
-			text: 'Press Enter to add another. These help EMRALD suggest recovery when it matters.'
+			text: 'Press Enter to add another. These help emrald suggest recovery when it matters.'
 		});
 
 		let rowCount = 0;
@@ -570,7 +570,7 @@ export class OnboardingModal extends Modal {
 		const addRow = (prefill?: string) => {
 			if (rowCount >= MAX_ROWS) return;
 			rowCount++;
-			const row = createEl('div', { cls: 'emerald-recovery-row' });
+			const row = createDiv({ cls: 'emerald-recovery-row' });
 			const input = row.createEl('input', {
 				cls: 'emerald-onboard-input',
 				type: 'text',
@@ -588,7 +588,7 @@ export class OnboardingModal extends Modal {
 		};
 		addRow();
 
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const saveBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -599,7 +599,7 @@ export class OnboardingModal extends Modal {
 				const inputs = protocolGroup.querySelectorAll('input');
 				const activities: string[] = [];
 				inputs.forEach(input => {
-					const val = (input as HTMLInputElement).value.trim();
+					const val = (input).value.trim();
 					if (val) activities.push(val);
 				});
 				if (activities.length > 0) {
@@ -634,26 +634,26 @@ export class OnboardingModal extends Modal {
 		});
 
 		// "What's a tracked project?" — first encounter with the concept
-		const trackedExplainer = container.createEl('div', { cls: 'emerald-onboard-hint emerald-onboard-hint-top' });
+		const trackedExplainer = container.createDiv({ cls: 'emerald-onboard-hint emerald-onboard-hint-top' });
 		trackedExplainer.createEl('strong', { text: "What's a tracked project?" });
-		trackedExplainer.createEl('span', {
-			text: ' A tracked project is something you\'re actively working on: a creative pursuit, a work initiative, a learning goal, a side project. It\'s bigger than a single task or errand.'
+		trackedExplainer.createSpan({
+			text: " A tracked project is something you're actively working on: a creative pursuit, a work initiative, a learning goal, a side project. It's bigger than a single task or errand."
 		});
 		trackedExplainer.createEl('br');
-		trackedExplainer.createEl('span', {
+		trackedExplainer.createSpan({
 			text: 'Think of it as anything worth dedicating focused time to. Your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano \u2014 not your grocery list.'
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
 		const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		const dayGroup = form.createEl('div', { cls: 'emerald-form-group' });
-		const dayRow = dayGroup.createEl('div', { cls: 'emerald-schedule-row' });
+		const dayGroup = form.createDiv({ cls: 'emerald-form-group' });
+		const dayRow = dayGroup.createDiv({ cls: 'emerald-schedule-row' });
 
 		const inputs: HTMLInputElement[] = [];
 
 		for (let d = 0; d < 7; d++) {
-			const dayCol = dayRow.createEl('div', { cls: 'emerald-schedule-day' });
+			const dayCol = dayRow.createDiv({ cls: 'emerald-schedule-day' });
 			dayCol.createEl('label', { text: dayLabels[d], cls: 'emerald-schedule-label' });
 
 			const input = dayCol.createEl('input', {
@@ -677,7 +677,7 @@ export class OnboardingModal extends Modal {
 		}
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const nextBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -712,46 +712,46 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add your first projects' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'What are you working on? Give each project an effort level — EMRALD uses this to measure what your day actually costs you.'
+			text: 'What are you working on? Give each project an effort level — emrald uses this to measure what your day actually costs you.'
 		});
 
 		// Active limit guidance (P2.6)
-		container.createEl('div', {
+		container.createDiv({
 			cls: 'emerald-onboard-hint emerald-onboard-hint-top',
 			text: 'We recommend keeping 5 or fewer active projects. Focus is a feature, not a limitation.'
 		});
 
 		// E-level explainer
-		const explainer = container.createEl('div', { cls: 'emerald-onboard-explainer' });
-		explainer.createEl('div', { text: 'E1 = Light (25% of your daily work time)' });
-		explainer.createEl('div', { text: 'E2 = Moderate (50% of your daily work time)' });
-		explainer.createEl('div', { text: 'E3 = Demanding (75% of your daily work time)' });
-		explainer.createEl('div', { text: 'E4 = Maximum (100% of your daily work time)' });
+		const explainer = container.createDiv({ cls: 'emerald-onboard-explainer' });
+		explainer.createDiv({ text: 'E1 = Light (25% of your daily work time)' });
+		explainer.createDiv({ text: 'E2 = Moderate (50% of your daily work time)' });
+		explainer.createDiv({ text: 'E3 = Demanding (75% of your daily work time)' });
+		explainer.createDiv({ text: 'E4 = Maximum (100% of your daily work time)' });
 
 		// Note linking hint
-		container.createEl('div', {
+		container.createDiv({
 			cls: 'emerald-onboard-hint',
-			text: 'Tip: click the link icon to connect a project to an existing note — EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list.'
+			text: 'Tip: click the link icon to connect a project to an existing note — emrald will sync session data directly to that note. Without a link, the project lives only in your project list.'
 		});
 
-		const form = container.createEl('div', { cls: 'emerald-form' });
+		const form = container.createDiv({ cls: 'emerald-form' });
 
 		// Project list (dynamic)
-		const listEl = form.createEl('div', { cls: 'emerald-onboard-project-list' });
+		const listEl = form.createDiv({ cls: 'emerald-onboard-project-list' });
 
 		const renderList = () => {
 			listEl.empty();
 			for (let i = 0; i < this.projects.length; i++) {
 				const proj = this.projects[i];
-				const row = listEl.createEl('div', { cls: 'emerald-onboard-project-row' });
-				const infoCol = row.createEl('div', { cls: 'emerald-onboard-project-info' });
-				infoCol.createEl('span', { cls: 'emerald-onboard-project-name', text: proj.name });
-				infoCol.createEl('span', { cls: 'emerald-elevel-badge', text: proj.effortLevel });
+				const row = listEl.createDiv({ cls: 'emerald-onboard-project-row' });
+				const infoCol = row.createDiv({ cls: 'emerald-onboard-project-info' });
+				infoCol.createSpan({ cls: 'emerald-onboard-project-name', text: proj.name });
+				infoCol.createSpan({ cls: 'emerald-elevel-badge', text: proj.effortLevel });
 
 				// Note link status
-				const noteCol = row.createEl('div', { cls: 'emerald-onboard-project-note' });
+				const noteCol = row.createDiv({ cls: 'emerald-onboard-project-note' });
 				if (proj.notePath) {
-					const noteLabel = noteCol.createEl('span', { cls: 'emerald-onboard-note-path', text: proj.notePath });
+					const noteLabel = noteCol.createSpan({ cls: 'emerald-onboard-note-path', text: proj.notePath });
 					noteLabel.title = proj.notePath;
 				}
 
@@ -785,7 +785,7 @@ export class OnboardingModal extends Modal {
 		};
 
 		// Add project form
-		const addRow = form.createEl('div', { cls: 'emerald-onboard-add-row' });
+		const addRow = form.createDiv({ cls: 'emerald-onboard-add-row' });
 		const nameInput = addRow.createEl('input', {
 			cls: 'emerald-onboard-input emerald-onboard-proj-name',
 			type: 'text',
@@ -798,7 +798,7 @@ export class OnboardingModal extends Modal {
 			if (l === 'E2') opt.selected = true;
 		}
 
-		const addBtn = addRow.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: '+ Add' });
+		const addBtn = addRow.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: '+ add' });
 		addBtn.addEventListener('click', () => {
 			const name = nameInput.value.trim();
 			if (!name) return;
@@ -815,13 +815,13 @@ export class OnboardingModal extends Modal {
 		renderList();
 
 		// Hint
-		container.createEl('div', {
+		container.createDiv({
 			cls: 'emerald-onboard-hint',
 			text: 'Add at least 1 to get started. You can always add more later.'
 		});
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const nextBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
@@ -866,32 +866,32 @@ export class OnboardingModal extends Modal {
 			{
 				icon: 'bar-chart-2',
 				title: 'Effort management',
-				desc: 'Seven sections break down the ins and outs of your effort levels. Each one opens a detailed workspace view for you to analyze and track. If you\'re a PRO user, read effort insights and pinnable sparklines at a glance.'
+				desc: "Seven sections break down the ins and outs of your effort levels. Each one opens a detailed workspace view for you to analyze and track. If you're a PRO user, read effort insights and pinnable sparklines at a glance."
 			},
 			{
 				icon: 'flame',
 				title: 'Burnout Protection',
-				desc: "EMRALD watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
+				desc: "Emrald watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
 			}
 		];
 
-		const tourList = container.createEl('div', { cls: 'emerald-onboard-tour' });
+		const tourList = container.createDiv({ cls: 'emerald-onboard-tour' });
 
 		for (const step of steps) {
-			const card = tourList.createEl('div', { cls: 'emerald-onboard-tour-step' });
-			const iconEl = card.createEl('span', { cls: 'emerald-onboard-tour-icon' });
+			const card = tourList.createDiv({ cls: 'emerald-onboard-tour-step' });
+			const iconEl = card.createSpan({ cls: 'emerald-onboard-tour-icon' });
 			setIcon(iconEl, step.icon);
-			const content = card.createEl('div', { cls: 'emerald-onboard-tour-content' });
-			content.createEl('div', { cls: 'emerald-onboard-tour-title', text: step.title });
-			content.createEl('div', { cls: 'emerald-onboard-tour-desc', text: step.desc });
+			const content = card.createDiv({ cls: 'emerald-onboard-tour-content' });
+			content.createDiv({ cls: 'emerald-onboard-tour-title', text: step.title });
+			content.createDiv({ cls: 'emerald-onboard-tour-desc', text: step.desc });
 		}
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 
 		const doneBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Let\'s Go!'
+			text: "Let's go!"
 		});
 		doneBtn.addEventListener('click', () => this.goTo('done'));
 	}
@@ -899,23 +899,23 @@ export class OnboardingModal extends Modal {
 	// ── Done ─────────────────────────────────────────────
 
 	private renderDone(container: HTMLElement) {
-		const doneIcon = container.createEl('div', { cls: 'emerald-onboard-icon' });
+		const doneIcon = container.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(doneIcon, 'sparkles');
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'You\'re all set!' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: "You're all set!" });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "EMRALD has enough data to start working for you. Track your sessions, check your metrics, and if you're a PRO user, get insights right away."
+			text: "Emrald has enough data to start working for you. Track your sessions, check your metrics, and if you're a pro user, get insights right away."
 		});
 
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want even smarter insights? Complete your Effort Profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
+			text: 'Want even smarter insights? Complete your effort profile — it helps emrald understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
 		});
 
 		// Research opt-in
-		const researchRow = container.createEl('div', { cls: 'emerald-onboard-research' });
+		const researchRow = container.createDiv({ cls: 'emerald-onboard-research' });
 		const researchToggle = researchRow.createEl('label', { cls: 'emerald-onboard-research-label' });
-		const checkbox = researchToggle.createEl('input', { type: 'checkbox' }) as HTMLInputElement;
+		const checkbox = researchToggle.createEl('input', { type: 'checkbox' });
 		checkbox.checked = this.plugin.settings.researchOptIn;
 		checkbox.addEventListener('change', () => { void (async () => {
 			try {
@@ -926,17 +926,17 @@ export class OnboardingModal extends Modal {
 				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
 		})(); });
-		researchToggle.appendText(' Help improve EMRALD — contribute anonymous usage data to build smarter features and advance effort management research. ');
-		const detailsLink = researchToggle.createEl('span', {
+		researchToggle.appendText(' Help improve emrald — contribute anonymous usage data to build smarter features and advance effort management research. ');
+		const detailsLink = researchToggle.createSpan({
 			cls: 'emerald-link',
 			text: 'Change anytime in Settings → Privacy.'
 		});
 
-		const actions = container.createEl('div', { cls: 'emerald-modal-actions emerald-onboard-done-actions' });
+		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-done-actions' });
 
 		const profileBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Enable Advanced Profile'
+			text: 'Enable advanced profile'
 		});
 		profileBtn.addEventListener('click', () => { void (async () => {
 			try {
@@ -963,7 +963,7 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-subtle',
 			text: 'Keep it simple for now'
 		});
-		laterBtn.addEventListener('click', () => this.finish());
+		laterBtn.addEventListener('click', () => { void this.finish(); });
 	}
 
 	// ── Navigation ───────────────────────────────────────
@@ -982,7 +982,7 @@ export class OnboardingModal extends Modal {
 		// Use a tiny delay so the sidebar has time to mount first.
 		const aboutViewType = VIEW_ABOUT;
 		this.close();
-		setTimeout(() => {
+		activeWindow.setTimeout(() => {
 			void this.plugin.openWorkspaceView(aboutViewType);
 			this.onComplete();
 		}, 300);

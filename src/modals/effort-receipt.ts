@@ -59,7 +59,7 @@ export class EffortReceiptModal extends Modal {
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: subtitle });
 
 		// Form
-		const form = contentEl.createEl('div', { cls: 'emerald-form' });
+		const form = contentEl.createDiv({ cls: 'emerald-form' });
 
 		// Perceived Effort (1-10 slider)
 		this.renderSlider(form, 'How hard was that?', null, 1, 10, 5, (val) => {
@@ -83,7 +83,7 @@ export class EffortReceiptModal extends Modal {
 		}, 'Unpleasant', 'Enjoyable');
 
 		// Notes (textarea)
-		const notesGroup = form.createEl('div', { cls: 'emerald-form-group' });
+		const notesGroup = form.createDiv({ cls: 'emerald-form-group' });
 		notesGroup.createEl('label', { text: 'Notes (optional)' });
 		const textarea = notesGroup.createEl('textarea', { cls: 'emerald-textarea' });
 		textarea.placeholder = 'Any observations?';
@@ -93,14 +93,14 @@ export class EffortReceiptModal extends Modal {
 
 		// Completion prompt (if met prescribed effort)
 		if (this.metPrescribedEffort) {
-			const completionGroup = form.createEl('div', { cls: 'emerald-completion-prompt' });
+			const completionGroup = form.createDiv({ cls: 'emerald-completion-prompt' });
 			completionGroup.createEl('p', {
 				text: `You've met the ${this.effortLevel || 'prescribed'} target for ${this.itemName}. Mark complete for today?`
 			});
 		}
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		if (this.metPrescribedEffort) {
 			const completeBtn = actions.createEl('button', {
@@ -134,22 +134,22 @@ export class EffortReceiptModal extends Modal {
 		leftLabel?: string,
 		rightLabel?: string
 	) {
-		const group = container.createEl('div', { cls: 'emerald-form-group' });
-		const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
+		const group = container.createDiv({ cls: 'emerald-form-group' });
+		const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
 		const labelEl = labelRow.createEl('label', { text: label });
 		const labelId = `emerald-slider-${label.replace(/\s+/g, '-').toLowerCase()}`;
 		labelEl.id = labelId;
-		const valueEl = labelRow.createEl('span', { cls: 'emerald-slider-value', text: `${initial}/10` });
+		const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: `${initial}/10` });
 
 		if (description) {
-			group.createEl('div', { cls: 'emerald-form-desc', text: description });
+			group.createDiv({ cls: 'emerald-form-desc', text: description });
 		}
 
 		// Endpoint labels row (above slider)
 		if (leftLabel || rightLabel) {
-			const endpointRow = group.createEl('div', { cls: 'emerald-slider-endpoints' });
-			endpointRow.createEl('span', { cls: 'emerald-slider-endpoint-left', text: leftLabel ?? '' });
-			endpointRow.createEl('span', { cls: 'emerald-slider-endpoint-right', text: rightLabel ?? '' });
+			const endpointRow = group.createDiv({ cls: 'emerald-slider-endpoints' });
+			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-left', text: leftLabel ?? '' });
+			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-right', text: rightLabel ?? '' });
 		}
 
 		const slider = group.createEl('input', { cls: 'emerald-slider' });
@@ -171,10 +171,10 @@ export class EffortReceiptModal extends Modal {
 	}
 
 	private renderFlowButtons(container: HTMLElement) {
-		const group = container.createEl('div', { cls: 'emerald-form-group' });
+		const group = container.createDiv({ cls: 'emerald-form-group' });
 		group.createEl('label', { text: 'Were you in the zone?' });
 
-		const btnRow = group.createEl('div', { cls: 'emerald-btn-group' });
+		const btnRow = group.createDiv({ cls: 'emerald-btn-group' });
 		btnRow.setAttribute('role', 'radiogroup');
 		btnRow.setAttribute('aria-label', 'Were you in the zone?');
 
@@ -206,7 +206,7 @@ export class EffortReceiptModal extends Modal {
 	}
 
 	private renderEffortSource(container: HTMLElement) {
-		const group = container.createEl('div', { cls: 'emerald-form-group' });
+		const group = container.createDiv({ cls: 'emerald-form-group' });
 		group.createEl('label', { text: 'What made it effortful?' });
 
 		const sources = [
@@ -218,7 +218,7 @@ export class EffortReceiptModal extends Modal {
 			{ key: 'uncertainty', label: 'Uncertainty' }
 		];
 
-		const grid = group.createEl('div', { cls: 'emerald-source-grid' });
+		const grid = group.createDiv({ cls: 'emerald-source-grid' });
 		grid.setAttribute('role', 'group');
 		grid.setAttribute('aria-label', 'Effort sources (select all that apply)');
 

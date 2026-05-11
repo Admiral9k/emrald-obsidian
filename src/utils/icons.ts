@@ -9,7 +9,7 @@ import { setIcon } from 'obsidian';
  * Returns a <span> with the SVG inserted.
  */
 export function createIconEl(parent: HTMLElement, iconId: string, cls?: string): HTMLElement {
-	const span = parent.createEl('span', { cls: cls || 'emerald-icon' });
+	const span = parent.createSpan({ cls: cls || 'emerald-icon' });
 	setIcon(span, iconId);
 	return span;
 }

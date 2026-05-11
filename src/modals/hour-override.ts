@@ -35,22 +35,22 @@ export class HourOverrideModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-houroverride-modal');
 
-		contentEl.createEl('h2', { text: 'Adjust today\'s hours' });
+		contentEl.createEl('h2', { text: "Adjust today's hours" });
 
-		const form = contentEl.createEl('div', { cls: 'emerald-form' });
+		const form = contentEl.createDiv({ cls: 'emerald-form' });
 
 		// Base schedule display
 		const dayName = DAY_NAMES[new Date().getDay()];
 		if (this.baseScheduleHours !== null) {
-			const baseEl = form.createEl('div', { cls: 'emerald-houroverride-base' });
-			baseEl.createEl('span', { text: `Base schedule (${dayName}): ${this.baseScheduleHours}h` });
+			const baseEl = form.createDiv({ cls: 'emerald-houroverride-base' });
+			baseEl.createSpan({ text: `Base schedule (${dayName}): ${this.baseScheduleHours}h` });
 		}
 
 		// Slider
-		const group = form.createEl('div', { cls: 'emerald-form-group' });
-		const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
-		labelRow.createEl('label', { text: 'Today\'s hours' });
-		const valueEl = labelRow.createEl('span', {
+		const group = form.createDiv({ cls: 'emerald-form-group' });
+		const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
+		labelRow.createEl('label', { text: "Today's hours" });
+		const valueEl = labelRow.createSpan({
 			cls: 'emerald-slider-value emerald-houroverride-value',
 			text: `${this.selectedHours}h`
 		});
@@ -69,9 +69,9 @@ export class HourOverrideModal extends Modal {
 		slider.setAttribute('aria-valuetext', `${this.selectedHours} hours`);
 
 		// Range labels
-		const rangeLabels = group.createEl('div', { cls: 'emerald-houroverride-range' });
-		rangeLabels.createEl('span', { text: '0h' });
-		rangeLabels.createEl('span', { text: '12h' });
+		const rangeLabels = group.createDiv({ cls: 'emerald-houroverride-range' });
+		rangeLabels.createSpan({ text: '0h' });
+		rangeLabels.createSpan({ text: '12h' });
 
 		slider.addEventListener('input', () => {
 			this.selectedHours = parseInt(slider.value) / 2;
@@ -81,10 +81,10 @@ export class HourOverrideModal extends Modal {
 		});
 
 		// Reset note
-		form.createEl('div', { cls: 'emerald-form-desc emerald-houroverride-note', text: 'This override resets at midnight.' });
+		form.createDiv({ cls: 'emerald-form-desc emerald-houroverride-note', text: 'This override resets at midnight.' });
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const saveBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',

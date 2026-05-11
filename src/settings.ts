@@ -86,7 +86,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl).setName('General').setHeading();
+		;
 
 		// ── Account ─────────────────────────────────────────
 
@@ -94,9 +94,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('API key')
-			.setDesc('Your EMRALD API key from effortmastery.com')
+			.setDesc('Your emrald API key from effortmastery.com')
 			.addText(text => text
-				.setPlaceholder('em_...')
+				.setPlaceholder('Em_...')
 				.setValue(this.plugin.settings.apiKey)
 				.onChange((value) => {
 					this.plugin.settings.apiKey = value;
@@ -106,7 +106,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('API URL')
-			.setDesc('EMRALD API endpoint')
+			.setDesc('Emrald API endpoint')
 			.addText(text => text
 				.setValue(this.plugin.settings.apiUrl)
 				.onChange((value) => {
@@ -123,13 +123,13 @@ export class EmraldSettingTab extends PluginSettingTab {
 				.onClick(() => {
 					statusSetting.setDesc('Testing...');
 					void this.plugin.apiClient.testConnection().then(resp => {
-						statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected ✓');
+						statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected 2713');
 					});
 				}));
 
 		if (this.plugin.settings.apiKey) {
 			void this.plugin.apiClient.testConnection().then(resp => {
-				statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected ✓');
+						statusSetting.setDesc(resp.error ? `Error: ${resp.error}` : 'Connected 2713');
 			});
 		} else {
 			statusSetting.setDesc('No API key configured');
@@ -163,7 +163,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Auto-detect new notes')
-			.setDesc('Prompt when new notes appear in Active folder')
+			.setDesc('Prompt when new notes appear in active folder')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.autoDetectNotes)
 				.onChange((value) => {
@@ -173,7 +173,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Auto-detect folder moves')
-			.setDesc('Prompt when notes move between Active/Inactive')
+			.setDesc('Prompt when notes move between active/inactive')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.autoDetectMoves)
 				.onChange((value) => {
@@ -201,7 +201,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Burnout warning modals')
-			.setDesc('Show burnout warning modals when D8 crosses threshold')
+			.setDesc('Show burnout warning modals when d8 crosses threshold')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.burnoutModalEnabled)
 				.onChange((value) => {
@@ -230,8 +230,8 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setDesc('How the session timer is displayed')
 			.addDropdown(drop => drop
 				.addOption('digital', 'Digital')
-				.addOption('analog', 'Analog (post-MVP)')
-				.addOption('timetimer', 'Time Timer (post-MVP)')
+				.addOption('analog', 'Analog (post-mvp)')
+				.addOption('timetimer', 'Time timer (post-mvp)')
 				.setValue(this.plugin.settings.timerStyle)
 				.onChange((value) => {
 					this.plugin.settings.timerStyle = value as 'digital' | 'analog' | 'timetimer';
@@ -256,7 +256,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Frontmatter sync')
-			.setDesc('Write EMRALD metadata to note frontmatter')
+			.setDesc('Write emrald metadata to note frontmatter')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.frontmatterEnabled)
 				.onChange((value) => {
@@ -296,7 +296,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 				}));
 
 		if (pending.length > 0) {
-			containerEl.createEl('div', { text: 'Pending queued actions:', cls: 'setting-item-description' });
+			containerEl.createDiv({ text: 'Pending queued actions:', cls: 'setting-item-description' });
 			for (const action of pending) {
 				const desc = `${action.description} • retries: ${action.retries}${action.lastStatus !== undefined ? ` • last status: ${action.lastStatus}` : ''}${action.lastError ? ` • ${action.lastError}` : ''}`;
 				new Setting(containerEl)
@@ -317,7 +317,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName('Privacy').setHeading();
 
 		new Setting(containerEl)
-			.setName('Help improve EMRALD')
+			.setName('Help improve emrald')
 			.setDesc(
 				'Effort management is a new field, and every data point helps make it better. ' +
 				'Your anonymized usage patterns (never notes, names, or identifiers) help us build smarter ' +
@@ -359,17 +359,17 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Digest delivery time')
-			.setDesc('Time of day in UTC (24h format, e.g. 09:00 = 4am EST)')
+			.setDesc('Time of day in utc (24h format, e.g. 09:00 = 4am est)')
 			.addText(text => {
-				let debounce: ReturnType<typeof setTimeout> | null = null;
+				let debounce: number | null = null;
 				text
 					.setPlaceholder('09:00')
 					.setValue(this.plugin.settings.digestTime)
 					.onChange((value) => {
 						this.plugin.settings.digestTime = value;
 						void this.plugin.saveSettings();
-						if (debounce) clearTimeout(debounce);
-						debounce = setTimeout(() => {
+						if (debounce) activeWindow.clearTimeout(debounce);
+						debounce = activeWindow.setTimeout(() => {
 							void this.plugin.syncDigestPreferences();
 						}, 700);
 					});
@@ -403,16 +403,16 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Send feedback')
-			.setDesc('Help us improve EMRALD — report bugs, request features, or share your experience')
+			.setDesc('Help us improve emrald — report bugs, request features, or share your experience')
 			.addButton(btn => btn
-				.setButtonText('Send Email')
+				.setButtonText('Send email')
 				.onClick(() => {
-					window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
+					window.open('mailto:feedback@effortmastery.com?subject=Emrald%20Feedback', '_blank');
 				}));
 
 		new Setting(containerEl)
 			.setName('Website')
-			.setDesc('Learn more about EMRALD and Effort Management')
+			.setDesc('Learn more about emrald and effort management')
 			.addButton(btn => btn
 				.setButtonText('getemrald.com')
 				.onClick(() => {

@@ -43,7 +43,7 @@ export class BurnoutWarningModal extends Modal {
 		contentEl.setAttribute('aria-describedby', 'emerald-burnout-desc');
 
 		// Warm gold icon + title
-		const header = contentEl.createEl('div', { cls: 'emerald-burnout-header' });
+		const header = contentEl.createDiv({ cls: 'emerald-burnout-header' });
 		createIconEl(header, ICONS.flame, 'emerald-burnout-icon');
 		const titleEl = header.createEl('h2', { text: this.phaseTitle() });
 		titleEl.id = 'emerald-burnout-title';
@@ -54,8 +54,8 @@ export class BurnoutWarningModal extends Modal {
 
 		// Contributing factors (if any)
 		if (this.contributingFactors.length > 0) {
-			const factorsEl = contentEl.createEl('div', { cls: 'emerald-burnout-factors' });
-			factorsEl.createEl('div', { cls: 'emerald-burnout-factors-label', text: 'What\'s contributing:' });
+			const factorsEl = contentEl.createDiv({ cls: 'emerald-burnout-factors' });
+			factorsEl.createDiv({ cls: 'emerald-burnout-factors-label', text: "What's contributing:" });
 			const list = factorsEl.createEl('ul', { cls: 'emerald-burnout-factors-list' });
 			for (const factor of this.contributingFactors) {
 				list.createEl('li', { text: factor });
@@ -63,13 +63,13 @@ export class BurnoutWarningModal extends Modal {
 		}
 
 		// Gentle suggestion
-		const suggestion = contentEl.createEl('div', { cls: 'emerald-burnout-suggestion' });
+		const suggestion = contentEl.createDiv({ cls: 'emerald-burnout-suggestion' });
 		suggestion.createEl('p', {
 			text: this.phaseSuggestion()
 		});
 
 		// Action buttons — 3 options per spec
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions emerald-burnout-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions emerald-burnout-actions' });
 
 		const breakBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-warm',
@@ -83,8 +83,8 @@ export class BurnoutWarningModal extends Modal {
 
 		const okayBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',
-			text: 'I\'m okay',
-			attr: { 'aria-label': 'I\'m okay' }
+			text: "I'm okay",
+			attr: { 'aria-label': "I'm okay" }
 		});
 		okayBtn.addEventListener('click', () => {
 			this.onAction('im_okay');
@@ -105,7 +105,7 @@ export class BurnoutWarningModal extends Modal {
 	private phaseTitle(): string {
 		switch (this.burnoutPhase) {
 			case 'yellow': return 'Hey — just checking in';
-			case 'orange': return 'You\'re pushing pretty hard';
+			case 'orange': return "You're pushing pretty hard";
 			case 'red': return 'You need to stop';
 			default: return 'Burnout Warning';
 		}
@@ -116,9 +116,9 @@ export class BurnoutWarningModal extends Modal {
 			case 'yellow':
 				return 'Your effort levels have been creeping up. Maybe ease off a bit today?';
 			case 'orange':
-				return 'You\'ve been running hot for a while now. A real break — not just a pause — would do you good.';
+				return "You've been running hot for a while now. A real break — not just a pause — would do you good.";
 			case 'red':
-				return 'This isn\'t sustainable. Step away. The work will be there tomorrow, but you need to be too.';
+				return "This isn't sustainable. Step away. The work will be there tomorrow, but you need to be too.";
 			default:
 				return 'Consider taking a break.';
 		}

@@ -31,7 +31,7 @@ export class WelcomeBackModal extends Modal {
 		contentEl.addClass('emerald-modal', 'emerald-welcomeback-modal');
 
 		// Welcome icon
-		const iconEl = contentEl.createEl('div', { cls: 'emerald-welcomeback-icon' });
+		const iconEl = contentEl.createDiv({ cls: 'emerald-welcomeback-icon' });
 		iconEl.textContent = '👋';
 
 		// Title — varies by gap length
@@ -41,7 +41,7 @@ export class WelcomeBackModal extends Modal {
 		contentEl.createEl('h2', { text: title });
 
 		// Body
-		const body = contentEl.createEl('div', { cls: 'emerald-welcomeback-body' });
+		const body = contentEl.createDiv({ cls: 'emerald-welcomeback-body' });
 
 		// Context about the gap
 		const gapText = this.daysSinceLastSession === 1
@@ -62,14 +62,14 @@ export class WelcomeBackModal extends Modal {
 		// Encouragement — gentle nudge, not guilt
 		body.createEl('p', {
 			cls: 'emerald-welcomeback-encouragement',
-			text: 'Every session — even a short one — gives EMRALD better data to work with. Start small if you need to.'
+			text: 'Every session — even a short one — gives emrald better data to work with. Start small if you need to.'
 		});
 
 		// Single dismiss button
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions emerald-welcomeback-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions emerald-welcomeback-actions' });
 		const btn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Let\'s go'
+			text: "Let's go"
 		});
 		btn.addEventListener('click', () => this.close());
 	}

@@ -122,7 +122,7 @@ export class EmraldAPIClient {
 			const response: RequestUrlResponse = await Promise.race([
 				requestUrl(params),
 				new Promise<never>((_, reject) =>
-					setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+					activeWindow.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
 				)
 			]);
 
@@ -141,7 +141,7 @@ export class EmraldAPIClient {
 
 				// Unwrap API envelope: many endpoints return { data: <payload>, total?, limit?, offset? }
 				// Extract the inner .data so callers get the actual payload directly.
-				let payload = response.json;
+				let payload: unknown = response.json;
 				if (payload && typeof payload === 'object' && 'data' in payload && !Array.isArray(payload)) {
 					payload = (payload as Record<string, unknown>).data;
 				}
@@ -161,7 +161,7 @@ export class EmraldAPIClient {
 
 			// 403 Forbidden — free tier limit hit
 			if (response.status === 403) {
-				const msg = this.extractErrorMessage(response) || 'Feature requires EMRALD Pro';
+				const msg = this.extractErrorMessage(response) || 'Feature requires emrald Pro';
 				return {
 					data: null,
 					error: `Free tier limit: ${msg}. Upgrade at effortmastery.com/pro`,
@@ -209,7 +209,7 @@ export class EmraldAPIClient {
 
 				return {
 					data: null,
-					error: 'EMRALD is having trouble. Please try again in a moment.',
+					error: 'Emrald is having trouble. Please try again in a moment.',
 					status: response.status
 				};
 			}
@@ -242,7 +242,7 @@ export class EmraldAPIClient {
 				if (this.offlineQueue) {
 					this.offlineQueue.setOnlineStatus(true);
 				}
-				console.error(`[EMRALD API] ${method} ${path} failed`, {
+				console.error(`[Emrald API] ${method} ${path} failed`, {
 					status: thrownStatus,
 					message,
 					body,
@@ -255,7 +255,7 @@ export class EmraldAPIClient {
 					return { data: null, error: 'Invalid API key — please check your key in Settings.', status: 401 };
 				}
 				if (thrownStatus === 403) {
-					return { data: null, error: 'Feature requires EMRALD Pro. Upgrade at effortmastery.com/pro', status: 403 };
+					return { data: null, error: 'Feature requires emrald Pro. Upgrade at effortmastery.com/pro', status: 403 };
 				}
 				if (thrownStatus === 404) {
 					return { data: null, error: null, status: 404 };
@@ -279,7 +279,7 @@ export class EmraldAPIClient {
 				return { data: null, error: null, status: 0, queued: true };
 			}
 
-			console.error(`[EMRALD API] ${method} ${path} network failure`, {
+			console.error(`[Emrald API] ${method} ${path} network failure`, {
 				message,
 				body,
 				error: errAny
@@ -497,7 +497,7 @@ export class EmraldAPIClient {
 	}
 
 	private delay(ms: number): Promise<void> {
-		return new Promise(resolve => setTimeout(resolve, ms));
+		return new Promise(resolve => activeWindow.setTimeout(resolve, ms));
 	}
 
 	// ── Auth ──────────────────────────────────────────────
@@ -723,13 +723,13 @@ export class EmraldAPIClient {
 		// For a single-day override, fetch current schedule, update the target day, then PUT.
 		// API returns flat array: [{day_of_week, available_hours}, ...]
 		const currentResp = await this.getAvailability();
-		const currentRows = currentResp.data;
+		const currentRows = currentResp.data as unknown as Array<{day_of_week: number; available_hours: number}> | null;
 
 		const dayOfWeek = new Date(date + 'T12:00:00').getDay(); // 0=Sun, 6=Sat
 		const schedule: Array<{ day: number; available_hours: number }> = [];
 		for (let d = 0; d < 7; d++) {
 			const existing = Array.isArray(currentRows)
-				? currentRows.find((e: Record<string, unknown>) => e.day_of_week === d)
+				? currentRows.find((e) => e.day_of_week === d)
 				: null;
 			schedule.push({
 				day: d,

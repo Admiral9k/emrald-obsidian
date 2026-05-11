@@ -93,7 +93,7 @@ export class FolderSync {
 			// Fetch all items from API
 			const response = await this.apiClient.getItems();
 			if (response.error || !response.data) {
-				console.warn('EMRALD: Full sync failed —', response.error);
+				console.warn('Emrald: Full sync failed —', response.error);
 				return;
 			}
 
@@ -183,7 +183,7 @@ export class FolderSync {
 		if (isEmraldNote(this.app, file)) return;
 
 		// Prompt user to track this note
-		new Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
+		new Notice(`New note in Active folder: "${file.basename}". Open emrald sidebar to track it.`);
 	}
 
 	/**
@@ -202,7 +202,7 @@ export class FolderSync {
 
 		// Active → Inactive: pause the item
 		if (wasActive && nowInactive) {
-			const response = await this.apiClient.updateItem(emeraldId, { status: 'paused' } as Partial<TrackedItem>);
+			const response = await this.apiClient.updateItem(emeraldId, { status: 'paused' });
 			if (!response.error) {
 				await writeEmraldFrontmatter(this.app, file, { 'status': 'paused' });
 				new Notice(`"${file.basename}" paused.`);
@@ -211,7 +211,7 @@ export class FolderSync {
 
 		// Inactive → Active: reactivate the item
 		if (wasInactive && nowActive) {
-			const response = await this.apiClient.updateItem(emeraldId, { status: 'active' } as Partial<TrackedItem>);
+			const response = await this.apiClient.updateItem(emeraldId, { status: 'active' });
 			if (!response.error) {
 				await writeEmraldFrontmatter(this.app, file, { 'status': 'active' });
 				new Notice(`"${file.basename}" reactivated.`);
@@ -239,7 +239,7 @@ export class FolderSync {
 		if (currentLevel && currentLevel !== cachedItem.effort_level) {
 			const response = await this.apiClient.updateItem(emeraldId, {
 				effort_level: currentLevel
-			} as Partial<TrackedItem>);
+			});
 
 			if (!response.error && response.data) {
 				this.localItemCache.set(emeraldId, response.data);
@@ -276,11 +276,11 @@ export class FolderSync {
 		}
 
 		if (Object.keys(updates).length > 0) {
-			await writeEmraldFrontmatter(this.app, file, updates as Partial<import('./frontmatter').EmraldFrontmatter>);
+			await writeEmraldFrontmatter(this.app, file, updates);
 		}
 	}
 }
 
 function sleep(ms: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise(resolve => activeWindow.setTimeout(resolve, ms));
 }

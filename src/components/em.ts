@@ -42,11 +42,11 @@ export class EMComponent {
 	destroy() {
 		this.stopInsightRotation();
 		if (this.pinnedMetricsListener) {
-			window.removeEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener as EventListener);
+			window.removeEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener);
 			this.pinnedMetricsListener = undefined;
 		}
 		if (this.insightAckListener) {
-			window.removeEventListener('emrald:insight-acknowledged', this.insightAckListener as EventListener);
+			window.removeEventListener('emrald:insight-acknowledged', this.insightAckListener);
 			this.insightAckListener = undefined;
 		}
 	}
@@ -56,12 +56,12 @@ export class EMComponent {
 		this.containerEl.addClass('emerald-em-content');
 
 		// Energy check-in banner (placeholder — filled by loadData)
-		this.checkinBannerEl = this.containerEl.createEl('div', { cls: 'emerald-checkin-banner is-hidden' });
+		this.checkinBannerEl = this.containerEl.createDiv({ cls: 'emerald-checkin-banner is-hidden' });
 
 		// Sparklines (Pro only — Pinned Metrics)
 		if (tierState.isPro()) {
-			this.sparklinesEl = this.containerEl.createEl('div', { cls: 'emerald-sparklines' });
-			this.sparklinesEl.createEl('div', { cls: 'emerald-sparklines-title', text: 'Pinned metrics' });
+			this.sparklinesEl = this.containerEl.createDiv({ cls: 'emerald-sparklines' });
+			this.sparklinesEl.createDiv({ cls: 'emerald-sparklines-title', text: 'Pinned metrics' });
 			this.renderSparklinePlaceholders();
 		} else {
 			this.sparklinesEl = null;
@@ -69,8 +69,8 @@ export class EMComponent {
 
 		// Insight bulletin (Pro only)
 		if (tierState.isPro()) {
-			this.insightEl = this.containerEl.createEl('div', { cls: 'emerald-insight-bulletin' });
-			this.insightEl.createEl('div', { cls: 'emerald-insight-empty', text: 'Loading insights...' });
+			this.insightEl = this.containerEl.createDiv({ cls: 'emerald-insight-bulletin' });
+			this.insightEl.createDiv({ cls: 'emerald-insight-empty', text: 'Loading insights...' });
 		} else {
 			this.insightEl = null;
 		}
@@ -85,20 +85,20 @@ export class EMComponent {
 
 		// Listen for live pin changes from Data Center
 		if (this.pinnedMetricsListener) {
-			window.removeEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener as EventListener);
+			window.removeEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener);
 		}
 		this.pinnedMetricsListener = () => this.render();
-		window.addEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener as EventListener);
+		window.addEventListener('emrald:pinned-metrics-changed', this.pinnedMetricsListener);
 
 		// Listen for insight acknowledgement from Insight Log workspace view
 		if (this.insightAckListener) {
-			window.removeEventListener('emrald:insight-acknowledged', this.insightAckListener as EventListener);
+			window.removeEventListener('emrald:insight-acknowledged', this.insightAckListener);
 		}
 		this.insightAckListener = () => {
 			// Reload insights from API to sync state, then re-render bulletin + badge
 			void this.loadData();
 		};
-		window.addEventListener('emrald:insight-acknowledged', this.insightAckListener as EventListener);
+		window.addEventListener('emrald:insight-acknowledged', this.insightAckListener);
 
 		// Load real data
 		void this.loadData();
@@ -117,11 +117,11 @@ export class EMComponent {
 
 		this.checkinBannerEl.removeClass('is-hidden');
 
-		const inner = this.checkinBannerEl.createEl('div', { cls: 'emerald-checkin-inner' });
+		const inner = this.checkinBannerEl.createDiv({ cls: 'emerald-checkin-inner' });
 		createIconEl(inner, ICONS.sun, 'emerald-checkin-icon');
-		const textCol = inner.createEl('div', { cls: 'emerald-checkin-text' });
-		textCol.createEl('div', { cls: 'emerald-checkin-title', text: 'Daily check-in' });
-		textCol.createEl('div', { cls: 'emerald-checkin-desc', text: 'How are you feeling today?' });
+		const textCol = inner.createDiv({ cls: 'emerald-checkin-text' });
+		textCol.createDiv({ cls: 'emerald-checkin-title', text: 'Daily check-in' });
+		textCol.createDiv({ cls: 'emerald-checkin-desc', text: 'How are you feeling today?' });
 
 		const btn = inner.createEl('button', { cls: 'emerald-btn emerald-btn-primary emerald-checkin-btn', text: 'Check in' });
 		btn.setAttribute('aria-label', 'Open daily energy check-in');
@@ -163,11 +163,11 @@ export class EMComponent {
 		if (title) this.sparklinesEl.appendChild(title);
 
 		for (const key of this.pinnedMetrics) {
-			const row = this.sparklinesEl.createEl('div', { cls: 'emerald-sparkline-row' });
+			const row = this.sparklinesEl.createDiv({ cls: 'emerald-sparkline-row' });
 			row.dataset.metricKey = key;
-			row.createEl('span', { cls: 'emerald-sparkline-key', text: key });
-			row.createEl('span', { cls: 'emerald-sparkline-graph', text: '·······' });
-			row.createEl('span', { cls: 'emerald-sparkline-value', text: '—' });
+			row.createSpan({ cls: 'emerald-sparkline-key', text: key });
+			row.createSpan({ cls: 'emerald-sparkline-graph', text: '·······' });
+			row.createSpan({ cls: 'emerald-sparkline-value', text: '—' });
 		}
 	}
 
@@ -243,7 +243,7 @@ export class EMComponent {
 	 * Returns an <svg> element with a polyline and endpoint dot.
 	 */
 	private buildSparklineSVG(values: number[]): SVGElement {
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		const svg = activeDocument.createSvg('svg');
 		svg.setAttribute('width', String(SPARK_WIDTH));
 		svg.setAttribute('height', String(SPARK_HEIGHT));
 		svg.setAttribute('viewBox', `0 0 ${SPARK_WIDTH} ${SPARK_HEIGHT}`);
@@ -254,7 +254,7 @@ export class EMComponent {
 		// No data — render a flat dashed line at midpoint
 		if (values.length === 0) {
 			const midY = SPARK_HEIGHT / 2;
-			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			const line = activeDocument.createSvg('line');
 			line.setAttribute('x1', '0');
 			line.setAttribute('y1', String(midY));
 			line.setAttribute('x2', String(SPARK_WIDTH));
@@ -266,7 +266,7 @@ export class EMComponent {
 
 		// Single value — render a dot at center
 		if (values.length === 1) {
-			const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			const dot = activeDocument.createSvg('circle');
 			dot.setAttribute('cx', String(SPARK_WIDTH / 2));
 			dot.setAttribute('cy', String(SPARK_HEIGHT / 2));
 			dot.setAttribute('r', String(SPARK_DOT_RADIUS + 0.5));
@@ -297,14 +297,14 @@ export class EMComponent {
 		}
 
 		// Polyline for the sparkline path
-		const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+		const polyline = activeDocument.createSvg('polyline');
 		polyline.setAttribute('points', points.join(' '));
 		polyline.classList.add('emerald-sparkline-line');
 		svg.appendChild(polyline);
 
 		// Endpoint dot on the most recent value (last point)
 		const lastPoint = points[points.length - 1].split(',');
-		const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		const dot = activeDocument.createSvg('circle');
 		dot.setAttribute('cx', lastPoint[0]);
 		dot.setAttribute('cy', lastPoint[1]);
 		dot.setAttribute('r', String(SPARK_DOT_RADIUS));
@@ -323,29 +323,29 @@ export class EMComponent {
 		const unread = this.insights.filter(i => !i.acknowledged_at);
 
 		if (unread.length === 0) {
-			this.insightEl.createEl('div', { cls: 'emerald-insight-empty', text: 'No insights yet. Keep working!' });
+			this.insightEl.createDiv({ cls: 'emerald-insight-empty', text: 'No insights yet. Keep working!' });
 			return;
 		}
 
 		// Container with visual distinction
-		const container = this.insightEl.createEl('div', { cls: 'emerald-insight-container' });
+		const container = this.insightEl.createDiv({ cls: 'emerald-insight-container' });
 
 		// Header
-		container.createEl('div', { cls: 'emerald-insight-header', text: 'Latest insights' });
+		container.createDiv({ cls: 'emerald-insight-header', text: 'Latest insights' });
 
 		// Clamp index
 		this.currentInsightIndex = Math.min(this.currentInsightIndex, Math.max(unread.length - 1, 0));
 		if (this.currentInsightIndex < 0) this.currentInsightIndex = 0;
 
 		const insight = unread[this.currentInsightIndex];
-		container.createEl('div', { cls: 'emerald-insight-title', text: insight.title });
-		container.createEl('div', { cls: 'emerald-insight-body', text: insight.body });
+		container.createDiv({ cls: 'emerald-insight-title', text: insight.title });
+		container.createDiv({ cls: 'emerald-insight-body', text: insight.body });
 
 		// Pagination dots
 		if (unread.length > 1) {
-			const dots = container.createEl('div', { cls: 'emerald-insight-dots' });
+			const dots = container.createDiv({ cls: 'emerald-insight-dots' });
 			for (let i = 0; i < unread.length; i++) {
-				const dot = dots.createEl('span', { cls: 'emerald-insight-dot' });
+				const dot = dots.createSpan({ cls: 'emerald-insight-dot' });
 				if (i === this.currentInsightIndex) dot.addClass('is-active');
 				const idx = i; // capture for closure
 				dot.addEventListener('click', () => {
@@ -357,7 +357,7 @@ export class EMComponent {
 		}
 
 		// Actions
-		const actions = container.createEl('div', { cls: 'emerald-insight-actions' });
+		const actions = container.createDiv({ cls: 'emerald-insight-actions' });
 		const gotItBtn = actions.createEl('button', { cls: 'emerald-btn-tiny', text: 'Got it' });
 		gotItBtn.setAttribute('aria-label', 'Dismiss insight');
 		gotItBtn.addEventListener('click', () => void this.acknowledgeInsight(insight.id, 'dismissed'));
@@ -366,13 +366,13 @@ export class EMComponent {
 		this.startInsightRotation();
 	}
 
-	private insightRotationTimer: ReturnType<typeof setInterval> | null = null;
+	private insightRotationTimer: number | null = null;
 
 	private startInsightRotation() {
 		this.stopInsightRotation();
 		if (this.insights.length <= 1) return;
 
-		this.insightRotationTimer = setInterval(() => {
+		this.insightRotationTimer = activeWindow.setInterval(() => {
 			this.currentInsightIndex = (this.currentInsightIndex + 1) % this.insights.length;
 			this.renderInsightBulletin();
 		}, (this.plugin.settings?.insightRotationSeconds ?? 15) * 1000);
@@ -380,7 +380,7 @@ export class EMComponent {
 
 	private stopInsightRotation() {
 		if (this.insightRotationTimer) {
-			clearInterval(this.insightRotationTimer);
+			activeWindow.clearInterval(this.insightRotationTimer);
 			this.insightRotationTimer = null;
 		}
 	}
@@ -391,8 +391,8 @@ export class EMComponent {
 	private static PRO_VIEWS = new Set([VIEW_INSIGHT_LOG, VIEW_DATA_CENTER]);
 
 	private renderWorkspaceButtons() {
-		const section = this.containerEl.createEl('div', { cls: 'emerald-workspace-buttons' });
-		section.createEl('div', { cls: 'emerald-workspace-title', text: 'Workspace views' });
+		const section = this.containerEl.createDiv({ cls: 'emerald-workspace-buttons' });
+		section.createDiv({ cls: 'emerald-workspace-title', text: 'Workspace views' });
 
 		const buttons = [
 			{ icon: ICONS.barChart, label: 'E-level overview', view: VIEW_ELEVEL_OVERVIEW },
@@ -405,24 +405,24 @@ export class EMComponent {
 		];
 
 		for (const btn of buttons) {
-			const row = section.createEl('div', { cls: 'emerald-workspace-btn' });
+			const row = section.createDiv({ cls: 'emerald-workspace-btn' });
 			row.setAttribute('role', 'button');
 			row.setAttribute('aria-label', btn.label + (btn.badge && btn.badge > 0 ? ` (${btn.badge} unread)` : ''));
 			row.tabIndex = 0;
-			const rowContent = row.createEl('span', { cls: 'emerald-workspace-btn-label' });
+			const rowContent = row.createSpan({ cls: 'emerald-workspace-btn-label' });
 			const iconEl = createIconEl(rowContent, btn.icon, 'emerald-workspace-btn-icon');
 			iconEl.setAttribute('aria-hidden', 'true');
-			rowContent.createEl('span', { text: btn.label });
+			rowContent.createSpan({ text: btn.label });
 
 			// Unread badge — inline with label so it doesn't push PRO pill
 			if (btn.badge && btn.badge > 0) {
-				const badgeEl = rowContent.createEl('span', { cls: 'emerald-badge', text: String(btn.badge) });
+				const badgeEl = rowContent.createSpan({ cls: 'emerald-badge', text: String(btn.badge) });
 				badgeEl.setAttribute('aria-hidden', 'true');
 			}
 
 			// PRO pill badge for gated views
 			if (EMComponent.PRO_VIEWS.has(btn.view)) {
-				row.createEl('span', { cls: 'emerald-pro-pill', text: 'PRO' });
+				row.createSpan({ cls: 'emerald-pro-pill', text: 'PRO' });
 			}
 
 			row.addEventListener('click', () => void this.openWorkspaceView(btn.view));
@@ -438,15 +438,15 @@ export class EMComponent {
 		const version = this.plugin.manifest.version ?? '0.0.0';
 		const major = parseInt(version.split('.')[0] ?? '0');
 		if (major < 1) {
-			const footer = section.createEl('div', { cls: 'emerald-feedback-footer' });
+			const footer = section.createDiv({ cls: 'emerald-feedback-footer' });
 			const link = footer.createEl('a', {
 				cls: 'emerald-feedback-link',
-				text: '🟢 Early Access · Send Feedback',
-				href: 'mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback'
+				text: '🟢 Early access · send feedback',
+				href: 'mailto:feedback@effortmastery.com?subject=Emrald%20Feedback'
 			});
 			link.addEventListener('click', (e) => {
 				e.preventDefault();
-				window.open('mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback', '_blank');
+				window.open('mailto:feedback@effortmastery.com?subject=Emrald%20Feedback', '_blank');
 			});
 		}
 	}
@@ -454,21 +454,21 @@ export class EMComponent {
 	// ── Upgrade Card (sidebar, free users only) ─────────────
 
 	private renderUpgradeCard() {
-		const card = this.containerEl.createEl('div', { cls: 'emerald-sidebar-upgrade-card' });
+		const card = this.containerEl.createDiv({ cls: 'emerald-sidebar-upgrade-card' });
 
-		const headerRow = card.createEl('div', { cls: 'emerald-upgrade-header' });
+		const headerRow = card.createDiv({ cls: 'emerald-upgrade-header' });
 		const upgradeIcon = createIconEl(headerRow, 'sparkles', 'emerald-upgrade-icon-svg');
 		upgradeIcon.setAttribute('aria-hidden', 'true');
-		headerRow.createEl('span', { cls: 'emerald-upgrade-title', text: 'Unlock full intelligence' });
+		headerRow.createSpan({ cls: 'emerald-upgrade-title', text: 'Unlock full intelligence' });
 
 		card.createEl('p', {
 			cls: 'emerald-upgrade-desc',
-			text: 'Pinned metrics, AI insights, daily digests, and advanced analytics — all with Pro.'
+			text: 'Pinned metrics, AI insights, daily digests, and advanced analytics — all with pro.'
 		});
 
 		const btn = card.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to Pro',
+			text: 'Upgrade to pro',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		btn.setAttribute('target', '_blank');

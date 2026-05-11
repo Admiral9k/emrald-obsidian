@@ -41,9 +41,9 @@ export class EnergyCheckinModal extends Modal {
 		contentEl.addClass('emerald-modal', 'emerald-checkin-modal');
 
 		// Show loading while checking duplicate status
-		const loadingEl = contentEl.createEl('div', { cls: 'emerald-loading' });
-		loadingEl.createEl('div', { cls: 'emerald-spinner' });
-		loadingEl.createEl('div', { cls: 'emerald-loading-text', text: 'Checking today\'s status...' });
+		const loadingEl = contentEl.createDiv({ cls: 'emerald-loading' });
+		loadingEl.createDiv({ cls: 'emerald-spinner' });
+		loadingEl.createDiv({ cls: 'emerald-loading-text', text: "Checking today's status..." });
 
 		// Duplicate guard — check if already submitted today
 		const todayResp = await this.plugin.apiClient.getTodayCheckin();
@@ -53,9 +53,9 @@ export class EnergyCheckinModal extends Modal {
 			contentEl.createEl('h2', { text: 'Already checked in ✓' });
 			contentEl.createEl('p', {
 				cls: 'emerald-modal-subtitle',
-				text: 'You\'ve already submitted your energy check-in today. Come back tomorrow!'
+				text: "You've already submitted your energy check-in today. Come back tomorrow!"
 			});
-			const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+			const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 			const closeBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Got it' });
 			closeBtn.addEventListener('click', () => this.close());
 			return;
@@ -64,7 +64,7 @@ export class EnergyCheckinModal extends Modal {
 		contentEl.createEl('h2', { text: 'Daily check-in' });
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: 'How are you feeling today?' });
 
-		const form = contentEl.createEl('div', { cls: 'emerald-form' });
+		const form = contentEl.createDiv({ cls: 'emerald-form' });
 
 		// Sleep Quality (1-10)
 		this.renderSlider(form, 'Sleep Quality', 'How well did you sleep?', 1, 10, 5, (val) => {
@@ -82,7 +82,7 @@ export class EnergyCheckinModal extends Modal {
 		}, false, 'Drained', 'Energized');
 
 		// Emotional State (1-10)
-		this.renderSlider(form, 'Emotional State', 'How\'s your mood?', 1, 10, 5, (val) => {
+		this.renderSlider(form, 'Emotional State', "How's your mood?", 1, 10, 5, (val) => {
 			this.emotionalEnergy = val;
 		}, false, 'Struggling', 'Great');
 
@@ -92,23 +92,23 @@ export class EnergyCheckinModal extends Modal {
 		}, false, 'Foggy', 'Sharp');
 
 		// Notes (optional)
-		const notesGroup = form.createEl('div', { cls: 'emerald-form-group' });
+		const notesGroup = form.createDiv({ cls: 'emerald-form-group' });
 		notesGroup.createEl('label', { text: 'Notes (optional)' });
 		const textarea = notesGroup.createEl('textarea', { cls: 'emerald-textarea' });
-		textarea.placeholder = 'Anything to note about today\'s energy?';
+		textarea.placeholder = "Anything to note about today's energy?";
 		textarea.addEventListener('input', () => {
 			this.notes = textarea.value;
 		});
 
 		// ── Recovery Question ─────────────────────────────────
-		const recoverySeparator = form.createEl('div', { cls: 'emerald-form-separator' });
+		const recoverySeparator = form.createDiv({ cls: 'emerald-form-separator' });
 		recoverySeparator.createEl('hr');
 
-		const recoveryGroup = form.createEl('div', { cls: 'emerald-form-group' });
-		const recoveryLabelRow = recoveryGroup.createEl('div', { cls: 'emerald-form-label-row' });
+		const recoveryGroup = form.createDiv({ cls: 'emerald-form-group' });
+		const recoveryLabelRow = recoveryGroup.createDiv({ cls: 'emerald-form-label-row' });
 		recoveryLabelRow.createEl('label', { text: 'Did you recharge yesterday?' });
 
-		const recoveryToggle = recoveryLabelRow.createEl('div', { cls: 'checkbox-container' });
+		const recoveryToggle = recoveryLabelRow.createDiv({ cls: 'checkbox-container' });
 		recoveryToggle.setAttribute('role', 'switch');
 		recoveryToggle.setAttribute('aria-checked', 'false');
 		recoveryToggle.setAttribute('aria-label', 'Did you recharge yesterday?');
@@ -117,7 +117,7 @@ export class EnergyCheckinModal extends Modal {
 			this.recoveryYesterday = !this.recoveryYesterday;
 			recoveryToggle.toggleClass('is-enabled', this.recoveryYesterday);
 			recoveryToggle.setAttribute('aria-checked', String(this.recoveryYesterday));
-			this.recoveryYesterday ? effectivenessGroup.removeClass('emrald-hidden') : effectivenessGroup.addClass('emrald-hidden');
+			if (this.recoveryYesterday) { effectivenessGroup.removeClass('emrald-hidden'); } else { effectivenessGroup.addClass('emrald-hidden'); }
 		});
 		recoveryToggle.addEventListener('keydown', (e: KeyboardEvent) => {
 			if (e.key === 'Enter' || e.key === ' ') {
@@ -126,16 +126,16 @@ export class EnergyCheckinModal extends Modal {
 			}
 		});
 
-		recoveryGroup.createEl('div', {
+		recoveryGroup.createDiv({
 			cls: 'emerald-form-desc',
 			text: 'Rest, hobbies, exercise, anything that recharged your batteries.'
 		});
 
-		const effectivenessGroup = form.createEl('div', { cls: 'emerald-form-group' });
+		const effectivenessGroup = form.createDiv({ cls: 'emerald-form-group' });
 		effectivenessGroup.addClass('emrald-hidden');
 		effectivenessGroup.createEl('label', { text: 'How effective was it?' });
 
-		const effRow = effectivenessGroup.createEl('div', { cls: 'emerald-radio-group' });
+		const effRow = effectivenessGroup.createDiv({ cls: 'emerald-radio-group' });
 		effRow.setAttribute('role', 'radiogroup');
 		effRow.setAttribute('aria-label', 'How effective was your recovery?');
 		const effOptions = [
@@ -164,7 +164,7 @@ export class EnergyCheckinModal extends Modal {
 		}
 
 		// Actions
-		const actions = contentEl.createEl('div', { cls: 'emerald-modal-actions' });
+		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const submitBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Submit' });
 		submitBtn.addEventListener('click', () => this.submit());
@@ -185,24 +185,24 @@ export class EnergyCheckinModal extends Modal {
 		lowLabel?: string,
 		highLabel?: string
 	) {
-		const group = container.createEl('div', { cls: 'emerald-form-group' });
-		const labelRow = group.createEl('div', { cls: 'emerald-form-label-row' });
+		const group = container.createDiv({ cls: 'emerald-form-group' });
+		const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
 		const labelEl = labelRow.createEl('label', { text: label });
 		const labelId = `emerald-slider-${label.replace(/\s+/g, '-').toLowerCase()}`;
 		labelEl.id = labelId;
 
 		const displayVal = halfSteps ? `${initial}h` : String(initial);
-		const valueEl = labelRow.createEl('span', { cls: 'emerald-slider-value', text: displayVal });
+		const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: displayVal });
 
 		if (description) {
-			group.createEl('div', { cls: 'emerald-form-desc', text: description });
+			group.createDiv({ cls: 'emerald-form-desc', text: description });
 		}
 
 		// Endpoint labels row (above slider)
 		if (lowLabel || highLabel) {
-			const endpointRow = group.createEl('div', { cls: 'emerald-slider-endpoints' });
-			endpointRow.createEl('span', { cls: 'emerald-slider-endpoint-left', text: lowLabel ?? '' });
-			endpointRow.createEl('span', { cls: 'emerald-slider-endpoint-right', text: highLabel ?? '' });
+			const endpointRow = group.createDiv({ cls: 'emerald-slider-endpoints' });
+			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-left', text: lowLabel ?? '' });
+			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-right', text: highLabel ?? '' });
 		}
 
 		const slider = group.createEl('input', { cls: 'emerald-slider' });

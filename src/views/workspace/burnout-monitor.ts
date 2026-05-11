@@ -13,7 +13,7 @@ const PHASE_META: Record<string, { label: string; icon: string; message: string;
 	green: {
 		label: 'All Clear',
 		icon: 'sun',
-		message: 'You\'re in a good place. Your effort patterns look healthy and sustainable. Keep doing what you\'re doing.',
+		message: "You're in a good place. Your effort patterns look healthy and sustainable. Keep doing what you're doing.",
 		tone: 'Your energy reserves are solid.'
 	},
 	yellow: {
@@ -25,13 +25,13 @@ const PHASE_META: Record<string, { label: string; icon: string; message: string;
 	orange: {
 		label: 'Slow Down',
 		icon: 'cloud-rain',
-		message: 'Multiple indicators suggest you\'re running hot. Consider lighter sessions, more breaks, or activities that recharge you.',
-		tone: 'Your effort debt is accumulating faster than you\'re recovering.'
+		message: "Multiple indicators suggest you're running hot. Consider lighter sessions, more breaks, or activities that recharge you.",
+		tone: "Your effort debt is accumulating faster than you're recovering."
 	},
 	red: {
 		label: 'Recharge Needed',
 		icon: 'cloud-lightning',
-		message: 'Your patterns strongly suggest burnout risk. Please prioritize rest and recharge. This isn\'t a failure — it\'s your body asking for what it needs.',
+		message: "Your patterns strongly suggest burnout risk. Please prioritize rest and recharge. This isn't a failure — it's your body asking for what it needs.",
 		tone: 'This is important. Take care of yourself first.'
 	}
 };
@@ -49,7 +49,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Burnout monitor', 'How you\'re really doing', 'flame');
+		this.renderHeader(container, 'Burnout monitor', "How you're really doing", 'flame');
 
 		// Fetch data concurrently
 		let burnoutResp, metricsResp, historyResp, recoveryResp, d8CurrentResp;
@@ -66,7 +66,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			return;
 		}
 
-		const recoveryProtocols = (recoveryResp.data ?? []) as RecoveryProtocol[];
+		const recoveryProtocols = (recoveryResp.data ?? []);
 		const hasRecoveryActivities = recoveryProtocols.filter(p => p.is_active !== false).length > 0;
 
 		// Offline: if burnout + metrics both failed with no cache, show offline message (P15 fix)
@@ -84,9 +84,9 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		// Normalize burnout state: API may return raw DB row or structured BurnoutState.
 		// Derive phase + score from D8 metric (source of truth), episode info from burnout_state row.
 		const rawState = burnoutResp.data as Record<string, unknown> | null;
-		const d8Metric = d8CurrentResp?.data?.find((m: any) => m.metric_key === 'D8');
+		const d8Metric = d8CurrentResp?.data?.find((m) => m.metric_key === 'D8');
 		const d8Value = d8Metric?.value ?? null;
-		const d8Meta = d8Metric?.metadata as Record<string, unknown> | undefined;
+		const d8Meta = d8Metric?.metadata;
 
 		// Derive phase from D8 value (0-10 scale)
 		let currentPhase: string;
@@ -156,13 +156,13 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		// ── Past Episodes (tucked away) ──
 		// History API returns raw burnout_state rows — normalize to episode shape
 		const rawEpisodes = historyResp.data ?? [];
-		const episodes = rawEpisodes
-			.filter((e: any) => e.episode_started_at || e.started_at) // Only rows with episode data
-			.map((e: any) => ({
-				started_at: e.started_at ?? e.episode_started_at ?? null,
-				resolved_at: e.resolved_at ?? null,
-				peak_phase: e.peak_phase ?? this.escalationToPhase(e.escalation_level),
-				contributing_factors: Array.isArray(e.contributing_factors) ? e.contributing_factors : []
+		const episodes = (rawEpisodes as unknown as Array<Record<string, unknown>>)
+			.filter((e) => e.episode_started_at || e.started_at)
+			.map((e) => ({
+				started_at: ((e.started_at ?? e.episode_started_at ?? '') as string),
+				resolved_at: (e.resolved_at ?? null) as string | null,
+				peak_phase: ((e.peak_phase ?? this.escalationToPhase((e.escalation_level as string) ?? '')) as string),
+				contributing_factors: Array.isArray(e.contributing_factors) ? e.contributing_factors as string[] : []
 			}));
 		if (episodes.length > 0) {
 			this.renderEpisodesCollapsed(container, episodes);
@@ -170,7 +170,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	}
 
 	private renderCrossLink(container: Element) {
-		const link = container.createEl('div', { cls: 'emerald-wv-cross-link' });
+		const link = container.createDiv({ cls: 'emerald-wv-cross-link' });
 		const anchor = link.createEl('a', {
 			cls: 'emerald-wv-cross-link-text',
 			text: 'Review your recharge activities \u2192'
@@ -184,8 +184,8 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	// ── Empty State ─────────────────────────────────────
 
 	private renderEmptyState(container: Element) {
-		const empty = container.createEl('div', { cls: 'emerald-wv-empty-state' });
-		const iconEl = empty.createEl('div', { cls: 'emerald-wv-empty-icon' });
+		const empty = container.createDiv({ cls: 'emerald-wv-empty-state' });
+		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'flame');
 		empty.createEl('h3', { text: 'Not enough data yet' });
 		empty.createEl('p', {
@@ -198,13 +198,13 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 	private renderHero(container: Element, state: { current_phase: string; score: number; contributing_factors: string[] }) {
 		const meta = PHASE_META[state.current_phase] ?? PHASE_META.green;
-		const section = container.createEl('div', { cls: `emerald-wv-section emerald-wv-burnout-hero emerald-wv-burnout-hero-${state.current_phase}` });
+		const section = container.createDiv({ cls: `emerald-wv-section emerald-wv-burnout-hero emerald-wv-burnout-hero-${state.current_phase}` });
 
 		// Phase icon + label
-		const phaseRow = section.createEl('div', { cls: 'emerald-wv-burnout-phase-row' });
-		const iconEl = phaseRow.createEl('span', { cls: 'emerald-wv-burnout-hero-icon' });
+		const phaseRow = section.createDiv({ cls: 'emerald-wv-burnout-phase-row' });
+		const iconEl = phaseRow.createSpan({ cls: 'emerald-wv-burnout-hero-icon' });
 		setIcon(iconEl, meta.icon);
-		phaseRow.createEl('span', { cls: 'emerald-wv-burnout-phase-label', text: meta.label });
+		phaseRow.createSpan({ cls: 'emerald-wv-burnout-phase-label', text: meta.label });
 
 		// Main message
 		section.createEl('p', { cls: 'emerald-wv-burnout-message', text: meta.message });
@@ -214,17 +214,17 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 		// D8 score (understated)
 		const score = typeof state.score === 'number' ? state.score : 0;
-		const scoreRow = section.createEl('div', { cls: 'emerald-wv-burnout-score-row' });
-		const scoreLabelWrap = scoreRow.createEl('span', { cls: 'emerald-wv-burnout-score-label-wrap' });
-		scoreLabelWrap.createEl('span', { cls: 'emerald-wv-burnout-score-label', text: 'D8 Burnout Risk Score' });
+		const scoreRow = section.createDiv({ cls: 'emerald-wv-burnout-score-row' });
+		const scoreLabelWrap = scoreRow.createSpan({ cls: 'emerald-wv-burnout-score-label-wrap' });
+		scoreLabelWrap.createSpan({ cls: 'emerald-wv-burnout-score-label', text: 'D8 Burnout Risk Score' });
 
 		// ⓘ explainer tooltip
-		const infoBtn = scoreLabelWrap.createEl('span', {
+		const infoBtn = scoreLabelWrap.createSpan({
 			cls: 'emerald-wv-burnout-score-info',
 			attr: { 'aria-label': 'About this score' }
 		});
 		setIcon(infoBtn, 'info');
-		const infoDetail = section.createEl('div', {
+		const infoDetail = section.createDiv({
 			cls: 'emerald-wv-burnout-score-explainer',
 			text: '0 = no risk signals detected. 100 = multiple burnout indicators active. Combines rising effort, declining enjoyment, low flow, emotional strain, and demand imbalance over the past 14 days.'
 		});
@@ -232,56 +232,56 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		infoBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
 			const visible = !infoDetail.hasClass('emrald-hidden');
-			visible ? infoDetail.addClass('emrald-hidden') : infoDetail.removeClass('emrald-hidden');
+			if (visible) { infoDetail.addClass('emrald-hidden'); } else { infoDetail.removeClass('emrald-hidden'); }
 		});
-		const barOuter = scoreRow.createEl('div', { cls: 'emerald-wv-burnout-score-bar' });
-		const barFill = barOuter.createEl('div', {
+		const barOuter = scoreRow.createDiv({ cls: 'emerald-wv-burnout-score-bar' });
+		const barFill = barOuter.createDiv({
 			cls: `emerald-wv-burnout-score-fill emerald-wv-bar-${state.current_phase}`
 		});
 		barFill.style.width = `${Math.min(score, 100)}%`;
-		scoreRow.createEl('span', { cls: 'emerald-wv-burnout-score-num', text: `${score.toFixed(0)}/100` });
+		scoreRow.createSpan({ cls: 'emerald-wv-burnout-score-num', text: `${score.toFixed(0)}/100` });
 	}
 
 	// ── PAST: What's Driving This ───────────────────────
 
 	private renderFactors(container: Element, factors: string[], phase: string) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
-		section.createEl('h3', { text: 'What\'s driving this' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
+		section.createEl('h3', { text: "What's driving this" });
 
 		const intro = phase === 'green'
-			? 'These are the factors EMRALD is watching — all looking fine right now.'
+			? 'These are the factors emrald is watching — all looking fine right now.'
 			: 'These factors are contributing to your current state:';
 		section.createEl('p', { cls: 'emerald-wv-factors-intro', text: intro });
 
-		const list = section.createEl('div', { cls: 'emerald-wv-factors-list' });
+		const list = section.createDiv({ cls: 'emerald-wv-factors-list' });
 		for (const factor of factors) {
-			const row = list.createEl('div', { cls: 'emerald-wv-factor-row' });
-			const dot = row.createEl('span', { cls: 'emerald-wv-factor-indicator' });
+			const row = list.createDiv({ cls: 'emerald-wv-factor-row' });
+			const dot = row.createSpan({ cls: 'emerald-wv-factor-indicator' });
 			dot.dataset.phase = phase;
-			row.createEl('span', { text: factor });
+			row.createSpan({ text: factor });
 		}
 	}
 
 	// ── FUTURE: Suggestions ─────────────────────────────
 
 	private renderSuggestions(container: Element, phase: string, hasRecoveryActivities: boolean = false) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 		section.createEl('h3', { text: 'What you can do' });
 
 		// Phase-aware suggestions
 		const suggestions = this.getSuggestionsForPhase(phase, hasRecoveryActivities);
 
 		for (const sug of suggestions) {
-			const row = section.createEl('div', { cls: 'emerald-wv-suggestion-row' });
-			const iconEl = row.createEl('span', { cls: 'emerald-wv-suggestion-bullet' });
+			const row = section.createDiv({ cls: 'emerald-wv-suggestion-row' });
+			const iconEl = row.createSpan({ cls: 'emerald-wv-suggestion-bullet' });
 			setIcon(iconEl, sug.icon);
-			row.createEl('span', { text: sug.text });
+			row.createSpan({ text: sug.text });
 		}
 
 		if (phase === 'green') {
 			section.createEl('p', {
 				cls: 'emerald-wv-suggestion-note',
-				text: 'No action needed right now. These suggestions will become more specific as EMRALD learns your patterns.'
+				text: 'No action needed right now. These suggestions will become more specific as emrald learns your patterns.'
 			});
 		}
 	}
@@ -290,10 +290,10 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		switch (phase) {
 			case 'green': {
 				const recoverySuggestion = hasRecoveryActivities
-					? { icon: 'check-circle', text: 'Your recharge activities are being tracked — EMRALD is learning what recharges you.' }
-					: { icon: 'calendar', text: 'Consider logging recharge activities so EMRALD can learn what recharges you.' };
+					? { icon: 'check-circle', text: 'Your recharge activities are being tracked — emrald is learning what recharges you.' }
+					: { icon: 'calendar', text: 'Consider logging recharge activities so emrald can learn what recharges you.' };
 				return [
-					{ icon: 'check', text: 'Keep your current rhythm — it\'s working.' },
+					{ icon: 'check', text: "Keep your current rhythm — it's working." },
 					recoverySuggestion
 				];
 			}
@@ -301,7 +301,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				return [
 					{ icon: 'pause', text: 'Try shorter sessions this week.' },
 					{ icon: 'coffee', text: 'Schedule deliberate breaks between sessions.' },
-					{ icon: 'moon', text: 'Prioritize sleep — it\'s your fastest recovery lever.' }
+					{ icon: 'moon', text: "Prioritize sleep — it's your fastest recovery lever." }
 				];
 			case 'orange':
 				return [
@@ -313,7 +313,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				return [
 					{ icon: 'shield', text: 'Take a full rest day. Not a light day — a real rest day.' },
 					{ icon: 'heart', text: 'Reach out to someone you trust. Burnout is easier with support.' },
-					{ icon: 'pause-circle', text: 'Pause non-essential projects. They\'ll be there when you\'re ready.' }
+					{ icon: 'pause-circle', text: "Pause non-essential projects. They'll be there when you're ready." }
 				];
 			default:
 				return [];
@@ -323,10 +323,10 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	// ── Recovery Sparkline (collapsed) ──────────────────
 
 	private renderRecoverySparkline(container: Element, history: Array<{ value: number | null; computed_at: string }>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section emerald-wv-burnout-sparkline-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-burnout-sparkline-section' });
 
-		const headerRow = section.createEl('div', { cls: 'emerald-wv-burnout-spark-header' });
-		headerRow.createEl('span', { cls: 'emerald-wv-burnout-spark-label', text: 'Burnout risk trend' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-burnout-spark-header' });
+		headerRow.createSpan({ cls: 'emerald-wv-burnout-spark-label', text: 'Burnout risk trend' });
 
 		// Deduplicate by date (keep latest entry per day)
 		const byDate = new Map<string, { value: number | null; computed_at: string }>();
@@ -347,20 +347,20 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		// Current value + info tooltip
 		const latest = history[0];
 		if (latest?.value !== null) {
-			const displayVal = Math.round(latest!.value! * 10); // D8 is 0-10, display as 0-100
-			headerRow.createEl('span', {
+			const displayVal = Math.round(latest.value * 10); // D8 is 0-10, display as 0-100
+			headerRow.createSpan({
 				cls: 'emerald-wv-burnout-spark-value',
 				text: `${displayVal}/100`
 			});
 		}
 
 		// ⓘ explainer for the trendline score
-		const sparkInfo = headerRow.createEl('span', {
+		const sparkInfo = headerRow.createSpan({
 			cls: 'emerald-wv-burnout-score-info',
 			attr: { 'aria-label': 'About this trend' }
 		});
 		setIcon(sparkInfo, 'info');
-		const sparkExplainer = section.createEl('div', {
+		const sparkExplainer = section.createDiv({
 			cls: 'emerald-wv-burnout-score-explainer',
 			text: 'This tracks your D8 Burnout Risk Score over time. Each point is the daily score (0–100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating.'
 		});
@@ -368,7 +368,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		sparkInfo.addEventListener('click', (e) => {
 			e.stopPropagation();
 			const visible = !sparkExplainer.hasClass('emrald-hidden');
-			visible ? sparkExplainer.addClass('emrald-hidden') : sparkExplainer.removeClass('emrald-hidden');
+			if (visible) { sparkExplainer.addClass('emrald-hidden'); } else { sparkExplainer.removeClass('emrald-hidden'); }
 		});
 
 		// Toggle to expand
@@ -378,12 +378,12 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		});
 
 		let expanded = false;
-		const chartContainer = section.createEl('div', { cls: 'emerald-wv-burnout-full-chart' });
+		const chartContainer = section.createDiv({ cls: 'emerald-wv-burnout-full-chart' });
 		chartContainer.addClass('emrald-hidden');
 
 		toggleBtn.addEventListener('click', () => {
 			expanded = !expanded;
-			expanded ? chartContainer.removeClass('emrald-hidden') : chartContainer.addClass('emrald-hidden');
+			if (expanded) { chartContainer.removeClass('emrald-hidden'); } else { chartContainer.addClass('emrald-hidden'); }
 			toggleBtn.textContent = expanded ? 'Hide trendline ▲' : 'Show full trendline ▼';
 
 			if (expanded && chartContainer.childElementCount === 0) {
@@ -393,7 +393,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	}
 
 	private buildSparklineSVG(values: number[]): SVGElement {
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		const svg = activeDocument.createSvg('svg');
 		svg.setAttribute('width', String(SPARK_W));
 		svg.setAttribute('height', String(SPARK_H));
 		svg.setAttribute('viewBox', `0 0 ${SPARK_W} ${SPARK_H}`);
@@ -415,14 +415,14 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
 		}
 
-		const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+		const polyline = activeDocument.createSvg('polyline');
 		polyline.setAttribute('points', points.join(' '));
 		polyline.classList.add('emerald-sparkline-line');
 		svg.appendChild(polyline);
 
 		// Endpoint dot
 		const lastPt = points[points.length - 1].split(',');
-		const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		const dot = activeDocument.createSvg('circle');
 		dot.setAttribute('cx', lastPt[0]);
 		dot.setAttribute('cy', lastPt[1]);
 		dot.setAttribute('r', '2.5');
@@ -439,7 +439,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const barWidth = Math.max(Math.floor(chartWidth / entries.length) - 6, 8);
 		const maxVal = Math.max(...entries.map(e => e.value ?? 0), 10);
 
-		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		const svg = activeDocument.createSvg('svg');
 		svg.setAttribute('width', String(chartWidth));
 		svg.setAttribute('height', String(chartHeight + 24));
 		svg.setAttribute('viewBox', `0 0 ${chartWidth} ${chartHeight + 24}`);
@@ -451,7 +451,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			const x = i * (chartWidth / entries.length) + (chartWidth / entries.length - barWidth) / 2;
 			const y = chartHeight - barH;
 
-			const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			const rect = activeDocument.createSvg('rect');
 			rect.setAttribute('x', String(x));
 			rect.setAttribute('y', String(y));
 			rect.setAttribute('width', String(barWidth));
@@ -464,7 +464,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			else rect.classList.add('emerald-chart-bar-green');
 			svg.appendChild(rect);
 
-			const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			const label = activeDocument.createSvg('text');
 			label.setAttribute('x', String(x + barWidth / 2));
 			label.setAttribute('y', String(chartHeight + 16));
 			label.setAttribute('text-anchor', 'middle');
@@ -496,35 +496,35 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	// ── Past Episodes (collapsed toggle) ────────────────
 
 	private renderEpisodesCollapsed(container: Element, episodes: Array<{ started_at: string; resolved_at: string | null; peak_phase: string; contributing_factors: string[] }>) {
-		const section = container.createEl('div', { cls: 'emerald-wv-section' });
+		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
 		const toggleBtn = section.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle emerald-btn-sm',
 			text: `Past Episodes (${episodes.length}) ▼`
 		});
 
-		const listContainer = section.createEl('div', { cls: 'emerald-wv-burnout-episodes-list' });
+		const listContainer = section.createDiv({ cls: 'emerald-wv-burnout-episodes-list' });
 		listContainer.addClass('emrald-hidden');
 
 		let expanded = false;
 		toggleBtn.addEventListener('click', () => {
 			expanded = !expanded;
-			expanded ? listContainer.removeClass('emrald-hidden') : listContainer.addClass('emrald-hidden');
+			if (expanded) { listContainer.removeClass('emrald-hidden'); } else { listContainer.addClass('emrald-hidden'); }
 			toggleBtn.textContent = expanded
 				? `Past Episodes (${episodes.length}) ▲`
 				: `Past Episodes (${episodes.length}) ▼`;
 		});
 
 		for (const episode of episodes) {
-			const card = listContainer.createEl('div', { cls: 'emerald-wv-episode-card' });
-			const topRow = card.createEl('div', { cls: 'emerald-wv-episode-top' });
+			const card = listContainer.createDiv({ cls: 'emerald-wv-episode-card' });
+			const topRow = card.createDiv({ cls: 'emerald-wv-episode-top' });
 
 			const peakPhase = typeof episode.peak_phase === 'string' && episode.peak_phase.length > 0
 				? episode.peak_phase
 				: 'unknown';
 			const peakLabel = peakPhase.charAt(0).toUpperCase() + peakPhase.slice(1);
-			const badge = topRow.createEl('span', { cls: `emerald-wv-episode-badge emerald-wv-bg-${peakPhase}` });
-			badge.createEl('span', { text: `Peak: ${peakLabel}` });
+			const badge = topRow.createSpan({ cls: `emerald-wv-episode-badge emerald-wv-bg-${peakPhase}` });
+			badge.createSpan({ text: `Peak: ${peakLabel}` });
 
 			const started = this.formatDateShort(episode.started_at);
 			const resolved = episode.resolved_at ? this.formatDateShort(episode.resolved_at) : 'ongoing';
@@ -539,12 +539,12 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				dateText = 'Dates unavailable';
 			}
 			if (dateText) {
-				topRow.createEl('span', { cls: 'emerald-wv-episode-dates', text: dateText });
+				topRow.createSpan({ cls: 'emerald-wv-episode-dates', text: dateText });
 			}
 
 			const factors = Array.isArray(episode.contributing_factors) ? episode.contributing_factors.filter(Boolean) : [];
 			if (factors.length > 0) {
-				card.createEl('div', { cls: 'emerald-wv-episode-factors', text: factors.join(' · ') });
+				card.createDiv({ cls: 'emerald-wv-episode-factors', text: factors.join(' · ') });
 			}
 		}
 	}

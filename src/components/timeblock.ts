@@ -73,31 +73,31 @@ export class TimeblockComponent {
 		this.containerEl.addClass('emerald-timeblock-content');
 
 		// Timer display (visible during active session)
-		this.timerEl = this.containerEl.createEl('div', { cls: 'emerald-timer' });
+		this.timerEl = this.containerEl.createDiv({ cls: 'emerald-timer' });
 		if (!this.state.activeSession) this.timerEl.addClass('emrald-hidden');
 
 		// Tick bar container
-		const barWrapper = this.containerEl.createEl('div', { cls: 'emerald-bar-wrapper' });
-		this.tickBarEl = barWrapper.createEl('div', { cls: 'emerald-tick-bar' });
-		this.greenBarEl = barWrapper.createEl('div', { cls: 'emerald-green-bar' });
-		this.overtimeBarEl = barWrapper.createEl('div', { cls: 'emerald-overtime-bar' });
-		this.eLevelMarkerEl = barWrapper.createEl('div', { cls: 'emerald-elevel-marker' });
+		const barWrapper = this.containerEl.createDiv({ cls: 'emerald-bar-wrapper' });
+		this.tickBarEl = barWrapper.createDiv({ cls: 'emerald-tick-bar' });
+		this.greenBarEl = barWrapper.createDiv({ cls: 'emerald-green-bar' });
+		this.overtimeBarEl = barWrapper.createDiv({ cls: 'emerald-overtime-bar' });
+		this.eLevelMarkerEl = barWrapper.createDiv({ cls: 'emerald-elevel-marker' });
 		this.eLevelMarkerEl.addClass('emrald-hidden');
-		this.dailyHoursMarkerEl = barWrapper.createEl('div', { cls: 'emerald-dh-marker' });
+		this.dailyHoursMarkerEl = barWrapper.createDiv({ cls: 'emerald-dh-marker' });
 		this.updateDailyHoursMarker();
 
 		// Bar label — "Today: Xh Xm / Yh worked" sits right below the bar
-		this.barLabelEl = this.containerEl.createEl('div', { cls: 'emerald-bar-label' });
+		this.barLabelEl = this.containerEl.createDiv({ cls: 'emerald-bar-label' });
 
 		// Render tick marks
 		this.renderTicks();
 
 		// Controls
-		this.controlsEl = this.containerEl.createEl('div', { cls: 'emerald-controls' });
+		this.controlsEl = this.containerEl.createDiv({ cls: 'emerald-controls' });
 		this.renderControls();
 
 		// Summary
-		this.summaryEl = this.containerEl.createEl('div', { cls: 'emerald-summary' });
+		this.summaryEl = this.containerEl.createDiv({ cls: 'emerald-summary' });
 		this.renderSummary();
 
 		// Start appropriate animation
@@ -306,9 +306,9 @@ export class TimeblockComponent {
 		// Render 48 ticks (two days) so wide panels never run out past midnight.
 		for (let i = 0; i < 48; i++) {
 			const h = i % 24;
-			const tick = this.tickBarEl.createEl('div', { cls: 'emerald-tick' });
+			const tick = this.tickBarEl.createDiv({ cls: 'emerald-tick' });
 			const label = h === 0 ? '12a' : h < 12 ? `${h}` : h === 12 ? '12p' : `${h - 12}`;
-			tick.createEl('span', { cls: 'emerald-tick-label', text: label });
+			tick.createSpan({ cls: 'emerald-tick-label', text: label });
 			tick.dataset.hour = String(i);
 		}
 	}
@@ -401,9 +401,9 @@ export class TimeblockComponent {
 			const timeStr = `${pad(h)}:${pad(m)}:${pad(s)}`;
 
 			this.timerEl.empty();
-			const dot = this.timerEl.createEl('span', { cls: 'emerald-timer-dot is-recording' });
+			const dot = this.timerEl.createSpan({ cls: 'emerald-timer-dot is-recording' });
 			dot.setAttribute('aria-hidden', 'true');
-			this.timerEl.createEl('span', { cls: 'emerald-timer-text', text: timeStr });
+			this.timerEl.createSpan({ cls: 'emerald-timer-text', text: timeStr });
 			this.timerEl.setAttribute('role', 'timer');
 			this.timerEl.setAttribute('aria-label', `Session elapsed: ${timeStr}`);
 		}
@@ -437,9 +437,9 @@ export class TimeblockComponent {
 			this.overtimeBarEl.removeClass('emrald-hidden');
 
 			// Add/update overtime counter text
-			let counterEl = this.overtimeBarEl.querySelector('.emerald-overtime-counter') as HTMLElement | null;
+			let counterEl = this.overtimeBarEl.querySelector('.emerald-overtime-counter');
 			if (!counterEl) {
-				counterEl = this.overtimeBarEl.createEl('span', { cls: 'emerald-overtime-counter' });
+				counterEl = this.overtimeBarEl.createSpan({ cls: 'emerald-overtime-counter' });
 			}
 			const otH = Math.floor(overtimeMin / 60);
 			const otM = Math.round(overtimeMin % 60);
@@ -510,7 +510,7 @@ export class TimeblockComponent {
 		this.controlsEl.empty();
 
 		if (this.state.dayIsClosed) {
-			this.controlsEl.createEl('div', {
+			this.controlsEl.createDiv({
 				cls: 'emerald-day-closed',
 				text: 'Day closed ✓'
 			});
@@ -520,7 +520,7 @@ export class TimeblockComponent {
 		if (this.state.activeSession) {
 			// Pending sync indicator for offline-started sessions
 			if (this.state.activeSession.isPendingSync) {
-				const syncBadge = this.controlsEl.createEl('div', {
+				const syncBadge = this.controlsEl.createDiv({
 					cls: 'emerald-pending-sync-badge',
 					text: '⚡ Pending sync — tracking locally'
 				});
@@ -598,11 +598,11 @@ export class TimeblockComponent {
 		const workedStr = workedM > 0 ? `${workedH}h ${workedM}m` : `${workedH}h`;
 
 		// Available hours (tappable for override)
-		const availEl = this.summaryEl.createEl('div', { cls: 'emerald-available' });
+		const availEl = this.summaryEl.createDiv({ cls: 'emerald-available' });
 		const availText = this.state.availableHours > 0
 			? `Daily hours: ${this.state.availableHours}h`
 			: 'Set your daily hours';
-		availEl.createEl('span', {
+		availEl.createSpan({
 			cls: 'emerald-available-text',
 			text: availText
 		});
@@ -612,14 +612,14 @@ export class TimeblockComponent {
 		if (this.barLabelEl) {
 			this.barLabelEl.empty();
 			const availStr = this.state.availableHours > 0 ? ` / ${this.state.availableHours}h` : '';
-			this.barLabelEl.createEl('span', { text: `Today: ${workedStr}${availStr} worked` });
+			this.barLabelEl.createSpan({ text: `Today: ${workedStr}${availStr} worked` });
 
 			// Overtime indicator
 			if (totalWorkedMin > totalAvailableMin && totalAvailableMin > 0) {
 				const overtimeMin = Math.round(totalWorkedMin - totalAvailableMin);
 				const otH = Math.floor(overtimeMin / 60);
 				const otM = overtimeMin % 60;
-				this.barLabelEl.createEl('span', {
+				this.barLabelEl.createSpan({
 					cls: 'emerald-overtime-label',
 					text: ` +${otH > 0 ? otH + 'h ' : ''}${otM}m overtime`
 				});
