@@ -551,13 +551,13 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Recharge processes are activities that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
+			text: 'Recharge activities are things that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
 
 		const protocolGroup = form.createDiv({ cls: 'emerald-form-group' });
-		protocolGroup.createEl('label', { text: 'Add up to 3 recharge processes' });
+		protocolGroup.createEl('label', { text: 'Add up to 3 recharge activities' });
 
 		const hintEl = protocolGroup.createDiv({
 			cls: 'emerald-form-desc',
