@@ -6912,8 +6912,11 @@ var DigestView = class extends EmraldWorkspaceView {
     }
   }
   filteredDigests() {
-    if (this.filterPeriod === "all")
+    if (this.filterPeriod === "all") {
+      if (!tierState.isPro())
+        return this.allDigests.filter((d) => d.period_type === "weekly");
       return this.allDigests;
+    }
     return this.allDigests.filter((d) => d.period_type === this.filterPeriod);
   }
   // ── Navigation ──────────────────────────────────────

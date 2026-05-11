@@ -155,7 +155,11 @@ export class DigestView extends EmraldWorkspaceView {
 	}
 
 	private filteredDigests(): Digest[] {
-		if (this.filterPeriod === 'all') return this.allDigests;
+		if (this.filterPeriod === 'all') {
+			// Free users only see weekly digests even in 'all' view
+			if (!tierState.isPro()) return this.allDigests.filter(d => d.period_type === 'weekly');
+			return this.allDigests;
+		}
 		return this.allDigests.filter(d => d.period_type === this.filterPeriod);
 	}
 
