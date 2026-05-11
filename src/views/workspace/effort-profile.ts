@@ -150,15 +150,14 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		this.renderHeader(container, 'Effort profile', 'How EMRALD sees you', 'user');
 
 		// Fetch data concurrently
-		let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
+		let profileResp, historyResp, metricsResp, recoveryResp;
 		try {
 			const forceFresh = !this.isOffline();
-			[profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp] = await Promise.all([
+			[profileResp, historyResp, metricsResp, recoveryResp] = await Promise.all([
 				this.plugin.apiClient.getProfile({ skipCache: forceFresh }),
 				this.plugin.apiClient.getProfileHistory({ skipCache: forceFresh }),
 				this.plugin.apiClient.getMetrics(['D19'], { skipCache: forceFresh }),
 				this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh }),
-				this.plugin.apiClient.getMetricHistory('D19', undefined, undefined, 2, { skipCache: forceFresh })
 			]);
 		} catch {
 			this.renderError(container, 'Could not load effort profile — check your connection.');

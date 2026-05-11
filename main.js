@@ -5681,15 +5681,14 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     var _a, _b, _c, _d, _e, _f;
     const container = this.getContainer();
     this.renderHeader(container, "Effort profile", "How EMRALD sees you", "user");
-    let profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp;
+    let profileResp, historyResp, metricsResp, recoveryResp;
     try {
       const forceFresh = !this.isOffline();
-      [profileResp, historyResp, metricsResp, recoveryResp, d19HistoryResp] = await Promise.all([
+      [profileResp, historyResp, metricsResp, recoveryResp] = await Promise.all([
         this.plugin.apiClient.getProfile({ skipCache: forceFresh }),
         this.plugin.apiClient.getProfileHistory({ skipCache: forceFresh }),
         this.plugin.apiClient.getMetrics(["D19"], { skipCache: forceFresh }),
-        this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh }),
-        this.plugin.apiClient.getMetricHistory("D19", void 0, void 0, 2, { skipCache: forceFresh })
+        this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh })
       ]);
     } catch (e) {
       this.renderError(container, "Could not load effort profile \u2014 check your connection.");
@@ -7503,6 +7502,16 @@ var _EMComponent = class {
     if (tierState.isFree()) {
       this.renderUpgradeCard();
     }
+    const feedbackFooter = this.containerEl.createDiv({ cls: "emerald-feedback-footer" });
+    const feedbackLink = feedbackFooter.createEl("a", {
+      cls: "emerald-feedback-link",
+      text: "\u{1F7E2} Send feedback",
+      href: "mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback"
+    });
+    feedbackLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
+    });
     if (this.pinnedMetricsListener) {
       window.removeEventListener("emrald:pinned-metrics-changed", this.pinnedMetricsListener);
     }
@@ -7745,7 +7754,6 @@ var _EMComponent = class {
     }
   }
   renderWorkspaceButtons() {
-    var _a, _b;
     const section = this.containerEl.createDiv({ cls: "emerald-workspace-buttons" });
     section.createDiv({ cls: "emerald-workspace-title", text: "Workspace views" });
     const buttons = [
@@ -7779,20 +7787,6 @@ var _EMComponent = class {
           e.preventDefault();
           this.openWorkspaceView(btn.view);
         }
-      });
-    }
-    const version = (_a = this.plugin.manifest.version) != null ? _a : "0.0.0";
-    const major = parseInt((_b = version.split(".")[0]) != null ? _b : "0");
-    if (major < 1) {
-      const footer = section.createDiv({ cls: "emerald-feedback-footer" });
-      const link = footer.createEl("a", {
-        cls: "emerald-feedback-link",
-        text: "\u{1F7E2} Early access \xB7 send feedback",
-        href: "mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback"
-      });
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.open("mailto:feedback@effortmastery.com?subject=EMRALD%20Feedback", "_blank");
       });
     }
   }
