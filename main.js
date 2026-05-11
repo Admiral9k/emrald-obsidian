@@ -8560,6 +8560,8 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
         new import_obsidian26.Notice(`Failed to start session: ${resp.error}`);
         return;
       }
+      this._loadingTodayData = false;
+      await this.loadTodayData();
       const todayMin = (_h = (_g = (_f = (_e = this.projects) == null ? void 0 : _e.state) == null ? void 0 : _f.todayMinutesByItem) == null ? void 0 : _g.get(item.id)) != null ? _h : 0;
       this.timeblock.startSession(resp.data, item, todayMin);
       if (this.projects) {

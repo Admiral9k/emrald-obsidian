@@ -727,6 +727,13 @@ export class EmraldSidebarView extends ItemView {
 			return;
 		}
 
+		// P19 fix: ensure todayMinutesByItem is fresh before calculating priorMinutes.
+		// After offline→reconnect, the queue replay may have completed a stop+receipt
+		// but loadTodayData() hasn't run yet, leaving todayMinutesByItem stale.
+		// Force a fresh load so priorMinutesToday is accurate from the first tick.
+		this._loadingTodayData = false; // Reset guard so we can force a fresh load
+		await this.loadTodayData();
+
 		// Calculate prior minutes today for this project
 		const todayMin = this.projects?.state?.todayMinutesByItem?.get(item.id) ?? 0;
 
