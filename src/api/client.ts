@@ -122,7 +122,7 @@ export class EmraldAPIClient {
 			const response: RequestUrlResponse = await Promise.race([
 				requestUrl(params),
 				new Promise<never>((_, reject) =>
-					activeWindow.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+					window.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
 				)
 			]);
 
@@ -496,7 +496,7 @@ export class EmraldAPIClient {
 	}
 
 	private delay(ms: number): Promise<void> {
-		return new Promise(resolve => activeWindow.setTimeout(resolve, ms));
+		return new Promise(resolve => window.setTimeout(resolve, ms));
 	}
 
 	// ── Auth ──────────────────────────────────────────────

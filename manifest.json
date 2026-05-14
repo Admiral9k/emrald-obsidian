@@ -1,8 +1,8 @@
 {
   "id": "emrald",
-  "name": "EMRALD",
-  "version": "1.0.0",
-  "minAppVersion": "0.15.0",
+  "name": "Emrald",
+  "version": "1.0.1",
+  "minAppVersion": "1.7.2",
   "description": "Track what work costs you: effort, flow, energy, and burnout risk.",
   "author": "Effort Mastery LLC",
   "authorUrl": "https://effortmastery.com",

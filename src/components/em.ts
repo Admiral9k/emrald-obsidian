@@ -365,7 +365,7 @@ export class EMComponent {
 		this.stopInsightRotation();
 		if (this.insights.length <= 1) return;
 
-		this.insightRotationTimer = activeWindow.setInterval(() => {
+		this.insightRotationTimer = window.setInterval(() => {
 			this.currentInsightIndex = (this.currentInsightIndex + 1) % this.insights.length;
 			this.renderInsightBulletin();
 		}, (this.plugin.settings?.insightRotationSeconds ?? 15) * 1000);
@@ -373,7 +373,7 @@ export class EMComponent {
 
 	private stopInsightRotation() {
 		if (this.insightRotationTimer) {
-			activeWindow.clearInterval(this.insightRotationTimer);
+			window.clearInterval(this.insightRotationTimer);
 			this.insightRotationTimer = null;
 		}
 	}

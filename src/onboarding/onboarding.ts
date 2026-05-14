@@ -45,7 +45,7 @@ export class OnboardingModal extends Modal {
 		if (!this.plugin.settings.onboardingComplete) {
 			this.plugin.settings.onboardingComplete = true;
 			void this.plugin.saveSettings();
-			activeWindow.setTimeout(() => {
+			window.setTimeout(() => {
 				void this.plugin.openWorkspaceView(VIEW_ABOUT);
 				this.onComplete();
 			}, 300);
@@ -243,7 +243,7 @@ export class OnboardingModal extends Modal {
 					this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
 
 					// New users get full flow; returning users skip profile/availability but see calibration
-					activeWindow.setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
+					window.setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
 				}
 			} catch { /* non-fatal */ }
 		})(); });
@@ -998,7 +998,7 @@ export class OnboardingModal extends Modal {
 		// Use a tiny delay so the sidebar has time to mount first.
 		const aboutViewType = VIEW_ABOUT;
 		this.close();
-		activeWindow.setTimeout(() => {
+		window.setTimeout(() => {
 			void this.plugin.openWorkspaceView(aboutViewType);
 			this.onComplete();
 		}, 300);

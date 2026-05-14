@@ -368,8 +368,8 @@ export class EmraldSettingTab extends PluginSettingTab {
 					.onChange((value) => {
 						this.plugin.settings.digestTime = value;
 						void this.plugin.saveSettings();
-						if (debounce) activeWindow.clearTimeout(debounce);
-						debounce = activeWindow.setTimeout(() => {
+						if (debounce) window.clearTimeout(debounce);
+						debounce = window.setTimeout(() => {
 							void this.plugin.syncDigestPreferences();
 						}, 700);
 					});

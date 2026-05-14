@@ -921,7 +921,7 @@ var init_onboarding = __esm({
         if (!this.plugin.settings.onboardingComplete) {
           this.plugin.settings.onboardingComplete = true;
           void this.plugin.saveSettings();
-          activeWindow.setTimeout(() => {
+          window.setTimeout(() => {
             void this.plugin.openWorkspaceView(VIEW_ABOUT);
             this.onComplete();
           }, 300);
@@ -1100,7 +1100,7 @@ var init_onboarding = __esm({
                 await this.plugin.saveSettings();
                 const itemsResp = await this.plugin.apiClient.getItems();
                 this.isNewUser = !itemsResp.data || Array.isArray(itemsResp.data) && itemsResp.data.length === 0;
-                activeWindow.setTimeout(() => this.goTo(this.isNewUser ? "profile" : "calibration"), 800);
+                window.setTimeout(() => this.goTo(this.isNewUser ? "profile" : "calibration"), 800);
               }
             } catch (e) {
             }
@@ -1638,7 +1638,7 @@ var init_onboarding = __esm({
         await this.plugin.saveSettings();
         const aboutViewType = VIEW_ABOUT;
         this.close();
-        activeWindow.setTimeout(() => {
+        window.setTimeout(() => {
           void this.plugin.openWorkspaceView(aboutViewType);
           this.onComplete();
         }, 300);
@@ -3276,8 +3276,8 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
         this.plugin.settings.digestTime = value;
         void this.plugin.saveSettings();
         if (debounce)
-          activeWindow.clearTimeout(debounce);
-        debounce = activeWindow.setTimeout(() => {
+          window.clearTimeout(debounce);
+        debounce = window.setTimeout(() => {
           void this.plugin.syncDigestPreferences();
         }, 700);
       });
@@ -3638,13 +3638,13 @@ var TimeblockComponent = class {
       const now = /* @__PURE__ */ new Date();
       const hourFraction = now.getHours() + now.getMinutes() / 60;
       this.positionTicks(hourFraction);
-      this.tickAnimationId = requestAnimationFrame(animate);
+      this.tickAnimationId = window.requestAnimationFrame(animate);
     };
-    this.tickAnimationId = requestAnimationFrame(animate);
+    this.tickAnimationId = window.requestAnimationFrame(animate);
   }
   stopIdleAnimation() {
     if (this.tickAnimationId !== null) {
-      cancelAnimationFrame(this.tickAnimationId);
+      window.cancelAnimationFrame(this.tickAnimationId);
       this.tickAnimationId = null;
     }
   }
@@ -7774,14 +7774,14 @@ var _EMComponent = class {
     this.stopInsightRotation();
     if (this.insights.length <= 1)
       return;
-    this.insightRotationTimer = activeWindow.setInterval(() => {
+    this.insightRotationTimer = window.setInterval(() => {
       this.currentInsightIndex = (this.currentInsightIndex + 1) % this.insights.length;
       this.renderInsightBulletin();
     }, ((_b = (_a = this.plugin.settings) == null ? void 0 : _a.insightRotationSeconds) != null ? _b : 15) * 1e3);
   }
   stopInsightRotation() {
     if (this.insightRotationTimer) {
-      activeWindow.clearInterval(this.insightRotationTimer);
+      window.clearInterval(this.insightRotationTimer);
       this.insightRotationTimer = null;
     }
   }
@@ -9253,7 +9253,7 @@ var EmraldAPIClient = class {
       const response = await Promise.race([
         (0, import_obsidian27.requestUrl)(params),
         new Promise(
-          (_, reject) => activeWindow.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
+          (_, reject) => window.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
         )
       ]);
       if (response.status < 400) {
@@ -9543,7 +9543,7 @@ var EmraldAPIClient = class {
     }
   }
   delay(ms) {
-    return new Promise((resolve) => activeWindow.setTimeout(resolve, ms));
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
   }
   // ── Auth ──────────────────────────────────────────────
   async testConnection() {
@@ -9950,7 +9950,7 @@ var FolderSync = class {
   }
 };
 function sleep(ms) {
-  return new Promise((resolve) => activeWindow.setTimeout(resolve, ms));
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 // src/sync/offline-queue.ts
@@ -10439,7 +10439,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       if (wasOffline && isNowOnline) {
         void Promise.race([
           this.apiClient.waitForReconciliation(),
-          new Promise((r) => activeWindow.setTimeout(r, 5e3))
+          new Promise((r) => window.setTimeout(r, 5e3))
         ]).then(() => {
           void this.refreshSidebar();
         });
@@ -10516,7 +10516,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
       });
     }
     if (!this.settings.onboardingComplete) {
-      activeWindow.setTimeout(() => {
+      window.setTimeout(() => {
         void (async () => {
           const { OnboardingModal: OnboardingModal2 } = await Promise.resolve().then(() => (init_onboarding(), onboarding_exports));
           const modal = new OnboardingModal2(this.app, this, () => {

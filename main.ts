@@ -68,7 +68,7 @@ export default class EmraldPlugin extends Plugin {
 			if (wasOffline && isNowOnline) {
 				void Promise.race([
 					this.apiClient.waitForReconciliation(),
-					new Promise<void>(r => activeWindow.setTimeout(r, 5000))
+					new Promise<void>(r => window.setTimeout(r, 5000))
 				]).then(() => { void this.refreshSidebar(); });
 			}
 			wasOffline = !isNowOnline;
@@ -166,7 +166,7 @@ export default class EmraldPlugin extends Plugin {
 		// Show onboarding if not completed
 		if (!this.settings.onboardingComplete) {
 			// Delay to let Obsidian fully load
-			activeWindow.setTimeout(() => {
+			window.setTimeout(() => {
 				void (async () => {
 					const { OnboardingModal } = await import('./src/onboarding/onboarding');
 					const modal = new OnboardingModal(this.app, this, () => {

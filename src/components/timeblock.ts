@@ -335,15 +335,15 @@ export class TimeblockComponent {
 			const now = new Date();
 			const hourFraction = now.getHours() + now.getMinutes() / 60;
 			this.positionTicks(hourFraction);
-			this.tickAnimationId = requestAnimationFrame(animate);
+			this.tickAnimationId = window.requestAnimationFrame(animate);
 		};
 
-		this.tickAnimationId = requestAnimationFrame(animate);
+		this.tickAnimationId = window.requestAnimationFrame(animate);
 	}
 
 	private stopIdleAnimation() {
 		if (this.tickAnimationId !== null) {
-			cancelAnimationFrame(this.tickAnimationId);
+			window.cancelAnimationFrame(this.tickAnimationId);
 			this.tickAnimationId = null;
 		}
 	}
