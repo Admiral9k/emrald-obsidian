@@ -68,7 +68,7 @@ export class EmraldSidebarView extends ItemView {
 	}
 
 	getIcon(): string {
-		return 'zap';
+		return 'gem';
 	}
 
 	async refresh() {

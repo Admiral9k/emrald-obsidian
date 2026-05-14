@@ -47,6 +47,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_ELEVEL_OVERVIEW; }
+	getIcon(): string { return 'bar-chart-2'; }
 
 	async onOpen() {
 		const container = this.getContainer();

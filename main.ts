@@ -96,7 +96,7 @@ export default class EmraldPlugin extends Plugin {
 		this.registerView(VIEW_ABOUT, (leaf) => new AboutView(leaf, this));
 
 		// Add ribbon icon to open sidebar
-		this.addRibbonIcon('zap', 'EMRALD', () => {
+		this.addRibbonIcon('gem', 'EMRALD', () => {
 			void this.activateView();
 		});
 

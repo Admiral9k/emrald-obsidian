@@ -112,6 +112,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_DATA_CENTER; }
+	getIcon(): string { return 'trending-up'; }
 
 	async onOpen() {
 		const container = this.getContainer();

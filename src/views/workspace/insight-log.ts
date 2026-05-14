@@ -28,6 +28,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_INSIGHT_LOG; }
+	getIcon(): string { return 'lightbulb'; }
 
 	private _ackListener?: () => void;
 	private _ackSelf = false;

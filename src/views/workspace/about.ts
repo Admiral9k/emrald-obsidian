@@ -14,6 +14,7 @@ export class AboutView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_ABOUT; }
+	getIcon(): string { return 'gem'; }
 
 	// ── Helpers ────────────────────────
 

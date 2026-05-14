@@ -45,6 +45,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_BURNOUT_MONITOR; }
+	getIcon(): string { return 'flame'; }
 
 	async onOpen() {
 		const container = this.getContainer();

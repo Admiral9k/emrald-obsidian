@@ -155,7 +155,7 @@ var init_base = __esm({
         return this.viewTitle;
       }
       getIcon() {
-        return "zap";
+        return "gem";
       }
       async onClose() {
         await Promise.resolve();
@@ -1019,6 +1019,20 @@ var init_onboarding = __esm({
           cls: "emerald-onboard-desc",
           text: "Enter your API key to connect. You can get one from your EMRALD dashboard."
         });
+        const privacyCallout = container.createDiv({ cls: "emerald-wv-about-callout emerald-onboard-privacy" });
+        privacyCallout.createDiv({ cls: "emerald-wv-about-callout-title", text: "Your notes stay yours." });
+        const privacyBody = privacyCallout.createEl("p", { cls: "emerald-wv-about-callout-body" });
+        privacyBody.appendText("EMRALD never reads, uploads, or indexes your note content. ");
+        privacyBody.createEl("strong", { text: "Ever." });
+        privacyBody.createEl("br");
+        privacyBody.createEl("br");
+        privacyBody.appendText("What it syncs: session timestamps, effort ratings, and project names \u2014 the minimum needed to calculate your metrics. Your vault content never leaves your machine. The plugin has no mechanism to access your notes \u2014 it couldn\u2019t read them even if it tried.");
+        const privacyLinks = privacyCallout.createDiv({ cls: "emerald-onboard-privacy-links" });
+        const policyLink = privacyLinks.createEl("a", { text: "Privacy policy", href: "https://effortmastery.com/legal/privacy" });
+        policyLink.setAttribute("target", "_blank");
+        privacyLinks.appendText(" \xB7 ");
+        const learnLink = privacyLinks.createEl("a", { text: "See exactly what\u2019s sent", href: "https://getemrald.com/learn" });
+        learnLink.setAttribute("target", "_blank");
         const linkEl = container.createDiv({ cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
         anchor.addEventListener("click", (e) => {
@@ -4238,6 +4252,9 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   getViewType() {
     return VIEW_ELEVEL_OVERVIEW;
   }
+  getIcon() {
+    return "bar-chart-2";
+  }
   async onOpen() {
     var _a, _b, _c, _d, _e, _f;
     const container = this.getContainer();
@@ -4567,6 +4584,9 @@ var InsightLogView = class extends EmraldWorkspaceView {
   }
   getViewType() {
     return VIEW_INSIGHT_LOG;
+  }
+  getIcon() {
+    return "lightbulb";
   }
   async onOpen() {
     const container = this.getContainer();
@@ -4971,6 +4991,9 @@ var DataCenterView = class extends EmraldWorkspaceView {
   }
   getViewType() {
     return VIEW_DATA_CENTER;
+  }
+  getIcon() {
+    return "trending-up";
   }
   async onOpen() {
     const container = this.getContainer();
@@ -5680,6 +5703,9 @@ var EffortProfileView = class extends EmraldWorkspaceView {
   getViewType() {
     return VIEW_EFFORT_PROFILE;
   }
+  getIcon() {
+    return "user";
+  }
   async onOpen() {
     var _a, _b, _c, _d, _e, _f;
     const container = this.getContainer();
@@ -6344,6 +6370,9 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
   getViewType() {
     return VIEW_BURNOUT_MONITOR;
   }
+  getIcon() {
+    return "flame";
+  }
   async onOpen() {
     var _a, _b, _c, _d, _e;
     const container = this.getContainer();
@@ -6814,6 +6843,9 @@ var DigestView = class extends EmraldWorkspaceView {
   getViewType() {
     return VIEW_DIGEST;
   }
+  getIcon() {
+    return "clipboard-list";
+  }
   async onOpen() {
     const container = this.getContainer();
     this.renderHeader(container, "Digest", "Your effort story, summarized", "clipboard-list");
@@ -7253,6 +7285,9 @@ var AboutView = class extends EmraldWorkspaceView {
   }
   getViewType() {
     return VIEW_ABOUT;
+  }
+  getIcon() {
+    return "gem";
   }
   // ── Helpers ────────────────────────
   makeSection(parent, id, iconName, title, children) {
@@ -8042,7 +8077,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     return "EMRALD";
   }
   getIcon() {
-    return "zap";
+    return "gem";
   }
   async refresh() {
     await this.onOpen();
@@ -10426,7 +10461,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
     this.registerView(VIEW_BURNOUT_MONITOR, (leaf) => new BurnoutMonitorView(leaf, this));
     this.registerView(VIEW_DIGEST, (leaf) => new DigestView(leaf, this));
     this.registerView(VIEW_ABOUT, (leaf) => new AboutView(leaf, this));
-    this.addRibbonIcon("zap", "EMRALD", () => {
+    this.addRibbonIcon("gem", "EMRALD", () => {
       void this.activateView();
     });
     this.addCommand({

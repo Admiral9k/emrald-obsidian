@@ -144,6 +144,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_EFFORT_PROFILE; }
+	getIcon(): string { return 'user'; }
 
 	async onOpen() {
 		const container = this.getContainer();

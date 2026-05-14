@@ -141,6 +141,22 @@ export class OnboardingModal extends Modal {
 			text: 'Enter your API key to connect. You can get one from your EMRALD dashboard.'
 		});
 
+		// Privacy reassurance (#9 onboarding copy)
+		const privacyCallout = container.createDiv({ cls: 'emerald-wv-about-callout emerald-onboard-privacy' });
+		privacyCallout.createDiv({ cls: 'emerald-wv-about-callout-title', text: 'Your notes stay yours.' });
+		const privacyBody = privacyCallout.createEl('p', { cls: 'emerald-wv-about-callout-body' });
+		privacyBody.appendText('EMRALD never reads, uploads, or indexes your note content. ');
+		privacyBody.createEl('strong', { text: 'Ever.' });
+		privacyBody.createEl('br');
+		privacyBody.createEl('br');
+		privacyBody.appendText('What it syncs: session timestamps, effort ratings, and project names \u2014 the minimum needed to calculate your metrics. Your vault content never leaves your machine. The plugin has no mechanism to access your notes \u2014 it couldn\u2019t read them even if it tried.');
+		const privacyLinks = privacyCallout.createDiv({ cls: 'emerald-onboard-privacy-links' });
+		const policyLink = privacyLinks.createEl('a', { text: 'Privacy policy', href: 'https://effortmastery.com/legal/privacy' });
+		policyLink.setAttribute('target', '_blank');
+		privacyLinks.appendText(' \u00b7 ');
+		const learnLink = privacyLinks.createEl('a', { text: 'See exactly what\u2019s sent', href: 'https://getemrald.com/learn' });
+		learnLink.setAttribute('target', '_blank');
+
 		// "Get an API key" link for community plugin store users
 		const linkEl = container.createDiv({ cls: 'emerald-onboard-link' });
 		const anchor = linkEl.createEl('a', { text: "Don't have an API key? Get one at app.effortmastery.com →", href: 'https://app.effortmastery.com' });

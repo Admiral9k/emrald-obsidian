@@ -26,6 +26,7 @@ export class DigestView extends EmraldWorkspaceView {
 	}
 
 	getViewType(): string { return VIEW_DIGEST; }
+	getIcon(): string { return 'clipboard-list'; }
 
 	async onOpen() {
 		const container = this.getContainer();

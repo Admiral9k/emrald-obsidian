@@ -42,7 +42,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	getIcon(): string {
-		return 'zap';
+		return 'gem';
 	}
 
 	async onClose() {
