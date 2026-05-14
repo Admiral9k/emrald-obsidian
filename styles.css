@@ -3306,15 +3306,15 @@
 	padding: 14px 16px;
 }
 
-.emerald-wv-recovery-grid {
-	display: flex !important; /* override Obsidian default */
+.workspace-leaf-content .emerald-wv-recovery-grid {
+	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	margin-top: 8px;
 }
 
-.emerald-wv-recovery-card {
-	display: flex !important; /* override Obsidian default */
+.workspace-leaf-content .emerald-wv-recovery-card {
+	display: flex;
 	align-items: center;
 	gap: 10px;
 	padding: 10px 14px;
@@ -3843,8 +3843,8 @@ span.emerald-pro-pill {
 	width: fit-content;
 	padding: 4px 10px;
 	border-radius: 4px;
-	background: var(--emerald-e2, #B8912E) !important; /* override Obsidian default */
-	color: #000000 !important; /* override Obsidian default */
+	background: var(--emerald-e2, #B8912E);
+	color: #000000;
 	font-size: 10px;
 	font-weight: 600;
 	text-decoration: none;
@@ -3975,7 +3975,7 @@ span.emerald-pro-pill {
 .emerald-wv-pro-feature-icon svg {
 	width: 14px;
 	height: 14px;
-	color: var(--emerald-e2, #B8912E) !important; /* override Obsidian default */
+	color: var(--emerald-e2, #B8912E);
 }
 
 /* ── Runaway Session Modal ── */
@@ -4254,8 +4254,8 @@ span.emerald-pro-pill {
 
 .emerald-section.is-collapsed .emerald-section-content {
   opacity: 0;
-  padding-top: 0 !important; /* override Obsidian default */
-  padding-bottom: 0 !important; /* override Obsidian default */
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .emerald-section-content.is-animating {
@@ -4513,14 +4513,14 @@ span.emerald-pro-pill {
 	border-left: 3px solid var(--emerald-e1);
 	padding: 8px 12px;
 	border-radius: 0 4px 4px 0;
-	font-size: 13px !important; /* override Obsidian default */
-	color: var(--text-muted) !important; /* override Obsidian default */
+	font-size: 13px;
+	color: var(--text-muted);
 }
 
 .emerald-celebration-encouragement {
 	font-style: italic;
-	color: var(--text-muted) !important; /* override Obsidian default */
-	font-size: 13px !important; /* override Obsidian default */
+	color: var(--text-muted);
+	font-size: 13px;
 }
 
 .emerald-celebration-actions {
@@ -4579,8 +4579,8 @@ span.emerald-pro-pill {
 
 .emerald-welcomeback-encouragement {
 	font-style: italic;
-	color: var(--text-muted) !important; /* override Obsidian default */
-	font-size: 13px !important; /* override Obsidian default */
+	color: var(--text-muted);
+	font-size: 13px;
 }
 
 .emerald-welcomeback-actions {
