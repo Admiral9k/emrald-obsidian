@@ -132,12 +132,6 @@
 	gap: 6px;
 }
 
-.emerald-section-arrow {
-	font-size: 10px;
-	color: var(--text-muted);
-	flex-shrink: 0;
-}
-
 .emerald-section-icon {
 	display: flex;
 	align-items: center;
@@ -163,10 +157,6 @@
 
 .emerald-section-header:hover {
 	background: var(--background-modifier-hover);
-}
-
-.emerald-section-content {
-	padding: 12px;
 }
 
 /* display: none removed — section collapse is now handled by max-height
@@ -356,7 +346,7 @@
 	text-align: center;
 }
 .emerald-elevel-marker.is-active {
-	color: #fff;
+	color: #ffffff;
 }
 .emerald-elevel-marker[data-level="E1"] { background-color: var(--emerald-e1); }
 .emerald-elevel-marker[data-level="E2"] { background-color: var(--emerald-e2); }
@@ -396,16 +386,6 @@
 }
 
 /* ── Buttons ─────────────────────────────────────────── */
-
-.emerald-btn {
-	padding: 6px 12px;
-	border-radius: 4px;
-	border: none;
-	cursor: pointer;
-	font-size: 13px;
-	font-weight: 500;
-	transition: background 0.15s;
-}
 
 .emerald-btn-primary {
 	background: var(--interactive-accent);
@@ -512,17 +492,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
-}
-
-.emerald-project-card {
-	padding: 8px 10px;
-	border-radius: 4px;
-	background: var(--background-secondary);
-	transition: background 0.15s;
-}
-
-.emerald-project-card:hover {
-	background: var(--background-modifier-hover);
 }
 
 .emerald-project-card.is-in-session {
@@ -728,8 +697,6 @@
 	border: 1px solid rgba(76, 175, 80, 0.2);
 	border-radius: 6px;
 }
-
-.emerald-checkin-icon { font-size: 20px; flex-shrink: 0; }
 
 .emerald-checkin-text { flex: 1; min-width: 100px; }
 .emerald-checkin-title { font-size: 13px; font-weight: 600; }
@@ -1001,21 +968,11 @@
 	stroke-width: 2;
 }
 
-.emerald-btn-icon {
-	display: inline-flex;
-	align-items: center;
-	margin-right: 4px;
-}
-
-.emerald-btn-icon svg {
-	width: 14px;
-	height: 14px;
-	stroke-width: 2;
-}
-
 .emerald-checkin-icon {
-	display: flex;
-	align-items: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .emerald-checkin-icon svg {
@@ -1064,15 +1021,6 @@
 	color: var(--interactive-accent);
 	font-size: 12px;
 	text-decoration: underline;
-}
-
-.emerald-onboard-hint-top {
-	margin-bottom: 12px;
-	font-size: 12px;
-	color: var(--text-muted);
-	padding: 6px 8px;
-	background: var(--background-secondary);
-	border-radius: 3px;
 }
 
 /* ── Modals ──────────────────────────────────────────── */
@@ -1569,12 +1517,7 @@
 .emerald-wv-collapsible-header .emerald-section-arrow { margin-right: 4px; font-size: 10px; color: var(--text-muted); }
 .emerald-wv-table td { padding: 6px 8px; border-bottom: 1px solid var(--background-modifier-border); }
 
-.emerald-wv-insight-card { padding: 12px; background: var(--background-secondary); border-radius: 4px; margin-bottom: 8px; }
 .emerald-wv-insight-type { font-size: 10px; font-weight: 600; color: var(--interactive-accent); margin-bottom: 4px; }
-.emerald-wv-insight-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-.emerald-wv-insight-body { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
-.emerald-wv-insight-date { font-size: 11px; color: var(--text-faint); margin-top: 6px; }
-
 .emerald-wv-burnout-phase { font-size: 18px; margin-bottom: 16px; }
 .emerald-wv-phase-green { color: var(--text-success); }
 .emerald-wv-phase-yellow { color: var(--text-warning); }
@@ -1644,8 +1587,6 @@
 
 .emerald-wv-dist-level { font-weight: 700; font-size: 16px; }
 .emerald-wv-dist-count { font-size: 24px; font-weight: 600; margin: 4px 0; }
-.emerald-wv-dist-label { font-size: 11px; color: var(--text-muted); }
-
 /* Project table extras */
 .emerald-wv-row-inactive { opacity: 0.5; }
 .emerald-wv-elevel-cell { font-weight: 700; }
@@ -1669,15 +1610,6 @@
 .emerald-wv-pct-text { position: absolute; top: 0; right: 4px; font-size: 10px; line-height: 16px; font-weight: 600; }
 
 /* Suggestions */
-.emerald-wv-suggestion-card {
-	padding: 10px;
-	background: rgba(255, 193, 7, 0.08);
-	border-left: 3px solid rgba(255, 193, 7, 0.6);
-	border-radius: 4px;
-	margin-bottom: 6px;
-	font-size: 13px;
-}
-
 /* Filter bar */
 .emerald-wv-filter-bar {
 	display: flex;
@@ -1701,42 +1633,7 @@
 .emerald-wv-filter-btn.is-locked:hover { background: var(--background-secondary); }
 
 /* Insight card enhancements */
-.emerald-wv-insight-card.is-unread { border-left: 3px solid var(--interactive-accent); }
-.emerald-wv-insight-card.is-dismissed { opacity: 0.4; }
-.emerald-wv-insight-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.emerald-wv-insight-metric { font-size: 10px; background: var(--background-modifier-border); padding: 2px 6px; border-radius: 8px; }
-.emerald-wv-insight-actions { display: flex; gap: 6px; margin-top: 8px; }
-
 /* Data Center: Metric Grid */
-.emerald-wv-metric-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-	gap: 10px;
-}
-
-.emerald-wv-metric-card {
-	padding: 12px;
-	background: var(--background-secondary);
-	border-radius: 4px;
-	border: 1px solid var(--background-modifier-border);
-	transition: border-color 0.15s;
-}
-
-.emerald-wv-metric-card:hover { border-color: var(--interactive-accent); }
-
-.emerald-wv-metric-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 4px;
-}
-
-.emerald-wv-metric-key { font-weight: 700; font-size: 14px; color: var(--interactive-accent); }
-.emerald-wv-metric-value { font-size: 16px; font-weight: 600; }
-.emerald-wv-metric-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
-.emerald-wv-metric-desc { font-size: 11px; color: var(--text-muted); }
-.emerald-wv-metric-updated { font-size: 10px; color: var(--text-faint); margin-top: 6px; }
-
 .emerald-wv-metric-history {
 	margin-top: 12px;
 	padding-top: 12px;
@@ -1850,12 +1747,6 @@
 	stroke-width: 2;
 }
 
-.emerald-wv-stat-icon svg {
-	width: 20px;
-	height: 20px;
-	stroke-width: 2;
-}
-
 .emerald-wv-burnout-score { font-size: 14px; margin-bottom: 12px; }
 
 .emerald-wv-burnout-bar-outer {
@@ -1961,17 +1852,7 @@
 .emerald-wv-burnout-episodes-list { margin-top: 8px; }
 
 /* Episode cards */
-.emerald-wv-episode-card {
-	padding: 10px;
-	background: var(--background-secondary);
-	border-radius: 4px;
-	margin-bottom: 6px;
-}
-
 .emerald-wv-episode-header { display: flex; justify-content: space-between; align-items: center; }
-.emerald-wv-episode-dates { font-size: 12px; color: var(--text-muted); }
-.emerald-wv-episode-factors { font-size: 12px; color: var(--text-faint); margin-top: 4px; }
-
 /* Digest View — Enhanced */
 .emerald-wv-digest-nav {
 	display: flex;
@@ -2036,7 +1917,11 @@
 	color: var(--text-muted);
 }
 
-.emerald-wv-stat-icon svg { width: 20px; height: 20px; stroke-width: 2; }
+.emerald-wv-stat-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
 .emerald-wv-stat-value { font-size: 20px; font-weight: 700; margin: 2px 0; }
 .emerald-wv-stat-label { font-size: 11px; color: var(--text-muted); }
 
@@ -2476,11 +2361,11 @@
 }
 
 .emerald-wv-episode-card {
-	padding: 10px;
-	background: var(--background-secondary);
-	border-radius: 4px;
-	margin-bottom: 6px;
-	border: 1px solid var(--background-modifier-border);
+  padding: 10px;
+  background: var(--background-secondary);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  border: 1px solid var(--background-modifier-border);
 }
 
 .emerald-wv-episode-top {
@@ -2502,9 +2387,16 @@
 .emerald-wv-bg-orange { background: rgba(255, 152, 0, 0.15); color: #e68a00; }
 .emerald-wv-bg-red { background: rgba(244, 67, 54, 0.15); color: var(--text-error); }
 
-.emerald-wv-episode-dates { font-size: 12px; color: var(--text-muted); }
+.emerald-wv-episode-dates {
+  font-size: 12px;
+  color: var(--text-muted);
+}
 .emerald-wv-episode-duration { font-size: 11px; color: var(--text-faint); }
-.emerald-wv-episode-factors { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+.emerald-wv-episode-factors {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin-top: 6px;
+}
 .emerald-wv-episode-notes { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
 
 /* ── Insight Log — Enhanced ──────────────────────────── */
@@ -2558,21 +2450,23 @@
 .emerald-wv-filter-btn.is-empty { opacity: 0.5; }
 
 .emerald-wv-insight-card {
-	padding: 12px;
-	background: var(--background-secondary);
-	border-radius: 6px;
-	margin-bottom: 8px;
-	border: 1px solid var(--background-modifier-border);
-	transition: border-color 0.15s;
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid var(--background-modifier-border);
+  transition: border-color 0.15s;
 }
 
 .emerald-wv-insight-card:hover { border-color: var(--background-modifier-border-hover, var(--interactive-accent)); }
 
 .emerald-wv-insight-card.is-unread {
-	border-left: 3px solid var(--interactive-accent);
-	box-shadow: inset 0 0 0 1px rgba(110, 196, 184, 0.10);
+  border-left: 3px solid var(--interactive-accent);
+  box-shadow: inset 0 0 0 1px rgba(110, 196, 184, 0.10);
 }
-.emerald-wv-insight-card.is-dismissed { opacity: 0.4; }
+.emerald-wv-insight-card.is-dismissed {
+  opacity: 0.4;
+}
 .emerald-wv-insight-card.is-expanded { background: var(--background-primary-alt, var(--background-secondary)); }
 
 .emerald-wv-insight-title-row {
@@ -2598,11 +2492,11 @@
 }
 
 .emerald-wv-insight-top {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 6px;
-	flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
 }
 
 .emerald-wv-insight-type-badge {
@@ -2621,22 +2515,32 @@
 .emerald-wv-insight-type-icon svg { width: 12px; height: 12px; stroke-width: 2.5; }
 
 .emerald-wv-insight-metric {
-	font-size: 10px;
-	background: var(--background-modifier-border);
-	padding: 2px 6px;
-	border-radius: 8px;
-	color: var(--text-muted);
+  font-size: 10px;
+  background: var(--background-modifier-border);
+  padding: 2px 6px;
+  border-radius: 8px;
+  color: var(--text-muted);
 }
 
 .emerald-wv-insight-date {
-	font-size: 11px;
-	color: var(--text-faint);
-	margin-left: auto;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 6px;
+  margin-left: auto;
 }
 
-.emerald-wv-insight-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.emerald-wv-insight-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
 .emerald-wv-insight-preview { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-.emerald-wv-insight-body { font-size: 13px; color: var(--text-normal); line-height: 1.5; margin-bottom: 8px; }
+.emerald-wv-insight-body {
+  font-size: 13px;
+  color: var(--text-normal);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
 
 .emerald-wv-insight-source {
 	font-size: 11px;
@@ -2647,7 +2551,11 @@
 
 .emerald-wv-insight-timestamp { font-size: 10px; color: var(--text-faint); }
 
-.emerald-wv-insight-actions { display: flex; gap: 6px; margin-top: 8px; }
+.emerald-wv-insight-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
 
 /* ── E-Level Overview — Enhanced ─────────────────────── */
 
@@ -2846,21 +2754,6 @@
 	color: var(--text-normal);
 }
 
-.emerald-wv-about-thesis {
-	margin: 20px 0;
-}
-
-.emerald-wv-about-thesis blockquote {
-	font-size: 14px;
-	font-style: italic;
-	color: var(--text-muted);
-	border-left: 3px solid var(--interactive-accent);
-	padding: 10px 16px;
-	margin: 0;
-	background: var(--background-secondary);
-	border-radius: 4px;
-}
-
 .emerald-wv-about-callout {
 	margin: 20px 0;
 	padding: 16px 20px;
@@ -2896,15 +2789,15 @@
 
 /* Suggestions */
 .emerald-wv-suggestion-card {
-	display: flex;
-	align-items: flex-start;
-	gap: 8px;
-	padding: 10px;
-	background: rgba(255, 193, 7, 0.08);
-	border-left: 3px solid rgba(255, 193, 7, 0.6);
-	border-radius: 4px;
-	margin-bottom: 6px;
-	font-size: 13px;
+  padding: 10px;
+  background: rgba(255, 193, 7, 0.08);
+  border-left: 3px solid rgba(255, 193, 7, 0.6);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .emerald-wv-suggestion-icon {
@@ -2944,33 +2837,16 @@
 	gap: 20px;
 }
 
-.emerald-wv-dc-category { margin-bottom: 0; }
-
 .emerald-wv-metric-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-	gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
 }
 
-.emerald-wv-metric-card {
-	padding: 12px;
-	background: var(--background-secondary);
-	border-radius: 6px;
-	border: 1px solid var(--background-modifier-border);
-	border-left: 3px solid var(--background-modifier-border);
-	transition: border-color 0.15s;
-}
-
-.emerald-wv-metric-card:hover { border-color: var(--interactive-accent); }
 .emerald-wv-metric-card[data-category="effort"] { border-left-color: #C06A30; }
 .emerald-wv-metric-card[data-category="energy"] { border-left-color: #4A8AB5; }
 .emerald-wv-metric-card[data-category="productivity"] { border-left-color: #2D7A4A; }
 .emerald-wv-metric-card[data-category="calibration"] { border-left-color: #7B61A3; }
-
-.emerald-wv-metric-card.is-expanded {
-	grid-column: 1 / -1;
-	background: var(--background-primary-alt, var(--background-secondary));
-}
 
 .emerald-wv-metric-card.is-no-data { opacity: 0.6; }
 .emerald-wv-metric-card.is-no-data:hover { opacity: 0.8; }
@@ -3021,10 +2897,10 @@
 }
 
 .emerald-wv-metric-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .emerald-wv-metric-key-row {
@@ -3033,8 +2909,15 @@
 	gap: 4px;
 }
 
-.emerald-wv-metric-key { font-weight: 700; font-size: 14px; color: var(--interactive-accent); }
-.emerald-wv-metric-value { font-size: 18px; font-weight: 600; }
+.emerald-wv-metric-key {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--interactive-accent);
+}
+.emerald-wv-metric-value {
+  font-size: 18px;
+  font-weight: 600;
+}
 .emerald-wv-metric-value.is-no-data { color: var(--text-faint); }
 
 .emerald-wv-metric-value-wrap {
@@ -3053,9 +2936,21 @@
 .emerald-wv-trend-bad { color: var(--text-error, #B54545); }
 .emerald-wv-trend-caution { color: #B8912E; }
 .emerald-wv-trend-neutral { color: var(--text-faint); }
-.emerald-wv-metric-name { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
-.emerald-wv-metric-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
-.emerald-wv-metric-updated { font-size: 10px; color: var(--text-faint); margin-top: 6px; }
+.emerald-wv-metric-name {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.emerald-wv-metric-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+.emerald-wv-metric-updated {
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: 6px;
+}
 
 .emerald-wv-metric-nodata {
 	font-size: 11px;
@@ -3173,8 +3068,9 @@
 }
 
 .emerald-wv-dist-label {
-	font-weight: 600;
-	color: var(--text-normal);
+  font-size: 11px;
+  color: var(--text-normal);
+  font-weight: 600;
 }
 
 .emerald-wv-dist-value {
@@ -3411,14 +3307,14 @@
 }
 
 .emerald-wv-recovery-grid {
-	display: flex !important;
+	display: flex !important; /* override Obsidian default */
 	flex-direction: column;
 	gap: 8px;
 	margin-top: 8px;
 }
 
 .emerald-wv-recovery-card {
-	display: flex !important;
+	display: flex !important; /* override Obsidian default */
 	align-items: center;
 	gap: 10px;
 	padding: 10px 14px;
@@ -3531,10 +3427,16 @@
 }
 
 .emerald-btn-icon {
-	display: inline-flex;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
 }
 
-.emerald-btn-icon svg { width: 14px; height: 14px; }
+.emerald-btn-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
 
 /* ── Feedback Footer (Early Access) ──────────────────── */
 
@@ -3835,7 +3737,12 @@
 }
 
 .emerald-onboard-hint-top {
-	margin-bottom: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 6px 8px;
+  background: var(--background-secondary);
+  border-radius: 3px;
 }
 
 .emerald-calibration-actions {
@@ -3936,8 +3843,8 @@ span.emerald-pro-pill {
 	width: fit-content;
 	padding: 4px 10px;
 	border-radius: 4px;
-	background: var(--emerald-e2, #B8912E) !important;
-	color: #000 !important;
+	background: var(--emerald-e2, #B8912E) !important; /* override Obsidian default */
+	color: #000000 !important; /* override Obsidian default */
 	font-size: 10px;
 	font-weight: 600;
 	text-decoration: none;
@@ -4068,7 +3975,7 @@ span.emerald-pro-pill {
 .emerald-wv-pro-feature-icon svg {
 	width: 14px;
 	height: 14px;
-	color: var(--emerald-e2, #B8912E) !important;
+	color: var(--emerald-e2, #B8912E) !important; /* override Obsidian default */
 }
 
 /* ── Runaway Session Modal ── */
@@ -4297,6 +4204,7 @@ span.emerald-pro-pill {
   text-decoration: underline;
 }
 .emerald-wv-about-thesis {
+  margin: 20px 0;
   margin-top: 12px;
 }
 .emerald-wv-about-thesis blockquote {
@@ -4338,6 +4246,7 @@ span.emerald-pro-pill {
 /* ── Section collapse/expand transitions ─────────────── */
 
 .emerald-section-content {
+  padding: 12px;
   overflow: hidden;
   transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.35s ease;
   opacity: 1;
@@ -4345,8 +4254,8 @@ span.emerald-pro-pill {
 
 .emerald-section.is-collapsed .emerald-section-content {
   opacity: 0;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding-top: 0 !important; /* override Obsidian default */
+  padding-bottom: 0 !important; /* override Obsidian default */
 }
 
 .emerald-section-content.is-animating {
@@ -4356,6 +4265,9 @@ span.emerald-pro-pill {
 }
 
 .emerald-section-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
   display: inline-block;
   transition: transform 0.2s ease;
 }
@@ -4367,7 +4279,12 @@ span.emerald-pro-pill {
 /* ── Metric card hover polish ────────────────────────── */
 
 .emerald-wv-metric-card {
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
   transition: border-color 0.2s, box-shadow 0.2s;
+  border-left: 3px solid var(--background-modifier-border);
 }
 
 .emerald-wv-metric-card:hover {
@@ -4376,6 +4293,8 @@ span.emerald-pro-pill {
 }
 
 .emerald-wv-metric-card.is-expanded {
+  grid-column: 1 / -1;
+  background: var(--background-primary-alt, var(--background-secondary));
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -4398,6 +4317,12 @@ span.emerald-pro-pill {
 /* ── Button press feedback ─────────────────────────── */
 
 .emerald-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
   transition: background 0.15s, transform 0.1s, border-color 0.15s;
 }
 
@@ -4505,6 +4430,7 @@ span.emerald-pro-pill {
 /* ── Workspace view category stagger ───────────────── */
 
 .emerald-wv-dc-category {
+  margin-bottom: 0;
   animation: emerald-fade-in 0.3s ease-out both;
 }
 
@@ -4516,6 +4442,9 @@ span.emerald-pro-pill {
 /* ── Enhanced sidebar project card hover ───────────── */
 
 .emerald-project-card {
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: var(--background-secondary);
   transition: background 0.15s, border-color 0.15s;
 }
 
@@ -4584,14 +4513,14 @@ span.emerald-pro-pill {
 	border-left: 3px solid var(--emerald-e1);
 	padding: 8px 12px;
 	border-radius: 0 4px 4px 0;
-	font-size: 13px !important;
-	color: var(--text-muted) !important;
+	font-size: 13px !important; /* override Obsidian default */
+	color: var(--text-muted) !important; /* override Obsidian default */
 }
 
 .emerald-celebration-encouragement {
 	font-style: italic;
-	color: var(--text-muted) !important;
-	font-size: 13px !important;
+	color: var(--text-muted) !important; /* override Obsidian default */
+	font-size: 13px !important; /* override Obsidian default */
 }
 
 .emerald-celebration-actions {
@@ -4650,8 +4579,8 @@ span.emerald-pro-pill {
 
 .emerald-welcomeback-encouragement {
 	font-style: italic;
-	color: var(--text-muted) !important;
-	font-size: 13px !important;
+	color: var(--text-muted) !important; /* override Obsidian default */
+	font-size: 13px !important; /* override Obsidian default */
 }
 
 .emerald-welcomeback-actions {
