@@ -84,7 +84,7 @@ export class AboutView extends EmraldWorkspaceView {
 		}
 
 		// 1. What EMRALD Is
-		this.makeSection(container, 'what-it-is', 'zap', 'What EMRALD Is', el => {
+		this.makeSection(container, 'what-it-is', 'gem', 'What EMRALD Is', el => {
 			this.para(el as HTMLElement, 'EMRALD is an effort tracker that lives inside Obsidian. While other tools count tasks completed or hours logged, EMRALD asks a different question: what did that work actually cost you?');
 
 			// Effort ≠ Energy callout
@@ -165,7 +165,7 @@ export class AboutView extends EmraldWorkspaceView {
 			this.bullet(list, 'Data Center: The visual home of all your D-metrics, with charts and context for each measurement.');
 			this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
 			this.bullet(list, 'Daily Check-in & Effort Receipt: The two feedback inputs that power the entire system.');
-			this.para(el as HTMLElement, "Effort management is a growing field in academic research, practical application, and everyday awareness. EMRALD is built to grow with it. Future integrations and capability expansions are already planned as the field continues to mature.");
+			this.para(el as HTMLElement, "Effort management is a growing field: new research surfaces regularly on how people experience, misallocate, and recover from the effort they spend. EMRALD tracks that research closely, so the system is evolving alongside the science. If you've tried productivity tools that felt right at first but eventually stopped helping, this is part of why: they were built on static assumptions about how you work. EMRALD isn't.");
 		});
 
 		// 7. Who EMRALD Helps
@@ -184,7 +184,7 @@ export class AboutView extends EmraldWorkspaceView {
 			wholeLife.createDiv( { cls: 'emerald-wv-about-callout-title', text: 'EMRALD works across your whole life' });
 			wholeLife.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "Your novel. Learning piano. A home renovation. Family commitments. Side projects. EMRALD doesn\u2019t care if it\u2019s a work task or a personal one \u2014 if it takes focused time and costs you something, it belongs here." });
 
-			this.para(el as HTMLElement, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes \u2014 you're probably the person EMRALD was made for.");
+			this.para(el as HTMLElement, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes, you're probably the person EMRALD was made for.");
 		});
 
 		// 8. How EMRALD Learns
@@ -201,8 +201,13 @@ export class AboutView extends EmraldWorkspaceView {
 		this.makeSection(container, 'learn-more', 'book-open', 'Learn More', el => {
 			this.para(el as HTMLElement, "This page is the field guide. The full story of effort management — the research behind it, the sources, the methodology, and the reasoning — lives online.");
 			const linkWrap = el.createDiv( { cls: 'emerald-wv-about-link-row' });
-			this.link(linkWrap, 'https://effortmastery.com', 'effortmastery.com — deeper reading on effort management');
+			this.link(linkWrap, 'https://getemrald.com/learn', 'getemrald.com/learn — deeper reading on effort management and the research behind it');
 			this.link(linkWrap, 'https://app.effortmastery.com', 'app.effortmastery.com — manage your EMRALD account');
+
+			// Privacy callout
+			const privacyCallout = el.createDiv( { cls: 'emerald-wv-about-callout' });
+			privacyCallout.createDiv( { cls: 'emerald-wv-about-callout-title', text: 'Your notes stay yours.' });
+			privacyCallout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried." });
 		});
 
 		// Pro Teaser (free users only)
