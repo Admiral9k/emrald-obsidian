@@ -96,10 +96,32 @@ It is built to match the workspace visually, but it is completely optional and c
 
 ---
 
-## Privacy / note safety
+## Privacy and data
 
-EMRALD is designed to work alongside your Obsidian workflow without taking over your notes.
-Its integration is built around metadata and plugin-managed state rather than rewriting your note content.
+EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync session data, metrics, and insights. This is how the plugin works — there is no local-only mode.
+
+**What EMRALD sends:**
+- Session data (start/stop times, effort level, project association)
+- Daily check-in responses (energy, readiness)
+- Project metadata (name, folder, effort level)
+
+**What EMRALD never sends:**
+- Note content — EMRALD does not read, upload, or modify the body of your notes
+- File contents, attachments, or images
+- Vault structure beyond the folders you designate as Active/Inactive during onboarding
+
+**Vault access:**
+- EMRALD uses `vault.getFiles()` during onboarding to let you pick Active and Inactive project folders
+- `processFrontMatter` writes metadata (effort-level, session info) to note YAML — never note content
+- No background vault scanning occurs outside of the folder sync you configure
+
+**External domains:**
+- `api.effortmastery.com` — API (session sync, metrics, insights, authentication)
+- `app.effortmastery.com` — linked from settings for account management
+- `getemrald.com` — linked from the About view for documentation
+
+No data is shared with third parties. No analytics or tracking SDKs are included.
+Full privacy policy: [effortmastery.com/privacy](https://effortmastery.com/privacy)
 
 ---
 
