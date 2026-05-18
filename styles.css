@@ -4737,3 +4737,18 @@ span.emerald-pro-pill {
 	white-space: pre-wrap;
 	word-break: break-word;
 }
+
+/* Onboarding privacy callout */
+.emerald-onboard-privacy {
+	margin: 10px 0 14px 0;
+	padding: 10px 14px;
+	border-radius: 6px;
+	background: var(--background-secondary);
+	border-left: 3px solid var(--interactive-accent);
+}
+.emerald-onboard-privacy-text {
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--text-muted);
+	margin: 0;
+}

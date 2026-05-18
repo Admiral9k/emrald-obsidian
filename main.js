@@ -155,16 +155,17 @@ var init_base = __esm({
       VIEW_ABOUT
     ];
     EmraldWorkspaceView = class extends import_obsidian.ItemView {
-      constructor(leaf, plugin, title) {
+      constructor(leaf, plugin, title, viewIcon) {
         super(leaf);
         this.plugin = plugin;
         this.viewTitle = title;
+        this.viewIcon = viewIcon || "gem";
       }
       getDisplayText() {
         return this.viewTitle;
       }
       getIcon() {
-        return "zap";
+        return this.viewIcon;
       }
       async onClose() {
         this.containerEl.children[1].empty();
@@ -1014,6 +1015,11 @@ var init_onboarding = __esm({
         container.createEl("p", {
           cls: "emerald-onboard-desc",
           text: "Enter your API key to connect. You can get one from your EMRALD dashboard."
+        });
+        const privacyEl = container.createEl("div", { cls: "emerald-onboard-privacy" });
+        privacyEl.createEl("p", {
+          cls: "emerald-onboard-privacy-text",
+          text: "\ud83d\udd12 EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried."
         });
         const linkEl = container.createEl("div", { cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
@@ -4220,7 +4226,7 @@ var E_LEVEL_META = {
 };
 var ELevelOverviewView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "E-Level Overview");
+    super(leaf, plugin, "E-Level Overview", "bar-chart-2");
     this.items = [];
     this.minutesByItem = /* @__PURE__ */ new Map();
     this.availableHours = 4;
@@ -4585,7 +4591,7 @@ var INSIGHT_TYPE_META = {
 var INSIGHT_TYPES = ["all", "observation", "suggestion", "warning", "celebration", "discovery"];
 var InsightLogView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "Insight Log");
+    super(leaf, plugin, "Insight Log", "lightbulb");
     this.allInsights = [];
     this.filterType = "all";
     this.contentContainer = null;
@@ -4989,7 +4995,7 @@ var CHART_PAD = 4;
 var DataCenterView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
     var _a, _b;
-    super(leaf, plugin, "Data Center");
+    super(leaf, plugin, "Data Center", "trending-up");
     this.metricMap = /* @__PURE__ */ new Map();
     this.prevValueMap = /* @__PURE__ */ new Map();
     // Previous values for trend indicators
@@ -5734,7 +5740,7 @@ var ENUM_DISPLAY = {
 };
 var EffortProfileView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "Effort Profile");
+    super(leaf, plugin, "Effort Profile", "user");
   }
   getViewType() {
     return VIEW_EFFORT_PROFILE;
@@ -6396,7 +6402,7 @@ var SPARK_W = 200;
 var SPARK_H = 32;
 var BurnoutMonitorView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "Burnout Monitor");
+    super(leaf, plugin, "Burnout Monitor", "flame");
   }
   getViewType() {
     return VIEW_BURNOUT_MONITOR;
@@ -6867,7 +6873,7 @@ var PERIOD_ICONS = {
 };
 var DigestView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "Digest");
+    super(leaf, plugin, "Digest", "clipboard-list");
     this.allDigests = [];
     this.selectedIndex = 0;
     this.filterPeriod = "all";
@@ -7371,7 +7377,7 @@ init_base();
 init_tier();
 var AboutView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "About EMRALD");
+    super(leaf, plugin, "About EMRALD", "gem");
   }
   getViewType() {
     return VIEW_ABOUT;
@@ -7433,7 +7439,7 @@ var AboutView = class extends EmraldWorkspaceView {
       (0, import_obsidian16.setIcon)(chip.createEl("span", { cls: "emerald-wv-about-speckchip-icon" }), s.icon);
       chip.createEl("span", { cls: "emerald-wv-about-speckchip-label", text: s.label });
     }
-    this.makeSection(container, "what-it-is", "zap", "What EMRALD Is", (el) => {
+    this.makeSection(container, "what-it-is", "gem", "What EMRALD Is", (el) => {
       this.para(el, "EMRALD is an effort tracker that lives inside Obsidian. While other tools count tasks completed or hours logged, EMRALD asks a different question: what did that work actually cost you?");
       const callout = el.createEl("div", { cls: "emerald-wv-about-callout" });
       callout.createEl("div", { cls: "emerald-wv-about-callout-title", text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
@@ -7502,7 +7508,7 @@ var AboutView = class extends EmraldWorkspaceView {
       this.bullet(list, "Data Center: The visual home of all your D-metrics, with charts and context for each measurement.");
       this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
       this.bullet(list, "Daily Check-in & Effort Receipt: The two feedback inputs that power the entire system.");
-      this.para(el, "Effort management is a growing field in academic research, practical application, and everyday awareness. EMRALD is built to grow with it. Future integrations and capability expansions are already planned as the field continues to mature.");
+      this.para(el, "Effort management is a growing field: new research surfaces regularly on how people experience, misallocate, and recover from the effort they spend. EMRALD tracks that research closely, so the system is evolving alongside the science. If you\u2019ve tried productivity tools that felt right at first but eventually stopped helping, this is part of why: they were built on static assumptions about how you work. EMRALD isn\u2019t.");
     });
     this.makeSection(container, "who-its-for", "users", "Who EMRALD Helps", (el) => {
       this.para(el, "EMRALD was designed for people who refuse to simplify their lives to fit a productivity system. If any of these describe you, EMRALD was probably built for you:");
@@ -7516,7 +7522,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const wholeLife = el.createEl("div", { cls: "emerald-wv-about-callout" });
       wholeLife.createEl("div", { cls: "emerald-wv-about-callout-title", text: "EMRALD works across your whole life" });
       wholeLife.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Your novel. Learning piano. A home renovation. Family commitments. Side projects. EMRALD doesn\u2019t care if it\u2019s a work task or a personal one \u2014 if it takes focused time and costs you something, it belongs here." });
-      this.para(el, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes \u2014 you're probably the person EMRALD was made for.");
+      this.para(el, "If you\u2019ve tried every productivity system and found that none of them actually helped you understand where your energy goes, you\u2019re probably the person EMRALD was made for.");
     });
     this.makeSection(container, "how-it-learns", "brain", "How EMRALD Learns", (el) => {
       this.para(el, "EMRALD is a recursive feedback system. It's only as smart as the signal you give it.");
@@ -7526,10 +7532,13 @@ var AboutView = class extends EmraldWorkspaceView {
       const quoteLearns = el.createEl("div", { cls: "emerald-wv-about-thesis" });
       quoteLearns.createEl("blockquote", { text: "EMRALD isn't going to dazzle you on day one. But if you stick with it, it will show you things about yourself that no other system can." });
     });
+    this.makeSection(container, "privacy", "shield", "Your Notes Stay Yours", (el) => {
+      this.para(el, "EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried.");
+    });
     this.makeSection(container, "learn-more", "book-open", "Learn More", (el) => {
       this.para(el, "This page is the field guide. The full story of effort management \u2014 the research behind it, the sources, the methodology, and the reasoning \u2014 lives online.");
       const linkWrap = el.createEl("div", { cls: "emerald-wv-about-link-row" });
-      this.link(linkWrap, "https://effortmastery.com", "effortmastery.com \u2014 deeper reading on effort management");
+      this.link(linkWrap, "https://getemrald.com/learn", "getemrald.com/learn \u2014 deeper reading on effort management");
       this.link(linkWrap, "https://app.effortmastery.com", "app.effortmastery.com \u2014 manage your EMRALD account");
     });
     if (tierState.isFree()) {
@@ -8280,7 +8289,7 @@ var EmraldSidebarView = class extends import_obsidian26.ItemView {
     return "EMRALD";
   }
   getIcon() {
-    return "zap";
+    return "gem";
   }
   async refresh() {
     await this.onOpen();
@@ -10637,7 +10646,7 @@ var EmraldPlugin = class extends import_obsidian30.Plugin {
     this.registerView(VIEW_BURNOUT_MONITOR, (leaf) => new BurnoutMonitorView(leaf, this));
     this.registerView(VIEW_DIGEST, (leaf) => new DigestView(leaf, this));
     this.registerView(VIEW_ABOUT, (leaf) => new AboutView(leaf, this));
-    this.addRibbonIcon("zap", "EMRALD", () => {
+    this.addRibbonIcon("gem", "EMRALD", () => {
       this.activateView();
     });
     this.addCommand({
