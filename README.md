@@ -89,6 +89,53 @@ The first few sessions establish the baseline. The pattern recognition gets stro
 
 ---
 
+## Templater & Periodic Notes integration
+
+EMRALD automatically writes a daily summary file to your vault at `.emrald/daily-summary.md`. This file updates every time you stop a session, complete a check-in, or close your day.
+
+If you use **Templater** and **Periodic Notes**, you can pull this data into your daily notes automatically.
+
+### Setup (3 steps)
+
+1. **Install Templater** from the Obsidian community plugins, if you haven't already.
+
+2. **Add this line** to your daily note template wherever you want the summary to appear:
+
+   ```
+   <% tp.file.include("[[.emrald/daily-summary]]") %>
+   ```
+
+3. **That's it.** The next time Periodic Notes creates a daily note (or you manually create one from your template), your EMRALD data fills in automatically.
+
+### What the summary includes
+
+- **Session count and total hours** for the day
+- **Project breakdown** — which projects you worked on, how long, what effort level, how many sessions
+- **Check-in scores** — energy, focus, stress, sleep quality, mental clarity
+- **Burnout risk level** — Low / Moderate / High / Critical with score
+
+### Example output
+
+```markdown
+## Today's Effort
+- **Sessions:** 3 | **Total:** 4h 12m
+- **Check-in:** Energy 4/5 | Focus 4/5 | Stress 2/5 | Sleep 7/10 | Clarity 8/10
+- **Burnout Risk:** Low (18/100)
+
+## Project Breakdown
+- **EMRALD MVP** (E3): 2h 48m ×2
+- **Marketing** (E2): 1h 24m ×1
+```
+
+### Notes
+
+- The `.emrald` folder is created automatically the first time EMRALD writes the summary.
+- The file updates in place — it always reflects _today's_ data, not historical.
+- If you don't use Templater, you can still open `.emrald/daily-summary.md` directly or link to it manually.
+- Works with any template system that can include a file by wiki-link.
+
+---
+
 ## Companion theme
 
 The optional **EMRALD Theme** is the official companion theme for the plugin.
