@@ -4750,3 +4750,13 @@ span.emerald-pro-pill {
 	color: var(--text-muted);
 	margin: 0;
 }
+.emerald-onboard-privacy-icon {
+	display: inline-flex;
+	vertical-align: middle;
+	margin-right: 4px;
+}
+.emerald-onboard-privacy-icon svg {
+	width: 14px;
+	height: 14px;
+	stroke: var(--text-muted);
+}

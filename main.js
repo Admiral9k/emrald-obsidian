@@ -1017,10 +1017,10 @@ var init_onboarding = __esm({
           text: "Enter your API key to connect. You can get one from your EMRALD dashboard."
         });
         const privacyEl = container.createEl("div", { cls: "emerald-onboard-privacy" });
-        privacyEl.createEl("p", {
-          cls: "emerald-onboard-privacy-text",
-          text: "\ud83d\udd12 EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried."
-        });
+        const privacyText = privacyEl.createEl("p", { cls: "emerald-onboard-privacy-text" });
+        const lockIcon = privacyText.createEl("span", { cls: "emerald-onboard-privacy-icon" });
+        (0, import_obsidian5.setIcon)(lockIcon, "lock");
+        privacyText.appendText(" EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried.");
         const linkEl = container.createEl("div", { cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
         anchor.addEventListener("click", (e) => {
