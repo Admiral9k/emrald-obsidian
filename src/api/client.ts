@@ -568,6 +568,10 @@ export class EmraldAPIClient {
 		return this.request('POST', `/sessions/${sessionId}/receipt`, receipt);
 	}
 
+	async getReceipts(limit: number = 50): Promise<APIResponse<EffortReceipt[]>> {
+		return this.request('GET', `/receipts?limit=${limit}`);
+	}
+
 	// ── Energy Check-ins ─────────────────────────────────
 
 	async submitEnergyCheckin(checkin: CreateEnergyCheckinPayload): Promise<APIResponse<EnergyCheckin>> {
@@ -576,6 +580,10 @@ export class EmraldAPIClient {
 
 	async getTodayCheckin(): Promise<APIResponse<EnergyCheckin | null>> {
 		return this.request('GET', '/energy-checkins/today');
+	}
+
+	async getCheckins(limit: number = 50): Promise<APIResponse<EnergyCheckin[]>> {
+		return this.request('GET', `/energy-checkins?limit=${limit}`);
 	}
 
 	// ── Metrics ──────────────────────────────────────────
@@ -811,6 +819,12 @@ export interface EffortReceipt {
 	created_at: string;
 }
 
+export interface EffortReceiptWithContext extends EffortReceipt {
+	item_name: string;
+	effort_level: string;
+	duration_minutes: number;
+}
+
 export interface CreateReceiptPayload {
 	perceived_effort: number;      // 1-10
 	hedonic_valence: number;       // 1-10
@@ -829,6 +843,7 @@ export interface EnergyCheckin {
 	physical_energy: number;
 	emotional_state: number;
 	mental_clarity: number;
+	notes: string | null;
 	created_at: string;
 }
 

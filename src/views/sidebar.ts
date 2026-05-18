@@ -832,14 +832,10 @@ export class EmraldSidebarView extends ItemView {
 								sessionMinutes,
 								metPrescribedEffort
 							},
-							(receipt: import("../api/client").CreateReceiptPayload, markComplete: boolean) => { void (async () => {
+							(receipt: import("../api/client").CreateReceiptPayload, _markComplete: boolean) => { void (async () => {
 								const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 								if (!resp.error || resp.queued) {
 									new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
-									if (markComplete) {
-										await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' });
-										new Notice(`${session.itemName} marked complete`);
-									}
 									void this.loadTodayData();
 									void this.loadProjects();
 									await this.updateFrontmatterStats(session.itemId);
@@ -908,17 +904,11 @@ export class EmraldSidebarView extends ItemView {
 				sessionMinutes,
 				metPrescribedEffort
 			},
-			(receipt: import("../api/client").CreateReceiptPayload, markComplete: boolean) => { void (async () => {
+			(receipt: import("../api/client").CreateReceiptPayload, _markComplete: boolean) => { void (async () => {
 				// Submit receipt
 				const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 				if (!resp.error || resp.queued) {
 					new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
-
-					// Mark complete if requested
-					if (markComplete) {
-						await this.plugin.apiClient.updateItem(session.itemId, { status: 'completed' });
-						new Notice(`${session.itemName} marked complete`);
-					}
 
 					// Reload data (will use cache if offline)
 					void this.loadTodayData();

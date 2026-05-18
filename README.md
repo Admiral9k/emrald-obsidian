@@ -130,9 +130,35 @@ If you use **Templater** and **Periodic Notes**, you can pull this data into you
 ### Notes
 
 - The `.emrald` folder is created automatically the first time EMRALD writes the summary.
+- A `README.md` inside `.emrald/` has setup instructions and use case ideas — it’s created once and never overwritten.
 - The file updates in place — it always reflects _today's_ data, not historical.
 - If you don't use Templater, you can still open `.emrald/daily-summary.md` directly or link to it manually.
 - Works with any template system that can include a file by wiki-link.
+
+### Suggested uses
+
+The summary gives you the raw data. Your daily note is where you add the meaning.
+
+**Pair it with a Reflections section** in your daily note template:
+
+```markdown
+<% tp.file.include("[[.emrald/daily-summary]]") %>
+
+## Reflections
+- What did the numbers miss? How did the day *feel*?
+- Did I work on what I planned, or did something pull me away?
+- What would I do differently tomorrow?
+```
+
+**Track patterns over time:**
+- Compare your check-in scores with how the day actually went
+- Notice when high-stress days cluster — that’s a burnout signal your task list won’t show
+- Catch effort drift — spending hours on the wrong project without realizing it
+
+**Use it as an accountability mirror:**
+- "I planned to focus on Project X but spent 80% of my effort on Project Y"
+- "Burnout risk has been Moderate three days straight — time to ease off"
+- "My clarity was 9/10 and I wasted it on admin tasks"
 
 ---
 

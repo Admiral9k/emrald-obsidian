@@ -339,6 +339,9 @@ export class DigestView extends EmraldWorkspaceView {
 
 		// ── Delivery Schedule Footer ──
 		this.renderDeliveryFooter(this.contentContainer);
+
+		// ── Daily Check-in Notes (within digest date range) ──
+		void this.renderCheckinNotes(this.contentContainer, digest);
 	}
 
 	// ── Effort Source Breakdown ──────────────────────────
@@ -555,5 +558,73 @@ export class DigestView extends EmraldWorkspaceView {
 		if (days === 1) return 'yesterday';
 		if (days < 7) return `${days} days ago`;
 		return this.formatDate(iso);
+	}
+
+	// ── Check-in Notes (within digest period) ─────────
+
+	private async renderCheckinNotes(container: Element, digest: Digest) {
+		let checkinsResp;
+		try {
+			checkinsResp = await this.plugin.apiClient.getCheckins(50);
+		} catch {
+			return; // Silently skip
+		}
+
+		const allCheckins = checkinsResp?.data ?? [];
+		const periodStart = digest.period_start;
+		const periodEnd = digest.period_end;
+
+		// Filter to check-ins with notes within digest date range
+		const withNotes = allCheckins.filter(c =>
+			c.notes?.trim() &&
+			c.checkin_date >= periodStart &&
+			c.checkin_date <= periodEnd
+		).slice(0, 7); // Max 7 per digest period
+
+		if (withNotes.length === 0) return;
+
+		// Collapsible section
+		const section = container.createDiv({ cls: 'emerald-wv-digest-section' });
+		const headerRow = section.createDiv({ cls: 'emerald-wv-digest-section-header emrald-clickable' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-digest-section-icon' });
+		setIcon(iconEl, 'edit-3');
+		const headerTitle = headerRow.createEl('h4', { text: `\u25b8 Daily check-in notes (${withNotes.length})` });
+
+		const body = section.createDiv({ cls: 'emerald-wv-digest-section-body' });
+		body.addClass('emrald-hidden');
+
+		headerRow.addEventListener('click', () => {
+			const hidden = body.hasClass('emrald-hidden');
+			if (hidden) { body.removeClass('emrald-hidden'); } else { body.addClass('emrald-hidden'); }
+			headerTitle.textContent = `${hidden ? '\u25bc' : '\u25b8'} Daily check-in notes (${withNotes.length})`;
+		});
+
+		// Table
+		const table = body.createEl('table', { cls: 'emerald-wv-table emerald-wv-notes-table' });
+		const thead = table.createEl('thead');
+		const thRow = thead.createEl('tr');
+		for (const h of ['Date', 'Energy', 'Notes']) {
+			thRow.createEl('th', { text: h });
+		}
+
+		const tbody = table.createEl('tbody');
+		for (const c of withNotes) {
+			const row = tbody.createEl('tr');
+
+			// Date
+			const dateStr = new Date(c.checkin_date + 'T00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+			row.createEl('td', { text: dateStr });
+
+			// Energy chips
+			const chipCell = row.createEl('td');
+			const chips = chipCell.createDiv({ cls: 'emerald-wv-note-chips' });
+			if (c.sleep_quality) chips.createSpan({ cls: 'emerald-wv-chip', text: `Sleep: ${c.sleep_quality}` });
+			if (c.physical_energy) chips.createSpan({ cls: 'emerald-wv-chip', text: `Phys: ${c.physical_energy}` });
+			if (c.emotional_state) chips.createSpan({ cls: 'emerald-wv-chip', text: `Emo: ${c.emotional_state}` });
+			if (c.mental_clarity) chips.createSpan({ cls: 'emerald-wv-chip', text: `Mental: ${c.mental_clarity}` });
+
+			// Notes
+			row.createEl('td', { text: c.notes ?? '' });
+		}
 	}
 }

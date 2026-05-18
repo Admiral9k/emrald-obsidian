@@ -195,6 +195,25 @@ export class ProjectsComponent {
 		header.tabIndex = 0;
 		header.createSpan({ text: `▸ ${label} (${items.length})` });
 
+		// Clear button for Completed section — matches "+Add" style
+		if (sectionStatus === 'completed') {
+			const clearBtn = header.createEl('span', {
+				cls: 'emerald-section-action emerald-clear-action',
+				text: 'Clear'
+			});
+			clearBtn.setAttribute('role', 'button');
+			clearBtn.setAttribute('aria-label', 'Clear completed projects');
+			clearBtn.tabIndex = 0;
+			clearBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				const menu = new Menu();
+				menu.addItem(i => i.setTitle('Confirm clear').setIcon('trash-2').onClick(() => {
+					void this.clearCompletedProjects(items);
+				}));
+				menu.showAtMouseEvent(e as MouseEvent);
+			});
+		}
+
 		const content = accordion.createDiv({ cls: 'emerald-inactive-content' });
 		content.addClass('emrald-hidden');
 
@@ -202,8 +221,9 @@ export class ProjectsComponent {
 			const isHidden = content.hasClass('emrald-hidden');
 			if (isHidden) { content.removeClass('emrald-hidden'); } else { content.addClass('emrald-hidden'); }
 			header.setAttribute('aria-expanded', String(isHidden));
-			header.empty();
-			header.createSpan({ text: `${isHidden ? '▼' : '▸'} ${label} (${items.length})` });
+			// Update only the label span, preserve Clear button
+			const labelSpan = header.querySelector('span');
+			if (labelSpan) labelSpan.textContent = `${isHidden ? '▼' : '▸'} ${label} (${items.length})`;
 		};
 
 		header.addEventListener('click', toggle);

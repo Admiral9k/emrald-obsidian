@@ -26,6 +26,7 @@ export class EMComponent {
 		return this.plugin.settings?.pinnedMetricKeys ?? ['D1', 'D8', 'D12', 'D3'];
 	}
 	private insights: AIInsight[] = [];
+	private unreadCount: number = 0;
 	private currentInsightIndex: number = 0;
 	private checkinDone: boolean = false;
 
@@ -389,7 +390,7 @@ export class EMComponent {
 
 		const buttons = [
 			{ icon: ICONS.barChart, label: 'E-level overview', view: VIEW_ELEVEL_OVERVIEW },
-			{ icon: ICONS.lightbulb, label: 'Insight log', view: VIEW_INSIGHT_LOG, badge: this.insights.filter(i => !i.acknowledged_at).length },
+			{ icon: ICONS.lightbulb, label: 'Insight log', view: VIEW_INSIGHT_LOG, badge: this.unreadCount },
 			{ icon: ICONS.trendingUp, label: 'Data center', view: VIEW_DATA_CENTER },
 			{ icon: ICONS.user, label: 'Effort profile', view: VIEW_EFFORT_PROFILE },
 			{ icon: ICONS.flame, label: 'Burnout monitor', view: VIEW_BURNOUT_MONITOR },
@@ -477,9 +478,15 @@ export class EMComponent {
 		// Load insights (Pro only — Insight Bulletin)
 		if (tierState.isPro()) {
 			try {
-				const insightsResp = await this.plugin.apiClient.getInsights(5);
+				const [insightsResp, unreadResp] = await Promise.all([
+					this.plugin.apiClient.getInsights(5),
+					this.plugin.apiClient.getUnreadInsights()
+				]);
 				if (insightsResp.data) {
 					this.insights = insightsResp.data;
+				}
+				if (unreadResp.data) {
+					this.unreadCount = (unreadResp.data as { count: number }).count;
 				}
 			} catch { /* non-fatal */
 				// Insights stay empty
@@ -531,6 +538,7 @@ export class EMComponent {
 				? { ...i, acknowledged_at: new Date().toISOString(), action_taken: action }
 				: i
 			);
+			this.unreadCount = Math.max(0, this.unreadCount - 1);
 			this.currentInsightIndex = Math.min(this.currentInsightIndex, Math.max(this.insights.length - 1, 0));
 			this.renderInsightBulletin();
 

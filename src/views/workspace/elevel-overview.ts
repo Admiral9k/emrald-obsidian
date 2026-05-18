@@ -54,13 +54,12 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		this.renderHeader(container, 'E-level overview', 'Your projects by effort level', 'bar-chart-2');
 
 		// Fetch data concurrently
-		let itemsResp, sessionsResp, availResp, suggestionsResp;
+		let itemsResp, sessionsResp, availResp;
 		try {
-			[itemsResp, sessionsResp, availResp, suggestionsResp] = await Promise.all([
+			[itemsResp, sessionsResp, availResp] = await Promise.all([
 				this.plugin.apiClient.getItems(),
 				this.plugin.apiClient.getTodaySessions(),
-				this.plugin.apiClient.getAvailability(),
-				this.plugin.apiClient.getSuggestions()
+				this.plugin.apiClient.getAvailability()
 			]);
 		} catch {
 			this.renderError(container, 'Could not load E-Level data — check your connection.');
@@ -125,11 +124,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		this.projectContainer = container.createDiv({ cls: 'emerald-wv-project-table-wrap' });
 		this.renderProjectTable();
 
-		// ── Suggestions ──
-		const suggestions = (suggestionsResp.data ?? []).filter(s => s.message?.trim());
-		if (suggestions.length > 0) {
-			this.renderSuggestions(container, suggestions);
-		}
+		// ── Session Notes (receipts with notes from last 30 days) ──
+		void this.renderReceiptNotes(container);
 
 		// ── "What is effort management?" link → About EMRALD ──
 		const emLink = container.createDiv({ cls: 'emerald-wv-em-link' });
@@ -417,6 +413,89 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			setIcon(sugIcon, sug.type === 'effort_adjustment' ? 'sliders' : 'lightbulb');
 
 			card.createSpan({ text: sug.message });
+		}
+	}
+
+	// ── Session Notes (Receipt notes from last 30 days) ────
+
+	private async renderReceiptNotes(container: Element) {
+		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+		let receiptsResp;
+		try {
+			receiptsResp = await this.plugin.apiClient.getReceipts(50);
+		} catch {
+			return; // Silently skip if API unavailable
+		}
+
+		const allReceipts = receiptsResp?.data ?? [];
+		// Filter to last 30 days with notes
+		const withNotes = (allReceipts as unknown as Array<Record<string, unknown>>).filter((r: Record<string, unknown>) => {
+			const notes = r.notes as string | null;
+			const created = r.created_at as string;
+			return notes?.trim() && created >= thirtyDaysAgo;
+		});
+
+		if (withNotes.length === 0) return;
+
+		// Insert before the "What is effort management?" link
+		const emLink = container.querySelector('.emerald-wv-em-link');
+		const section = createDiv({ cls: 'emerald-wv-section emerald-wv-notes-section' });
+		if (emLink) {
+			container.insertBefore(section, emLink);
+		} else {
+			(container as HTMLElement).appendChild(section);
+		}
+
+		// Collapsible header
+		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row emrald-clickable' });
+		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
+		setIcon(iconEl, 'file-text');
+		const headerTitle = headerRow.createEl('h3', { text: `\u25b8 Session notes (${withNotes.length})` });
+
+		const notesContent = section.createDiv({ cls: 'emerald-wv-notes-content' });
+		notesContent.addClass('emrald-hidden');
+
+		headerRow.addEventListener('click', () => {
+			const hidden = notesContent.hasClass('emrald-hidden');
+			if (hidden) { notesContent.removeClass('emrald-hidden'); } else { notesContent.addClass('emrald-hidden'); }
+			headerTitle.textContent = `${hidden ? '\u25bc' : '\u25b8'} Session notes (${withNotes.length})`;
+		});
+
+		for (const r of withNotes) {
+			const receipt = r as Record<string, unknown>;
+			const item = receipt.item as { name: string; effort_level: string } | null;
+			const session = receipt.session as { duration_minutes: number } | null;
+			const created = new Date(receipt.created_at as string);
+			const dateStr = created.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+			const card = notesContent.createDiv({ cls: 'emerald-wv-note-card' });
+
+			// Header: Project · Date · E-level · Duration
+			const header = card.createDiv({ cls: 'emerald-wv-note-header' });
+			const parts: string[] = [];
+			if (item?.name) parts.push(item.name);
+			parts.push(dateStr);
+			if (item?.effort_level) parts.push(item.effort_level);
+			if (session?.duration_minutes) {
+				const h = Math.floor(session.duration_minutes / 60);
+				const m = Math.round(session.duration_minutes % 60);
+				parts.push(h > 0 ? `${h}h ${m}m` : `${m}m`);
+			}
+			header.textContent = parts.join(' \u00b7 ');
+
+			// Stat chips
+			const chips = card.createDiv({ cls: 'emerald-wv-note-chips' });
+			const effort = receipt.perceived_effort as number;
+			const flow = receipt.flow_occurred as number;
+			const pleasant = receipt.hedonic_valence as number;
+			const balance = receipt.demand_investment_balance as number;
+			if (typeof effort === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Effort: ${effort}/10` });
+			if (typeof flow === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Flow: ${['No', 'Somewhat', 'Yes'][flow] ?? flow}` });
+			if (typeof pleasant === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Pleasant: ${pleasant}/10` });
+			if (typeof balance === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Balance: ${balance}/10` });
+
+			// Notes text
+			card.createDiv({ cls: 'emerald-wv-note-text', text: receipt.notes as string });
 		}
 	}
 }

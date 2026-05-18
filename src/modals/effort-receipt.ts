@@ -91,36 +91,22 @@ export class EffortReceiptModal extends Modal {
 			this.notes = textarea.value;
 		});
 
-		// Completion prompt (if met prescribed effort)
+		// Over-E-level informational nudge
 		if (this.metPrescribedEffort) {
-			const completionGroup = form.createDiv({ cls: 'emerald-completion-prompt' });
-			completionGroup.createEl('p', {
-				text: `You've met the ${this.effortLevel || 'prescribed'} target for ${this.itemName}. Mark complete for today?`
+			const nudge = form.createDiv({ cls: 'emerald-completion-prompt' });
+			nudge.createEl('p', {
+				text: `You've passed the ${this.effortLevel || 'prescribed'} target for ${this.itemName} today \u2014 nice effort. Consider switching to another project next.`
 			});
 		}
 
-		// Actions
+		// Actions — single Submit button always
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
-		if (this.metPrescribedEffort) {
-			const completeBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Submit & complete'
-			});
-			completeBtn.addEventListener('click', () => this.submit(true));
-
-			const notYetBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-secondary',
-				text: 'Submit (not yet)'
-			});
-			notYetBtn.addEventListener('click', () => this.submit(false));
-		} else {
-			const submitBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Submit'
-			});
-			submitBtn.addEventListener('click', () => this.submit(false));
-		}
+		const submitBtn = actions.createEl('button', {
+			cls: 'emerald-btn emerald-btn-primary',
+			text: 'Submit'
+		});
+		submitBtn.addEventListener('click', () => this.submit(false));
 	}
 
 	private renderSlider(

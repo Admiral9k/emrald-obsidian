@@ -94,7 +94,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 // SVG chart constants
 const CHART_WIDTH = 360;
-const CHART_HEIGHT = 104;
+const CHART_HEIGHT = 175;
 const CHART_PAD = 4;
 
 export class DataCenterView extends EmraldWorkspaceView {

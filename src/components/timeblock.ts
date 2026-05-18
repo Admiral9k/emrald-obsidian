@@ -78,10 +78,11 @@ export class TimeblockComponent {
 
 		// Tick bar container
 		const barWrapper = this.containerEl.createDiv({ cls: 'emerald-bar-wrapper' });
-		this.tickBarEl = barWrapper.createDiv({ cls: 'emerald-tick-bar' });
-		this.greenBarEl = barWrapper.createDiv({ cls: 'emerald-green-bar' });
-		this.overtimeBarEl = barWrapper.createDiv({ cls: 'emerald-overtime-bar' });
-		this.eLevelMarkerEl = barWrapper.createDiv({ cls: 'emerald-elevel-marker' });
+		const barClip = barWrapper.createDiv({ cls: 'emerald-bar-clip' });
+		this.tickBarEl = barClip.createDiv({ cls: 'emerald-tick-bar' });
+		this.greenBarEl = barClip.createDiv({ cls: 'emerald-green-bar' });
+		this.overtimeBarEl = barClip.createDiv({ cls: 'emerald-overtime-bar' });
+		this.eLevelMarkerEl = barClip.createDiv({ cls: 'emerald-elevel-marker' });
 		this.eLevelMarkerEl.addClass('emrald-hidden');
 		this.dailyHoursMarkerEl = barWrapper.createDiv({ cls: 'emerald-dh-marker' });
 		this.updateDailyHoursMarker();
@@ -486,7 +487,8 @@ export class TimeblockComponent {
 		const dhPx = this.state.availableHours * hourWidth;
 
 		this.dailyHoursMarkerEl.style.left = `${dhPx}px`;
-		this.dailyHoursMarkerEl.textContent = `${this.state.availableHours}h`;
+		this.dailyHoursMarkerEl.empty();
+		this.dailyHoursMarkerEl.createSpan({ cls: 'emerald-dh-label', text: `${this.state.availableHours}h` });
 	}
 
 	/**
