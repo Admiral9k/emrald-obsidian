@@ -4,6 +4,8 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-05-18
+
 ### Added
 - **Daily Summary for Templater / Periodic Notes** — EMRALD now writes `.emrald/daily-summary.md` to your vault, updated automatically on session stop, energy check-in, day close, and sidebar refresh. Include it in your daily note template with `<% tp.file.include("[[.emrald/daily-summary]]") %>`. Shows today's session count, total hours, project breakdown with effort levels, check-in scores, and burnout risk level. Works with Periodic Notes out of the box — your daily notes auto-populate with EMRALD data. Setup steps and suggested use cases are in the [README](README.md#templater--periodic-notes-integration) and in `.emrald/README.md` (created automatically in your vault).
 - **Export Data** — Export your EMRALD data as JSON from Settings or Effort Profile. Tier-gated: Free exports 90-day window (D1–D8, weekly digests); Pro exports full history with all metrics, insights, and digests. Saves to vault root.
@@ -59,6 +61,7 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ---
 
-[Unreleased]: https://github.com/Admiral9k/emrald-obsidian/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/Admiral9k/emrald-obsidian/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/Admiral9k/emrald-obsidian/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/Admiral9k/emrald-obsidian/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/Admiral9k/emrald-obsidian/releases/tag/1.0.0
