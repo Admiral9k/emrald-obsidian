@@ -107,7 +107,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 	private gridContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Data center');
+		super(leaf, plugin, 'Data Center', 'trending-up');
 		this.pinnedKeys = new Set(plugin.settings?.pinnedMetricKeys ?? ['D1', 'D8', 'D12', 'D3']);
 	}
 

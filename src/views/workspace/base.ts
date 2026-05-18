@@ -30,11 +30,13 @@ export const ALL_WORKSPACE_VIEWS = [
 export abstract class EmraldWorkspaceView extends ItemView {
 	protected plugin: EmraldPlugin;
 	protected viewTitle: string;
+	protected viewIcon: string;
 
-	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin, title: string) {
+	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin, title: string, viewIcon?: string) {
 		super(leaf);
 		this.plugin = plugin;
 		this.viewTitle = title;
+		this.viewIcon = viewIcon || 'gem';
 	}
 
 	getDisplayText(): string {
@@ -42,7 +44,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 	}
 
 	getIcon(): string {
-		return 'gem';
+		return this.viewIcon;
 	}
 
 	async onClose() {
@@ -157,7 +159,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 
 		const cta = gate.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to PRO',
+			text: 'Upgrade to Pro',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		cta.setAttribute('target', '_blank');

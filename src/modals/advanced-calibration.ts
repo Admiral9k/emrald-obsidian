@@ -294,7 +294,7 @@ export class AdvancedCalibrationModal extends Modal {
 		// If showAll, use all unanswered; otherwise use the batch
 		const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
 
-		contentEl.createEl('h2', { text: 'Effort profile — advanced' });
+		contentEl.createEl('h2', { text: 'Effort Profile — Advanced' });
 
 		const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
 		if (this.showAll) {
@@ -400,7 +400,7 @@ export class AdvancedCalibrationModal extends Modal {
 
 		const submitBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Save & continue'
+			text: 'Save & Continue'
 		});
 		submitBtn.addEventListener('click', () => { void (async () => {
 			try {

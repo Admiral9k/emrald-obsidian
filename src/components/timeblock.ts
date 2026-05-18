@@ -14,6 +14,14 @@ const E_LEVEL_PERCENT: Record<string, number> = {
 	E4: 1.00
 };
 
+// E-level marker colors
+const E_LEVEL_COLORS: Record<string, string> = {
+	E1: '#2D7A4A',
+	E2: '#B8912E',
+	E3: '#C06A30',
+	E4: '#B54545'
+};
+
 export interface TimeblockState {
 	availableHours: number;       // Today's available hours (from availability or override)
 	workedMinutes: number;        // Total minutes worked today (all projects)
@@ -457,23 +465,18 @@ export class TimeblockComponent {
 		const totalAvailableMin = this.state.availableHours * 60;
 		const prescribedMin = totalAvailableMin * (E_LEVEL_PERCENT[session.effortLevel] ?? 0.5);
 
-		// Remaining prescribed time = prescribed - already worked on this project today
-		const remainingMin = Math.max(prescribedMin - session.priorMinutesToday, 0);
-
-		// Position marker in pixels (same coordinate system as tick marks).
-		// Each hour = 50px. The marker sits at a fixed time distance from "now" (left edge),
-		// so it moves with the ticks on resize — not as a percentage of bar width.
+		// Position marker at absolute prescribed position on the timeline.
+		// prescribedMin is the total minutes this E-level prescribes for the day.
+		// Do NOT add priorMinutesToday — that double-counts (Session 15 fix).
 		const hourWidth = 50; // Must match tick CSS width
-		const currentWorkedMin = this.state.workedMinutes + session.priorMinutesToday;
-		const markerMin = currentWorkedMin + remainingMin;
-		const markerHours = markerMin / 60;
+		const markerHours = prescribedMin / 60;
 		const markerPx = markerHours * hourWidth;
 
 		this.eLevelMarkerEl.style.left = `${markerPx}px`;
-		this.eLevelMarkerEl.removeClass('emrald-hidden');
+		this.eLevelMarkerEl.style.display = 'block';
 		this.eLevelMarkerEl.textContent = session.effortLevel;
-		this.eLevelMarkerEl.dataset.level = session.effortLevel;
-		this.eLevelMarkerEl.addClass('is-active');
+		this.eLevelMarkerEl.style.backgroundColor = E_LEVEL_COLORS[session.effortLevel] ?? 'var(--interactive-accent)';
+		this.eLevelMarkerEl.style.color = '#fff';
 	}
 
 	/**

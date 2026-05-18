@@ -43,7 +43,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	private projectContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'E-level overview');
+		super(leaf, plugin, 'E-Level Overview', 'bar-chart-2');
 	}
 
 	getViewType(): string { return VIEW_ELEVEL_OVERVIEW; }
@@ -422,7 +422,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 		let receiptsResp;
 		try {
-			receiptsResp = await this.plugin.apiClient.getReceipts(50);
+			receiptsResp = await this.plugin.apiClient.getReceipts({ from: thirtyDaysAgo, limit: 50 });
 		} catch {
 			return; // Silently skip if API unavailable
 		}

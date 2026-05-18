@@ -24,7 +24,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 	private expandedIds: Set<string> = new Set();
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Insight log');
+		super(leaf, plugin, 'Insight Log', 'lightbulb');
 	}
 
 	getViewType(): string { return VIEW_INSIGHT_LOG; }

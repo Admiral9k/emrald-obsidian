@@ -568,8 +568,12 @@ export class EmraldAPIClient {
 		return this.request('POST', `/sessions/${sessionId}/receipt`, receipt);
 	}
 
-	async getReceipts(limit: number = 50): Promise<APIResponse<EffortReceipt[]>> {
-		return this.request('GET', `/receipts?limit=${limit}`);
+	async getReceipts(opts?: { from?: string; to?: string; limit?: number }): Promise<APIResponse<EffortReceipt[]>> {
+		const params = new URLSearchParams();
+		if (opts?.from) params.set('from', opts.from);
+		if (opts?.to) params.set('to', opts.to);
+		params.set('limit', String(opts?.limit ?? 50));
+		return this.request('GET', `/receipts?${params.toString()}`);
 	}
 
 	// ── Energy Check-ins ─────────────────────────────────
@@ -582,8 +586,12 @@ export class EmraldAPIClient {
 		return this.request('GET', '/energy-checkins/today');
 	}
 
-	async getCheckins(limit: number = 50): Promise<APIResponse<EnergyCheckin[]>> {
-		return this.request('GET', `/energy-checkins?limit=${limit}`);
+	async getCheckins(opts?: { from?: string; to?: string; limit?: number }): Promise<APIResponse<EnergyCheckin[]>> {
+		const params = new URLSearchParams();
+		if (opts?.from) params.set('from', opts.from);
+		if (opts?.to) params.set('to', opts.to);
+		params.set('limit', String(opts?.limit ?? 50));
+		return this.request('GET', `/energy-checkins?${params.toString()}`);
 	}
 
 	// ── Metrics ──────────────────────────────────────────
@@ -768,6 +776,12 @@ export class EmraldAPIClient {
 
 	async getPendingNotifications(): Promise<APIResponse<EmraldNotification[]>> {
 		return this.request('GET', '/notifications?status=pending');
+	}
+
+	// ── Export ───────────────────────────────────────────────
+
+	async exportData(): Promise<APIResponse<Record<string, unknown>>> {
+		return this.request('GET', '/export', undefined, { skipCache: true });
 	}
 }
 

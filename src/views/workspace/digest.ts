@@ -22,7 +22,7 @@ export class DigestView extends EmraldWorkspaceView {
 	private navContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Digest');
+		super(leaf, plugin, 'Digest', 'clipboard-list');
 	}
 
 	getViewType(): string { return VIEW_DIGEST; }
@@ -565,7 +565,11 @@ export class DigestView extends EmraldWorkspaceView {
 	private async renderCheckinNotes(container: Element, digest: Digest) {
 		let checkinsResp;
 		try {
-			checkinsResp = await this.plugin.apiClient.getCheckins(50);
+			checkinsResp = await this.plugin.apiClient.getCheckins({
+				from: digest.period_start,
+				to: digest.period_end,
+				limit: 50
+			});
 		} catch {
 			return; // Silently skip
 		}

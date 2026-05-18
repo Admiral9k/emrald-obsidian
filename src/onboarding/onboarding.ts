@@ -127,7 +127,7 @@ export class OnboardingModal extends Modal {
 		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-actions' });
 		const startBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Get started'
+			text: 'Get Started'
 		});
 		startBtn.addEventListener('click', () => this.goTo('connect'));
 	}
@@ -141,21 +141,12 @@ export class OnboardingModal extends Modal {
 			text: 'Enter your API key to connect. You can get one from your EMRALD dashboard.'
 		});
 
-		// Privacy reassurance (#9 onboarding copy)
-		const privacyCallout = container.createDiv({ cls: 'emerald-wv-about-callout emerald-onboard-privacy' });
-		privacyCallout.createDiv({ cls: 'emerald-wv-about-callout-title', text: 'Your notes stay yours.' });
-		const privacyBody = privacyCallout.createEl('p', { cls: 'emerald-wv-about-callout-body' });
-		privacyBody.appendText('EMRALD never reads, uploads, or indexes your note content. ');
-		privacyBody.createEl('strong', { text: 'Ever.' });
-		privacyBody.createEl('br');
-		privacyBody.createEl('br');
-		privacyBody.appendText('What it syncs: session timestamps, effort ratings, and project names \u2014 the minimum needed to calculate your metrics. Your vault content never leaves your machine. The plugin has no mechanism to access your notes \u2014 it couldn\u2019t read them even if it tried.');
-		const privacyLinks = privacyCallout.createDiv({ cls: 'emerald-onboard-privacy-links' });
-		const policyLink = privacyLinks.createEl('a', { text: 'Privacy policy', href: 'https://effortmastery.com/legal/privacy' });
-		policyLink.setAttribute('target', '_blank');
-		privacyLinks.appendText(' \u00b7 ');
-		const learnLink = privacyLinks.createEl('a', { text: 'See exactly what\u2019s sent', href: 'https://getemrald.com/learn' });
-		learnLink.setAttribute('target', '_blank');
+		// Privacy reassurance (lock icon + single-line callout)
+		const privacyEl = container.createDiv({ cls: 'emerald-onboard-privacy' });
+		const privacyText = privacyEl.createEl('p', { cls: 'emerald-onboard-privacy-text' });
+		const lockIcon = privacyText.createSpan({ cls: 'emerald-onboard-privacy-icon' });
+		setIcon(lockIcon, 'lock');
+		privacyText.appendText(' EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried.');
 
 		// "Get an API key" link for community plugin store users
 		const linkEl = container.createDiv({ cls: 'emerald-onboard-link' });
@@ -447,7 +438,7 @@ export class OnboardingModal extends Modal {
 			(this.calibrationPage + 1) * perPage
 		);
 
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort Profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
@@ -541,7 +532,7 @@ export class OnboardingModal extends Modal {
 			// Last page — show Save & Continue
 			const saveBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Save & continue'
+				text: 'Save & Continue'
 			});
 			saveBtn.addEventListener('click', () => { void (async () => {
 				try {
@@ -549,7 +540,7 @@ export class OnboardingModal extends Modal {
 					if (Object.keys(this.calibrationAnswers).length > 0) {
 						try {
 							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-							new Notice('Effort profile saved ✓');
+							new Notice('Effort Profile saved ✓');
 						} catch { /* non-fatal */
 							new Notice('Profile saved locally — will sync later.');
 						}
@@ -925,7 +916,7 @@ export class OnboardingModal extends Modal {
 
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want even smarter insights? Complete your effort profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
+			text: 'Want even smarter insights? Complete your Effort Profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
 		});
 
 		// Research opt-in

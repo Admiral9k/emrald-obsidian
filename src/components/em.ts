@@ -392,7 +392,7 @@ export class EMComponent {
 			{ icon: ICONS.barChart, label: 'E-level overview', view: VIEW_ELEVEL_OVERVIEW },
 			{ icon: ICONS.lightbulb, label: 'Insight log', view: VIEW_INSIGHT_LOG, badge: this.unreadCount },
 			{ icon: ICONS.trendingUp, label: 'Data center', view: VIEW_DATA_CENTER },
-			{ icon: ICONS.user, label: 'Effort profile', view: VIEW_EFFORT_PROFILE },
+			{ icon: ICONS.user, label: 'Effort Profile', view: VIEW_EFFORT_PROFILE },
 			{ icon: ICONS.flame, label: 'Burnout monitor', view: VIEW_BURNOUT_MONITOR },
 			{ icon: ICONS.clipboardList, label: 'Digest', view: VIEW_DIGEST },
 			{ icon: ICONS.gem, label: 'About EMRALD', view: VIEW_ABOUT }
@@ -447,7 +447,7 @@ export class EMComponent {
 
 		const btn = card.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to PRO',
+			text: 'Upgrade to Pro',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		btn.setAttribute('target', '_blank');

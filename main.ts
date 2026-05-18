@@ -13,7 +13,8 @@ import {
 	VIEW_EFFORT_PROFILE, EffortProfileView,
 	VIEW_BURNOUT_MONITOR, BurnoutMonitorView,
 	VIEW_DIGEST, DigestView,
-	VIEW_ABOUT, AboutView
+	VIEW_ABOUT, AboutView,
+	ALL_WORKSPACE_VIEWS
 } from './src/views/workspace-views';
 
 export default class EmraldPlugin extends Plugin {
@@ -242,6 +243,10 @@ export default class EmraldPlugin extends Plugin {
 		this.stopSync();
 		this.stopMidnightCheck();
 		this.offlineQueue.destroy();
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_EMRALD);
+		for (const viewType of ALL_WORKSPACE_VIEWS) {
+			this.app.workspace.detachLeavesOfType(viewType);
+		}
 	}
 
 	async loadSettings() {

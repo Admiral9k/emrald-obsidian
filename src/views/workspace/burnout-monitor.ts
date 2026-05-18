@@ -41,7 +41,7 @@ const SPARK_H = 32;
 
 export class BurnoutMonitorView extends EmraldWorkspaceView {
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Burnout monitor');
+		super(leaf, plugin, 'Burnout Monitor', 'flame');
 	}
 
 	getViewType(): string { return VIEW_BURNOUT_MONITOR; }

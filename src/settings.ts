@@ -375,6 +375,38 @@ export class EmraldSettingTab extends PluginSettingTab {
 					});
 			});
 
+		// ── Data ──────────────────────────────────────────
+
+		containerEl.createEl('h3', { text: 'Data' });
+
+		new Setting(containerEl)
+			.setName('Export data')
+			.setDesc("Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk — it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + D1-D8 metrics. Pro: everything.")
+			.addButton(btn => {
+				btn.setButtonText('Export').onClick(async () => {
+					btn.setDisabled(true);
+					btn.setButtonText('Exporting...');
+					try {
+						const resp = await this.plugin.apiClient.exportData();
+						if (resp.error) {
+							new Notice(`Export failed: ${resp.error}`);
+							return;
+						}
+						const dateStr = new Date().toISOString().split('T')[0];
+						const filename = `emrald-export-${dateStr}.json`;
+						const content = JSON.stringify(resp.data, null, 2);
+						await this.plugin.app.vault.create(filename, content);
+						new Notice(`Exported to ${filename}`);
+					} catch (e) {
+						const msg = e instanceof Error ? e.message : 'Unknown error';
+						new Notice(`Export failed: ${msg}`);
+					} finally {
+						btn.setDisabled(false);
+						btn.setButtonText('Export');
+					}
+				});
+			});
+
 		// ── Onboarding ──────────────────────────────────────
 
 		new Setting(containerEl).setName('Setup').setHeading();

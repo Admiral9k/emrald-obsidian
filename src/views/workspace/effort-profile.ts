@@ -140,7 +140,7 @@ const ENUM_DISPLAY: Record<string, string> = {
 
 export class EffortProfileView extends EmraldWorkspaceView {
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'Effort profile');
+		super(leaf, plugin, 'Effort Profile', 'user');
 	}
 
 	getViewType(): string { return VIEW_EFFORT_PROFILE; }
@@ -148,7 +148,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Effort profile', 'How EMRALD sees you', 'user');
+		this.renderHeader(container, 'Effort Profile', 'How EMRALD sees you', 'user');
 
 		// Fetch data concurrently
 		let profileResp, historyResp, metricsResp, recoveryResp;
@@ -396,7 +396,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			upgradeBtn.addEventListener('click', () => { void (async () => {
 				try {
 					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
-					new Notice('Advanced mode enabled! Questions will appear before your next session.');
+					new Notice('Advanced Mode enabled! Questions will appear before your next session.');
 					void this.onOpen(); // Refresh
 				} catch { /* non-fatal */ }
 			})(); });
@@ -813,14 +813,35 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			} catch { /* non-fatal */ }
 		})(); });
 
-		// Export data placeholder
+		// Export data
 		const exportBtn = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-subtle' });
 		const exportIcon = exportBtn.createSpan({ cls: 'emerald-btn-icon' });
 		setIcon(exportIcon, 'download');
-		exportBtn.createSpan({ text: 'Export data (coming soon)' });
-		exportBtn.setAttribute('disabled', 'true');
-		exportBtn.addClass('emrald-dim');
-		exportBtn.addClass('emrald-not-clickable');
+		exportBtn.createSpan({ text: 'Export data' });
+		exportBtn.addEventListener('click', () => {
+			void (async () => {
+				exportBtn.setAttribute('disabled', 'true');
+				exportBtn.style.opacity = '0.5';
+				try {
+					const resp = await this.plugin.apiClient.exportData();
+					if (resp.error) {
+						new Notice(`Export failed: ${resp.error}`);
+						return;
+					}
+					const dateStr = new Date().toISOString().split('T')[0];
+					const filename = `emrald-export-${dateStr}.json`;
+					const jsonContent = JSON.stringify(resp.data, null, 2);
+					await this.plugin.app.vault.create(filename, jsonContent);
+					new Notice(`Exported to ${filename}`);
+				} catch (e) {
+					const msg = e instanceof Error ? e.message : 'Unknown error';
+					new Notice(`Export failed: ${msg}`);
+				} finally {
+					exportBtn.removeAttribute('disabled');
+					exportBtn.style.opacity = '';
+				}
+			})();
+		});
 	}
 
 	// ── Data Center Cross-Link ─────────────────────────

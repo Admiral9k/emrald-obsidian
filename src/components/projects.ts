@@ -438,6 +438,31 @@ export class ProjectsComponent {
 		el.textContent = `${fmt(totalMin)} / ${fmt(prescribedMin)}`;
 	}
 
+	// ── Clear Completed Projects ────────────────────────────
+
+	async clearCompletedProjects(items: TrackedItem[]) {
+		let cleared = 0;
+		for (const item of items) {
+			const idx = this.state.items.findIndex(i => i.id === item.id);
+			if (idx >= 0) {
+				this.state.items[idx] = { ...this.state.items[idx], status: 'abandoned' };
+			}
+			const resp = await this.plugin.apiClient.updateItem(item.id, { status: 'abandoned' });
+			if (resp.error && !resp.queued) {
+				// Revert on failure
+				if (idx >= 0) {
+					this.state.items[idx] = { ...this.state.items[idx], status: 'completed' };
+				}
+			} else {
+				cleared++;
+			}
+		}
+		this.render();
+		new Notice(cleared > 0
+			? `Cleared ${cleared} completed project${cleared > 1 ? 's' : ''}`
+			: 'Failed to clear projects');
+	}
+
 	// ── Event Handlers (wired by sidebar view) ──────────────
 
 	onStartSession: (item: TrackedItem) => void = () => {};

@@ -10,7 +10,7 @@ import { tierState } from '../../tier';
 
 export class AboutView extends EmraldWorkspaceView {
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'About EMRALD');
+		super(leaf, plugin, 'About EMRALD', 'gem');
 	}
 
 	getViewType(): string { return VIEW_ABOUT; }
@@ -244,7 +244,7 @@ export class AboutView extends EmraldWorkspaceView {
 			const ctaRow = proSection.createDiv( { cls: 'emerald-wv-pro-cta-row' });
 			const cta = ctaRow.createEl('a', {
 				cls: 'emerald-btn emerald-btn-upgrade',
-				text: 'Upgrade to PRO',
+				text: 'Upgrade to Pro',
 				href: 'https://app.effortmastery.com/app/billing'
 			});
 			cta.setAttribute('target', '_blank');
