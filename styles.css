@@ -8,6 +8,11 @@
 	--emerald-e3: #C06A30;
 	--emerald-e4: #B54545;
 }
+/* Utility classes */
+.emrald-hidden,
+.is-hidden { display: none !important; }
+.emrald-clickable { cursor: pointer; }
+.emrald-not-clickable { cursor: default; }
 .emrald-sidebar {
 	padding: 10px;
 	height: 100%;

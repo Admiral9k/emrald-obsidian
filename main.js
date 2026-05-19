@@ -3171,23 +3171,6 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
     } else {
       statusSetting.setDesc("No API key configured");
     }
-    new import_obsidian6.Setting(containerEl).setName("Folders").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("Active projects folder").setDesc("Folder path for active project notes").addText((text) => text.setPlaceholder("Active").setValue(this.plugin.settings.activeFolderPath).onChange((value) => {
-      this.plugin.settings.activeFolderPath = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian6.Setting(containerEl).setName("Inactive projects folder").setDesc("Folder path for inactive/paused project notes").addText((text) => text.setPlaceholder("Inactive").setValue(this.plugin.settings.inactiveFolderPath).onChange((value) => {
-      this.plugin.settings.inactiveFolderPath = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian6.Setting(containerEl).setName("Auto-detect new notes").setDesc("Prompt when new notes appear in active folder").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoDetectNotes).onChange((value) => {
-      this.plugin.settings.autoDetectNotes = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian6.Setting(containerEl).setName("Auto-detect folder moves").setDesc("Prompt when notes move between active/inactive").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoDetectMoves).onChange((value) => {
-      this.plugin.settings.autoDetectMoves = value;
-      void this.plugin.saveSettings();
-    }));
     new import_obsidian6.Setting(containerEl).setName("Timeblock").setHeading();
     new import_obsidian6.Setting(containerEl).setName("Show overtime indicator").setDesc("Yellow bar + counter when exceeding daily hours").addToggle((toggle) => toggle.setValue(this.plugin.settings.showOvertime).onChange((value) => {
       this.plugin.settings.showOvertime = value;
@@ -3208,10 +3191,6 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       void this.plugin.saveSettings();
     }));
     new import_obsidian6.Setting(containerEl).setName("Data").setHeading();
-    new import_obsidian6.Setting(containerEl).setName("Sync interval").setDesc("Minutes between automatic API syncs (1-30)").addSlider((slider) => slider.setLimits(1, 30, 1).setValue(this.plugin.settings.syncIntervalMinutes).setDynamicTooltip().onChange((value) => {
-      this.plugin.settings.syncIntervalMinutes = value;
-      void this.plugin.saveSettings();
-    }));
     new import_obsidian6.Setting(containerEl).setName("Frontmatter sync").setDesc("Write EMRALD metadata to note frontmatter").addToggle((toggle) => toggle.setValue(this.plugin.settings.frontmatterEnabled).onChange((value) => {
       this.plugin.settings.frontmatterEnabled = value;
       void this.plugin.saveSettings();
@@ -3258,16 +3237,18 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       void this.plugin.saveSettings();
       void this.plugin.syncDigestPreferences();
     }));
-    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Time of day in UTC (24h format, e.g. 09:00 = 4am est)").addText((text) => {
-      let debounce = null;
-      text.setPlaceholder("09:00").setValue(this.plugin.settings.digestTime).onChange((value) => {
+    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Hour of day in UTC (e.g. 09:00 = 4am EST). Digests run on the hour.").addDropdown((drop) => {
+      for (let h = 0; h < 24; h++) {
+        const label = `${String(h).padStart(2, "0")}:00`;
+        drop.addOption(label, label);
+      }
+      const stored = this.plugin.settings.digestTime || "09:00";
+      const hourPart = stored.split(":")[0].padStart(2, "0");
+      drop.setValue(`${hourPart}:00`);
+      drop.onChange(async (value) => {
         this.plugin.settings.digestTime = value;
-        void this.plugin.saveSettings();
-        if (debounce)
-          window.clearTimeout(debounce);
-        debounce = window.setTimeout(() => {
-          void this.plugin.syncDigestPreferences();
-        }, 700);
+        await this.plugin.saveSettings();
+        await this.plugin.syncDigestPreferences();
       });
     });
     containerEl.createEl("h3", { text: "Data" });
@@ -4767,7 +4748,6 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
       }
     }
   }
-  // ── Suggestions ─────────────────────────────────────
   // ── Open Note ────────────────────────────────────────
   openNote(item) {
     if (item.obsidian_note_path) {
@@ -4779,19 +4759,6 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
       }
     } else {
       new import_obsidian9.Notice(`No linked note for "${item.name}"`);
-    }
-  }
-  renderSuggestions(container, suggestions) {
-    const section = container.createDiv({ cls: "emerald-wv-section" });
-    const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
-    const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian9.setIcon)(iconEl, "message-circle");
-    headerRow.createEl("h3", { text: "Suggestions" });
-    for (const sug of suggestions) {
-      const card = section.createDiv({ cls: "emerald-wv-suggestion-card" });
-      const sugIcon = card.createSpan({ cls: "emerald-wv-suggestion-icon" });
-      (0, import_obsidian9.setIcon)(sugIcon, sug.type === "effort_adjustment" ? "sliders" : "lightbulb");
-      card.createSpan({ text: sug.message });
     }
   }
   // ── Session Notes (Receipt notes from last 30 days) ────

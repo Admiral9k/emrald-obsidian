@@ -135,52 +135,6 @@ export class EmraldSettingTab extends PluginSettingTab {
 			statusSetting.setDesc('No API key configured');
 		}
 
-		// ── Folders ─────────────────────────────────────────
-
-		new Setting(containerEl).setName('Folders').setHeading();
-
-		new Setting(containerEl)
-			.setName('Active projects folder')
-			.setDesc('Folder path for active project notes')
-			.addText(text => text
-				.setPlaceholder('Active')
-				.setValue(this.plugin.settings.activeFolderPath)
-				.onChange((value) => {
-					this.plugin.settings.activeFolderPath = value;
-					void this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
-			.setName('Inactive projects folder')
-			.setDesc('Folder path for inactive/paused project notes')
-			.addText(text => text
-				.setPlaceholder('Inactive')
-				.setValue(this.plugin.settings.inactiveFolderPath)
-				.onChange((value) => {
-					this.plugin.settings.inactiveFolderPath = value;
-					void this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
-			.setName('Auto-detect new notes')
-			.setDesc('Prompt when new notes appear in active folder')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.autoDetectNotes)
-				.onChange((value) => {
-					this.plugin.settings.autoDetectNotes = value;
-					void this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
-			.setName('Auto-detect folder moves')
-			.setDesc('Prompt when notes move between active/inactive')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.autoDetectMoves)
-				.onChange((value) => {
-					this.plugin.settings.autoDetectMoves = value;
-					void this.plugin.saveSettings();
-				}));
-
 		// ── Timeblock ───────────────────────────────────────
 
 		new Setting(containerEl).setName('Timeblock').setHeading();
@@ -241,18 +195,6 @@ export class EmraldSettingTab extends PluginSettingTab {
 		// ── Data ────────────────────────────────────────────
 
 		new Setting(containerEl).setName('Data').setHeading();
-
-		new Setting(containerEl)
-			.setName('Sync interval')
-			.setDesc('Minutes between automatic API syncs (1-30)')
-			.addSlider(slider => slider
-				.setLimits(1, 30, 1)
-				.setValue(this.plugin.settings.syncIntervalMinutes)
-				.setDynamicTooltip()
-				.onChange((value) => {
-					this.plugin.settings.syncIntervalMinutes = value;
-					void this.plugin.saveSettings();
-				}));
 
 		new Setting(containerEl)
 			.setName('Frontmatter sync')
@@ -359,20 +301,20 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Digest delivery time')
-			.setDesc('Time of day in UTC (24h format, e.g. 09:00 = 4am est)')
-			.addText(text => {
-				let debounce: number | null = null;
-				text
-					.setPlaceholder('09:00')
-					.setValue(this.plugin.settings.digestTime)
-					.onChange((value) => {
-						this.plugin.settings.digestTime = value;
-						void this.plugin.saveSettings();
-						if (debounce) window.clearTimeout(debounce);
-						debounce = window.setTimeout(() => {
-							void this.plugin.syncDigestPreferences();
-						}, 700);
-					});
+			.setDesc('Hour of day in UTC (e.g. 09:00 = 4am EST). Digests run on the hour.')
+			.addDropdown(drop => {
+				for (let h = 0; h < 24; h++) {
+					const label = `${String(h).padStart(2, '0')}:00`;
+					drop.addOption(label, label);
+				}
+				const stored = this.plugin.settings.digestTime || '09:00';
+				const hourPart = stored.split(':')[0].padStart(2, '0');
+				drop.setValue(`${hourPart}:00`);
+				drop.onChange(async (value) => {
+					this.plugin.settings.digestTime = value;
+					await this.plugin.saveSettings();
+					await this.plugin.syncDigestPreferences();
+				});
 			});
 
 		// ── Data ──────────────────────────────────────────

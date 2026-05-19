@@ -1,5 +1,5 @@
 // EMRALD E-Level Overview — Bird's-eye view of all projects and effort allocation.
-// Shows: E-level filter cards, project table, allocation summary, suggestions.
+// Shows: E-level filter cards, project table, allocation summary.
 // Click an E-level card to filter the project list.
 // Expandable ⓘ info on each card, clickable project names → open note,
 // "What is effort management?" link → About EMRALD view.
@@ -388,8 +388,6 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		}
 	}
 
-	// ── Suggestions ─────────────────────────────────────
-
 	// ── Open Note ────────────────────────────────────────
 
 	private openNote(item: TrackedItem) {
@@ -402,24 +400,6 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			}
 		} else {
 			new Notice(`No linked note for "${item.name}"`);
-		}
-	}
-
-	private renderSuggestions(container: Element, suggestions: Array<{ message: string; type: string }>) {
-		const section = container.createDiv({ cls: 'emerald-wv-section' });
-
-		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
-		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
-		setIcon(iconEl, 'message-circle');
-		headerRow.createEl('h3', { text: 'Suggestions' });
-
-		for (const sug of suggestions) {
-			const card = section.createDiv({ cls: 'emerald-wv-suggestion-card' });
-
-			const sugIcon = card.createSpan({ cls: 'emerald-wv-suggestion-icon' });
-			setIcon(sugIcon, sug.type === 'effort_adjustment' ? 'sliders' : 'lightbulb');
-
-			card.createSpan({ text: sug.message });
 		}
 	}
 
