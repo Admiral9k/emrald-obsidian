@@ -197,18 +197,22 @@ Updated automatically when you stop a session, complete a check-in, close your d
 Add this line to your daily note template:
 
 \`\`\`
-<% tp.file.include("[[.emrald/daily-summary]]") %>
+<%- await app.vault.adapter.read(".emrald/daily-summary.md") %>
 \`\`\`
 
 Your daily notes will auto-populate with your effort data.
 
+> **Note:** We use \`adapter.read()\` instead of \`tp.file.include()\` because Obsidian's vault index doesn't see dotfile paths.
+
 ### Use without Templater
 
-You can open this file directly, or link to it from any note:
+You can embed a live-updating link from any note:
 
 \`\`\`
 ![[.emrald/daily-summary]]
 \`\`\`
+
+> **Note:** Obsidian may not resolve this embed for dotfile paths. If it doesn't render, copy the file contents manually or use the Templater approach above.
 
 ### What's included
 
