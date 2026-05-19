@@ -258,6 +258,13 @@
 	left: 0;
 	height: 100%;
 	width: 0%;
+	background: linear-gradient(
+		to right,
+		rgba(45, 140, 80, 0.45) 0%,
+		rgba(55, 175, 95, 0.55) 85%,
+		rgba(70, 200, 110, 0.65) 100%
+	);
+	border-right: 2px solid rgba(80, 210, 120, 0.9);
 	box-shadow: 2px 0 12px rgba(80, 210, 120, 0.5), 2px 0 4px rgba(80, 210, 120, 0.8);
 	transition: width 1s linear;
 	z-index: 1;
