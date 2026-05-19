@@ -4,6 +4,20 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.1.2] — 2026-05-19
+
+### New
+- **Templater & Periodic Notes integration** — EMRALD now writes `.emrald/daily-summary.md` to your vault. Add one line to your daily note template and your effort data fills in automatically. Triggers on session stop, energy check-in, day close, and sidebar refresh.
+
+### Fixed
+- **Receipt note cards** in E-Level Overview — restored clickable project names, accent borders, and stat chips
+- **Check-in notes collapsible** in Digest view — toggle wasn't working (missing CSS utility class)
+- **Digest time setting** — now a whole-hour dropdown instead of free-text input
+- **Settings cleanup** — removed stale Folder section and Sync interval slider
+- **Dotfile path handling** — uses `vault.adapter.*` methods for `.emrald/` paths (Obsidian's vault index can't see dotfiles)
+- **Dead code removed** — unused Suggestions renderer stripped from E-Level Overview
+- **Zero `!important`** in CSS — replaced with specificity bumps for community review compliance
+
 ## [1.1.1] — 2026-05-19
 
 ### Fixed
