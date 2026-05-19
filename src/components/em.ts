@@ -3,6 +3,7 @@
 // with real 14-day history data, rotating insights, and workspace view buttons.
 
 import { Notice } from 'obsidian';
+import { writeDailySummary } from '../sync/daily-summary';
 import EmraldPlugin from '../../main';
 import { ComputedMetricHistory, AIInsight } from '../api/client';
 import { createIconEl, ICONS } from '../utils/icons';
@@ -141,10 +142,12 @@ export class EMComponent {
 								this.checkinDone = true;
 								this.renderCheckinBanner();
 								new Notice('Energy check-in queued — will sync when online');
+								void writeDailySummary(this.plugin);
 							} else if (!resp.error) {
 								this.checkinDone = true;
 								this.renderCheckinBanner();
 								new Notice('Energy check-in recorded ✓');
+								void writeDailySummary(this.plugin);
 							} else {
 								new Notice(`Check-in failed: ${resp.error}`);
 							}

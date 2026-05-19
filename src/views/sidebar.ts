@@ -6,6 +6,7 @@ import { EMComponent } from '../components/em';
 import { TrackedItem } from '../api/client';
 import { tierState } from '../tier';
 import { updateSessionStats, isEmraldNote, initializeEmraldFrontmatter, buildNotePathMap } from '../sync/frontmatter';
+import { writeDailySummary } from '../sync/daily-summary';
 
 export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
 
@@ -626,6 +627,8 @@ export class EmraldSidebarView extends ItemView {
 
 		} finally {
 			this._loadingTodayData = false;
+			// Update daily summary file (non-blocking, fire-and-forget)
+			void writeDailySummary(this.plugin);
 		}
 	}
 
@@ -988,6 +991,7 @@ export class EmraldSidebarView extends ItemView {
 			() => {
 				this.timeblock?.closeDay();
 				new Notice('Day closed');
+				void writeDailySummary(this.plugin);
 			}
 		);
 		modal.open();
