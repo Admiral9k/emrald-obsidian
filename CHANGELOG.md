@@ -4,6 +4,11 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-05-19
+
+### Fixed
+- **Timeblock green bar invisible** — Restored session progress bar gradient and leading-edge border that were accidentally removed during CSS cleanup in v1.1.0. The bar now renders correctly as a dark-to-light green fill during active sessions.
+
 ## [1.1.0] — 2026-05-18
 
 ### Added
