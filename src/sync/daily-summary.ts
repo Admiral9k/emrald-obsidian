@@ -160,13 +160,22 @@ export async function writeDailySummary(plugin: EmraldPlugin): Promise<void> {
 		if (existingFile) {
 			await vault.modify(existingFile as import('obsidian').TFile, content);
 		} else {
-			await vault.create(SUMMARY_PATH, content);
+			try {
+				await vault.create(SUMMARY_PATH, content);
+			} catch {
+				// File exists on disk but not in Obsidian's index — try adapter.write directly
+				await vault.adapter.write(SUMMARY_PATH, content);
+			}
 		}
 
 		// Write README once (never overwrite)
 		const readmeExists = vault.getAbstractFileByPath(README_PATH);
 		if (!readmeExists) {
-			await vault.create(README_PATH, getReadmeContent());
+			try {
+				await vault.create(README_PATH, getReadmeContent());
+			} catch {
+				// Already exists on disk
+			}
 		}
 	} catch (err) {
 		console.warn('[EMRALD] Failed to write daily summary:', err);
