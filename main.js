@@ -4303,13 +4303,6 @@ async function writeDailySummary(plugin) {
     }
   }
   const lines = [];
-  lines.push("---");
-  lines.push(`date: "${today}"`);
-  lines.push(`sessions: ${sessionCount}`);
-  lines.push(`total_minutes: ${Math.round(totalMinutes)}`);
-  lines.push(`generated: "${(/* @__PURE__ */ new Date()).toISOString()}"`);
-  lines.push("---");
-  lines.push("");
   lines.push("## Today's Effort");
   const totalH = Math.floor(totalMinutes / 60);
   const totalM = Math.round(totalMinutes % 60);
@@ -4416,7 +4409,6 @@ You can embed a live-updating link from any note:
 - Project breakdown (name, effort level, time, session count)
 - Check-in scores (energy, clarity, mood, sleep)
 - Burnout risk level and score
-- YAML frontmatter for machine-readability
 `;
 }
 

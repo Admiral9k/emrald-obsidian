@@ -102,8 +102,10 @@ If you use **Templater** and **Periodic Notes**, you can pull this data into you
 2. **Add this line** to your daily note template wherever you want the summary to appear:
 
    ```
-   <% tp.file.include("[[.emrald/daily-summary]]") %>
+   <%- await app.vault.adapter.read(".emrald/daily-summary.md") %>
    ```
+
+   > **Why `adapter.read()`?** Obsidian's vault index doesn't see dotfile paths (`.emrald/`), so the standard `tp.file.include()` can't resolve them. This reads the file directly from disk.
 
 3. **That's it.** The next time Periodic Notes creates a daily note (or you manually create one from your template), your EMRALD data fills in automatically.
 
@@ -132,8 +134,7 @@ If you use **Templater** and **Periodic Notes**, you can pull this data into you
 - The `.emrald` folder is created automatically the first time EMRALD writes the summary.
 - A `README.md` inside `.emrald/` has setup instructions and use case ideas — it’s created once and never overwritten.
 - The file updates in place — it always reflects _today's_ data, not historical.
-- If you don't use Templater, you can still open `.emrald/daily-summary.md` directly or link to it manually.
-- Works with any template system that can include a file by wiki-link.
+- If you don't use Templater, you can still open `.emrald/daily-summary.md` directly — it's a plain markdown file on disk.
 
 ### Suggested uses
 
@@ -142,7 +143,7 @@ The summary gives you the raw data. Your daily note is where you add the meaning
 **Pair it with a Reflections section** in your daily note template:
 
 ```markdown
-<% tp.file.include("[[.emrald/daily-summary]]") %>
+<%- await app.vault.adapter.read(".emrald/daily-summary.md") %>
 
 ## Reflections
 - What did the numbers miss? How did the day *feel*?
