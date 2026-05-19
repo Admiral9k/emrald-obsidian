@@ -143,39 +143,21 @@ export async function writeDailySummary(plugin: EmraldPlugin): Promise<void> {
 
 	const content = lines.join('\n');
 
-	// ── Write to vault ──────────────────────────────
+	// ── Write to vault (adapter methods for dotfile paths) ──
 	try {
 		// Ensure .emrald folder exists
-		const folderExists = vault.getAbstractFileByPath(SUMMARY_FOLDER);
+		const folderExists = await vault.adapter.exists(SUMMARY_FOLDER);
 		if (!folderExists) {
-			try {
-				await vault.createFolder(SUMMARY_FOLDER);
-			} catch {
-				// Folder may already exist on disk but not in Obsidian's index
-			}
+			await vault.adapter.mkdir(SUMMARY_FOLDER);
 		}
 
 		// Write or overwrite the summary file
-		const existingFile = vault.getAbstractFileByPath(SUMMARY_PATH);
-		if (existingFile) {
-			await vault.modify(existingFile as import('obsidian').TFile, content);
-		} else {
-			try {
-				await vault.create(SUMMARY_PATH, content);
-			} catch {
-				// File exists on disk but not in Obsidian's index — try adapter.write directly
-				await vault.adapter.write(SUMMARY_PATH, content);
-			}
-		}
+		await vault.adapter.write(SUMMARY_PATH, content);
 
 		// Write README once (never overwrite)
-		const readmeExists = vault.getAbstractFileByPath(README_PATH);
+		const readmeExists = await vault.adapter.exists(README_PATH);
 		if (!readmeExists) {
-			try {
-				await vault.create(README_PATH, getReadmeContent());
-			} catch {
-				// Already exists on disk
-			}
+			await vault.adapter.write(README_PATH, getReadmeContent());
 		}
 	} catch (err) {
 		console.warn('[EMRALD] Failed to write daily summary:', err);

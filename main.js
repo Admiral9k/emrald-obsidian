@@ -4354,29 +4354,14 @@ async function writeDailySummary(plugin) {
   lines.push("");
   const content = lines.join("\n");
   try {
-    const folderExists = vault.getAbstractFileByPath(SUMMARY_FOLDER);
+    const folderExists = await vault.adapter.exists(SUMMARY_FOLDER);
     if (!folderExists) {
-      try {
-        await vault.createFolder(SUMMARY_FOLDER);
-      } catch (e) {
-      }
+      await vault.adapter.mkdir(SUMMARY_FOLDER);
     }
-    const existingFile = vault.getAbstractFileByPath(SUMMARY_PATH);
-    if (existingFile) {
-      await vault.modify(existingFile, content);
-    } else {
-      try {
-        await vault.create(SUMMARY_PATH, content);
-      } catch (e) {
-        await vault.adapter.write(SUMMARY_PATH, content);
-      }
-    }
-    const readmeExists = vault.getAbstractFileByPath(README_PATH);
+    await vault.adapter.write(SUMMARY_PATH, content);
+    const readmeExists = await vault.adapter.exists(README_PATH);
     if (!readmeExists) {
-      try {
-        await vault.create(README_PATH, getReadmeContent());
-      } catch (e) {
-      }
+      await vault.adapter.write(README_PATH, getReadmeContent());
     }
   } catch (err) {
     console.warn("[EMRALD] Failed to write daily summary:", err);
