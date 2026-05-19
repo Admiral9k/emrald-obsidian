@@ -4356,7 +4356,10 @@ async function writeDailySummary(plugin) {
   try {
     const folderExists = vault.getAbstractFileByPath(SUMMARY_FOLDER);
     if (!folderExists) {
-      await vault.createFolder(SUMMARY_FOLDER);
+      try {
+        await vault.createFolder(SUMMARY_FOLDER);
+      } catch (e) {
+      }
     }
     const existingFile = vault.getAbstractFileByPath(SUMMARY_PATH);
     if (existingFile) {

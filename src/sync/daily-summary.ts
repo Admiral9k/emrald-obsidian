@@ -148,7 +148,11 @@ export async function writeDailySummary(plugin: EmraldPlugin): Promise<void> {
 		// Ensure .emrald folder exists
 		const folderExists = vault.getAbstractFileByPath(SUMMARY_FOLDER);
 		if (!folderExists) {
-			await vault.createFolder(SUMMARY_FOLDER);
+			try {
+				await vault.createFolder(SUMMARY_FOLDER);
+			} catch {
+				// Folder may already exist on disk but not in Obsidian's index
+			}
 		}
 
 		// Write or overwrite the summary file
