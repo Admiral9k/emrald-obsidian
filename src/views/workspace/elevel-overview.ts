@@ -12,26 +12,30 @@ import { TrackedItem } from '../../api/client';
 
 const E_LEVEL_PCT: Record<string, number> = { E1: 25, E2: 50, E3: 75, E4: 100 };
 
-const E_LEVEL_META: Record<string, { label: string; desc: string; detail: string }> = {
+const E_LEVEL_META: Record<string, { label: string; desc: string; detail: string; color: string }> = {
 	E1: {
 		label: 'E1 — Light',
 		desc: '25% of your daily hours',
-		detail: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.'
+		detail: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
+		color: '#2D7A4A'
 	},
 	E2: {
 		label: 'E2 — Moderate',
 		desc: '50% of your daily hours',
-		detail: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.'
+		detail: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.',
+		color: '#B8912E'
 	},
 	E3: {
 		label: 'E3 — Demanding',
 		desc: '75% of your daily hours',
-		detail: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.'
+		detail: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.',
+		color: '#C06A30'
 	},
 	E4: {
 		label: 'E4 — Maximum',
 		desc: '100% of your daily hours',
-		detail: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.'
+		detail: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.',
+		color: '#B54545'
 	}
 };
 
@@ -172,6 +176,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				cls: `emerald-wv-elevel-card ${this.activeFilter === level ? 'is-active' : ''}`
 			});
 			card.dataset.level = level;
+			card.style.borderLeftColor = meta.color;
 
 			// Left side: level info
 			const info = card.createDiv({ cls: 'emerald-wv-elevel-info' });
@@ -355,6 +360,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// E-Level (colored)
 			const levelCell = row.createEl('td');
 			const levelBadge = levelCell.createSpan({ cls: 'emerald-wv-level-badge', text: item.effort_level });
+			const levelMeta = E_LEVEL_META[item.effort_level];
+			levelBadge.style.color = levelMeta?.color ?? 'var(--text-muted)';
 			levelBadge.dataset.level = item.effort_level ?? '';
 
 			// Today's time

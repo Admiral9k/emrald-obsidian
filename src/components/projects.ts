@@ -15,6 +15,14 @@ const E_LEVEL_PERCENT: Record<string, number> = {
 	E4: 1.00
 };
 
+// E-level colors for inline badge styling
+const E_LEVEL_COLORS: Record<string, string> = {
+	E1: '#2D7A4A',
+	E2: '#B8912E',
+	E3: '#C06A30',
+	E4: '#B54545'
+};
+
 export interface ProjectsState {
 	items: TrackedItem[];
 	activeSessionItemId: string | null;
@@ -149,6 +157,7 @@ export class ProjectsComponent {
 			attr: { 'aria-label': `Effort level ${item.effort_level}` }
 		});
 		badge.dataset.level = item.effort_level ?? '';
+		badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
 
 		// Bottom row: today's time
 		const bottomRow = card.createDiv({ cls: 'emerald-project-bottom' });
@@ -250,6 +259,7 @@ export class ProjectsComponent {
 			nameEl.setAttribute('aria-hidden', 'true');
 			const badge = row.createSpan({ cls: 'emerald-elevel-badge-small', text: item.effort_level });
 			badge.dataset.level = item.effort_level ?? '';
+			badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
 
 			row.addClass('emrald-clickable');
 			row.addEventListener('click', (e) => {

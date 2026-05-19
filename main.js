@@ -3904,6 +3904,12 @@ var E_LEVEL_PERCENT2 = {
   E3: 0.75,
   E4: 1
 };
+var E_LEVEL_COLORS2 = {
+  E1: "#2D7A4A",
+  E2: "#B8912E",
+  E3: "#C06A30",
+  E4: "#B54545"
+};
 var ProjectsComponent = class {
   constructor(plugin, containerEl) {
     // ── Event Handlers (wired by sidebar view) ──────────────
@@ -3980,7 +3986,7 @@ var ProjectsComponent = class {
     }
   }
   renderProjectCard(item, isActive) {
-    var _a, _b;
+    var _a, _b, _c;
     const isInSession = this.state.activeSessionItemId === item.id;
     const todayMin = (_a = this.state.todayMinutesByItem.get(item.id)) != null ? _a : 0;
     const card = this.containerEl.createDiv({
@@ -4006,6 +4012,7 @@ var ProjectsComponent = class {
       attr: { "aria-label": `Effort level ${item.effort_level}` }
     });
     badge.dataset.level = (_b = item.effort_level) != null ? _b : "";
+    badge.style.color = (_c = E_LEVEL_COLORS2[item.effort_level]) != null ? _c : "var(--text-muted)";
     const bottomRow = card.createDiv({ cls: "emerald-project-bottom" });
     if (isInSession) {
       bottomRow.createSpan({ cls: "emerald-in-session-label", text: "\u2504\u2504 In session \u2504\u2504" });
@@ -4030,7 +4037,7 @@ var ProjectsComponent = class {
   }
   // ── Collapsible Section (Inactive / Completed) ─────────
   renderCollapsibleSection(label, items, sectionStatus) {
-    var _a;
+    var _a, _b;
     if (items.length === 0)
       return;
     const accordion = this.containerEl.createDiv({ cls: "emerald-inactive-accordion" });
@@ -4094,6 +4101,7 @@ var ProjectsComponent = class {
       nameEl.setAttribute("aria-hidden", "true");
       const badge = row.createSpan({ cls: "emerald-elevel-badge-small", text: item.effort_level });
       badge.dataset.level = (_a = item.effort_level) != null ? _a : "";
+      badge.style.color = (_b = E_LEVEL_COLORS2[item.effort_level]) != null ? _b : "var(--text-muted)";
       row.addClass("emrald-clickable");
       row.addEventListener("click", (e) => {
         this.showCollapsibleContextMenu(e, item, sectionStatus);
@@ -4447,22 +4455,26 @@ var E_LEVEL_META = {
   E1: {
     label: "E1 \u2014 Light",
     desc: "25% of your daily hours",
-    detail: "Low-effort tasks you can sustain indefinitely \u2014 quick check-ins, light reading, routine maintenance. These barely dent your energy budget."
+    detail: "Low-effort tasks you can sustain indefinitely \u2014 quick check-ins, light reading, routine maintenance. These barely dent your energy budget.",
+    color: "#2D7A4A"
   },
   E2: {
     label: "E2 \u2014 Moderate",
     desc: "50% of your daily hours",
-    detail: "Meaningful work that requires focus but not peak performance \u2014 writing, planning, steady progress on familiar projects."
+    detail: "Meaningful work that requires focus but not peak performance \u2014 writing, planning, steady progress on familiar projects.",
+    color: "#B8912E"
   },
   E3: {
     label: "E3 \u2014 Demanding",
     desc: "75% of your daily hours",
-    detail: "High-effort work that taxes your energy significantly \u2014 complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously."
+    detail: "High-effort work that taxes your energy significantly \u2014 complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.",
+    color: "#C06A30"
   },
   E4: {
     label: "E4 \u2014 Maximum",
     desc: "100% of your daily hours",
-    detail: "All-in effort \u2014 peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes."
+    detail: "All-in effort \u2014 peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.",
+    color: "#B54545"
   }
 };
 var ELevelOverviewView = class extends EmraldWorkspaceView {
@@ -4577,6 +4589,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
         cls: `emerald-wv-elevel-card ${this.activeFilter === level ? "is-active" : ""}`
       });
       card.dataset.level = level;
+      card.style.borderLeftColor = meta.color;
       const info = card.createDiv({ cls: "emerald-wv-elevel-info" });
       const levelLabel = info.createDiv({ cls: "emerald-wv-elevel-label" });
       levelLabel.createSpan({ cls: "emerald-wv-elevel-name", text: level });
@@ -4662,7 +4675,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   }
   // ── Project Table ───────────────────────────────────
   renderProjectTable() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     if (!this.projectContainer)
       return;
     this.projectContainer.empty();
@@ -4732,10 +4745,12 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
       }
       const levelCell = row.createEl("td");
       const levelBadge = levelCell.createSpan({ cls: "emerald-wv-level-badge", text: item.effort_level });
-      levelBadge.dataset.level = (_b = item.effort_level) != null ? _b : "";
-      const todayMin = (_c = this.minutesByItem.get(item.id)) != null ? _c : 0;
+      const levelMeta = E_LEVEL_META[item.effort_level];
+      levelBadge.style.color = (_b = levelMeta == null ? void 0 : levelMeta.color) != null ? _b : "var(--text-muted)";
+      levelBadge.dataset.level = (_c = item.effort_level) != null ? _c : "";
+      const todayMin = (_d = this.minutesByItem.get(item.id)) != null ? _d : 0;
       row.createEl("td", { text: todayMin > 0 ? this.formatDuration(todayMin) : "\u2014" });
-      const pct = (_d = E_LEVEL_PCT[item.effort_level]) != null ? _d : 50;
+      const pct = (_e = E_LEVEL_PCT[item.effort_level]) != null ? _e : 50;
       const prescribedMin = this.availableHours * 60 * pct / 100;
       row.createEl("td", { text: item.status === "active" ? this.formatDuration(prescribedMin) : "\u2014" });
       const progressCell = row.createEl("td");
