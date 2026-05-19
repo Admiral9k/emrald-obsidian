@@ -470,39 +470,49 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 		for (const r of withNotes) {
 			const receipt = r as Record<string, unknown>;
-			const item = receipt.item as { name: string; effort_level: string } | null;
-			const session = receipt.session as { duration_minutes: number } | null;
-			const created = new Date(receipt.created_at as string);
-			const dateStr = created.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+			const item = receipt.item as { name: string; effort_level: string; obsidian_note_path?: string } | null;
+			const session = receipt.session as { started_at: string; duration_minutes: number } | null;
+			const dateStr = session?.started_at
+				? new Date(session.started_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+				: '';
+			const durMin = session?.duration_minutes ?? 0;
+			const durStr = durMin > 60 ? `${Math.floor(durMin / 60)}h ${Math.round(durMin % 60)}m` : `${Math.round(durMin)}m`;
 
-			const card = notesContent.createDiv({ cls: 'emerald-wv-note-card' });
+			const card = notesContent.createDiv({ cls: 'emerald-wv-receipt-note-card' });
 
-			// Header: Project · Date · E-level · Duration
-			const header = card.createDiv({ cls: 'emerald-wv-note-header' });
-			const parts: string[] = [];
-			if (item?.name) parts.push(item.name);
-			parts.push(dateStr);
-			if (item?.effort_level) parts.push(item.effort_level);
-			if (session?.duration_minutes) {
-				const h = Math.floor(session.duration_minutes / 60);
-				const m = Math.round(session.duration_minutes % 60);
-				parts.push(h > 0 ? `${h}h ${m}m` : `${m}m`);
-			}
-			header.textContent = parts.join(' \u00b7 ');
+			// Header: clickable project name + date + E-level + duration
+			const headerLine = card.createDiv({ cls: 'emerald-wv-receipt-note-header' });
+			const itemName = item?.name ?? 'Unknown project';
+			const eLevel = item?.effort_level ?? '';
+
+			const nameLink = headerLine.createEl('a', {
+				cls: 'emerald-wv-receipt-note-title emerald-wv-project-link',
+				text: itemName
+			});
+			nameLink.addEventListener('click', (e) => {
+				e.preventDefault();
+				if (item) this.openNote(item as unknown as TrackedItem);
+			});
+
+			headerLine.createSpan({
+				cls: 'emerald-wv-receipt-note-meta',
+				text: ` \u00b7 ${dateStr} \u00b7 ${eLevel} \u00b7 ${durStr}`
+			});
 
 			// Stat chips
-			const chips = card.createDiv({ cls: 'emerald-wv-note-chips' });
+			const chips = card.createDiv({ cls: 'emerald-wv-notes-chips' });
 			const effort = receipt.perceived_effort as number;
 			const flow = receipt.flow_occurred as number;
 			const pleasant = receipt.hedonic_valence as number;
 			const balance = receipt.demand_investment_balance as number;
-			if (typeof effort === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Effort: ${effort}/10` });
-			if (typeof flow === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Flow: ${['No', 'Somewhat', 'Yes'][flow] ?? flow}` });
-			if (typeof pleasant === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Pleasant: ${pleasant}/10` });
-			if (typeof balance === 'number') chips.createSpan({ cls: 'emerald-wv-chip', text: `Balance: ${balance}/10` });
+			const flowLabels = ['No flow', 'Some flow', 'In the zone'];
+			if (typeof effort === 'number') chips.createSpan({ cls: 'emerald-wv-notes-chip', text: `Effort ${effort}/10` });
+			if (typeof flow === 'number') chips.createSpan({ cls: 'emerald-wv-notes-chip', text: flowLabels[flow] ?? 'No flow' });
+			if (typeof pleasant === 'number') chips.createSpan({ cls: 'emerald-wv-notes-chip', text: `Pleasant ${pleasant}/10` });
+			if (typeof balance === 'number') chips.createSpan({ cls: 'emerald-wv-notes-chip', text: `Balance ${balance}/10` });
 
 			// Notes text
-			card.createDiv({ cls: 'emerald-wv-note-text', text: receipt.notes as string });
+			card.createDiv({ cls: 'emerald-wv-receipt-note-text', text: receipt.notes as string });
 		}
 	}
 }

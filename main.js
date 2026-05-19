@@ -4796,7 +4796,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   }
   // ── Session Notes (Receipt notes from last 30 days) ────
   async renderReceiptNotes(container) {
-    var _a, _b;
+    var _a, _b, _c, _d, _e;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3).toISOString();
     let receiptsResp;
     try {
@@ -4838,36 +4838,41 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
       const receipt = r;
       const item = receipt.item;
       const session = receipt.session;
-      const created = new Date(receipt.created_at);
-      const dateStr = created.toLocaleDateString(void 0, { month: "short", day: "numeric" });
-      const card = notesContent.createDiv({ cls: "emerald-wv-note-card" });
-      const header = card.createDiv({ cls: "emerald-wv-note-header" });
-      const parts = [];
-      if (item == null ? void 0 : item.name)
-        parts.push(item.name);
-      parts.push(dateStr);
-      if (item == null ? void 0 : item.effort_level)
-        parts.push(item.effort_level);
-      if (session == null ? void 0 : session.duration_minutes) {
-        const h = Math.floor(session.duration_minutes / 60);
-        const m = Math.round(session.duration_minutes % 60);
-        parts.push(h > 0 ? `${h}h ${m}m` : `${m}m`);
-      }
-      header.textContent = parts.join(" \xB7 ");
-      const chips = card.createDiv({ cls: "emerald-wv-note-chips" });
+      const dateStr = (session == null ? void 0 : session.started_at) ? new Date(session.started_at).toLocaleDateString(void 0, { month: "short", day: "numeric" }) : "";
+      const durMin = (_b = session == null ? void 0 : session.duration_minutes) != null ? _b : 0;
+      const durStr = durMin > 60 ? `${Math.floor(durMin / 60)}h ${Math.round(durMin % 60)}m` : `${Math.round(durMin)}m`;
+      const card = notesContent.createDiv({ cls: "emerald-wv-receipt-note-card" });
+      const headerLine = card.createDiv({ cls: "emerald-wv-receipt-note-header" });
+      const itemName = (_c = item == null ? void 0 : item.name) != null ? _c : "Unknown project";
+      const eLevel = (_d = item == null ? void 0 : item.effort_level) != null ? _d : "";
+      const nameLink = headerLine.createEl("a", {
+        cls: "emerald-wv-receipt-note-title emerald-wv-project-link",
+        text: itemName
+      });
+      nameLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (item)
+          this.openNote(item);
+      });
+      headerLine.createSpan({
+        cls: "emerald-wv-receipt-note-meta",
+        text: ` \xB7 ${dateStr} \xB7 ${eLevel} \xB7 ${durStr}`
+      });
+      const chips = card.createDiv({ cls: "emerald-wv-notes-chips" });
       const effort = receipt.perceived_effort;
       const flow = receipt.flow_occurred;
       const pleasant = receipt.hedonic_valence;
       const balance = receipt.demand_investment_balance;
+      const flowLabels = ["No flow", "Some flow", "In the zone"];
       if (typeof effort === "number")
-        chips.createSpan({ cls: "emerald-wv-chip", text: `Effort: ${effort}/10` });
+        chips.createSpan({ cls: "emerald-wv-notes-chip", text: `Effort ${effort}/10` });
       if (typeof flow === "number")
-        chips.createSpan({ cls: "emerald-wv-chip", text: `Flow: ${(_b = ["No", "Somewhat", "Yes"][flow]) != null ? _b : flow}` });
+        chips.createSpan({ cls: "emerald-wv-notes-chip", text: (_e = flowLabels[flow]) != null ? _e : "No flow" });
       if (typeof pleasant === "number")
-        chips.createSpan({ cls: "emerald-wv-chip", text: `Pleasant: ${pleasant}/10` });
+        chips.createSpan({ cls: "emerald-wv-notes-chip", text: `Pleasant ${pleasant}/10` });
       if (typeof balance === "number")
-        chips.createSpan({ cls: "emerald-wv-chip", text: `Balance: ${balance}/10` });
-      card.createDiv({ cls: "emerald-wv-note-text", text: receipt.notes });
+        chips.createSpan({ cls: "emerald-wv-notes-chip", text: `Balance ${balance}/10` });
+      card.createDiv({ cls: "emerald-wv-receipt-note-text", text: receipt.notes });
     }
   }
 };
