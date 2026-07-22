@@ -2564,7 +2564,7 @@ var init_effort_receipt = __esm({
         this.renderEffortSource(form);
         this.renderSlider(form, "Did you give the right amount of effort for what this project needed?", null, 1, 10, 5, (val) => {
           this.demandInvestmentBalance = val;
-        }, "Under", "Over");
+        }, "Under", "Over", "Ideal");
         this.renderFlowButtons(form);
         this.renderSlider(form, "How pleasant was this work?", null, 1, 10, 5, (val) => {
           this.hedonicValence = val;
@@ -2589,7 +2589,7 @@ var init_effort_receipt = __esm({
         });
         submitBtn.addEventListener("click", () => this.submit(false));
       }
-      renderSlider(container, label, description, min, max, initial, onChange, leftLabel, rightLabel) {
+      renderSlider(container, label, description, min, max, initial, onChange, leftLabel, rightLabel, centerLabel) {
         const group = container.createDiv({ cls: "emerald-form-group" });
         const labelRow = group.createDiv({ cls: "emerald-form-label-row" });
         const labelEl = labelRow.createEl("label", { text: label });
@@ -2599,9 +2599,12 @@ var init_effort_receipt = __esm({
         if (description) {
           group.createDiv({ cls: "emerald-form-desc", text: description });
         }
-        if (leftLabel || rightLabel) {
+        if (leftLabel || rightLabel || centerLabel) {
           const endpointRow = group.createDiv({ cls: "emerald-slider-endpoints" });
           endpointRow.createSpan({ cls: "emerald-slider-endpoint-left", text: leftLabel != null ? leftLabel : "" });
+          if (centerLabel) {
+            endpointRow.createSpan({ cls: "emerald-slider-endpoint-center", text: centerLabel });
+          }
           endpointRow.createSpan({ cls: "emerald-slider-endpoint-right", text: rightLabel != null ? rightLabel : "" });
         }
         const slider = group.createEl("input", { cls: "emerald-slider" });

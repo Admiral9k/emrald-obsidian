@@ -69,10 +69,10 @@ export class EffortReceiptModal extends Modal {
 		// Effort Source (multi-select — large tap targets per spec)
 		this.renderEffortSource(form);
 
-		// Demand-Investment Balance (1-10 slider)
+		// Demand-Investment Balance (1-10 slider; midpoint 5 = balanced/ideal per engine semantics)
 		this.renderSlider(form, 'Did you give the right amount of effort for what this project needed?', null, 1, 10, 5, (val) => {
 			this.demandInvestmentBalance = val;
-		}, 'Under', 'Over');
+		}, 'Under', 'Over', 'Ideal');
 
 		// Flow (0/1/2 buttons)
 		this.renderFlowButtons(form);
@@ -118,7 +118,8 @@ export class EffortReceiptModal extends Modal {
 		initial: number,
 		onChange: (val: number) => void,
 		leftLabel?: string,
-		rightLabel?: string
+		rightLabel?: string,
+		centerLabel?: string
 	) {
 		const group = container.createDiv({ cls: 'emerald-form-group' });
 		const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
@@ -132,9 +133,12 @@ export class EffortReceiptModal extends Modal {
 		}
 
 		// Endpoint labels row (above slider)
-		if (leftLabel || rightLabel) {
+		if (leftLabel || rightLabel || centerLabel) {
 			const endpointRow = group.createDiv({ cls: 'emerald-slider-endpoints' });
 			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-left', text: leftLabel ?? '' });
+			if (centerLabel) {
+				endpointRow.createSpan({ cls: 'emerald-slider-endpoint-center', text: centerLabel });
+			}
 			endpointRow.createSpan({ cls: 'emerald-slider-endpoint-right', text: rightLabel ?? '' });
 		}
 

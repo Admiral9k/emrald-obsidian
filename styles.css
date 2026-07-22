@@ -1087,6 +1087,13 @@
 	letter-spacing: 0.3px;
 	text-align: right;
 }
+.emerald-slider-endpoint-center {
+	font-size: 10px;
+	color: var(--text-faint);
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	text-align: center;
+}
 .emerald-btn-group {
 	display: flex;
 	gap: 6px;
