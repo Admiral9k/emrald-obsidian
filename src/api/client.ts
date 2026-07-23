@@ -519,6 +519,34 @@ export class EmraldAPIClient {
 		return this.request('PATCH', `/items/${id}`, updates);
 	}
 
+	// SEQ-3 (migration 012). PostgREST returns NUMERIC as strings; normalizeEffortProfile
+	// coerces the 15 scale fields to number|null so callers can treat them as numbers.
+	async getEffortProfile(itemId: string): Promise<APIResponse<ItemEffortProfile | null>> {
+		const resp = await this.request<{ data: ItemEffortProfile | null }>('GET', `/items/${itemId}/effort-profile`);
+		if (resp.error || !resp.data) {
+			return { data: null, error: resp.error, status: resp.status, fromCache: resp.fromCache, queued: resp.queued };
+		}
+		return {
+			data: normalizeEffortProfile(resp.data.data),
+			error: null,
+			status: resp.status,
+			fromCache: resp.fromCache,
+			queued: resp.queued,
+		};
+	}
+
+	async patchEffortProfile(itemId: string, updates: EffortProfileUpdate): Promise<APIResponse<ItemEffortProfile>> {
+		const resp = await this.request<ItemEffortProfile>('PATCH', `/items/${itemId}/effort-profile`, updates);
+		if (resp.error || !resp.data) return resp;
+		return {
+			data: normalizeEffortProfile(resp.data),
+			error: null,
+			status: resp.status,
+			fromCache: resp.fromCache,
+			queued: resp.queued,
+		};
+	}
+
 	// ── Sessions ─────────────────────────────────────────
 
 	async startSession(itemId: string): Promise<APIResponse<Session>> {
@@ -795,6 +823,7 @@ export interface TrackedItem {
 	effort_level: 'E1' | 'E2' | 'E3' | 'E4';
 	area_id: string | null;
 	obsidian_note_path: string | null;
+	multi_day?: boolean; // SEQ-3 gateway (migration 012). Absent on API responses from pre-012 servers.
 	created_at: string;
 	updated_at: string;
 }
@@ -829,6 +858,7 @@ export interface EffortReceipt {
 	flow_occurred: number; // 0=no, 1=somewhat, 2=yes
 	demand_investment_balance: number;
 	effort_source: string[];
+	unexpected_complications?: number; // SEQ-3 (migration 012). 0=none, 1=some, 2=you-wouldn't-believe-me.
 	notes: string | null;
 	created_at: string;
 }
@@ -845,8 +875,44 @@ export interface CreateReceiptPayload {
 	flow_occurred: number;         // 0, 1, or 2
 	demand_investment_balance: number; // 1-10
 	effort_source: string[];       // e.g. ['complexity', 'emotional']
+	unexpected_complications?: number; // 0/1/2 — SEQ-3 (migration 012). Only sent for multi-day projects.
 	notes?: string;
 }
+
+// SEQ-3 per-project effort-profile (migration 012). All numeric scale fields are
+// 1–10 NUMERIC(4,2) at the DB level; PostgREST may return them as strings, so the
+// client normalizes on read. `item_id` is not on writes (it's the PK on the URL).
+// COMPARE-don't-FUSE (design §2): these are PREDICTION inputs, kept separate from
+// behavioral (receipt) data — no engine fusion.
+export interface ItemEffortProfile {
+	item_id: string;
+	// Existing fields (SMALLINT→NUMERIC in migration 012):
+	physical_demand: number | null;
+	mental_demand: number | null;
+	routine_level: number | null;
+	novelty_level: number | null;
+	motivation_context: string | null;
+	motivation_override: number | null;
+	duration_estimate_hours: number | null;
+	modifier_direction: 'up' | 'down' | 'neutral' | null;
+	modifier_magnitude: number | null;
+	// SEQ-3 new fields — CORE block:
+	task_complexity_intrinsic: number | null; // B1
+	expertise_match: number | null;           // B2
+	autotelic_rating: number | null;          // B14
+	// SEQ-3 new fields — EXTENDED block:
+	task_clarity: number | null;              // B8
+	task_first_step_obvious: number | null;   // B9
+	learning_investment: number | null;       // B3
+	repetition_impact: number | null;
+	task_novelty: number | null;              // B10
+	// SEQ-3 new fields — interpretation-only:
+	autonomy_level: number | null;            // B4
+	purpose_alignment: number | null;         // B7
+	updated_at: string;
+}
+
+export type EffortProfileUpdate = Partial<Omit<ItemEffortProfile, 'item_id' | 'updated_at'>>;
 
 export interface EnergyCheckin {
 	id: string;
@@ -1030,4 +1096,34 @@ export interface EmraldNotification {
 	body: string;
 	status: 'pending' | 'read' | 'dismissed';
 	created_at: string;
+}
+
+// ── SEQ-3 helpers ────────────────────────────────────
+// PostgREST returns NUMERIC(4,2) as strings to preserve precision. Coerce the
+// per-project effort-profile numeric fields to number|null so UI code can slider
+// them without repeating parseFloat everywhere.
+const EFFORT_PROFILE_NUMERIC_FIELDS: Array<keyof ItemEffortProfile> = [
+	'physical_demand', 'mental_demand', 'routine_level', 'novelty_level',
+	'motivation_override', 'duration_estimate_hours', 'modifier_magnitude',
+	'task_complexity_intrinsic', 'expertise_match', 'autotelic_rating',
+	'task_clarity', 'task_first_step_obvious', 'learning_investment',
+	'repetition_impact', 'task_novelty', 'autonomy_level', 'purpose_alignment'
+];
+
+export function normalizeEffortProfile<T extends ItemEffortProfile | null | undefined>(
+	profile: T
+): T {
+	if (!profile) return profile;
+	const out = { ...(profile) } as unknown as Record<string, unknown>;
+	for (const field of EFFORT_PROFILE_NUMERIC_FIELDS) {
+		const key = field as string;
+		const raw = out[key];
+		if (raw === null || raw === undefined) {
+			out[key] = null;
+		} else if (typeof raw === 'string') {
+			const n = parseFloat(raw);
+			out[key] = Number.isFinite(n) ? n : null;
+		}
+	}
+	return out as unknown as T;
 }

@@ -14,6 +14,7 @@ export class EffortReceiptModal extends Modal {
 	private effortLevel: string;
 	private sessionMinutes: number;
 	private metPrescribedEffort: boolean;
+	private isMultiDay: boolean;
 	private onSubmit: (receipt: CreateReceiptPayload, markComplete: boolean) => void;
 
 	// Form state
@@ -22,6 +23,7 @@ export class EffortReceiptModal extends Modal {
 	private flowOccurred: number = 0;
 	private demandInvestmentBalance: number = 5;
 	private effortSource: string[] = [];
+	private unexpectedComplications: number = 0; // SEQ-3 (mig 012), only sent if isMultiDay
 	private notes: string = '';
 
 	constructor(
@@ -33,6 +35,7 @@ export class EffortReceiptModal extends Modal {
 			effortLevel?: string;
 			sessionMinutes: number;
 			metPrescribedEffort: boolean;
+			isMultiDay?: boolean;
 		},
 		onSubmit: (receipt: CreateReceiptPayload, markComplete: boolean) => void
 	) {
@@ -43,6 +46,7 @@ export class EffortReceiptModal extends Modal {
 		this.effortLevel = opts.effortLevel ?? '';
 		this.sessionMinutes = opts.sessionMinutes;
 		this.metPrescribedEffort = opts.metPrescribedEffort;
+		this.isMultiDay = opts.isMultiDay ?? false;
 		this.onSubmit = onSubmit;
 	}
 
@@ -81,6 +85,12 @@ export class EffortReceiptModal extends Modal {
 		this.renderSlider(form, 'How pleasant was this work?', null, 1, 10, 5, (val) => {
 			this.hedonicValence = val;
 		}, 'Unpleasant', 'Enjoyable');
+
+		// Unexpected complications (SEQ-3, mig 012) — only shown for multi-day projects.
+		// The behavioral counterpart to the predicted task_clarity (B8) + task_novelty (B10).
+		if (this.isMultiDay) {
+			this.renderComplicationsButtons(form);
+		}
 
 		// Notes (textarea)
 		const notesGroup = form.createDiv({ cls: 'emerald-form-group' });
@@ -195,6 +205,47 @@ export class EffortReceiptModal extends Modal {
 		}
 	}
 
+	private renderComplicationsButtons(container: HTMLElement) {
+		const group = container.createDiv({ cls: 'emerald-form-group' });
+		const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
+		labelRow.createEl('label', { text: 'Any unexpected complications?' });
+		labelRow.createSpan({ cls: 'emerald-pill emerald-pill-experimental', text: 'Multi-day' });
+		group.createDiv({
+			cls: 'emerald-form-desc',
+			text: 'The actual side of your task-clarity + novelty predictions.',
+		});
+
+		const btnRow = group.createDiv({ cls: 'emerald-btn-group' });
+		btnRow.setAttribute('role', 'radiogroup');
+		btnRow.setAttribute('aria-label', 'Any unexpected complications?');
+
+		const options = [
+			{ label: 'None', value: 0 },
+			{ label: 'Some', value: 1 },
+			{ label: 'You wouldn\u2019t believe me', value: 2 }
+		];
+
+		for (const opt of options) {
+			const btn = btnRow.createEl('button', {
+				cls: 'emerald-btn-toggle',
+				text: opt.label
+			});
+			btn.setAttribute('role', 'radio');
+			btn.setAttribute('aria-checked', String(opt.value === this.unexpectedComplications));
+			if (opt.value === this.unexpectedComplications) btn.addClass('is-active');
+
+			btn.addEventListener('click', () => {
+				this.unexpectedComplications = opt.value;
+				btnRow.querySelectorAll('.emerald-btn-toggle').forEach(b => {
+					b.removeClass('is-active');
+					b.setAttribute('aria-checked', 'false');
+				});
+				btn.addClass('is-active');
+				btn.setAttribute('aria-checked', 'true');
+			});
+		}
+	}
+
 	private renderEffortSource(container: HTMLElement) {
 		const group = container.createDiv({ cls: 'emerald-form-group' });
 		group.createEl('label', { text: 'What made it effortful?' });
@@ -242,6 +293,10 @@ export class EffortReceiptModal extends Modal {
 			effort_source: this.effortSource.length > 0 ? this.effortSource : ['complexity'],
 			notes: this.notes || undefined
 		};
+
+		if (this.isMultiDay) {
+			receipt.unexpected_complications = this.unexpectedComplications;
+		}
 
 		this.onSubmit(receipt, markComplete);
 		this.close();

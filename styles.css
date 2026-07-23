@@ -4678,3 +4678,108 @@ span.emerald-pro-pill {
 	height: 14px;
 	stroke: var(--text-muted);
 }
+
+/* ── SEQ-3 Per-Project Effort Profile Modal (S97) ──────────────────── */
+
+.emerald-effort-profile-modal .modal-content {
+	max-width: 640px;
+}
+
+.emerald-modal-subtitle-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+
+.emerald-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.emerald-pill-experimental {
+	background: rgba(201, 162, 39, 0.15);
+	color: var(--emerald-e2, #B8912E);
+	border: 1px solid rgba(201, 162, 39, 0.35);
+}
+
+.emerald-effort-profile-preamble {
+	margin: 6px 0 16px;
+	line-height: 1.5;
+}
+
+.emerald-effort-profile-preamble p {
+	margin: 0 0 6px;
+}
+
+.emerald-form-note {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.emerald-effort-profile-section-header {
+	margin: 18px 0 8px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.emerald-effort-profile-section-header h3 {
+	margin: 0 0 2px;
+	font-size: 14px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-muted);
+}
+
+.emerald-effort-profile-section-header p {
+	margin: 0;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+
+.emerald-text-input.emerald-hours-input {
+	width: 100%;
+	padding: 6px 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-normal);
+	font-size: 13px;
+}
+
+.emerald-slider.is-unset::-webkit-slider-thumb {
+	opacity: 0.4;
+}
+
+.emerald-slider.is-unset::-moz-range-thumb {
+	opacity: 0.4;
+}
+
+.emerald-btn-group-tight {
+	margin-top: 6px;
+}
+
+.emerald-effort-profile-toggle-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 20px 0 8px;
+	flex-wrap: wrap;
+}
+
+.emerald-effort-profile-toggle {
+	white-space: nowrap;
+}
+
+.emerald-effort-profile-extended {
+	padding-top: 4px;
+}

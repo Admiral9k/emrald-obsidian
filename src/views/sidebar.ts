@@ -825,6 +825,7 @@ export class EmraldSidebarView extends ItemView {
 						void this.clearPersistedProvisionalSession();
 						// Open effort receipt (same as normal stop flow)
 						const { EffortReceiptModal } = await import('../modals/effort-receipt');
+						const isMultiDay = this.projects?.state?.items?.find(i => i.id === session.itemId)?.multi_day === true;
 						const receiptModal = new EffortReceiptModal(
 							this.app,
 							this.plugin,
@@ -833,7 +834,8 @@ export class EmraldSidebarView extends ItemView {
 								itemName: session.itemName,
 								effortLevel: session.effortLevel,
 								sessionMinutes,
-								metPrescribedEffort
+								metPrescribedEffort,
+								isMultiDay
 							},
 							(receipt: import("../api/client").CreateReceiptPayload, _markComplete: boolean) => { void (async () => {
 								const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
@@ -897,6 +899,7 @@ export class EmraldSidebarView extends ItemView {
 
 		// Open Effort Receipt modal
 		const { EffortReceiptModal } = await import('../modals/effort-receipt');
+		const isMultiDay = this.projects?.state?.items?.find(i => i.id === session.itemId)?.multi_day === true;
 		const modal = new EffortReceiptModal(
 			this.app,
 			this.plugin,
@@ -905,7 +908,8 @@ export class EmraldSidebarView extends ItemView {
 				itemName: session.itemName,
 				effortLevel: session.effortLevel,
 				sessionMinutes,
-				metPrescribedEffort
+				metPrescribedEffort,
+				isMultiDay
 			},
 			(receipt: import("../api/client").CreateReceiptPayload, _markComplete: boolean) => { void (async () => {
 				// Submit receipt

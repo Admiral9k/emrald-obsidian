@@ -206,7 +206,7 @@ export class ProjectsComponent {
 
 		// Clear button for Completed section — matches "+Add" style
 		if (sectionStatus === 'completed') {
-			const clearBtn = header.createEl('span', {
+			const clearBtn = header.createSpan({
 				cls: 'emerald-section-action emerald-clear-action',
 				text: 'Clear'
 			});
@@ -219,7 +219,7 @@ export class ProjectsComponent {
 				menu.addItem(i => i.setTitle('Confirm clear').setIcon('trash-2').onClick(() => {
 					void this.clearCompletedProjects(items);
 				}));
-				menu.showAtMouseEvent(e as MouseEvent);
+				menu.showAtMouseEvent(e);
 			});
 		}
 
@@ -288,6 +288,7 @@ export class ProjectsComponent {
 		}
 
 		menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+		this.addEffortProfileMenuItems(menu, item);
 
 		menu.showAtMouseEvent(e as MouseEvent);
 	}
@@ -301,10 +302,12 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Stop').setIcon('square').onClick(() => this.onStopSession()));
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+			this.addEffortProfileMenuItems(menu, item);
 		} else if (this.state.activeSessionItemId) {
 			// Another session is active — show management options too
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			this.addEffortProfileMenuItems(menu, item);
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
@@ -314,11 +317,76 @@ export class ProjectsComponent {
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			this.addEffortProfileMenuItems(menu, item);
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		}
 
 		menu.showAtMouseEvent(e as MouseEvent);
+	}
+
+	// SEQ-3 (mig 012). Adds "Toggle multi-day" — the design gateway (§4) — and,
+	// when the project is multi-day, "Edit effort profile" to open the prediction
+	// capture form. Kept behind the multi_day toggle so the form only appears for
+	// projects big enough to justify the effort of filling it out.
+	private addEffortProfileMenuItems(menu: Menu, item: TrackedItem) {
+		const isMultiDay = item.multi_day === true;
+		menu.addItem(i => i
+			.setTitle(isMultiDay ? 'Unmark multi-day' : 'Mark multi-day')
+			.setIcon(isMultiDay ? 'calendar-x' : 'calendar-days')
+			.onClick(() => { void this.toggleMultiDay(item); })
+		);
+		if (isMultiDay) {
+			menu.addItem(i => i
+				.setTitle('Edit effort profile')
+				.setIcon('sliders-horizontal')
+				.onClick(() => { void this.openEffortProfileModal(item); })
+			);
+		}
+	}
+
+	private async toggleMultiDay(item: TrackedItem) {
+		const next = !(item.multi_day === true);
+		const idx = this.state.items.findIndex(i => i.id === item.id);
+		if (idx >= 0) {
+			this.state.items[idx] = { ...this.state.items[idx], multi_day: next };
+			this.render();
+		}
+
+		const resp = await this.plugin.apiClient.updateItem(item.id, { multi_day: next });
+		if (resp.error && !resp.queued) {
+			if (idx >= 0) {
+				this.state.items[idx] = { ...this.state.items[idx], multi_day: item.multi_day };
+				this.render();
+			}
+			new Notice(`Couldn’t update “${item.name}”: ${resp.error}`);
+			return;
+		}
+
+		if (resp.data && idx >= 0) {
+			this.state.items[idx] = resp.data;
+			this.render();
+		}
+
+		if (next) {
+			new Notice(`“${item.name}” marked multi-day. You can now capture an effort profile.`);
+		} else {
+			new Notice(`“${item.name}” is no longer multi-day.`);
+		}
+	}
+
+	private async openEffortProfileModal(item: TrackedItem) {
+		const { EffortProfileModal } = await import('../modals/effort-profile');
+		const existingResp = await this.plugin.apiClient.getEffortProfile(item.id);
+		const existing = existingResp.data ?? null;
+		const modal = new EffortProfileModal(
+			this.plugin.app,
+			this.plugin,
+			item,
+			existing,
+			() => { /* saved — no local state refresh needed */ }
+		);
+		modal.open();
 	}
 
 	// ── Actions ─────────────────────────────────────────────
