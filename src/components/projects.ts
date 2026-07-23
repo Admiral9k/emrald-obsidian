@@ -4,7 +4,7 @@
 
 import { Menu, Notice, setIcon, TFile } from 'obsidian';
 import EmraldPlugin from '../../main';
-import { TrackedItem } from '../api/client';
+import { TrackedItem, Label } from '../api/client';
 
 
 // E-level prescribed duration as percentage of daily available hours
@@ -159,6 +159,17 @@ export class ProjectsComponent {
 		badge.dataset.level = item.effort_level ?? '';
 		badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
 
+		// Area chip (Option B, S100) — the single area-label this project is filed under, if any.
+		const area = this.areaOf(item);
+		if (area) {
+			const chip = topRow.createSpan({
+				cls: 'emrald-area-chip',
+				text: area.name,
+				attr: { 'aria-label': `Area: ${area.name}` }
+			});
+			if (area.color) chip.style.borderColor = area.color;
+		}
+
 		// Bottom row: today's time
 		const bottomRow = card.createDiv({ cls: 'emerald-project-bottom' });
 
@@ -288,6 +299,7 @@ export class ProjectsComponent {
 		}
 
 		menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+		menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 		this.addEffortProfileMenuItems(menu, item);
 
 		menu.showAtMouseEvent(e as MouseEvent);
@@ -302,11 +314,13 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Stop').setIcon('square').onClick(() => this.onStopSession()));
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
+			menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 			this.addEffortProfileMenuItems(menu, item);
 		} else if (this.state.activeSessionItemId) {
 			// Another session is active — show management options too
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 			this.addEffortProfileMenuItems(menu, item);
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
@@ -317,6 +331,7 @@ export class ProjectsComponent {
 			menu.addSeparator();
 			menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
 			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
+			menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 			this.addEffortProfileMenuItems(menu, item);
 			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
@@ -387,6 +402,95 @@ export class ProjectsComponent {
 			() => { /* saved — no local state refresh needed */ }
 		);
 		modal.open();
+	}
+
+	// ── Area (single-select, Option B, S100) ────────────────
+	// Area/category is represented via the generic label/item_label tables, but the UI treats it as
+	// ONE area-label per project (convention, not a DB constraint). areaOf() returns the project's
+	// current area = its first attached label (embedded on GET /v1/items).
+	private areaOf(item: TrackedItem): Label | null {
+		const labels = item.labels;
+		if (Array.isArray(labels) && labels.length > 0) return labels[0];
+		return null;
+	}
+
+	// Open the area picker; on choice, set/clear the single area-label (detach old, attach new).
+	private async onSetArea(item: TrackedItem) {
+		const { AreaPickerModal } = await import('../modals/area-picker');
+		const labelsResp = await this.plugin.apiClient.getLabels();
+		if (labelsResp.error) {
+			new Notice(`Couldn’t load areas: ${labelsResp.error}`);
+			return;
+		}
+		const allLabels = labelsResp.data ?? [];
+		const current = this.areaOf(item);
+
+		const modal = new AreaPickerModal(
+			this.plugin.app,
+			allLabels,
+			current?.id ?? null,
+			(choice) => {
+				if (choice.kind === 'clear') {
+					void this.applyArea(item, null, null);
+				} else if (choice.kind === 'label') {
+					void this.applyArea(item, choice.label, null);
+				} else {
+					void this.applyArea(item, null, choice.name);
+				}
+			},
+		);
+		modal.open();
+	}
+
+	// Set the project's single area. Detaches the current area-label (if any), then attaches the
+	// chosen one — creating the label first if the user typed a new name. null label + null name = clear.
+	private async applyArea(item: TrackedItem, label: Label | null, newName: string | null) {
+		const idx = this.state.items.findIndex(i => i.id === item.id);
+		const current = this.areaOf(item);
+
+		// Resolve the target label: use the chosen one, or create it from the typed name.
+		let target = label;
+		if (!target && newName) {
+			const created = await this.plugin.apiClient.createLabel(newName);
+			if (created.error || !created.data) {
+				new Notice(`Couldn’t create area “${newName}”: ${created.error ?? 'unknown error'}`);
+				return;
+			}
+			target = created.data;
+		}
+
+		// No-op if choosing the area already set.
+		if (target && current && target.id === current.id) return;
+
+		// Optimistic update: reflect the new area (or cleared) locally.
+		if (idx >= 0) {
+			this.state.items[idx] = { ...this.state.items[idx], labels: target ? [target] : [] };
+			this.render();
+		}
+
+		// Detach the previous area-label first (single-select convention).
+		if (current) {
+			const det = await this.plugin.apiClient.detachLabel(item.id, current.id);
+			if (det.error && !det.queued) {
+				// Revert on hard failure.
+				if (idx >= 0) { this.state.items[idx] = { ...this.state.items[idx], labels: current ? [current] : [] }; this.render(); }
+				new Notice(`Couldn’t update area: ${det.error}`);
+				return;
+			}
+		}
+
+		// Attach the new one (unless clearing).
+		if (target) {
+			const att = await this.plugin.apiClient.attachLabel(item.id, target.id);
+			if (att.error && !att.queued) {
+				if (idx >= 0) { this.state.items[idx] = { ...this.state.items[idx], labels: current ? [current] : [] }; this.render(); }
+				new Notice(`Couldn’t set area: ${att.error}`);
+				return;
+			}
+			new Notice(`“${item.name}” filed under “${target.name}”.`);
+		} else {
+			new Notice(`Area cleared for “${item.name}”.`);
+		}
 	}
 
 	// ── Actions ─────────────────────────────────────────────

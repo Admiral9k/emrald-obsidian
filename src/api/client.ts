@@ -547,6 +547,38 @@ export class EmraldAPIClient {
 		};
 	}
 
+	// ── Labels / Areas (S100) ────────────────────────────
+	// Labels double as the single-select "Area" (Option B): the picker enforces one area-label per
+	// project as a UI convention. These wrap the live /v1/labels + /v1/items/:id/labels routes.
+
+	async getLabels(): Promise<APIResponse<Label[]>> {
+		const resp = await this.request<{ data: Label[] }>('GET', '/labels', undefined, { skipCache: true });
+		if (resp.error || !resp.data) {
+			return { data: null, error: resp.error, status: resp.status, fromCache: resp.fromCache, queued: resp.queued };
+		}
+		return { data: resp.data.data ?? [], error: null, status: resp.status, fromCache: resp.fromCache, queued: resp.queued };
+	}
+
+	async createLabel(name: string, color?: string | null): Promise<APIResponse<Label>> {
+		return this.request('POST', '/labels', { name, color: color ?? null });
+	}
+
+	async attachLabel(itemId: string, labelId: string): Promise<APIResponse<unknown>> {
+		return this.request('POST', `/items/${itemId}/labels`, { label_id: labelId });
+	}
+
+	async detachLabel(itemId: string, labelId: string): Promise<APIResponse<unknown>> {
+		return this.request('DELETE', `/items/${itemId}/labels/${labelId}`);
+	}
+
+	async getItemLabels(itemId: string): Promise<APIResponse<Label[]>> {
+		const resp = await this.request<{ data: Label[] }>('GET', `/items/${itemId}/labels`, undefined, { skipCache: true });
+		if (resp.error || !resp.data) {
+			return { data: null, error: resp.error, status: resp.status, fromCache: resp.fromCache, queued: resp.queued };
+		}
+		return { data: resp.data.data ?? [], error: null, status: resp.status, fromCache: resp.fromCache, queued: resp.queued };
+	}
+
 	// ── Sessions ─────────────────────────────────────────
 
 	async startSession(itemId: string): Promise<APIResponse<Session>> {
@@ -824,8 +856,21 @@ export interface TrackedItem {
 	area_id: string | null;
 	obsidian_note_path: string | null;
 	multi_day?: boolean; // SEQ-3 gateway (migration 012). Absent on API responses from pre-012 servers.
+	// Labels attached to this project (embedded on GET /v1/items, S100). Used for the single-select
+	// Area picker (Option B): area/category is represented as ONE area-label per project via the
+	// generic label/item_label tables (UI convention, not a DB constraint). May be absent on
+	// responses from older servers that don't embed labels.
+	labels?: Label[];
 	created_at: string;
 	updated_at: string;
+}
+
+// A user label (also used as the single-select "Area" under Option B, S100).
+export interface Label {
+	id: string;
+	name: string;
+	color: string | null;
+	created_at?: string;
 }
 
 export interface CreateItemPayload {

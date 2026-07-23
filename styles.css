@@ -4784,3 +4784,38 @@ span.emerald-pro-pill {
 .emerald-effort-profile-extended {
 	padding-top: 4px;
 }
+
+/* Area chip (single-select area/category, Option B, S100) */
+.emrald-area-chip {
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	padding: 0 6px;
+	line-height: 15px;
+	max-width: 90px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+/* Area picker suggestions */
+.emrald-area-suggestion {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.emrald-area-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+	display: inline-block;
+	background: var(--background-modifier-border);
+}
+.emrald-area-current {
+	color: var(--text-muted);
+	font-size: 11px;
+}
