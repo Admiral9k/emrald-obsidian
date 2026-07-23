@@ -449,7 +449,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		});
 
 		for (const r of withNotes) {
-			const receipt = r as Record<string, unknown>;
+			const receipt = r;
 			const item = receipt.item as { name: string; effort_level: string; obsidian_note_path?: string } | null;
 			const session = receipt.session as { started_at: string; duration_minutes: number } | null;
 			const dateStr = session?.started_at

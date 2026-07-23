@@ -13,6 +13,7 @@
 .is-hidden.is-hidden { display: none; }
 .emrald-clickable { cursor: pointer; }
 .emrald-not-clickable { cursor: default; }
+.emrald-busy { opacity: 0.5; }
 .emrald-sidebar {
 	padding: 10px;
 	height: 100%;
@@ -346,10 +347,10 @@
 	width: 2px;
 	background: var(--interactive-accent);
 	z-index: 2;
-	display: none;
+	display: block;
 	font-size: 9px;
 	font-weight: 700;
-	color: var(--interactive-accent);
+	color: #fff;
 	padding-top: 2px;
 	text-align: center;
 }

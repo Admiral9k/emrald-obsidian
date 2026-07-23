@@ -473,10 +473,8 @@ export class TimeblockComponent {
 		const markerPx = markerHours * hourWidth;
 
 		this.eLevelMarkerEl.style.left = `${markerPx}px`;
-		this.eLevelMarkerEl.style.display = 'block';
 		this.eLevelMarkerEl.textContent = session.effortLevel;
 		this.eLevelMarkerEl.style.backgroundColor = E_LEVEL_COLORS[session.effortLevel] ?? 'var(--interactive-accent)';
-		this.eLevelMarkerEl.style.color = '#fff';
 	}
 
 	/**

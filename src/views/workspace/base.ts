@@ -159,7 +159,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 
 		const cta = gate.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to Pro',
+			text: 'Upgrade to PRO',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		cta.setAttribute('target', '_blank');

@@ -29,7 +29,7 @@ export class AdvancedUpgradeModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "You've completed your basic Effort Profile — EMRALD is already working for you."
+			text: "You've completed your basic effort profile — EMRALD is already working for you."
 		});
 
 		contentEl.createEl('p', {
@@ -54,14 +54,14 @@ export class AdvancedUpgradeModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-text-muted',
-			text: 'You can always switch back to Simple mode in settings.'
+			text: 'You can always switch back to simple mode in settings.'
 		});
 
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
 
 		const acceptBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Enable Advanced Mode'
+			text: 'Enable advanced mode'
 		});
 		acceptBtn.addEventListener('click', () => { void (async () => {
 			try {
@@ -70,7 +70,7 @@ export class AdvancedUpgradeModal extends Modal {
 					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
 					new Notice("Advanced mode enabled! You'll see calibration questions before your next session.");
 				} catch { /* non-fatal */
-					new Notice('Advanced Mode enabled locally — will sync on next session.');
+					new Notice('Advanced mode enabled locally — will sync on next session.');
 				}
 				this.close();
 
@@ -97,7 +97,7 @@ export class AdvancedUpgradeModal extends Modal {
 
 		const declineBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
-			text: 'Maybe later — keep Simple mode'
+			text: 'Maybe later — keep simple mode'
 		});
 		declineBtn.addEventListener('click', () => {
 			this.close();

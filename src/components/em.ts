@@ -450,7 +450,7 @@ export class EMComponent {
 
 		const btn = card.createEl('a', {
 			cls: 'emerald-btn emerald-btn-upgrade',
-			text: 'Upgrade to Pro',
+			text: 'Upgrade to PRO',
 			href: 'https://app.effortmastery.com/app/billing'
 		});
 		btn.setAttribute('target', '_blank');

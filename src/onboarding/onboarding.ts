@@ -127,7 +127,7 @@ export class OnboardingModal extends Modal {
 		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-actions' });
 		const startBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Get Started'
+			text: 'Get started'
 		});
 		startBtn.addEventListener('click', () => this.goTo('connect'));
 	}
@@ -438,7 +438,7 @@ export class OnboardingModal extends Modal {
 			(this.calibrationPage + 1) * perPage
 		);
 
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort Profile' });
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
@@ -532,7 +532,7 @@ export class OnboardingModal extends Modal {
 			// Last page — show Save & Continue
 			const saveBtn = actions.createEl('button', {
 				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Save & Continue'
+				text: 'Save & continue'
 			});
 			saveBtn.addEventListener('click', () => { void (async () => {
 				try {
@@ -540,7 +540,7 @@ export class OnboardingModal extends Modal {
 					if (Object.keys(this.calibrationAnswers).length > 0) {
 						try {
 							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-							new Notice('Effort Profile saved ✓');
+							new Notice('Effort profile saved ✓');
 						} catch { /* non-fatal */
 							new Notice('Profile saved locally — will sync later.');
 						}
@@ -916,7 +916,7 @@ export class OnboardingModal extends Modal {
 
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want even smarter insights? Complete your Effort Profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
+			text: 'Want even smarter insights? Complete your effort profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
 		});
 
 		// Research opt-in

@@ -301,7 +301,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Digest delivery time')
-			.setDesc('Hour of day in UTC (e.g. 09:00 = 4am EST). Digests run on the hour.')
+			.setDesc('Hour of day in UTC (e.g. 09:00 = 4am est). Digests run on the hour.')
 			.addDropdown(drop => {
 				for (let h = 0; h < 24; h++) {
 					const label = `${String(h).padStart(2, '0')}:00`;
@@ -319,7 +319,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		// ── Data ──────────────────────────────────────────
 
-		containerEl.createEl('h3', { text: 'Data' });
+		new Setting(containerEl).setName('Data').setHeading();
 
 		new Setting(containerEl)
 			.setName('Export data')

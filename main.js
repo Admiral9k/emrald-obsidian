@@ -259,7 +259,7 @@ var init_base = __esm({
         }
         const cta = gate.createEl("a", {
           cls: "emerald-btn emerald-btn-upgrade",
-          text: "Upgrade to Pro",
+          text: "Upgrade to PRO",
           href: "https://app.effortmastery.com/app/billing"
         });
         cta.setAttribute("target", "_blank");
@@ -289,14 +289,14 @@ var init_advanced_complete = __esm({
         contentEl.addClass("emerald-modal");
         const iconEl = contentEl.createDiv({ cls: "emerald-onboard-icon" });
         (0, import_obsidian2.setIcon)(iconEl, "sparkles");
-        contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile Complete!" });
+        contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile complete!" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
           text: "EMRALD now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate."
         });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "You can revisit and update your answers anytime in the Effort Profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted."
+          text: "You can revisit and update your answers anytime in the effort profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted."
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
         const goBtn = actions.createEl("button", {
@@ -657,7 +657,7 @@ var init_advanced_calibration = __esm({
         contentEl.empty();
         contentEl.addClass("emerald-modal", "emerald-calibration-modal");
         const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
-        contentEl.createEl("h2", { text: "Effort Profile \u2014 Advanced" });
+        contentEl.createEl("h2", { text: "Effort profile \u2014 advanced" });
         const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
         if (this.showAll) {
           contentEl.createEl("p", {
@@ -748,7 +748,7 @@ var init_advanced_calibration = __esm({
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
         const submitBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary",
-          text: "Save & Continue"
+          text: "Save & continue"
         });
         submitBtn.addEventListener("click", () => {
           void (async () => {
@@ -821,7 +821,7 @@ var init_advanced_upgrade = __esm({
         contentEl.createEl("h2", { text: "Go advanced?" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "You've completed your basic Effort Profile \u2014 EMRALD is already working for you."
+          text: "You've completed your basic effort profile \u2014 EMRALD is already working for you."
         });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
@@ -842,12 +842,12 @@ var init_advanced_upgrade = __esm({
         }
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc emerald-text-muted",
-          text: "You can always switch back to Simple mode in settings."
+          text: "You can always switch back to simple mode in settings."
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
         const acceptBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Enable Advanced Mode"
+          text: "Enable advanced mode"
         });
         acceptBtn.addEventListener("click", () => {
           void (async () => {
@@ -856,7 +856,7 @@ var init_advanced_upgrade = __esm({
                 await this.plugin.apiClient.updateProfile({ question_mode: "advanced" });
                 new import_obsidian4.Notice("Advanced mode enabled! You'll see calibration questions before your next session.");
               } catch (e) {
-                new import_obsidian4.Notice("Advanced Mode enabled locally \u2014 will sync on next session.");
+                new import_obsidian4.Notice("Advanced mode enabled locally \u2014 will sync on next session.");
               }
               this.close();
               const { AdvancedCalibrationModal: AdvancedCalibrationModal2, getAdvancedQuestionCount: getAdvancedQuestionCount2 } = await Promise.resolve().then(() => (init_advanced_calibration(), advanced_calibration_exports));
@@ -882,7 +882,7 @@ var init_advanced_upgrade = __esm({
         });
         const declineBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-subtle",
-          text: "Maybe later \u2014 keep Simple mode"
+          text: "Maybe later \u2014 keep simple mode"
         });
         declineBtn.addEventListener("click", () => {
           this.close();
@@ -1018,7 +1018,7 @@ var init_onboarding = __esm({
         const actions = container.createDiv({ cls: "emerald-modal-actions emerald-onboard-actions" });
         const startBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Get Started"
+          text: "Get started"
         });
         startBtn.addEventListener("click", () => this.goTo("connect"));
       }
@@ -1169,7 +1169,7 @@ var init_onboarding = __esm({
           this.calibrationPage * perPage,
           (this.calibrationPage + 1) * perPage
         );
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Effort Profile" });
+        container.createEl("h2", { cls: "emerald-onboard-title", text: "Effort profile" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
           text: "These questions help EMRALD calibrate effort levels to your personal style. Be honest \u2014 there are no wrong answers."
@@ -1243,7 +1243,7 @@ var init_onboarding = __esm({
         } else {
           const saveBtn = actions.createEl("button", {
             cls: "emerald-btn emerald-btn-primary",
-            text: "Save & Continue"
+            text: "Save & continue"
           });
           saveBtn.addEventListener("click", () => {
             void (async () => {
@@ -1251,7 +1251,7 @@ var init_onboarding = __esm({
                 if (Object.keys(this.calibrationAnswers).length > 0) {
                   try {
                     await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-                    new import_obsidian5.Notice("Effort Profile saved \u2713");
+                    new import_obsidian5.Notice("Effort profile saved \u2713");
                   } catch (e) {
                     new import_obsidian5.Notice("Profile saved locally \u2014 will sync later.");
                   }
@@ -1572,7 +1572,7 @@ var init_onboarding = __esm({
         });
         container.createEl("p", {
           cls: "emerald-onboard-desc emerald-onboard-profile-nudge",
-          text: "Want even smarter insights? Complete your Effort Profile \u2014 it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier."
+          text: "Want even smarter insights? Complete your effort profile \u2014 it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier."
         });
         const researchRow = container.createDiv({ cls: "emerald-onboard-research" });
         const researchToggle = researchRow.createEl("label", { cls: "emerald-onboard-research-label" });
@@ -3718,7 +3718,7 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
       void this.plugin.saveSettings();
       void this.plugin.syncDigestPreferences();
     }));
-    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Hour of day in UTC (e.g. 09:00 = 4am EST). Digests run on the hour.").addDropdown((drop) => {
+    new import_obsidian6.Setting(containerEl).setName("Digest delivery time").setDesc("Hour of day in UTC (e.g. 09:00 = 4am est). Digests run on the hour.").addDropdown((drop) => {
       for (let h = 0; h < 24; h++) {
         const label = `${String(h).padStart(2, "0")}:00`;
         drop.addOption(label, label);
@@ -3732,7 +3732,7 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
         await this.plugin.syncDigestPreferences();
       });
     });
-    containerEl.createEl("h3", { text: "Data" });
+    new import_obsidian6.Setting(containerEl).setName("Data").setHeading();
     new import_obsidian6.Setting(containerEl).setName("Export data").setDesc("Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk \u2014 it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + D1-D8 metrics. Pro: everything.").addButton((btn) => {
       btn.setButtonText("Export").onClick(async () => {
         btn.setDisabled(true);
@@ -4217,10 +4217,8 @@ var TimeblockComponent = class {
     const markerHours = prescribedMin / 60;
     const markerPx = markerHours * hourWidth;
     this.eLevelMarkerEl.style.left = `${markerPx}px`;
-    this.eLevelMarkerEl.style.display = "block";
     this.eLevelMarkerEl.textContent = session.effortLevel;
     this.eLevelMarkerEl.style.backgroundColor = (_b = E_LEVEL_COLORS[session.effortLevel]) != null ? _b : "var(--interactive-accent)";
-    this.eLevelMarkerEl.style.color = "#fff";
   }
   /**
    * Position the Daily Hours end marker.
@@ -6724,7 +6722,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
         void (async () => {
           try {
             await this.plugin.apiClient.updateProfile({ question_mode: "advanced" });
-            new import_obsidian14.Notice("Advanced Mode enabled! Questions will appear before your next session.");
+            new import_obsidian14.Notice("Advanced mode enabled! Questions will appear before your next session.");
             void this.onOpen();
           } catch (e) {
           }
@@ -7095,7 +7093,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     exportBtn.addEventListener("click", () => {
       void (async () => {
         exportBtn.setAttribute("disabled", "true");
-        exportBtn.style.opacity = "0.5";
+        exportBtn.addClass("emrald-busy");
         try {
           const resp = await this.plugin.apiClient.exportData();
           if (resp.error) {
@@ -7112,7 +7110,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
           new import_obsidian14.Notice(`Export failed: ${msg}`);
         } finally {
           exportBtn.removeAttribute("disabled");
-          exportBtn.style.opacity = "";
+          exportBtn.removeClass("emrald-busy");
         }
       })();
     });
@@ -8386,7 +8384,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const ctaRow = proSection.createDiv({ cls: "emerald-wv-pro-cta-row" });
       const cta = ctaRow.createEl("a", {
         cls: "emerald-btn emerald-btn-upgrade",
-        text: "Upgrade to Pro",
+        text: "Upgrade to PRO",
         href: "https://app.effortmastery.com/app/billing"
       });
       cta.setAttribute("target", "_blank");
@@ -8742,7 +8740,7 @@ var _EMComponent = class {
     });
     const btn = card.createEl("a", {
       cls: "emerald-btn emerald-btn-upgrade",
-      text: "Upgrade to Pro",
+      text: "Upgrade to PRO",
       href: "https://app.effortmastery.com/app/billing"
     });
     btn.setAttribute("target", "_blank");

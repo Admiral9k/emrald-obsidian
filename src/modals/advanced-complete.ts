@@ -20,7 +20,7 @@ export class AdvancedCompleteModal extends Modal {
 		const iconEl = contentEl.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(iconEl, 'sparkles');
 
-		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile Complete!' });
+		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: 'Profile complete!' });
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
@@ -29,7 +29,7 @@ export class AdvancedCompleteModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'You can revisit and update your answers anytime in the Effort Profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted.'
+			text: 'You can revisit and update your answers anytime in the effort profile workspace view. EMRALD will also prompt you to re-calibrate when it detects your patterns have shifted.'
 		});
 
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

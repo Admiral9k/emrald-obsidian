@@ -396,7 +396,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			upgradeBtn.addEventListener('click', () => { void (async () => {
 				try {
 					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
-					new Notice('Advanced Mode enabled! Questions will appear before your next session.');
+					new Notice('Advanced mode enabled! Questions will appear before your next session.');
 					void this.onOpen(); // Refresh
 				} catch { /* non-fatal */ }
 			})(); });
@@ -821,7 +821,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		exportBtn.addEventListener('click', () => {
 			void (async () => {
 				exportBtn.setAttribute('disabled', 'true');
-				exportBtn.style.opacity = '0.5';
+				exportBtn.addClass('emrald-busy');
 				try {
 					const resp = await this.plugin.apiClient.exportData();
 					if (resp.error) {
@@ -838,7 +838,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 					new Notice(`Export failed: ${msg}`);
 				} finally {
 					exportBtn.removeAttribute('disabled');
-					exportBtn.style.opacity = '';
+					exportBtn.removeClass('emrald-busy');
 				}
 			})();
 		});
