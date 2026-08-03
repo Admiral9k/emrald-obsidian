@@ -3439,6 +3439,20 @@
 	width: 12px;
 	height: 12px;
 }
+/* SEQ-4+5: strong mismatch (self-report clearly diverges from behavior) */
+.emerald-wv-answer-card-nudge-strong {
+	border-left-color: var(--text-error, #C0562F);
+}
+.emerald-wv-answer-card-nudge-strong .emerald-wv-answer-nudge {
+	color: var(--text-error, #C0562F);
+}
+/* SEQ-4+5: the "why" — human-readable predicted-vs-observed explanation */
+.emerald-wv-answer-why {
+	margin-top: 5px;
+	font-size: 11px;
+	line-height: 1.4;
+	color: var(--text-muted);
+}
 /* Recovery Activities (Effort Profile) */
 
 .emerald-wv-recovery-section {

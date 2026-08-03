@@ -6686,17 +6686,18 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     return "user";
   }
   async onOpen() {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     const container = this.getContainer();
     this.renderHeader(container, "Effort Profile", "How EMRALD sees you", "user");
-    let profileResp, historyResp, metricsResp, recoveryResp;
+    let profileResp, historyResp, metricsResp, recoveryResp, comparisonResp;
     try {
       const forceFresh = !this.isOffline();
-      [profileResp, historyResp, metricsResp, recoveryResp] = await Promise.all([
+      [profileResp, historyResp, metricsResp, recoveryResp, comparisonResp] = await Promise.all([
         this.plugin.apiClient.getProfile({ skipCache: forceFresh }),
         this.plugin.apiClient.getProfileHistory({ skipCache: forceFresh }),
         this.plugin.apiClient.getMetrics(["D19"], { skipCache: forceFresh }),
-        this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh })
+        this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh }),
+        this.plugin.apiClient.getProfileComparison({ skipCache: forceFresh })
       ]);
     } catch (e) {
       this.renderError(container, "Could not load effort profile \u2014 check your connection.");
@@ -6736,8 +6737,8 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     if (profile)
       this.renderCalibrationScore(container, profile);
     if (profile) {
-      const driftLevel = d19Established && !d19StaleAfterReassessment ? (_f = d19 == null ? void 0 : d19.value) != null ? _f : 0 : 0;
-      this.renderAnsweredQuestions(container, profile, driftLevel);
+      const comparisons = (_g = (_f = comparisonResp == null ? void 0 : comparisonResp.data) == null ? void 0 : _f.comparisons) != null ? _g : [];
+      this.renderAnsweredQuestions(container, profile, comparisons);
     }
     if (historyResp.data && historyResp.data.length > 0) {
       this.renderHistory(container, historyResp.data);
@@ -7036,7 +7037,27 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     }
   }
   // ── Answered Questions (ungrouped cards) ─────────────
-  renderAnsweredQuestions(container, profile, driftLevel = 0) {
+  // SEQ-4+5: build the human-readable "why" for a flagged card. Generic-first, then
+  // enriched per-trait from the server's observed summary + direction reason.
+  comparisonWhy(cmp) {
+    const observed = cmp.observed ? `Your recent behavior shows ${cmp.observed}.` : "Your recent behavior differs from this answer.";
+    let lead;
+    switch (cmp.reason) {
+      case "reports_more_than_observed":
+        lead = "You rated this higher than your behavior suggests.";
+        break;
+      case "observed_more_than_reports":
+        lead = "Your behavior suggests this runs higher than you rated it.";
+        break;
+      case "tenacity_vs_completion":
+        lead = "You lead with finishing \u2014 but recent completion is running lower.";
+        break;
+      default:
+        lead = "This answer looks out of step with your recent behavior.";
+    }
+    return `${lead} ${observed}`;
+  }
+  renderAnsweredQuestions(container, profile, comparisons = []) {
     var _a, _b;
     const calibrationAnswers = (_a = profile.calibration_answers) != null ? _a : {};
     const advancedAnswers = (_b = profile.advanced_answers) != null ? _b : {};
@@ -7044,22 +7065,12 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const answeredKeys = Object.keys(allAnswers).filter((k) => QUESTION_LABELS[k]);
     if (answeredKeys.length === 0)
       return;
-    const showNudges = driftLevel >= 0.2;
-    const highDrift = driftLevel >= 0.5;
-    const traitRelatedKeys = /* @__PURE__ */ new Set([
-      "chronotype",
-      "work_pace_style",
-      "sleep_quality_baseline",
-      "physical_fitness_baseline",
-      "focus_session_capacity",
-      "recovery_rate",
-      "stimulation_need",
-      "stress_pattern_primary",
-      "overcommitment_tendency",
-      "task_switching_preference",
-      "avoidance_pattern",
-      "natural_gravitation"
-    ]);
+    const mismatchByKey = /* @__PURE__ */ new Map();
+    for (const cmp of comparisons) {
+      if (cmp.status === "mild_mismatch" || cmp.status === "strong_mismatch") {
+        mismatchByKey.set(cmp.key, cmp);
+      }
+    }
     const section = container.createDiv({ cls: "emerald-wv-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
@@ -7070,17 +7081,19 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     for (const key of shuffled) {
       const info = QUESTION_LABELS[key];
       const value = allAnswers[key];
-      const shouldNudge = showNudges && (highDrift || traitRelatedKeys.has(key));
-      const cardCls = shouldNudge ? "emerald-wv-answer-card emerald-wv-answer-card-nudge" : "emerald-wv-answer-card";
+      const mismatch = mismatchByKey.get(key);
+      const isStrong = (mismatch == null ? void 0 : mismatch.status) === "strong_mismatch";
+      const cardCls = mismatch ? `emerald-wv-answer-card emerald-wv-answer-card-nudge${isStrong ? " emerald-wv-answer-card-nudge-strong" : ""}` : "emerald-wv-answer-card";
       const card = grid.createDiv({ cls: cardCls });
       card.createDiv({ cls: "emerald-wv-answer-question", text: info.label });
       const valueText = this.formatAnswerValue(value, info.format, key);
       card.createDiv({ cls: "emerald-wv-answer-value", text: valueText });
-      if (shouldNudge) {
+      if (mismatch) {
         const nudge = card.createDiv({ cls: "emerald-wv-answer-nudge" });
         const nudgeIcon = nudge.createSpan({ cls: "emerald-wv-answer-nudge-icon" });
         (0, import_obsidian15.setIcon)(nudgeIcon, "refresh-cw");
-        nudge.createSpan({ text: "Review suggested" });
+        nudge.createSpan({ text: isStrong ? "Doesn\u2019t match your behavior" : "Review suggested" });
+        card.createDiv({ cls: "emerald-wv-answer-why", text: this.comparisonWhy(mismatch) });
       }
     }
   }
@@ -10831,6 +10844,11 @@ var EmraldAPIClient = class {
   }
   async getProfileHistory(opts) {
     return this.request("GET", "/profile/history", void 0, opts);
+  }
+  // SEQ-4+5 Profile-Aware Comparison Layer: per-trait predicted-vs-observed mismatch.
+  // COMPARE-don't-FUSE — server reads D-metric values read-only. Tier-scoped server-side.
+  async getProfileComparison(opts) {
+    return this.request("GET", "/profile/comparison", void 0, opts);
   }
   async triggerReassessment() {
     return this.request("POST", "/profile/reassessment", { reason: "manual" });

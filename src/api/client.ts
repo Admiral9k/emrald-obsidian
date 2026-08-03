@@ -756,6 +756,12 @@ export class EmraldAPIClient {
 		return this.request('GET', '/profile/history', undefined, opts);
 	}
 
+	// SEQ-4+5 Profile-Aware Comparison Layer: per-trait predicted-vs-observed mismatch.
+	// COMPARE-don't-FUSE — server reads D-metric values read-only. Tier-scoped server-side.
+	async getProfileComparison(opts?: { skipCache?: boolean }): Promise<APIResponse<ProfileComparisonResponse>> {
+		return this.request('GET', '/profile/comparison', undefined, opts);
+	}
+
 	async triggerReassessment(): Promise<APIResponse<void>> {
 		return this.request('POST', '/profile/reassessment', { reason: 'manual' });
 	}
@@ -1118,6 +1124,32 @@ export interface ProfileHistoryEntry {
 	motivation_extrinsic: number;
 	calibration_score: number;
 	recorded_at: string;
+}
+
+// SEQ-4+5 Profile-Aware Comparison Layer (mirrors API engine/profile-comparison.ts).
+export type ComparisonStatus =
+	| 'aligned'
+	| 'mild_mismatch'
+	| 'strong_mismatch'
+	| 'insufficient_data'
+	| 'no_counterpart'
+	| 'unavailable';
+
+export interface TraitComparison {
+	key: string;
+	metric_key: string;
+	status: ComparisonStatus;
+	severity: number | null;
+	reported: unknown;
+	observed: string | null;
+	reason?: string;
+}
+
+export interface ProfileComparisonResponse {
+	comparisons: TraitComparison[];
+	flagged_keys: string[];
+	computed_at: string;
+	tier?: string;
 }
 
 export interface Suggestion {

@@ -6,7 +6,7 @@
 import { WorkspaceLeaf, Notice, Modal, Setting, setIcon, App } from 'obsidian';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_EFFORT_PROFILE, VIEW_DATA_CENTER } from './base';
-import { RecoveryProtocol } from '../../api/client';
+import { RecoveryProtocol, TraitComparison } from '../../api/client';
 
 // ── Calibration Fields (core 6) ─────────────────────────
 
@@ -151,14 +151,15 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		this.renderHeader(container, 'Effort Profile', 'How EMRALD sees you', 'user');
 
 		// Fetch data concurrently
-		let profileResp, historyResp, metricsResp, recoveryResp;
+		let profileResp, historyResp, metricsResp, recoveryResp, comparisonResp;
 		try {
 			const forceFresh = !this.isOffline();
-			[profileResp, historyResp, metricsResp, recoveryResp] = await Promise.all([
+			[profileResp, historyResp, metricsResp, recoveryResp, comparisonResp] = await Promise.all([
 				this.plugin.apiClient.getProfile({ skipCache: forceFresh }),
 				this.plugin.apiClient.getProfileHistory({ skipCache: forceFresh }),
 				this.plugin.apiClient.getMetrics(['D19'], { skipCache: forceFresh }),
 				this.plugin.apiClient.getRecoveryProtocols({ skipCache: forceFresh }),
+				this.plugin.apiClient.getProfileComparison({ skipCache: forceFresh }),
 			]);
 		} catch {
 			this.renderError(container, 'Could not load effort profile — check your connection.');
@@ -224,9 +225,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		// ── All Answered Questions (ungrouped cards) ──
 		if (profile) {
-			// Only highlight per-question drift nudges when D19 is established
-			const driftLevel = d19Established && !d19StaleAfterReassessment ? (d19?.value ?? 0) : 0;
-			this.renderAnsweredQuestions(container, profile, driftLevel);
+			// SEQ-4+5: flag the SPECIFIC card whose self-report diverges from behavior, driven
+			// by the server comparison layer. Falls back gracefully to no flags if unavailable.
+			const comparisons = comparisonResp?.data?.comparisons ?? [];
+			this.renderAnsweredQuestions(container, profile, comparisons);
 		}
 
 		// ── Profile History ──
@@ -580,7 +582,28 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	// ── Answered Questions (ungrouped cards) ─────────────
 
-	private renderAnsweredQuestions(container: Element, profile: Record<string, unknown>, driftLevel: number = 0) {
+	// SEQ-4+5: build the human-readable "why" for a flagged card. Generic-first, then
+	// enriched per-trait from the server's observed summary + direction reason.
+	private comparisonWhy(cmp: TraitComparison): string {
+		const observed = cmp.observed ? `Your recent behavior shows ${cmp.observed}.` : 'Your recent behavior differs from this answer.';
+		let lead: string;
+		switch (cmp.reason) {
+			case 'reports_more_than_observed':
+				lead = 'You rated this higher than your behavior suggests.';
+				break;
+			case 'observed_more_than_reports':
+				lead = 'Your behavior suggests this runs higher than you rated it.';
+				break;
+			case 'tenacity_vs_completion':
+				lead = 'You lead with finishing — but recent completion is running lower.';
+				break;
+			default:
+				lead = 'This answer looks out of step with your recent behavior.';
+		}
+		return `${lead} ${observed}`;
+	}
+
+	private renderAnsweredQuestions(container: Element, profile: Record<string, unknown>, comparisons: TraitComparison[] = []) {
 		// Collect all answered calibration/advanced answers
 		const calibrationAnswers = (profile.calibration_answers as Record<string, unknown>) ?? {};
 		const advancedAnswers = (profile.advanced_answers as Record<string, unknown>) ?? {};
@@ -590,17 +613,16 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		if (answeredKeys.length === 0) return;
 
-		// Determine which keys to nudge based on D19 drift
-		const showNudges = driftLevel >= 0.2;
-		const highDrift = driftLevel >= 0.5;
-
-		// Keys related to core traits — these are most likely to drift
-		const traitRelatedKeys = new Set([
-			'chronotype', 'work_pace_style', 'sleep_quality_baseline',
-			'physical_fitness_baseline', 'focus_session_capacity', 'recovery_rate',
-			'stimulation_need', 'stress_pattern_primary', 'overcommitment_tendency',
-			'task_switching_preference', 'avoidance_pattern', 'natural_gravitation'
-		]);
+		// SEQ-4+5: flag the SPECIFIC card whose self-report diverges from behavior, driven by
+		// the server comparison layer (COMPARE-don't-FUSE). Replaces the old crude heuristic
+		// ("high D19 drift → flag a hardcoded usual-suspects list"), which never knew WHICH
+		// answer actually diverged. Only mild/strong mismatches flag; everything else is quiet.
+		const mismatchByKey = new Map<string, TraitComparison>();
+		for (const cmp of comparisons) {
+			if (cmp.status === 'mild_mismatch' || cmp.status === 'strong_mismatch') {
+				mismatchByKey.set(cmp.key, cmp);
+			}
+		}
 
 		const section = container.createDiv({ cls: 'emerald-wv-section' });
 
@@ -619,9 +641,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			const info = QUESTION_LABELS[key];
 			const value = allAnswers[key];
 
-			const shouldNudge = showNudges && (highDrift || traitRelatedKeys.has(key));
-			const cardCls = shouldNudge
-				? 'emerald-wv-answer-card emerald-wv-answer-card-nudge'
+			const mismatch = mismatchByKey.get(key);
+			const isStrong = mismatch?.status === 'strong_mismatch';
+			const cardCls = mismatch
+				? `emerald-wv-answer-card emerald-wv-answer-card-nudge${isStrong ? ' emerald-wv-answer-card-nudge-strong' : ''}`
 				: 'emerald-wv-answer-card';
 
 			const card = grid.createDiv({ cls: cardCls });
@@ -630,11 +653,13 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			const valueText = this.formatAnswerValue(value, info.format, key);
 			card.createDiv({ cls: 'emerald-wv-answer-value', text: valueText });
 
-			if (shouldNudge) {
+			if (mismatch) {
 				const nudge = card.createDiv({ cls: 'emerald-wv-answer-nudge' });
 				const nudgeIcon = nudge.createSpan({ cls: 'emerald-wv-answer-nudge-icon' });
 				setIcon(nudgeIcon, 'refresh-cw');
-				nudge.createSpan({ text: 'Review suggested' });
+				nudge.createSpan({ text: isStrong ? 'Doesn’t match your behavior' : 'Review suggested' });
+				// The "why": generic-first, enriched per-trait from the server comparison.
+				card.createDiv({ cls: 'emerald-wv-answer-why', text: this.comparisonWhy(mismatch) });
 			}
 		}
 	}
