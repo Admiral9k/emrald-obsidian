@@ -4833,3 +4833,220 @@ span.emerald-pro-pill {
 	color: var(--text-muted);
 	font-size: 11px;
 }
+
+/* ── SEQ-6 Block 1: Effort Comparison modal (S105) ── */
+.emerald-effort-comparison-modal .modal-content {
+	max-width: 640px;
+}
+
+.emerald-effort-comparison-preamble {
+	margin: 6px 0 14px;
+	line-height: 1.5;
+}
+.emerald-effort-comparison-preamble p {
+	margin: 0;
+}
+
+.emerald-effort-comparison-body {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.emerald-effort-comparison-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.emerald-effort-comparison-section h3 {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--emerald-e2, #B8912E);
+}
+
+.emerald-comparison-message {
+	font-size: 13px;
+	color: var(--text-muted);
+	line-height: 1.5;
+	padding: 12px 14px;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+}
+
+/* One predicted|behavioral pair */
+.emerald-comparison-pair {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 10px;
+}
+
+.emerald-comparison-pair-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.emerald-comparison-pair-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+.emerald-comparison-pair-bref {
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--text-muted);
+	background: var(--background-modifier-border);
+	border-radius: 5px;
+	padding: 1px 6px;
+}
+.emerald-comparison-delta-chip {
+	margin-left: auto;
+	font-size: 11px;
+	font-weight: 700;
+	border-radius: 999px;
+	padding: 2px 10px;
+	font-variant-numeric: tabular-nums;
+}
+.emerald-comparison-delta-chip.is-aligned {
+	background: rgba(45, 122, 74, 0.15);
+	color: #2D7A4A;
+	border: 1px solid rgba(45, 122, 74, 0.35);
+}
+.emerald-comparison-delta-chip.is-mild {
+	background: rgba(201, 162, 39, 0.15);
+	color: var(--emerald-e2, #B8912E);
+	border: 1px solid rgba(201, 162, 39, 0.35);
+}
+.emerald-comparison-delta-chip.is-strong {
+	background: rgba(181, 69, 69, 0.15);
+	color: #B54545;
+	border: 1px solid rgba(181, 69, 69, 0.35);
+}
+.emerald-comparison-delta-chip.is-segmented {
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+	border: 1px solid var(--background-modifier-border);
+}
+
+/* Two panels side by side (never fused) */
+.emerald-comparison-panels {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+.emerald-comparison-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px 12px;
+	border-radius: 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+}
+.emerald-comparison-panel-predicted {
+	border-left: 3px solid var(--emerald-e2, #B8912E);
+}
+.emerald-comparison-panel-behavioral {
+	border-left: 3px solid #2D7A4A;
+}
+.emerald-comparison-panel-tag {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--text-muted);
+}
+.emerald-comparison-panel-value {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--text-normal);
+	font-variant-numeric: tabular-nums;
+}
+.emerald-comparison-panel-scale {
+	font-size: 11px;
+	color: var(--text-muted);
+	line-height: 1.35;
+}
+
+.emerald-comparison-pair-note {
+	font-size: 12px;
+	color: var(--text-muted);
+	line-height: 1.5;
+}
+
+/* skill_challenge_ratio */
+.emerald-comparison-scr-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.emerald-comparison-scr-badge {
+	font-size: 12px;
+	font-weight: 700;
+	border-radius: 999px;
+	padding: 3px 12px;
+	background: var(--background-modifier-border);
+	color: var(--text-normal);
+}
+.emerald-comparison-scr-badge[data-zone="flow_zone"] {
+	background: rgba(45, 122, 74, 0.15);
+	color: #2D7A4A;
+	border: 1px solid rgba(45, 122, 74, 0.35);
+}
+.emerald-comparison-scr-badge[data-zone="stretch"] {
+	background: rgba(192, 106, 48, 0.15);
+	color: #C06A30;
+	border: 1px solid rgba(192, 106, 48, 0.35);
+}
+.emerald-comparison-scr-badge[data-zone="comfort"] {
+	background: rgba(201, 162, 39, 0.15);
+	color: var(--emerald-e2, #B8912E);
+	border: 1px solid rgba(201, 162, 39, 0.35);
+}
+.emerald-comparison-scr-ratio {
+	font-size: 12px;
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Behavioral summary chips */
+.emerald-comparison-summary-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.emerald-comparison-summary-chip {
+	font-size: 11px;
+	padding: 3px 9px;
+	border-radius: 6px;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+/* Compare button in the E-Level project table */
+.emerald-wv-compare-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+}
+.emerald-wv-compare-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--emerald-e2, #B8912E);
+}
+.emerald-wv-compare-btn svg {
+	width: 15px;
+	height: 15px;
+}

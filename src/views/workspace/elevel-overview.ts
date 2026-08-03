@@ -9,6 +9,7 @@ import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_ELEVEL_OVERVIEW } from './base';
 import { VIEW_ABOUT } from './base';
 import { TrackedItem } from '../../api/client';
+import { EffortComparisonModal } from '../../modals/effort-comparison';
 
 const E_LEVEL_PCT: Record<string, number> = { E1: 25, E2: 50, E3: 75, E4: 100 };
 
@@ -326,7 +327,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const table = section.createEl('table', { cls: 'emerald-wv-table' });
 		const thead = table.createEl('thead');
 		const thRow = thead.createEl('tr');
-		for (const h of ['', 'Name', 'E-Level', 'Today', 'Prescribed', 'Progress']) {
+		for (const h of ['', 'Name', 'E-Level', 'Today', 'Prescribed', 'Progress', '']) {
 			thRow.createEl('th', { text: h });
 		}
 
@@ -385,10 +386,27 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			} else {
 				progressCell.createSpan({ cls: 'emerald-wv-empty', text: '—' });
 			}
+
+			// Compare (SEQ-6 Block 1): open per-project predicted-vs-behavioral comparison.
+			// "Judging what I'm doing now" = Track. Read-only detail surface.
+			const compareCell = row.createEl('td');
+			const compareBtn = compareCell.createSpan({
+				cls: 'emerald-wv-compare-btn emrald-clickable',
+				attr: { 'aria-label': `Compare predictions vs. actual for ${item.name}`, title: 'Predicted vs. actual' },
+			});
+			setIcon(compareBtn, 'git-compare');
+			compareBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.openComparison(item);
+			});
 		}
 	}
 
 	// ── Open Note ────────────────────────────────────────
+
+	private openComparison(item: TrackedItem) {
+		new EffortComparisonModal(this.plugin.app, this.plugin, item).open();
+	}
 
 	private openNote(item: TrackedItem) {
 		if (item.obsidian_note_path) {

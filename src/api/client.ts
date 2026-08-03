@@ -762,6 +762,12 @@ export class EmraldAPIClient {
 		return this.request('GET', '/profile/comparison', undefined, opts);
 	}
 
+	// SEQ-6 Block 1: per-project predicted-vs-behavioral comparison (COMPARE-don't-FUSE).
+	// Read-only, computed on-demand server-side. Two independent panels + descriptive divergence.
+	async getItemComparison(itemId: string, opts?: { skipCache?: boolean }): Promise<APIResponse<EffortComparison>> {
+		return this.request('GET', `/items/${itemId}/effort-comparison`, undefined, opts);
+	}
+
 	async triggerReassessment(): Promise<APIResponse<void>> {
 		return this.request('POST', '/profile/reassessment', { reason: 'manual' });
 	}
@@ -1150,6 +1156,43 @@ export interface ProfileComparisonResponse {
 	flagged_keys: string[];
 	computed_at: string;
 	tier?: string;
+}
+
+// ── SEQ-6 Block 1: per-project effort comparison (predicted vs behavioral) ──
+// Mirror of emrald-api/src/engine/effort-prediction.ts. COMPARE-don't-FUSE:
+// predicted and behavioral are ALWAYS two distinct numbers on their own scales.
+export interface ComparisonPair {
+	field: string;
+	b_ref: string | null;
+	predicted: number | null;
+	predicted_scale: string;
+	behavioral: number | null;
+	behavioral_scale: string;
+	behavioral_source: string;
+	comparable: boolean;
+	delta: number | null;
+	note: string;
+}
+
+export interface EffortComparison {
+	item_id: string;
+	status: 'ok' | 'no_profile' | 'no_behavioral_data';
+	skill_challenge_ratio: {
+		value: number | null;
+		zone: string | null;
+		complexity_b1: number | null;
+		expertise_b2: number | null;
+		note: string;
+	};
+	core: ComparisonPair[];
+	behavioral_summary: {
+		session_count: number;
+		total_hours: number | null;
+		avg_perceived_effort: number | null;
+		avg_hedonic_valence: number | null;
+		flow_rate: number | null;
+		assigned_e_level: string | null;
+	};
 }
 
 export interface Suggestion {
