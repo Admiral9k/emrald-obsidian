@@ -768,6 +768,21 @@ export class EmraldAPIClient {
 		return this.request('GET', `/items/${itemId}/effort-comparison`, undefined, opts);
 	}
 
+	// SEQ-6 Block 2: anchor-then-neighbor effort forecast (HINT, never PRE-FILL).
+	// Anchors (B1 complexity, B2 expertise-match) + the single area-label id come from the
+	// project's CURRENT saved effort profile (freshest details, not capture-time). Read-only.
+	async getEffortForecast(
+		anchors: { complexity?: number | null; expertise_match?: number | null; area?: string | null },
+		opts?: { skipCache?: boolean },
+	): Promise<APIResponse<EffortForecast>> {
+		const params = new URLSearchParams();
+		if (anchors.complexity !== null && anchors.complexity !== undefined) params.set('complexity', String(anchors.complexity));
+		if (anchors.expertise_match !== null && anchors.expertise_match !== undefined) params.set('expertise_match', String(anchors.expertise_match));
+		if (anchors.area) params.set('area', anchors.area);
+		const query = params.toString();
+		return this.request('GET', `/items/effort-forecast${query ? `?${query}` : ''}`, undefined, opts);
+	}
+
 	async triggerReassessment(): Promise<APIResponse<void>> {
 		return this.request('POST', '/profile/reassessment', { reason: 'manual' });
 	}
@@ -1193,6 +1208,30 @@ export interface EffortComparison {
 		flow_rate: number | null;
 		assigned_e_level: string | null;
 	};
+}
+
+// ── SEQ-6 Block 2: anchor-then-neighbor effort forecast (HINT, never PRE-FILL) ──
+// Mirror of emrald-api/src/engine/effort-forecast.ts. Read-only, on-demand. The
+// client renders these as HINTS beside the sliders — NEVER auto-populating a
+// field (pre-filling poisons the independent-prediction calibration data).
+export interface ForecastFieldHint {
+	field: string;
+	b_ref: string | null;
+	hint_value: number;
+	based_on: number;
+	note: string;
+}
+
+export interface EffortForecast {
+	status: 'ok' | 'cold_start' | 'coarse_fallback' | 'need_anchors';
+	anchors: { complexity_b1: number | null; expertise_match_b2: number | null };
+	area_label_id: string | null;
+	neighbor_count: number;
+	match_mode: 'neighbor' | 'area' | 'e_level_band' | 'none';
+	suggested_e_level: string | null;
+	e_level_confidence: string | null;
+	hints: ForecastFieldHint[];
+	message: string;
 }
 
 export interface Suggestion {

@@ -357,6 +357,17 @@ export class ProjectsComponent {
 				.setIcon('sliders-horizontal')
 				.onClick(() => { void this.openEffortProfileModal(item); })
 			);
+			// SEQ-6 Block 2: forecast lives on the readied-active project (design placement).
+			// Gated on multi_day because the anchors (B1/B2) come from the effort profile,
+			// which is only offered once a project is marked multi-day. Active-only: forecast
+			// is decision-support for a project you're about to work on.
+			if (item.status === 'active') {
+				menu.addItem(i => i
+					.setTitle('Effort forecast')
+					.setIcon('trending-up')
+					.onClick(() => { void this.openEffortForecastModal(item); })
+				);
+			}
 		}
 	}
 
@@ -401,6 +412,14 @@ export class ProjectsComponent {
 			existing,
 			() => { /* saved — no local state refresh needed */ }
 		);
+		modal.open();
+	}
+
+	// SEQ-6 Block 2: open the read-only forecast modal for a readied-active project.
+	// Anchors are read from the project's current effort profile inside the modal.
+	private async openEffortForecastModal(item: TrackedItem) {
+		const { EffortForecastModal } = await import('../modals/effort-forecast');
+		const modal = new EffortForecastModal(this.plugin.app, this.plugin, item);
 		modal.open();
 	}
 
