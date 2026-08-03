@@ -193,6 +193,7 @@ export default class EmraldPlugin extends Plugin {
 		if (this.settings.apiKey) {
 			void this.syncDigestPreferences(true); // silent on startup
 			void this.reconcileResearchOptIn(); // pull API truth into local settings
+			void this.syncTimezone(); // S102 follow-on: auto-set IANA tz for chronotype↔D11
 		}
 	}
 
@@ -277,6 +278,38 @@ export default class EmraldPlugin extends Plugin {
 		} catch { /* non-fatal */
 			// Non-fatal
 		}
+	}
+
+	/**
+	 * S102 follow-on (migration 013). Silently PATCH the user's IANA timezone once
+	 * per install so timezone-sensitive comparisons (chronotype↔D11 today; future
+	 * peak-hour insights, digest send times) can align UTC-stored behavior with
+	 * local wall-clock self-report. Only writes when the profile column is NULL —
+	 * never overwrites a user's explicit override. Fire-and-forget, non-blocking.
+	 */
+	private async syncTimezone(): Promise<void> {
+		try {
+			if (!this.settings.apiKey) return;
+			if (this.settings.timezoneSynced) return;
+			let detected: string | null = null;
+			try { detected = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch { detected = null; }
+			if (!detected) return;
+			const profileResp = await this.apiClient.getProfile();
+			const existing = (profileResp.data && typeof (profileResp.data as unknown as Record<string, unknown>).timezone === 'string')
+				? (profileResp.data as unknown as Record<string, unknown>).timezone as string
+				: null;
+			if (existing) {
+				// User already has a timezone (auto-set here, or set via web, or manual). Don't touch.
+				this.settings.timezoneSynced = true;
+				await this.saveData(this.settings);
+				return;
+			}
+			const resp = await this.apiClient.updateProfile({ timezone: detected });
+			if (!resp.error) {
+				this.settings.timezoneSynced = true;
+				await this.saveData(this.settings);
+			}
+		} catch { /* non-fatal — will retry next launch */ }
 	}
 
 	async syncDigestPreferences(silent: boolean = false): Promise<void> {

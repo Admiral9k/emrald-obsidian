@@ -37,6 +37,10 @@ export interface EmraldSettings {
 	installId: string;
 	installPinged: boolean;
 
+	// Timezone auto-sync (S102 follow-on) — one-shot flag; set true after we've
+	// successfully PATCHed user_profile.timezone with the detected IANA name.
+	timezoneSynced: boolean;
+
 	// Celebration (first receipt)
 	celebrationShown: boolean;
 
@@ -68,6 +72,7 @@ export const DEFAULT_SETTINGS: EmraldSettings = {
 	advancedProfileCompleted: false,
 	installId: '',
 	installPinged: false,
+	timezoneSynced: false,
 	celebrationShown: false,
 	researchOptIn: false,
 	digestDay: 'sunday',
