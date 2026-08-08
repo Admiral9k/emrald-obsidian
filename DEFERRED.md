@@ -21,8 +21,8 @@ Writing an API surface from a summary rather than a spec risks shipping settings
 
 1. Bump the `obsidian` dev dependency to typings that include the declarative settings API
 2. Read the real migration guide
-3. Convert all 8 settings in `EmraldSettingTab`
-4. Keep `display()` in place while `minAppVersion` is below 1.13.0
+3. Convert the **12 migratable settings** in `EmraldSettingTab`. Of the 28 `new Setting()` calls in the file, 10 are `setHeading()` section labels and 6 are interactive-only (Connection status, Offline queue status, Export data, Re-run onboarding, Send feedback, Website) — buttons and live status readouts, not persisted values, so they don't belong in settings search. The 12 real ones: API key, API URL, Show overtime indicator, Burnout warning modals, Insight rotation speed, Timer style, Frontmatter sync, Debug logging, Help improve EMRALD, Digest delivery day, Digest delivery time, timeblock hours.
+4. Keep `display()` in place indefinitely — it's the only path for the 6 interactive-only controls *and* for users below 1.13.0
 5. Verify on 1.13.0+ that the settings actually surface in global search
 
 **Also sweep while in there:** stray no-op `;` at `src/settings.ts:92`, pre-existing since the round-3 review fixes. Harmless, no lint complaint.
@@ -37,3 +37,16 @@ The tier-aware *sync interval* is implemented and correct (`main.ts`, `startSync
 Marketing copy has been corrected to claim only the sync behavior that is actually enforced.
 
 **To do it properly:** add a daily counter keyed by user with a date stamp, increment it in the existing auth middleware (which already resolves user and tier per request), return 429 past the ceiling, and prefer a rolling date check over a scheduled reset.
+
+## `removeSessionStart()` is a no-op stub
+
+**Status:** deferred, tracked
+**Location:** `src/sync/offline-queue.ts:251`
+
+Every filter branch returns `true`, so nothing is ever removed, and the function has zero call sites. From its name and position it was intended to drop a queued session-start action on reconnect so replay doesn't create a duplicate session.
+
+Left as-is deliberately during the 1.2.x review-fix batch — the parameter was renamed to `_localId` to satisfy lint and the state documented, but changing offline-replay behavior mid-release is a correctness decision, not a lint fix. Either implement the dedup properly or delete the stub; don't leave it looking implemented.
+
+## Resolved
+
+- **Dead `version` npm lifecycle hook** (removed `03831d9`) — `package.json` declared `"version": "node version-bump.mjs && git add manifest.json versions.json"` but `version-bump.mjs` never existed in this repo; git history confirms it was never added, not deleted. It came from Obsidian's sample plugin, which ships both the entry and the file — only the entry was copied. Inert in practice, since npm's `version` **lifecycle hook** only fires on `npm version <x>` and CI calls `esbuild` directly, but `npm version patch` would have failed on a missing module at exactly the wrong moment. Removed rather than backfilled: version bumps are done by hand across manifest/package/versions together, as 1.2.1 was.
