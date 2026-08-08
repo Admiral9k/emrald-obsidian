@@ -36,9 +36,21 @@ jobs:
         with:
           subject-path: styles.css
 
+      - name: Resolve release notes
+        id: notes
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -f "RELEASE-NOTES-${VERSION}.md" ]; then
+            echo "path=RELEASE-NOTES-${VERSION}.md" >> "$GITHUB_OUTPUT"
+          else
+            echo "No RELEASE-NOTES-${VERSION}.md found; failing so releases are never published without a description." >&2
+            exit 1
+          fi
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: ${{ steps.notes.outputs.path }}
           files: |
             main.js
             manifest.json
