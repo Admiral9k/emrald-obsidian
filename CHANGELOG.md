@@ -4,6 +4,18 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-08-08
+
+### Added
+- Per-project effort profiles now compare predicted vs. actual effort, side by side (no fused score)
+- Effort forecast for multi-day projects, based on your own project history
+- Area/category tagging for projects
+- Onboarding profile answers now flagged against real behavior when they diverge
+- Insight engine rebuild: rotating phrasing, dismissal-based suppression, two new insight categories (Discovery, Warnings)
+
+### Fixed
+- Peak-performance-hours detection (D11) was reading flat data and missing real peaks
+
 ## [1.1.2] — 2026-05-19
 
 ### New

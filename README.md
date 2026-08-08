@@ -89,6 +89,16 @@ The first few sessions establish the baseline. The pattern recognition gets stro
 
 ---
 
+## What's new: effort profiles, area grouping, and forecasting
+
+**Per-project effort profiles.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your prediction next to what actually happened, side by side. It never blends the two into a fake composite score.
+
+**Effort forecasting.** For multi-day projects, EMRALD can suggest a starting effort level and field hints. Drawn from how similar past projects actually went for you, not some generic guess. If there isn't enough history yet, it tells you that plainly.
+
+**Area grouping.** Tag projects by area (Work, Health, Family, or whatever fits your life) and see across your workspace.
+
+**(PRO mode) Smarter insights.** The insight engine now varies its phrasing instead of repeating the same sentence. It also learns from insights you dismiss and surfaces new insights in two categories: Discovery (patterns in your own data) and expanded Warnings (early heads-ups on sleep and effort volatility). Burnout warnings are unchanged. Same high bar as always.
+
 ## Templater & Periodic Notes integration
 
 EMRALD automatically writes a daily summary file to your vault at `.emrald/daily-summary.md`. This file updates every time you stop a session, complete a check-in, or close your day.
