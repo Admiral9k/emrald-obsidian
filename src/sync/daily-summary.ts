@@ -23,7 +23,6 @@ export async function writeDailySummary(plugin: EmraldPlugin): Promise<void> {
 	if (!plugin.apiClient.isConfigured()) return;
 
 	const vault = plugin.app.vault;
-	const today = new Date().toISOString().split('T')[0];
 
 	// Gather data in parallel
 	const [sessionsResp, checkinResp, burnoutResp] = await Promise.all([

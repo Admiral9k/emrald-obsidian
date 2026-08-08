@@ -518,7 +518,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		});
 	}
 
-	private addRecoveryProtocol(card: Element, placeholder: string) {
+	private addRecoveryProtocol(_card: Element, _placeholder: string) {
 		const modal = new RecoveryInputModal(this.plugin.app, 'Add recovery activity', '', (name) => {
 			void (async () => {
 				const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
@@ -535,7 +535,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		modal.open();
 	}
 
-	private editRecoveryProtocol(protocol: RecoveryProtocol, card: Element) {
+	private editRecoveryProtocol(protocol: RecoveryProtocol, _card: Element) {
 		const modal = new RecoveryInputModal(this.plugin.app, 'Edit recovery activity', protocol.name, (name) => {
 			void (async () => {
 				if (name.trim() === '') {
@@ -816,7 +816,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	// ── Actions ─────────────────────────────────────────
 
-	private renderActions(container: Element, profile: Record<string, unknown>) {
+	private renderActions(container: Element, _profile: Record<string, unknown>) {
 		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-profile-actions-section' });
 
 		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });

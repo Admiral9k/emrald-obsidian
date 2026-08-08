@@ -124,7 +124,7 @@ export class ProjectsComponent {
 		}
 	}
 
-	private renderProjectCard(item: TrackedItem, isActive: boolean) {
+	private renderProjectCard(item: TrackedItem, _isActive: boolean) {
 		const isInSession = this.state.activeSessionItemId === item.id;
 		const todayMin = this.state.todayMinutesByItem.get(item.id) ?? 0;
 

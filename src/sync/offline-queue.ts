@@ -247,8 +247,16 @@ export class OfflineQueue {
 	 * Remove the session-start action for a local session ID.
 	 * Called after successfully creating the remote session,
 	 * so replay doesn't try to create it again.
+	 *
+	 * ⚠️ UNIMPLEMENTED STUB — currently a no-op with no call sites.
+	 * Every filter branch returns true, so nothing is ever removed. The
+	 * blocker is that the POST /sessions body carries item_id, not the
+	 * local session ID, so the start action can't be matched directly.
+	 * Left as-is rather than deleted: removing it is a behavior decision
+	 * about offline replay, not a lint fix. See getStartActionItemId below
+	 * for the id-bridging approach a real implementation would need.
 	 */
-	removeSessionStart(localId: string) {
+	removeSessionStart(_localId: string) {
 		this.queue = this.queue.filter(action => {
 			// Remove the POST /sessions action that started this local session
 			if (action.method === 'POST' && action.path === '/sessions') {

@@ -1009,6 +1009,8 @@ class NoteSuggestModal extends FuzzySuggestModal<TFile> {
 	}
 
 	getItems(): TFile[] {
+		// Enumeration is required: this is a user-driven note picker, so it must
+		// list the vault's markdown files for the user to choose from.
 		return this.app.vault.getMarkdownFiles().sort((a, b) => a.path.localeCompare(b.path));
 	}
 

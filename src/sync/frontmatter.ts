@@ -140,6 +140,11 @@ export async function updateSessionStats(
  * Build a map of emrald-id → file path by scanning all vault markdown files.
  * Used to resolve note paths for API-loaded items that don't carry note paths.
  * Wrapped in try/catch per-file so one note with bad frontmatter can't crash the scan.
+ *
+ * Enumeration rationale: EMRALD stores its own id in a note's frontmatter, so
+ * reconnecting a synced item to its note requires looking for that id. Only
+ * frontmatter is inspected via the metadata cache — note body content is never
+ * read, and nothing about the vault leaves the device from this scan.
  */
 export function buildNotePathMap(app: App): Map<string, string> {
 	const map = new Map<string, string>();
