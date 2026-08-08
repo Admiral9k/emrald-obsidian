@@ -1089,7 +1089,9 @@ export class EmraldSidebarView extends ItemView {
 			return;
 		}
 
-		// Fuzzy note search — picks an existing vault file to link
+		// Fuzzy note search — picks an existing vault file to link.
+		// Enumeration is required: the user chooses which note becomes a project,
+		// so the picker must offer the vault's markdown files. No file is read here.
 		const files = this.app.vault.getMarkdownFiles();
 		const availableHours = this.timeblock?.state?.availableHours ?? 4;
 
