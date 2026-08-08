@@ -133,7 +133,7 @@ var init_tier = __esm({
 });
 
 // src/views/workspace/base.ts
-var import_obsidian, VIEW_ELEVEL_OVERVIEW, VIEW_INSIGHT_LOG, VIEW_DATA_CENTER, VIEW_EFFORT_PROFILE, VIEW_BURNOUT_MONITOR, VIEW_DIGEST, VIEW_ABOUT, ALL_WORKSPACE_VIEWS, EmraldWorkspaceView;
+var import_obsidian, VIEW_ELEVEL_OVERVIEW, VIEW_INSIGHT_LOG, VIEW_DATA_CENTER, VIEW_EFFORT_PROFILE, VIEW_BURNOUT_MONITOR, VIEW_DIGEST, VIEW_ABOUT, EmraldWorkspaceView;
 var init_base = __esm({
   "src/views/workspace/base.ts"() {
     import_obsidian = require("obsidian");
@@ -145,15 +145,6 @@ var init_base = __esm({
     VIEW_BURNOUT_MONITOR = "emrald-burnout-monitor";
     VIEW_DIGEST = "emrald-digest";
     VIEW_ABOUT = "emrald-about";
-    ALL_WORKSPACE_VIEWS = [
-      VIEW_ELEVEL_OVERVIEW,
-      VIEW_INSIGHT_LOG,
-      VIEW_DATA_CENTER,
-      VIEW_EFFORT_PROFILE,
-      VIEW_BURNOUT_MONITOR,
-      VIEW_DIGEST,
-      VIEW_ABOUT
-    ];
     EmraldWorkspaceView = class extends import_obsidian.ItemView {
       constructor(leaf, plugin, title, viewIcon) {
         super(leaf);
@@ -4713,7 +4704,7 @@ var ProjectsComponent = class {
       });
     }
   }
-  renderProjectCard(item, isActive) {
+  renderProjectCard(item, _isActive) {
     var _a, _b, _c;
     const isInSession = this.state.activeSessionItemId === item.id;
     const todayMin = (_a = this.state.todayMinutesByItem.get(item.id)) != null ? _a : 0;
@@ -5193,7 +5184,6 @@ async function writeDailySummary(plugin) {
   if (!plugin.apiClient.isConfigured())
     return;
   const vault = plugin.app.vault;
-  const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
   const [sessionsResp, checkinResp, burnoutResp] = await Promise.all([
     plugin.apiClient.getTodaySessions(),
     plugin.apiClient.getTodayCheckin(),
@@ -7412,7 +7402,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       text: "These activities will be suggested when your effort patterns show signs of strain."
     });
   }
-  addRecoveryProtocol(card, placeholder) {
+  addRecoveryProtocol(_card, _placeholder) {
     const modal = new RecoveryInputModal(this.plugin.app, "Add recovery activity", "", (name) => {
       void (async () => {
         const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
@@ -7428,7 +7418,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     });
     modal.open();
   }
-  editRecoveryProtocol(protocol, card) {
+  editRecoveryProtocol(protocol, _card) {
     const modal = new RecoveryInputModal(this.plugin.app, "Edit recovery activity", protocol.name, (name) => {
       void (async () => {
         if (name.trim() === "") {
@@ -7673,7 +7663,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     }
   }
   // ── Actions ─────────────────────────────────────────
-  renderActions(container, profile) {
+  renderActions(container, _profile) {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-profile-actions-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
@@ -11803,8 +11793,16 @@ var OfflineQueue = class {
    * Remove the session-start action for a local session ID.
    * Called after successfully creating the remote session,
    * so replay doesn't try to create it again.
+   *
+   * ⚠️ UNIMPLEMENTED STUB — currently a no-op with no call sites.
+   * Every filter branch returns true, so nothing is ever removed. The
+   * blocker is that the POST /sessions body carries item_id, not the
+   * local session ID, so the start action can't be matched directly.
+   * Left as-is rather than deleted: removing it is a behavior decision
+   * about offline replay, not a lint fix. See getStartActionItemId below
+   * for the id-bridging approach a real implementation would need.
    */
-  removeSessionStart(localId) {
+  removeSessionStart(_localId) {
     this.queue = this.queue.filter((action) => {
       if (action.method === "POST" && action.path === "/sessions") {
         return true;
@@ -12231,10 +12229,6 @@ var EmraldPlugin = class extends import_obsidian34.Plugin {
     this.stopSync();
     this.stopMidnightCheck();
     this.offlineQueue.destroy();
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_EMRALD);
-    for (const viewType of ALL_WORKSPACE_VIEWS) {
-      this.app.workspace.detachLeavesOfType(viewType);
-    }
   }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
