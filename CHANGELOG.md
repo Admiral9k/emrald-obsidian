@@ -4,6 +4,22 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.2.1] — 2026-08-08
+
+Fix release. The 1.2.0 assets were built before these fixes landed, so 1.2.1 is the build that actually contains them. Update if you installed 1.2.0.
+
+### Fixed
+- Views are no longer detached on plugin unload, so a sidebar you've moved stays where you put it across restarts and updates
+- TypeScript `lib` target corrected — ES2017 standard library calls (`Object.entries`, `padStart`) were resolving as untyped and disabling type checking downstream through timeblock, data cache, reassessment, settings, frontmatter sync, burnout monitor, and Data Center
+- Caught exceptions are now properly narrowed rather than assumed
+
+### Changed
+- Lint gate runs the same type-aware ruleset as the Obsidian community review
+- Release builds fail when `RELEASE-NOTES-<version>.md` is missing, so no release publishes without a description
+
+### Known limitation
+- On Obsidian 1.13.0+, settings don't appear in the global settings search yet (the settings tab works normally). Declarative settings API adoption is tracked for an upcoming release.
+
 ## [1.2.0] — 2026-08-08
 
 ### Added
