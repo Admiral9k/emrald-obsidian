@@ -5,22 +5,8 @@
 import EmraldPlugin from '../../main';
 import { TrackedItem, Session } from '../api/client';
 import { createIconEl, ICONS } from '../utils/icons';
-
-// E-level prescribed duration as percentage of daily available hours
-const E_LEVEL_PERCENT: Record<string, number> = {
-	E1: 0.25,
-	E2: 0.50,
-	E3: 0.75,
-	E4: 1.00
-};
-
-// E-level marker colors
-const E_LEVEL_COLORS: Record<string, string> = {
-	E1: '#2D7A4A',
-	E2: '#B8912E',
-	E3: '#C06A30',
-	E4: '#B54545'
-};
+import type { LevelRef } from '../e-levels';
+import { colorForLevel, levelBadgeText, levelTooltip, prescribedMinutes } from '../e-levels';
 
 export interface TimeblockState {
 	availableHours: number;       // Today's available hours (from availability or override)
@@ -33,7 +19,7 @@ export interface ActiveSessionState {
 	sessionId: string;
 	itemId: string;
 	itemName: string;
-	effortLevel: 'E1' | 'E2' | 'E3' | 'E4';
+	effortLevel: LevelRef;
 	startedAt: Date;
 	pausedAt: Date | null;
 	elapsedMs: number;            // Total elapsed (excluding pauses)
@@ -219,7 +205,9 @@ export class TimeblockComponent {
 			sessionId: data.sessionId as string,
 			itemId: data.itemId as string,
 			itemName: data.itemName as string,
-			effortLevel: data.effortLevel as 'E1' | 'E2' | 'E3' | 'E4',
+			// Persisted refs are plain strings ('E1'..'E4' or 'EC:<uuid>'); anything
+			// else restores empty and resolves through the resolver's fallback.
+			effortLevel: typeof data.effortLevel === 'string' ? data.effortLevel : '',
 			startedAt: new Date(data.startedAt as string),
 			pausedAt: data.pausedAt ? new Date(data.pausedAt as string) : null,
 			elapsedMs: data.elapsedMs as number,
@@ -462,8 +450,7 @@ export class TimeblockComponent {
 		const session = this.state.activeSession;
 		if (!session || !this.eLevelMarkerEl) return;
 
-		const totalAvailableMin = this.state.availableHours * 60;
-		const prescribedMin = totalAvailableMin * (E_LEVEL_PERCENT[session.effortLevel] ?? 0.5);
+		const prescribedMin = prescribedMinutes(session.effortLevel, this.state.availableHours);
 
 		// Position marker at absolute prescribed position on the timeline.
 		// prescribedMin is the total minutes this E-level prescribes for the day.
@@ -473,8 +460,11 @@ export class TimeblockComponent {
 		const markerPx = markerHours * hourWidth;
 
 		this.eLevelMarkerEl.style.left = `${markerPx}px`;
-		this.eLevelMarkerEl.textContent = session.effortLevel;
-		this.eLevelMarkerEl.style.backgroundColor = E_LEVEL_COLORS[session.effortLevel] ?? 'var(--interactive-accent)';
+		// Customs share the uniform "EC" badge; the name lives in the tooltip.
+		this.eLevelMarkerEl.textContent = levelBadgeText(session.effortLevel);
+		this.eLevelMarkerEl.style.backgroundColor = colorForLevel(session.effortLevel);
+		const tooltip = levelTooltip(session.effortLevel);
+		if (tooltip) this.eLevelMarkerEl.setAttribute('aria-label', tooltip);
 	}
 
 	/**
@@ -499,8 +489,7 @@ export class TimeblockComponent {
 		const session = this.state.activeSession;
 		if (!session) return false;
 
-		const totalAvailableMin = this.state.availableHours * 60;
-		const prescribedMin = totalAvailableMin * (E_LEVEL_PERCENT[session.effortLevel] ?? 0.5);
+		const prescribedMin = prescribedMinutes(session.effortLevel, this.state.availableHours);
 		const totalProjectMin = session.priorMinutesToday + (session.elapsedMs / 60000);
 
 		return totalProjectMin >= prescribedMin;

@@ -5,6 +5,8 @@
 import { App, Modal, Notice, TFile, FuzzySuggestModal, setIcon } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { VIEW_ABOUT } from '../views/workspace/base';
+import type { LevelRef } from '../e-levels';
+import { colorForLevel, levelBadgeText, levelTooltip } from '../e-levels';
 
 // ── Step Definitions ─────────────────────────────────────
 
@@ -22,7 +24,10 @@ export class OnboardingModal extends Modal {
 	// State accumulated across steps
 	private apiKey: string = '';
 	private isNewUser: boolean = false;
-	private projects: Array<{ name: string; effortLevel: 'E1' | 'E2' | 'E3' | 'E4'; notePath?: string }> = [];
+	// Onboarding only OFFERS the built-in levels — a brand-new account has no
+	// custom levels yet — but the field is a level ref so nothing downstream has
+	// to narrow it back to the built-in union.
+	private projects: Array<{ name: string; effortLevel: LevelRef; notePath?: string }> = [];
 	private calibrationAnswers: Record<string, unknown> = {};
 	private calibrationPage: number = 0;
 	private dailyHours: number[] = [4, 4, 4, 4, 4, 4, 4]; // Sun=0 through Sat=6
@@ -753,7 +758,13 @@ export class OnboardingModal extends Modal {
 				const row = listEl.createDiv({ cls: 'emerald-onboard-project-row' });
 				const infoCol = row.createDiv({ cls: 'emerald-onboard-project-info' });
 				infoCol.createSpan({ cls: 'emerald-onboard-project-name', text: proj.name });
-				infoCol.createSpan({ cls: 'emerald-elevel-badge', text: proj.effortLevel });
+				// Badge text via the resolver — a raw ref must never be rendered.
+				const badge = infoCol.createSpan({
+					cls: 'emerald-elevel-badge',
+					text: levelBadgeText(proj.effortLevel),
+					attr: { 'aria-label': levelTooltip(proj.effortLevel) || 'No effort level' }
+				});
+				badge.style.color = colorForLevel(proj.effortLevel);
 
 				// Note link status
 				const noteCol = row.createDiv({ cls: 'emerald-onboard-project-note' });
@@ -809,7 +820,7 @@ export class OnboardingModal extends Modal {
 		addBtn.addEventListener('click', () => {
 			const name = nameInput.value.trim();
 			if (!name) return;
-			this.projects.push({ name, effortLevel: levelSelect.value as 'E1' | 'E2' | 'E3' | 'E4' });
+			this.projects.push({ name, effortLevel: levelSelect.value });
 			nameInput.value = '';
 			renderList();
 		});

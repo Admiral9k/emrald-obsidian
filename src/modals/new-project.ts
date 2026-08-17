@@ -1,20 +1,24 @@
 // New Project Modal
 // Adapted from ELevelModal — editable name field + E-level picker.
-// Clicking an E-level row creates the project immediately.
+// Clicking an E-level row (built-in or custom) creates the project immediately.
+//
+// `level` is a level ref: 'E1'..'E4' or 'EC:<uuid>'.
 
 import { App, Modal, Notice } from 'obsidian';
 import EmraldPlugin from '../../main';
+import type { LevelRef } from '../e-levels';
+import { renderCustomLevelRows } from './elevel-picker-rows';
 
 export class NewProjectModal extends Modal {
 	private plugin: EmraldPlugin;
 	private availableHours: number;
-	private onSubmit: (name: string, level: 'E1' | 'E2' | 'E3' | 'E4') => void;
+	private onSubmit: (name: string, level: LevelRef) => void;
 	private nameInput: HTMLInputElement | null = null;
 
 	constructor(
 		app: App,
 		plugin: EmraldPlugin,
-		onSubmit: (name: string, level: 'E1' | 'E2' | 'E3' | 'E4') => void,
+		onSubmit: (name: string, level: LevelRef) => void,
 		availableHours = 4
 	) {
 		super(app);
@@ -63,16 +67,18 @@ export class NewProjectModal extends Modal {
 			btn.createDiv({ cls: 'emerald-elevel-option-time', text: `~${prescribedHours}h on a ${this.availableHours}h day` });
 
 			btn.addEventListener('click', () => {
-				const name = this.nameInput?.value.trim() ?? '';
-				if (!name) {
-					new Notice('Project name is required');
-					this.nameInput?.focus();
-					return;
-				}
-				this.onSubmit(name, level);
-				this.close();
+				this.submitWith(level);
 			});
 		}
+
+		// Custom levels (or the Pro pointer row) below the built-ins.
+		renderCustomLevelRows({
+			container: form,
+			plugin: this.plugin,
+			availableHours: this.availableHours,
+			currentLevel: '',
+			onPick: (ref: string) => { this.submitWith(ref); }
+		});
 
 		// Cancel only — confirming happens by clicking an E-level row
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });
@@ -81,6 +87,18 @@ export class NewProjectModal extends Modal {
 			text: 'Cancel'
 		});
 		cancelBtn.addEventListener('click', () => this.close());
+	}
+
+	/** Name gate is shared by every row — built-in and custom alike. */
+	private submitWith(level: LevelRef): void {
+		const name = this.nameInput?.value.trim() ?? '';
+		if (!name) {
+			new Notice('Project name is required');
+			this.nameInput?.focus();
+			return;
+		}
+		this.onSubmit(name, level);
+		this.close();
 	}
 
 	onClose() {

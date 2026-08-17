@@ -9,6 +9,7 @@
 // EMRALD writes the file; Templater reads it via tp.file.include.
 
 import type EmraldPlugin from '../../main';
+import { levelLabel } from '../e-levels';
 
 const SUMMARY_FOLDER = '.emrald';
 const SUMMARY_PATH = `${SUMMARY_FOLDER}/daily-summary.md`;
@@ -118,7 +119,9 @@ export async function writeDailySummary(plugin: EmraldPlugin): Promise<void> {
 			const projTime = projH > 0
 				? (projM > 0 ? `${projH}h ${projM}m` : `${projH}h`)
 				: `${projM}m`;
-			const eLevelStr = proj.effortLevel ? ` (${proj.effortLevel})` : '';
+			// Synced markdown body: label only. A raw 'EC:<uuid>' must never land here.
+			const eLevelLabel = levelLabel(proj.effortLevel);
+			const eLevelStr = eLevelLabel ? ` (${eLevelLabel})` : '';
 			lines.push(`- **${proj.name}**${eLevelStr}: ${projTime} ×${proj.sessions}`);
 		}
 	}

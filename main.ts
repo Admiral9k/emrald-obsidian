@@ -2,6 +2,7 @@ import { Plugin, WorkspaceLeaf, Notice, requestUrl } from 'obsidian';
 import { EmraldSettingTab, EmraldSettings, DEFAULT_SETTINGS } from './src/settings';
 import { EmraldSidebarView, VIEW_TYPE_EMRALD } from './src/views/sidebar';
 import { tierState } from './src/tier';
+import { eLevelStore, hydrateELevelStore } from './src/e-levels';
 import { EmraldAPIClient } from './src/api/client';
 import { FolderSync } from './src/sync/folder-sync';
 import { OfflineQueue, QueuedAction } from './src/sync/offline-queue';
@@ -28,6 +29,10 @@ export default class EmraldPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
+		// Restore the custom e-level cache from settings so the first paint can
+		// resolve 'EC:<uuid>' refs before the network answers.
+		hydrateELevelStore(this);
 
 		// Initialize offline queue (restore persisted actions)
 		this.offlineQueue = new OfflineQueue();
@@ -155,6 +160,10 @@ export default class EmraldPlugin extends Plugin {
 			// the workspace DOM isn't fully initialized yet.
 			this.app.workspace.onLayoutReady(() => {
 				void this.activateView();
+
+				// Pull the authoritative custom-level list once the workspace is up.
+				// Never throws; a failure just leaves the hydrated cache in place.
+				void eLevelStore.refresh(this);
 
 				// Auto-open E-Level Overview as "home screen" for returning users
 				if (this.settings.onboardingComplete) {

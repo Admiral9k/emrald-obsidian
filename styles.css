@@ -5260,3 +5260,159 @@ span.emerald-pro-pill {
 	font-size: 11px;
 	color: var(--text-muted);
 }
+/* ── Custom E-Levels ─────────────────────────────────── */
+/* Level colours are derived per-level and arrive as an inline style — nothing
+   below hardcodes a theme colour. */
+
+/* Editor modal (create / rename / change percent) */
+.emerald-elevel-editor-modal .emerald-slider {
+	width: 100%;
+}
+.emerald-elevel-editor-modal .emerald-form-group {
+	width: 100%;
+}
+.emerald-modal-body {
+	font-size: 13px;
+	color: var(--text-normal);
+	line-height: 1.5;
+}
+.emerald-modal-body p {
+	margin: 0 0 8px 0;
+}
+
+/* Shared form bits the editor introduces */
+.emerald-form-label {
+	font-weight: 500;
+	font-size: 13px;
+}
+.emerald-form-hint {
+	font-size: 11px;
+	color: var(--text-muted);
+}
+.emerald-form-error {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--text-error);
+	background: var(--background-secondary);
+	border-left: 2px solid var(--text-error);
+	border-radius: 4px;
+	padding: 6px 8px;
+}
+.emerald-form-error-icon {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+.emerald-form-error-icon svg {
+	width: 14px;
+	height: 14px;
+}
+.emerald-btn-link {
+	background: none;
+	border: none;
+	padding: 0 0 0 4px;
+	box-shadow: none;
+	color: var(--interactive-accent);
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.emerald-btn-link:hover {
+	color: var(--text-normal);
+}
+
+/* Live preview: uniform "EC" badge (inline-tinted) + the derived prose line */
+.emerald-elevel-preview {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 10px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+}
+.emerald-elevel-preview-text {
+	font-size: 13px;
+	color: var(--text-muted);
+}
+
+/* Picker rows: custom levels below the E1–E4 block */
+.emerald-elevel-divider {
+	height: 1px;
+	background: var(--background-modifier-border);
+	margin: 6px 0;
+}
+.emerald-elevel-option-custom {
+	display: block;
+}
+/* Free tier: existing customs render as labels, not choices. */
+.emerald-elevel-option.is-inert {
+	opacity: 0.55;
+	cursor: default;
+}
+.emerald-elevel-option.is-inert:hover {
+	background: var(--background-secondary);
+}
+/* Inert pointer row — reads as a signpost, not a selectable level. */
+.emerald-elevel-option-pointer {
+	color: var(--text-muted);
+	font-size: 12px;
+	font-style: italic;
+	background: transparent;
+	border-style: dashed;
+	cursor: pointer;
+}
+.emerald-elevel-option-pointer:hover {
+	color: var(--text-normal);
+	background: var(--background-modifier-hover);
+}
+.emerald-elevel-option-pointer:focus-visible {
+	outline: 1px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+/* Settings: "Manage effort levels" list */
+.emerald-elevel-manage-anchor {
+	/* Scroll target for openELevelSettings() — keep it clear of the tab header. */
+	scroll-margin-top: 24px;
+}
+.emerald-elevel-row .setting-item-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.emerald-elevel-row-badge {
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+.emerald-elevel-row-name {
+	font-weight: 600;
+}
+.emerald-elevel-row-archived {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	color: var(--text-faint);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 5px;
+	padding: 1px 5px;
+}
+.emerald-elevel-locked .setting-item-name {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--text-muted);
+}
+.emerald-pro-badge {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.4px;
+	color: var(--text-on-accent);
+	background: var(--interactive-accent);
+	border-radius: 5px;
+	padding: 1px 5px;
+}

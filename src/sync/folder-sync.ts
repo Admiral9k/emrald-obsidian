@@ -7,6 +7,7 @@
 
 import { App, TFile, TFolder, TAbstractFile, Notice, EventRef } from 'obsidian';
 import { EmraldAPIClient, TrackedItem } from '../api/client';
+import { levelLabel } from '../e-levels';
 import {
 	readEmraldFrontmatter,
 	writeEmraldFrontmatter,
@@ -233,7 +234,9 @@ export class FolderSync {
 		const cachedItem = this.localItemCache.get(emeraldId);
 		if (!cachedItem) return;
 
-		// Check if effort-level changed
+		// Check if effort-level changed. getEffortLevel() validates the ref shape,
+		// so a hand-typed garbage value never reaches the API. Custom 'EC:<uuid>'
+		// refs are pushed verbatim — the Notice shows the label, not the ref.
 		const currentLevel = getEffortLevel(this.app, file);
 		if (currentLevel && currentLevel !== cachedItem.effort_level) {
 			const response = await this.apiClient.updateItem(emeraldId, {
@@ -242,7 +245,7 @@ export class FolderSync {
 
 			if (!response.error && response.data) {
 				this.localItemCache.set(emeraldId, response.data);
-				new Notice(`E-level updated: ${file.basename} → ${currentLevel}`);
+				new Notice(`E-level updated: ${file.basename} → ${levelLabel(currentLevel) || 'updated'}`);
 			}
 		}
 	}

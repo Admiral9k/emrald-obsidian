@@ -8,6 +8,8 @@ import type { BurnoutAction } from '../modals/burnout-warning';
 import { tierState } from '../tier';
 import { updateSessionStats, isEmraldNote, initializeEmraldFrontmatter, buildNotePathMap } from '../sync/frontmatter';
 import { writeDailySummary } from '../sync/daily-summary';
+import type { LevelRef } from '../e-levels';
+import { levelLabel } from '../e-levels';
 
 export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
 
@@ -813,7 +815,7 @@ export class EmraldSidebarView extends ItemView {
 
 		class ProjectPickerModal extends FuzzySuggestModal<TrackedItem> {
 			getItems() { return activeItems; }
-			getItemText(item: TrackedItem) { return `${item.name} (${item.effort_level})`; }
+			getItemText(item: TrackedItem) { return `${item.name} (${levelLabel(item.effort_level) || '—'})`; }
 			onChooseItem(item: TrackedItem) {
 				handleStart(item);
 			}
@@ -1223,7 +1225,7 @@ export class EmraldSidebarView extends ItemView {
 		const modal = new NewProjectModal(
 			this.app,
 			this.plugin,
-			(name: string, level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
+			(name: string, level: LevelRef) => { void (async () => {
 				const resp = await this.plugin.apiClient.createItem({
 					name,
 					effort_level: level,
@@ -1269,7 +1271,7 @@ export class EmraldSidebarView extends ItemView {
 					name,
 					'E2',
 					availableHours,
-					(level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
+					(level: LevelRef) => { void (async () => {
 						const resp = await this.plugin.apiClient.createItem({
 							name,
 							effort_level: level,
@@ -1310,10 +1312,10 @@ export class EmraldSidebarView extends ItemView {
 			item.name,
 			item.effort_level,
 			availableHours,
-			(level: 'E1' | 'E2' | 'E3' | 'E4') => { void (async () => {
+			(level: LevelRef) => { void (async () => {
 				const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level });
 				if (!resp.error) {
-					new Notice(`${item.name} → ${level}`);
+					new Notice(`${item.name} → ${levelLabel(level) || 'level updated'}`);
 					void this.loadProjects();
 				}
 			})(); }

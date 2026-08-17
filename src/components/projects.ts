@@ -5,23 +5,7 @@
 import { Menu, Notice, setIcon, TFile } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { TrackedItem, Label } from '../api/client';
-
-
-// E-level prescribed duration as percentage of daily available hours
-const E_LEVEL_PERCENT: Record<string, number> = {
-	E1: 0.25,
-	E2: 0.50,
-	E3: 0.75,
-	E4: 1.00
-};
-
-// E-level colors for inline badge styling
-const E_LEVEL_COLORS: Record<string, string> = {
-	E1: '#2D7A4A',
-	E2: '#B8912E',
-	E3: '#C06A30',
-	E4: '#B54545'
-};
+import { colorForLevel, levelBadgeText, levelDisplayName, levelTooltip, prescribedMinutes } from '../e-levels';
 
 export interface ProjectsState {
 	items: TrackedItem[];
@@ -134,7 +118,7 @@ export class ProjectsComponent {
 		card.dataset.itemId = item.id;
 		card.setAttribute('role', 'button');
 		card.setAttribute('tabindex', '0');
-		card.setAttribute('aria-label', `${item.name}, ${item.effort_level}${isInSession ? ', in session' : ''}. Press Enter for options.`);
+		card.setAttribute('aria-label', `${item.name}, ${levelDisplayName(item.effort_level) || 'no effort level'}${isInSession ? ', in session' : ''}. Press Enter for options.`);
 
 		// Top row: name + E-level badge
 		const topRow = card.createDiv({ cls: 'emerald-project-top' });
@@ -150,14 +134,14 @@ export class ProjectsComponent {
 			this.openNote(item);
 		});
 
-		// E-level badge
+		// E-level badge — customs show the uniform "EC"; the name is in the tooltip.
 		const badge = topRow.createSpan({
 			cls: 'emerald-elevel-badge',
-			text: item.effort_level,
-			attr: { 'aria-label': `Effort level ${item.effort_level}` }
+			text: levelBadgeText(item.effort_level),
+			attr: { 'aria-label': levelTooltip(item.effort_level) || 'No effort level' }
 		});
-		badge.dataset.level = item.effort_level ?? '';
-		badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
+		badge.dataset.level = levelBadgeText(item.effort_level);
+		badge.style.color = colorForLevel(item.effort_level);
 
 		// Area chip (Option B, S100) — the single area-label this project is filed under, if any.
 		const area = this.areaOf(item);
@@ -257,7 +241,7 @@ export class ProjectsComponent {
 		for (const item of items) {
 			const row = content.createDiv({ cls: 'emerald-inactive-item' });
 			row.setAttribute('role', 'button');
-			row.setAttribute('aria-label', `${item.name} — ${item.effort_level}`);
+			row.setAttribute('aria-label', `${item.name} — ${levelTooltip(item.effort_level) || 'no effort level'}`);
 			row.tabIndex = 0;
 			const iconEl = row.createSpan({ cls: 'emerald-inactive-icon' });
 			iconEl.setAttribute('aria-hidden', 'true');
@@ -268,9 +252,9 @@ export class ProjectsComponent {
 			}
 			const nameEl = row.createSpan({ text: item.name });
 			nameEl.setAttribute('aria-hidden', 'true');
-			const badge = row.createSpan({ cls: 'emerald-elevel-badge-small', text: item.effort_level });
-			badge.dataset.level = item.effort_level ?? '';
-			badge.style.color = E_LEVEL_COLORS[item.effort_level] ?? 'var(--text-muted)';
+			const badge = row.createSpan({ cls: 'emerald-elevel-badge-small', text: levelBadgeText(item.effort_level) });
+			badge.dataset.level = levelBadgeText(item.effort_level);
+			badge.style.color = colorForLevel(item.effort_level);
 
 			row.addClass('emrald-clickable');
 			row.addEventListener('click', (e) => {
@@ -626,8 +610,9 @@ export class ProjectsComponent {
 		const priorMin = this.state.todayMinutesByItem.get(item.id) ?? 0;
 		const totalMin = priorMin + this.state.activeSessionElapsedMin;
 
-		const prescribedPct = E_LEVEL_PERCENT[item.effort_level] ?? 0.5;
-		const prescribedMin = this.state.availableHours * 60 * prescribedPct;
+		// Prescribed minutes come from the resolver so custom levels get the same
+		// math as E1–E4 (the C1 overtime rider reads this).
+		const prescribedMin = prescribedMinutes(item.effort_level, this.state.availableHours);
 
 		// Use Math.floor for both to prevent oscillation between two values each second
 		const fmt = (min: number): string => {

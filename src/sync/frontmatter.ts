@@ -3,10 +3,15 @@
 // NEVER touches note content — only frontmatter.
 
 import { App, TFile, CachedMetadata } from 'obsidian';
+import type { LevelRef } from '../e-levels';
+import { isValidLevelRef } from '../e-levels';
 
 export interface EmraldFrontmatter {
 	'emrald-id': string;
-	'effort-level': 'E1' | 'E2' | 'E3' | 'E4';
+	// A level ref: 'E1'..'E4' or 'EC:<uuid>'. Stored verbatim so a custom level
+	// round-trips losslessly through the note; display always goes through
+	// src/e-levels.ts.
+	'effort-level': LevelRef;
 	'status': 'active' | 'paused' | 'completed' | 'abandoned';
 	'sessions': number;
 	'last-session': string | null;
@@ -60,20 +65,19 @@ export async function writeEmraldFrontmatter(
 	});
 }
 
-const VALID_EFFORT_LEVELS = ['E1', 'E2', 'E3', 'E4'];
-
 /**
  * Initialize EMRALD frontmatter on a note that hasn't been tracked yet.
- * Validates effort level before writing.
+ * Validates the effort level before writing — built-ins and 'EC:<uuid>' custom
+ * refs are both accepted, anything else is refused rather than written.
  */
 export async function initializeEmraldFrontmatter(
 	app: App,
 	file: TFile,
 	emraldId: string,
-	effortLevel: 'E1' | 'E2' | 'E3' | 'E4'
+	effortLevel: LevelRef
 ): Promise<void> {
 	if (!emraldId || typeof emraldId !== 'string') return;
-	if (!VALID_EFFORT_LEVELS.includes(effortLevel)) return;
+	if (!isValidLevelRef(effortLevel)) return;
 
 	await writeEmraldFrontmatter(app, file, {
 		'emrald-id': emraldId,
@@ -102,13 +106,15 @@ export function getEmraldId(app: App, file: TFile): string | null {
 }
 
 /**
- * Get the effort-level from a note's frontmatter, or null if not set.
+ * Get the effort-level ref from a note's frontmatter, or null if it's missing or
+ * isn't a shape this client understands. 'EC:<uuid>' custom refs round-trip
+ * verbatim.
  */
-export function getEffortLevel(app: App, file: TFile): 'E1' | 'E2' | 'E3' | 'E4' | null {
+export function getEffortLevel(app: App, file: TFile): LevelRef | null {
 	const cache = app.metadataCache.getFileCache(file);
 	const level = cache?.frontmatter?.['effort-level'] as string | undefined;
-	if (level && ['E1', 'E2', 'E3', 'E4'].includes(level)) {
-		return level as 'E1' | 'E2' | 'E3' | 'E4';
+	if (isValidLevelRef(level)) {
+		return level as LevelRef;
 	}
 	return null;
 }

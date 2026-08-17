@@ -6,6 +6,7 @@
 import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { CreateReceiptPayload } from '../api/client';
+import { levelDisplayName } from '../e-levels';
 
 export class EffortReceiptModal extends Modal {
 	private plugin: EmraldPlugin;
@@ -55,10 +56,12 @@ export class EffortReceiptModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal', 'emerald-receipt-modal');
 
-		// Title with E-level and duration
+		// Title with E-level and duration. The subtitle shows the level's display
+		// name — a raw 'EC:<uuid>' must never appear here.
 		contentEl.createEl('h2', { text: 'Effort receipt' });
-		const subtitle = this.effortLevel
-			? `${this.itemName} (${this.effortLevel})  •  ${this.formatDuration(this.sessionMinutes)}`
+		const levelName = levelDisplayName(this.effortLevel);
+		const subtitle = levelName
+			? `${this.itemName} (${levelName})  •  ${this.formatDuration(this.sessionMinutes)}`
 			: `${this.itemName}  •  ${this.formatDuration(this.sessionMinutes)}`;
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: subtitle });
 
@@ -105,7 +108,7 @@ export class EffortReceiptModal extends Modal {
 		if (this.metPrescribedEffort) {
 			const nudge = form.createDiv({ cls: 'emerald-completion-prompt' });
 			nudge.createEl('p', {
-				text: `You've passed the ${this.effortLevel || 'prescribed'} target for ${this.itemName} today \u2014 nice effort. Consider switching to another project next.`
+				text: `You've passed the ${levelName || 'prescribed'} target for ${this.itemName} today \u2014 nice effort. Consider switching to another project next.`
 			});
 		}
 

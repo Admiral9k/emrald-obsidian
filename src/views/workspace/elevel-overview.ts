@@ -10,41 +10,36 @@ import { EmraldWorkspaceView, VIEW_ELEVEL_OVERVIEW } from './base';
 import { VIEW_ABOUT } from './base';
 import { TrackedItem } from '../../api/client';
 import { EffortComparisonModal } from '../../modals/effort-comparison';
+import type { LevelRef } from '../../e-levels';
+import {
+	BUILT_IN_LEVELS,
+	colorForLevel,
+	eLevelStore,
+	isArchivedLevel,
+	isCustomLevelRef,
+	levelBadgeText,
+	levelDisplayName,
+	levelLabel,
+	levelTooltip,
+	prescribedMinutes,
+	resolveLevelPercent
+} from '../../e-levels';
 
-const E_LEVEL_PCT: Record<string, number> = { E1: 25, E2: 50, E3: 75, E4: 100 };
-
-const E_LEVEL_META: Record<string, { label: string; desc: string; detail: string; color: string }> = {
-	E1: {
-		label: 'E1 — Light',
-		desc: '25% of your daily hours',
-		detail: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
-		color: '#2D7A4A'
-	},
-	E2: {
-		label: 'E2 — Moderate',
-		desc: '50% of your daily hours',
-		detail: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.',
-		color: '#B8912E'
-	},
-	E3: {
-		label: 'E3 — Demanding',
-		desc: '75% of your daily hours',
-		detail: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.',
-		color: '#C06A30'
-	},
-	E4: {
-		label: 'E4 — Maximum',
-		desc: '100% of your daily hours',
-		detail: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.',
-		color: '#B54545'
-	}
+// Editorial copy for the built-in levels only. Percent, colour and display name
+// all come from src/e-levels.ts — this table holds nothing but the prose that
+// has nowhere else to live, so custom levels get a derived equivalent instead.
+const BUILT_IN_DETAIL: Record<string, string> = {
+	E1: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
+	E2: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.',
+	E3: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.',
+	E4: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.'
 };
 
 export class ELevelOverviewView extends EmraldWorkspaceView {
 	private items: TrackedItem[] = [];
 	private minutesByItem: Map<string, number> = new Map();
 	private availableHours: number = 4;
-	private activeFilter: string | null = null; // null = all, 'E1'|'E2'|'E3'|'E4'
+	private activeFilter: LevelRef | null = null; // null = all, else a level ref ('E1'..'E4' or a custom ref)
 	private projectContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
@@ -58,6 +53,13 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const container = this.getContainer();
 		this.renderHeader(container, 'E-level overview', 'Your projects by effort level', 'bar-chart-2');
 
+		// Custom-level names and percents are resolved from the store, so warm it
+		// before the first badge renders. Runs concurrently with the data fetch
+		// and never throws.
+		const levelsReady: Promise<boolean> = eLevelStore.isStale()
+			? eLevelStore.refresh(this.plugin)
+			: Promise.resolve(false);
+
 		// Fetch data concurrently
 		let itemsResp, sessionsResp, availResp;
 		try {
@@ -70,6 +72,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			this.renderError(container, 'Could not load E-Level data — check your connection.');
 			return;
 		}
+		await levelsReady;
 
 		// If items failed to load (offline, no cache), show offline message (P15 fix)
 		if (itemsResp.data === null || itemsResp.data === undefined) {
@@ -122,7 +125,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		this.renderELevelCards(container, activeItems);
 
 		// ── Total Allocation Summary ──
-		const totalAllocatedPct = activeItems.reduce((sum, i) => sum + (E_LEVEL_PCT[i.effort_level] ?? 0), 0);
+		const totalAllocatedPct = activeItems.reduce((sum, i) => sum + resolveLevelPercent(i.effort_level), 0);
 		this.renderAllocationSummary(container, totalAllocatedPct, activeItems.length);
 
 		// ── Project Table (filterable) ──
@@ -160,35 +163,88 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 	// ── E-Level Cards ───────────────────────────────────
 
+	/**
+	 * The level refs that get a card, in ascending percent order. Built-ins are
+	 * always present; every assignable custom level joins them, and an archived
+	 * custom still earns a card while an active project carries it (otherwise
+	 * that project would vanish from the breakdown).
+	 */
+	private levelRefsToRender(activeItems: TrackedItem[]): LevelRef[] {
+		const refs: LevelRef[] = [...BUILT_IN_LEVELS];
+		const seen = new Set<string>(refs);
+
+		for (const level of eLevelStore.active()) {
+			if (seen.has(level.ref)) continue;
+			refs.push(level.ref);
+			seen.add(level.ref);
+		}
+		for (const item of activeItems) {
+			const ref = item.effort_level;
+			if (!ref || seen.has(ref) || !isCustomLevelRef(ref)) continue;
+			refs.push(ref);
+			seen.add(ref);
+		}
+
+		refs.sort((a, b) => {
+			const delta = resolveLevelPercent(a) - resolveLevelPercent(b);
+			if (delta !== 0) return delta;
+			// Built-in wins the tie so E1–E4 keep their familiar positions.
+			return Number(isCustomLevelRef(a)) - Number(isCustomLevelRef(b));
+		});
+		return refs;
+	}
+
+	/** Expandable ⓘ copy. Built-ins have authored prose; customs get a derived line. */
+	private levelDetail(ref: LevelRef): string {
+		const authored = BUILT_IN_DETAIL[ref];
+		if (authored) return authored;
+		const pct = resolveLevelPercent(ref);
+		const archived = isArchivedLevel(ref)
+			? ' This level is archived — projects keep the label, but you can\'t assign it to anything new.'
+			: '';
+		return `A custom effort level you created. It prescribes ${pct}% of your available hours each day — the same math the built-in levels use.${archived}`;
+	}
+
 	private renderELevelCards(container: Element, activeItems: TrackedItem[]) {
 		const grid = container.createDiv({ cls: 'emerald-wv-elevel-grid' });
 
-		for (const level of ['E1', 'E2', 'E3', 'E4']) {
-			const meta = E_LEVEL_META[level];
-			const itemsAtLevel = activeItems.filter(i => i.effort_level === level);
+		for (const ref of this.levelRefsToRender(activeItems)) {
+			const pct = resolveLevelPercent(ref);
+			const name = levelDisplayName(ref);
+			const badgeText = levelBadgeText(ref);
+			const tooltip = levelTooltip(ref);
+			const isCustom = isCustomLevelRef(ref);
+			const itemsAtLevel = activeItems.filter(i => i.effort_level === ref);
 			const count = itemsAtLevel.length;
 
 			// Today's total minutes at this level
 			const todayMin = itemsAtLevel.reduce((sum, i) => sum + (this.minutesByItem.get(i.id) ?? 0), 0);
-			const prescribedMin = this.availableHours * 60 * (E_LEVEL_PCT[level] / 100);
+			const prescribedMin = prescribedMinutes(ref, this.availableHours);
 			const totalPrescribed = count * prescribedMin;
 
 			const card = grid.createDiv({
-				cls: `emerald-wv-elevel-card ${this.activeFilter === level ? 'is-active' : ''}`
+				cls: `emerald-wv-elevel-card ${this.activeFilter === ref ? 'is-active' : ''}`
 			});
-			card.dataset.level = level;
-			card.style.borderLeftColor = meta.color;
+			// Badge text only — a raw 'EC:<uuid>' must never reach the DOM.
+			card.dataset.level = badgeText;
+			card.style.borderLeftColor = colorForLevel(ref);
 
 			// Left side: level info
 			const info = card.createDiv({ cls: 'emerald-wv-elevel-info' });
-			const levelLabel = info.createDiv({ cls: 'emerald-wv-elevel-label' });
-			levelLabel.createSpan({ cls: 'emerald-wv-elevel-name', text: level });
-			levelLabel.createSpan({ cls: 'emerald-wv-elevel-desc', text: meta.desc });
+			const labelRow = info.createDiv({ cls: 'emerald-wv-elevel-label' });
+			labelRow.createSpan({ cls: 'emerald-wv-elevel-name', text: badgeText });
+			labelRow.createSpan({
+				cls: 'emerald-wv-elevel-desc',
+				text: isCustom ? `${name} — ${pct}% of your daily hours` : `${pct}% of your daily hours`
+			});
 
 			// Expandable ⓘ info button
-			const infoBtn = levelLabel.createSpan({ cls: 'emerald-wv-elevel-info-btn', attr: { 'aria-label': `About ${level}` } });
+			const infoBtn = labelRow.createSpan({
+				cls: 'emerald-wv-elevel-info-btn',
+				attr: { 'aria-label': `About ${name}`, title: tooltip }
+			});
 			setIcon(infoBtn, 'info');
-			const detailEl = info.createDiv({ cls: 'emerald-wv-elevel-detail', text: meta.detail });
+			const detailEl = info.createDiv({ cls: 'emerald-wv-elevel-detail', text: this.levelDetail(ref) });
 			detailEl.addClass('emrald-hidden');
 			infoBtn.addEventListener('click', (e) => {
 				e.stopPropagation(); // Don't trigger card filter
@@ -207,8 +263,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// Right side: today's progress (if any work done)
 			const progress = card.createDiv({ cls: 'emerald-wv-elevel-progress' });
 			if (todayMin > 0 && totalPrescribed > 0) {
-				const pct = Math.min(Math.round((todayMin / totalPrescribed) * 100), 999);
-				progress.createDiv({ cls: 'emerald-wv-elevel-pct', text: `${pct}%` });
+				const pctDone = Math.min(Math.round((todayMin / totalPrescribed) * 100), 999);
+				progress.createDiv({ cls: 'emerald-wv-elevel-pct', text: `${pctDone}%` });
 				progress.createDiv({ cls: 'emerald-wv-elevel-time', text: `${this.formatDuration(todayMin)} today` });
 			} else if (count > 0) {
 				progress.createDiv({ cls: 'emerald-wv-elevel-time emerald-wv-elevel-no-work', text: 'No work yet' });
@@ -217,10 +273,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// Click to filter
 			card.addClass('emrald-clickable');
 			card.addEventListener('click', () => {
-				if (this.activeFilter === level) {
+				if (this.activeFilter === ref) {
 					this.activeFilter = null; // Toggle off
 				} else {
-					this.activeFilter = level;
+					this.activeFilter = ref;
 				}
 				// Update card active states
 				grid.querySelectorAll('.emerald-wv-elevel-card').forEach(c => c.removeClass('is-active'));
@@ -287,8 +343,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'folder');
 
+		// Display name for the filtered level — never the raw ref.
+		const filterName = this.activeFilter ? levelDisplayName(this.activeFilter) : '';
 		const title = this.activeFilter
-			? `${this.activeFilter} Projects`
+			? `${filterName || 'Filtered'} Projects`
 			: 'All Projects';
 		headerRow.createEl('h3', { text: title });
 
@@ -320,7 +378,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		});
 
 		if (displayItems.length === 0) {
-			this.renderPlaceholder(section, this.activeFilter ? `No ${this.activeFilter} projects.` : 'No projects yet.');
+			this.renderPlaceholder(section, this.activeFilter ? `No ${filterName || 'matching'} projects.` : 'No projects yet.');
 			return;
 		}
 
@@ -358,20 +416,24 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				});
 			}
 
-			// E-Level (colored)
+			// E-Level (colored) — customs show the uniform "EC"; the name lives in the tooltip.
 			const levelCell = row.createEl('td');
-			const levelBadge = levelCell.createSpan({ cls: 'emerald-wv-level-badge', text: item.effort_level });
-			const levelMeta = E_LEVEL_META[item.effort_level];
-			levelBadge.style.color = levelMeta?.color ?? 'var(--text-muted)';
-			levelBadge.dataset.level = item.effort_level ?? '';
+			const levelTip = levelTooltip(item.effort_level);
+			const levelBadge = levelCell.createSpan({
+				cls: 'emerald-wv-level-badge',
+				text: levelBadgeText(item.effort_level),
+				attr: { 'aria-label': levelTip || 'No effort level' }
+			});
+			if (levelTip) levelBadge.title = levelTip;
+			levelBadge.style.color = colorForLevel(item.effort_level);
+			levelBadge.dataset.level = levelBadgeText(item.effort_level);
 
 			// Today's time
 			const todayMin = this.minutesByItem.get(item.id) ?? 0;
 			row.createEl('td', { text: todayMin > 0 ? this.formatDuration(todayMin) : '—' });
 
 			// Prescribed time (active only — inactive/completed don't contribute to daily allocation)
-			const pct = E_LEVEL_PCT[item.effort_level] ?? 50;
-			const prescribedMin = (this.availableHours * 60 * pct) / 100;
+			const prescribedMin = prescribedMinutes(item.effort_level, this.availableHours);
 			row.createEl('td', { text: item.status === 'active' ? this.formatDuration(prescribedMin) : '—' });
 
 			// Progress bar
@@ -481,7 +543,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			// Header: clickable project name + date + E-level + duration
 			const headerLine = card.createDiv({ cls: 'emerald-wv-receipt-note-header' });
 			const itemName = item?.name ?? 'Unknown project';
-			const eLevel = item?.effort_level ?? '';
+			// Prose label ('E2' or 'EC — Deep research'), never the raw ref.
+			const eLevel = levelLabel(item?.effort_level);
 
 			const nameLink = headerLine.createEl('a', {
 				cls: 'emerald-wv-receipt-note-title emerald-wv-project-link',
@@ -492,9 +555,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				if (item) this.openNote(item as unknown as TrackedItem);
 			});
 
+			const metaParts = [dateStr, eLevel, durStr].filter(Boolean);
 			headerLine.createSpan({
 				cls: 'emerald-wv-receipt-note-meta',
-				text: ` \u00b7 ${dateStr} \u00b7 ${eLevel} \u00b7 ${durStr}`
+				text: ` \u00b7 ${metaParts.join(' \u00b7 ')}`
 			});
 
 			// Stat chips

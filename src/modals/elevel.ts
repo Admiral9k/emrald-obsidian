@@ -1,24 +1,30 @@
 // EMRALD E-Level Assignment Modal
-// Simple picker for E1-E4 with descriptions.
+// Picker for E1-E4 plus the user's custom levels, with descriptions.
 // Shows current level, available hours context, and prescribed time per level.
+//
+// `level` is a level ref: 'E1'..'E4' or 'EC:<uuid>'. The raw ref is only ever a
+// callback value — visible text goes through src/e-levels.ts.
 
 import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
+import type { LevelRef } from '../e-levels';
+import { levelLabel } from '../e-levels';
+import { renderCustomLevelRows } from './elevel-picker-rows';
 
 export class ELevelModal extends Modal {
 	private plugin: EmraldPlugin;
 	private itemName: string;
-	private currentLevel: 'E1' | 'E2' | 'E3' | 'E4';
+	private currentLevel: LevelRef;
 	private availableHours: number;
-	private onSubmit: (level: 'E1' | 'E2' | 'E3' | 'E4') => void;
+	private onSubmit: (level: LevelRef) => void;
 
 	constructor(
 		app: App,
 		plugin: EmraldPlugin,
 		itemName: string,
-		currentLevel: 'E1' | 'E2' | 'E3' | 'E4',
+		currentLevel: LevelRef,
 		availableHours: number,
-		onSubmit: (level: 'E1' | 'E2' | 'E3' | 'E4') => void
+		onSubmit: (level: LevelRef) => void
 	) {
 		super(app);
 		this.plugin = plugin;
@@ -36,9 +42,9 @@ export class ELevelModal extends Modal {
 		contentEl.createEl('h2', { text: 'Set e-level' });
 		contentEl.createEl('p', { cls: 'emerald-modal-subtitle', text: this.itemName });
 
-		// Current level indicator
+		// Current level indicator — label, never the raw ref
 		const currentEl = contentEl.createDiv({ cls: 'emerald-elevel-current' });
-		currentEl.createSpan({ text: `Current: ${this.currentLevel}` });
+		currentEl.createSpan({ text: `Current: ${levelLabel(this.currentLevel) || '—'}` });
 
 		// Available hours context
 		const contextEl = contentEl.createDiv({ cls: 'emerald-elevel-context' });
@@ -71,6 +77,18 @@ export class ELevelModal extends Modal {
 				this.close();
 			});
 		}
+
+		// Custom levels (or the Pro pointer row) below the built-ins.
+		renderCustomLevelRows({
+			container: form,
+			plugin: this.plugin,
+			availableHours: this.availableHours,
+			currentLevel: this.currentLevel,
+			onPick: (ref: string) => {
+				this.onSubmit(ref);
+				this.close();
+			}
+		});
 
 		// Actions
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

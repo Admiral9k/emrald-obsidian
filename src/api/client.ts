@@ -12,6 +12,29 @@ export interface APIResponse<T> {
 	status: number;
 	fromCache?: boolean;
 	queued?: boolean;
+	/**
+	 * Machine-readable code from the API error envelope ({error:{code,message}}).
+	 * Only populated for calls made with `rawError` — currently the e-levels
+	 * routes, which need PERCENT_LOCKED / CONFLICT / REF_COUNT_UNAVAILABLE /
+	 * PRO_REQUIRED distinguishable rather than collapsed to canned copy.
+	 */
+	errorCode?: string | null;
+}
+
+/**
+ * Per-request escape hatches.
+ *  - skipCache:    don't read/write the offline data cache.
+ *  - rawEnvelope:  don't unwrap the `{data: …}` envelope (needed when the
+ *                  sibling fields matter, e.g. DELETE /e-levels returns
+ *                  {deleted, archived, data, ref_count}).
+ *  - rawError:     surface the server's {error:{code,message}} verbatim
+ *                  instead of the canned per-status copy, and don't
+ *                  auto-retry 5xx (the caller offers an explicit retry).
+ */
+interface RequestOpts {
+	skipCache?: boolean;
+	rawEnvelope?: boolean;
+	rawError?: boolean;
 }
 
 export class EmraldAPIClient {
@@ -62,12 +85,12 @@ export class EmraldAPIClient {
 		});
 	}
 
-	private async request<T>(method: string, path: string, body?: unknown, opts?: { skipCache?: boolean }): Promise<APIResponse<T>> {
+	private async request<T>(method: string, path: string, body?: unknown, opts?: RequestOpts): Promise<APIResponse<T>> {
 		if (!this.isConfigured()) {
 			return { data: null, error: 'API key not configured', status: 0 };
 		}
 
-		const result = await this.requestWithRetry<T>(method, path, body, 0);
+		const result = await this.requestWithRetry<T>(method, path, body, 0, opts);
 
 		// On successful GET, cache the response
 		if (method === 'GET' && result.data !== null && this.dataCache && !opts?.skipCache) {
@@ -94,7 +117,7 @@ export class EmraldAPIClient {
 		return result;
 	}
 
-	private async requestWithRetry<T>(method: string, path: string, body: unknown, attempt: number): Promise<APIResponse<T>> {
+	private async requestWithRetry<T>(method: string, path: string, body: unknown, attempt: number, opts?: RequestOpts): Promise<APIResponse<T>> {
 		// Fast-path: if we already know we're offline, skip the network attempt for writes
 		if (this.offlineQueue && !this.offlineQueue.isOnline && method !== 'GET') {
 			this.offlineQueue.enqueue(method, path, body, `${method} ${path}`);
@@ -110,6 +133,12 @@ export class EmraldAPIClient {
 					'Authorization': `ApiKey ${this.apiKey}`
 				}
 			};
+
+			// rawError callers need the response body, not a thrown Error, so the
+			// {error:{code,message}} envelope survives to the UI.
+			if (opts?.rawError) {
+				params.throw = false;
+			}
 
 			if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
 				params.body = JSON.stringify(body);
@@ -141,11 +170,26 @@ export class EmraldAPIClient {
 
 				// Unwrap API envelope: many endpoints return { data: <payload>, total?, limit?, offset? }
 				// Extract the inner .data so callers get the actual payload directly.
+				// rawEnvelope callers opt out because the sibling fields carry meaning.
 				let payload: unknown = response.json;
-				if (payload && typeof payload === 'object' && 'data' in payload && !Array.isArray(payload)) {
+				if (!opts?.rawEnvelope && payload && typeof payload === 'object' && 'data' in payload && !Array.isArray(payload)) {
 					payload = (payload as Record<string, unknown>).data;
 				}
 				return { data: payload as T, error: null, status: response.status };
+			}
+
+			// ── rawError: hand the server envelope straight back ──
+			// Deliberately ahead of the canned per-status copy below, and without
+			// the 5xx auto-retry: 503 REF_COUNT_UNAVAILABLE is a "try again"
+			// the user drives, not something to burn 7s of backoff on.
+			if (opts?.rawError) {
+				const envelope = this.extractErrorEnvelope(response);
+				return {
+					data: null,
+					error: envelope.message,
+					errorCode: envelope.code,
+					status: response.status
+				};
 			}
 
 			// ── Client Errors (4xx) ─────────────────────
@@ -188,7 +232,7 @@ export class EmraldAPIClient {
 
 				if (attempt < 4) {
 					await this.delay(delayMs);
-					return this.requestWithRetry<T>(method, path, body, attempt + 1);
+					return this.requestWithRetry<T>(method, path, body, attempt + 1, opts);
 				}
 
 				return {
@@ -204,7 +248,7 @@ export class EmraldAPIClient {
 				if (attempt < 3) {
 					const delayMs = 1000 * Math.pow(2, attempt); // 1s, 2s, 4s
 					await this.delay(delayMs);
-					return this.requestWithRetry<T>(method, path, body, attempt + 1);
+					return this.requestWithRetry<T>(method, path, body, attempt + 1, opts);
 				}
 
 				return {
@@ -492,6 +536,38 @@ export class EmraldAPIClient {
 			return response.text || '';
 		} catch { /* non-fatal */
 			return '';
+		}
+	}
+
+	/**
+	 * Parse the API's `{error:{code,message}}` envelope. Falls back through the
+	 * looser shapes older routes use so a rawError caller always gets something
+	 * printable. Never throws.
+	 */
+	private extractErrorEnvelope(response: RequestUrlResponse): { code: string | null; message: string } {
+		const fallback = `HTTP ${response.status}`;
+		try {
+			const json: unknown = response.json;
+			if (json && typeof json === 'object') {
+				const bag = json as Record<string, unknown>;
+				const err = bag.error;
+				if (err && typeof err === 'object') {
+					const inner = err as Record<string, unknown>;
+					return {
+						code: typeof inner.code === 'string' ? inner.code : null,
+						message: typeof inner.message === 'string' && inner.message ? inner.message : fallback
+					};
+				}
+				if (typeof bag.message === 'string' && bag.message) {
+					return { code: typeof bag.code === 'string' ? bag.code : null, message: bag.message };
+				}
+				if (typeof err === 'string' && err) {
+					return { code: null, message: err };
+				}
+			}
+			return { code: null, message: response.text || fallback };
+		} catch { /* non-fatal */
+			return { code: null, message: fallback };
 		}
 	}
 
@@ -881,6 +957,47 @@ export class EmraldAPIClient {
 		return this.request('GET', '/notifications?status=pending');
 	}
 
+	// ── Custom E-Levels ──────────────────────────────────
+	// The `effort_level` field on items accepts and returns 'E1'..'E4' or
+	// 'EC:<uuid>' — the storage duality is invisible to this client. All five
+	// methods use rawError so the UI can branch on PERCENT_LOCKED / CONFLICT /
+	// REF_COUNT_UNAVAILABLE / PRO_REQUIRED instead of canned per-status copy.
+
+	/**
+	 * List the user's custom levels, archived rows included (archived_at
+	 * non-null) — historical assignments still need to resolve to a name.
+	 * Sorted percent ascending by the server.
+	 *
+	 * NOTE: the response's sibling `built_in` map is dropped by the envelope
+	 * unwrap. The built-in percents are frozen constants (25/50/75/100) and
+	 * live in src/e-levels.ts, so nothing reads them off the wire.
+	 */
+	async listELevels(): Promise<APIResponse<CustomELevel[]>> {
+		return this.request('GET', '/e-levels', undefined, { skipCache: true, rawError: true });
+	}
+
+	async createELevel(name: string, percent: number): Promise<APIResponse<CustomELevel>> {
+		return this.request('POST', '/e-levels', { name, percent }, { rawError: true });
+	}
+
+	async renameELevel(id: string, name: string): Promise<APIResponse<CustomELevel>> {
+		return this.request('PATCH', `/e-levels/${id}`, { name }, { rawError: true });
+	}
+
+	async changeELevelPercent(id: string, percent: number): Promise<APIResponse<CustomELevel>> {
+		return this.request('PATCH', `/e-levels/${id}`, { percent }, { rawError: true });
+	}
+
+	/**
+	 * One client intent — "remove". The server decides hard delete vs archive
+	 * based on whether anything references the level; the result says which
+	 * happened so the notice can reflect it. rawEnvelope because the
+	 * deleted/archived/ref_count siblings carry the answer.
+	 */
+	async deleteELevel(id: string): Promise<APIResponse<ELevelRemoveResult>> {
+		return this.request('DELETE', `/e-levels/${id}`, undefined, { rawError: true, rawEnvelope: true });
+	}
+
 	// ── Export ───────────────────────────────────────────────
 
 	async exportData(): Promise<APIResponse<Record<string, unknown>>> {
@@ -890,12 +1007,45 @@ export class EmraldAPIClient {
 
 // ── Type Definitions ────────────────────────────────────────
 
+/**
+ * A user-created effort level. `ref` is the string form used in the single
+ * `effort_level` field ('EC:<uuid>'); `ref_count` is how many items reference
+ * it — null means "unknown", which the UI must treat as "assume referenced".
+ * Archived levels (archived_at non-null) are still returned so historical
+ * assignments resolve to a name.
+ */
+export interface CustomELevel {
+	id: string;
+	name: string;
+	percent: number;
+	created_at: string;
+	archived_at: string | null;
+	ref: string;
+	ref_count: number | null;
+}
+
+/**
+ * DELETE /v1/e-levels/:id — the server picks hard delete vs archive.
+ * deleted:true/archived:false carries `id`; deleted:false/archived:true
+ * carries the archived `data` row.
+ */
+export interface ELevelRemoveResult {
+	deleted: boolean;
+	archived: boolean;
+	id?: string;
+	data?: CustomELevel;
+	ref_count: number | null;
+}
+
 export interface TrackedItem {
 	id: string;
 	user_id: string;
 	name: string;
 	status: 'active' | 'paused' | 'completed' | 'abandoned';
-	effort_level: 'E1' | 'E2' | 'E3' | 'E4';
+	// Level ref: 'E1'|'E2'|'E3'|'E4' or 'EC:<uuid>' for a custom level.
+	// Widened from the narrow built-in union for custom e-levels; resolve it
+	// through src/e-levels.ts (never render a raw 'EC:<uuid>').
+	effort_level: string;
 	area_id: string | null;
 	obsidian_note_path: string | null;
 	multi_day?: boolean; // SEQ-3 gateway (migration 012). Absent on API responses from pre-012 servers.
@@ -918,7 +1068,9 @@ export interface Label {
 
 export interface CreateItemPayload {
 	name: string;
-	effort_level: 'E1' | 'E2' | 'E3' | 'E4';
+	// 'E1'|'E2'|'E3'|'E4' or 'EC:<uuid>'. Server rejects with 400 INVALID_LEVEL
+	// or 400 LEVEL_ARCHIVED.
+	effort_level: string;
 	status?: 'active' | 'paused' | 'completed' | 'abandoned';
 	area_id?: string;
 	obsidian_note_path?: string;

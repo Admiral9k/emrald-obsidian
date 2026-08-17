@@ -5,6 +5,7 @@
 
 import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
+import { levelDisplayName, prescribedMinutes } from '../e-levels';
 
 export class CelebrationModal extends Modal {
 	private plugin: EmraldPlugin;
@@ -75,17 +76,18 @@ export class CelebrationModal extends Modal {
 	}
 
 	private getBudgetContext(): string {
-		const eLevelPercent: Record<string, number> = {
-			E1: 0.25, E2: 0.50, E3: 0.75, E4: 1.00
-		};
-		const percent = eLevelPercent[this.effortLevel] ?? 0.5;
-		const prescribedMin = this.availableHours * 60 * percent;
-		const percentUsed = Math.round((this.sessionMinutes / prescribedMin) * 100);
+		// Percent comes from the resolver so a custom level gets a real budget
+		// instead of the 50% fallback. Prose uses the level's name, never the ref.
+		const prescribedMin = prescribedMinutes(this.effortLevel, this.availableHours);
+		const levelName = levelDisplayName(this.effortLevel) || 'effort';
+		const percentUsed = prescribedMin > 0
+			? Math.round((this.sessionMinutes / prescribedMin) * 100)
+			: 0;
 
 		if (percentUsed >= 100) {
-			return `That session covered your full ${this.effortLevel} budget for ${this.itemName} today. Well spent.`;
+			return `That session covered your full ${levelName} budget for ${this.itemName} today. Well spent.`;
 		} else {
-			return `That's ${percentUsed}% of your ${this.effortLevel} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
+			return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
 		}
 	}
 
