@@ -294,9 +294,8 @@ export class EmraldSidebarView extends ItemView {
 			// view is still available for the user to check manually).
 			if (stored.shown >= BURNOUT_MAX_MODALS_PER_EPISODE) return;
 
-			const factors = Array.isArray(burnoutState?.contributing_factors)
-				? burnoutState!.contributing_factors
-				: [];
+			const rawFactors = burnoutState?.contributing_factors;
+			const factors = Array.isArray(rawFactors) ? rawFactors : [];
 			const variant: 'first' | 'followup' = stored.shown === 0 ? 'first' : 'followup';
 
 			// Count this surfacing immediately, before opening the modal, so a hard refresh

@@ -9913,7 +9913,8 @@ var EmraldSidebarView = class extends import_obsidian31.ItemView {
         return;
       if (stored.shown >= BURNOUT_MAX_MODALS_PER_EPISODE)
         return;
-      const factors = Array.isArray(burnoutState == null ? void 0 : burnoutState.contributing_factors) ? burnoutState.contributing_factors : [];
+      const rawFactors = burnoutState == null ? void 0 : burnoutState.contributing_factors;
+      const factors = Array.isArray(rawFactors) ? rawFactors : [];
       const variant = stored.shown === 0 ? "first" : "followup";
       stored.shown += 1;
       settingsRec._burnoutEpisode = stored;
