@@ -711,6 +711,16 @@ export class EmraldAPIClient {
 		return this.request('GET', '/burnout/history');
 	}
 
+	/** Acknowledge the current burnout warning (no body — server stamps last_warning_at). */
+	async acknowledgeBurnout(): Promise<APIResponse<BurnoutState>> {
+		return this.request('POST', '/burnout/acknowledge');
+	}
+
+	/** Snooze the burnout warning for `days` (server default 3 if omitted). */
+	async snoozeBurnout(days: number = 3): Promise<APIResponse<BurnoutState>> {
+		return this.request('POST', '/burnout/snooze', { days });
+	}
+
 	// ── Recovery ─────────────────────────────────────────
 
 	async getRecoveryProtocols(opts?: { skipCache?: boolean }): Promise<APIResponse<RecoveryProtocol[]>> {

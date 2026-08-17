@@ -1791,6 +1791,54 @@ var init_onboarding = __esm({
   }
 });
 
+// src/utils/icons.ts
+function createIconEl(parent, iconId, cls) {
+  const span = parent.createSpan({ cls: cls || "emerald-icon" });
+  (0, import_obsidian7.setIcon)(span, iconId);
+  return span;
+}
+var import_obsidian7, ICONS;
+var init_icons = __esm({
+  "src/utils/icons.ts"() {
+    import_obsidian7 = require("obsidian");
+    ICONS = {
+      // Sidebar sections
+      gem: "gem",
+      timer: "timer",
+      barChart: "bar-chart-2",
+      trendingUp: "trending-up",
+      lightbulb: "lightbulb",
+      user: "user",
+      flame: "flame",
+      clipboardList: "clipboard-list",
+      folder: "folder",
+      folderOpen: "folder-open",
+      target: "target",
+      zap: "zap",
+      sparkles: "sparkles",
+      sun: "sun",
+      link: "link",
+      // Actions
+      play: "play",
+      pause: "pause",
+      square: "square",
+      // stop
+      pencil: "pencil",
+      checkCircle: "check-circle",
+      x: "x",
+      plus: "plus",
+      chevronRight: "chevron-right",
+      chevronDown: "chevron-down",
+      // Status
+      circle: "circle",
+      // generic dot
+      alertTriangle: "alert-triangle",
+      info: "info",
+      refresh: "refresh-cw"
+    };
+  }
+});
+
 // src/modals/effort-profile.ts
 var effort_profile_exports = {};
 __export(effort_profile_exports, {
@@ -3212,16 +3260,124 @@ var init_welcome_back = __esm({
   }
 });
 
+// src/modals/burnout-warning.ts
+var burnout_warning_exports = {};
+__export(burnout_warning_exports, {
+  BurnoutWarningModal: () => BurnoutWarningModal
+});
+var import_obsidian24, BurnoutWarningModal;
+var init_burnout_warning = __esm({
+  "src/modals/burnout-warning.ts"() {
+    import_obsidian24 = require("obsidian");
+    init_icons();
+    BurnoutWarningModal = class extends import_obsidian24.Modal {
+      constructor(app, plugin, opts, onAction) {
+        var _a, _b, _c;
+        super(app);
+        this.plugin = plugin;
+        this.message = opts.message;
+        this.contributingFactors = (_a = opts.contributingFactors) != null ? _a : [];
+        this.burnoutPhase = (_b = opts.burnoutPhase) != null ? _b : "yellow";
+        this.variant = (_c = opts.variant) != null ? _c : "first";
+        this.onAction = onAction;
+      }
+      onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.addClass("emerald-modal", "emerald-burnout-modal", `emerald-burnout-${this.burnoutPhase}`);
+        contentEl.setAttribute("role", "alertdialog");
+        contentEl.setAttribute("aria-labelledby", "emerald-burnout-title");
+        contentEl.setAttribute("aria-describedby", "emerald-burnout-desc");
+        const header = contentEl.createDiv({ cls: "emerald-burnout-header" });
+        createIconEl(header, ICONS.flame, "emerald-burnout-icon");
+        const titleEl = header.createEl("h2", { text: this.phaseTitle() });
+        titleEl.id = "emerald-burnout-title";
+        const msgEl = contentEl.createEl("p", { cls: "emerald-burnout-message", text: this.message });
+        msgEl.id = "emerald-burnout-desc";
+        if (this.variant === "first" && this.contributingFactors.length > 0) {
+          const factorsEl = contentEl.createDiv({ cls: "emerald-burnout-factors" });
+          factorsEl.createDiv({ cls: "emerald-burnout-factors-label", text: "What's contributing:" });
+          const list = factorsEl.createEl("ul", { cls: "emerald-burnout-factors-list" });
+          for (const factor of this.contributingFactors) {
+            list.createEl("li", { text: factor });
+          }
+        }
+        const suggestion = contentEl.createDiv({ cls: "emerald-burnout-suggestion" });
+        suggestion.createEl("p", {
+          text: this.phaseSuggestion()
+        });
+        const actions = contentEl.createDiv({ cls: "emerald-modal-actions emerald-burnout-actions" });
+        const breakBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-primary emerald-btn-warm",
+          text: "Take a break",
+          attr: { "aria-label": "Take a break" }
+        });
+        breakBtn.addEventListener("click", () => {
+          this.onAction("take_break");
+          this.close();
+        });
+        const okayBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-secondary",
+          text: "I'm okay",
+          attr: { "aria-label": "I'm okay" }
+        });
+        okayBtn.addEventListener("click", () => {
+          this.onAction("im_okay");
+          this.close();
+        });
+        const snoozeBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-subtle",
+          text: "Snooze for today",
+          attr: { "aria-label": "Snooze burnout warning for today" }
+        });
+        snoozeBtn.addEventListener("click", () => {
+          this.onAction("snooze");
+          this.close();
+        });
+      }
+      phaseTitle() {
+        if (this.variant === "followup")
+          return "Checking back in";
+        switch (this.burnoutPhase) {
+          case "yellow":
+            return "Hey \u2014 just checking in";
+          case "orange":
+            return "You're pushing pretty hard";
+          case "red":
+            return "You need to stop";
+          default:
+            return "Burnout Warning";
+        }
+      }
+      phaseSuggestion() {
+        switch (this.burnoutPhase) {
+          case "yellow":
+            return "Your effort levels have been creeping up. Maybe ease off a bit today?";
+          case "orange":
+            return "You've been running hot for a while now. A real break \u2014 not just a pause \u2014 would do you good.";
+          case "red":
+            return "This isn't sustainable. Step away. The work will be there tomorrow, but you need to be too.";
+          default:
+            return "Consider taking a break.";
+        }
+      }
+      onClose() {
+        this.contentEl.empty();
+      }
+    };
+  }
+});
+
 // src/modals/effort-receipt.ts
 var effort_receipt_exports = {};
 __export(effort_receipt_exports, {
   EffortReceiptModal: () => EffortReceiptModal
 });
-var import_obsidian24, EffortReceiptModal;
+var import_obsidian25, EffortReceiptModal;
 var init_effort_receipt = __esm({
   "src/modals/effort-receipt.ts"() {
-    import_obsidian24 = require("obsidian");
-    EffortReceiptModal = class extends import_obsidian24.Modal {
+    import_obsidian25 = require("obsidian");
+    EffortReceiptModal = class extends import_obsidian25.Modal {
       constructor(app, plugin, opts, onSubmit) {
         var _a, _b;
         super(app);
@@ -3457,11 +3613,11 @@ var celebration_exports = {};
 __export(celebration_exports, {
   CelebrationModal: () => CelebrationModal
 });
-var import_obsidian25, CelebrationModal;
+var import_obsidian26, CelebrationModal;
 var init_celebration = __esm({
   "src/modals/celebration.ts"() {
-    import_obsidian25 = require("obsidian");
-    CelebrationModal = class extends import_obsidian25.Modal {
+    import_obsidian26 = require("obsidian");
+    CelebrationModal = class extends import_obsidian26.Modal {
       constructor(app, plugin, opts) {
         var _a;
         super(app);
@@ -3538,11 +3694,11 @@ var close_day_exports = {};
 __export(close_day_exports, {
   CloseDayModal: () => CloseDayModal
 });
-var import_obsidian26, CloseDayModal;
+var import_obsidian27, CloseDayModal;
 var init_close_day = __esm({
   "src/modals/close-day.ts"() {
-    import_obsidian26 = require("obsidian");
-    CloseDayModal = class extends import_obsidian26.Modal {
+    import_obsidian27 = require("obsidian");
+    CloseDayModal = class extends import_obsidian27.Modal {
       constructor(app, plugin, summary, onConfirm) {
         super(app);
         this.plugin = plugin;
@@ -3624,12 +3780,12 @@ var hour_override_exports = {};
 __export(hour_override_exports, {
   HourOverrideModal: () => HourOverrideModal
 });
-var import_obsidian27, DAY_NAMES, HourOverrideModal;
+var import_obsidian28, DAY_NAMES, HourOverrideModal;
 var init_hour_override = __esm({
   "src/modals/hour-override.ts"() {
-    import_obsidian27 = require("obsidian");
+    import_obsidian28 = require("obsidian");
     DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    HourOverrideModal = class extends import_obsidian27.Modal {
+    HourOverrideModal = class extends import_obsidian28.Modal {
       constructor(app, plugin, currentHours, baseScheduleHours, onSubmit) {
         super(app);
         this.plugin = plugin;
@@ -3715,11 +3871,11 @@ var new_project_exports = {};
 __export(new_project_exports, {
   NewProjectModal: () => NewProjectModal
 });
-var import_obsidian28, NewProjectModal;
+var import_obsidian29, NewProjectModal;
 var init_new_project = __esm({
   "src/modals/new-project.ts"() {
-    import_obsidian28 = require("obsidian");
-    NewProjectModal = class extends import_obsidian28.Modal {
+    import_obsidian29 = require("obsidian");
+    NewProjectModal = class extends import_obsidian29.Modal {
       constructor(app, plugin, onSubmit, availableHours = 4) {
         super(app);
         this.nameInput = null;
@@ -3759,7 +3915,7 @@ var init_new_project = __esm({
             var _a, _b, _c;
             const name = (_b = (_a = this.nameInput) == null ? void 0 : _a.value.trim()) != null ? _b : "";
             if (!name) {
-              new import_obsidian28.Notice("Project name is required");
+              new import_obsidian29.Notice("Project name is required");
               (_c = this.nameInput) == null ? void 0 : _c.focus();
               return;
             }
@@ -3786,11 +3942,11 @@ var elevel_exports = {};
 __export(elevel_exports, {
   ELevelModal: () => ELevelModal
 });
-var import_obsidian29, ELevelModal;
+var import_obsidian30, ELevelModal;
 var init_elevel = __esm({
   "src/modals/elevel.ts"() {
-    import_obsidian29 = require("obsidian");
-    ELevelModal = class extends import_obsidian29.Modal {
+    import_obsidian30 = require("obsidian");
+    ELevelModal = class extends import_obsidian30.Modal {
       constructor(app, plugin, itemName, currentLevel, availableHours, onSubmit) {
         super(app);
         this.plugin = plugin;
@@ -3850,7 +4006,7 @@ __export(main_exports, {
   default: () => EmraldPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian34 = require("obsidian");
+var import_obsidian35 = require("obsidian");
 
 // src/settings.ts
 var import_obsidian6 = require("obsidian");
@@ -4040,52 +4196,10 @@ var EmraldSettingTab = class extends import_obsidian6.PluginSettingTab {
 };
 
 // src/views/sidebar.ts
-var import_obsidian30 = require("obsidian");
-
-// src/utils/icons.ts
-var import_obsidian7 = require("obsidian");
-function createIconEl(parent, iconId, cls) {
-  const span = parent.createSpan({ cls: cls || "emerald-icon" });
-  (0, import_obsidian7.setIcon)(span, iconId);
-  return span;
-}
-var ICONS = {
-  // Sidebar sections
-  gem: "gem",
-  timer: "timer",
-  barChart: "bar-chart-2",
-  trendingUp: "trending-up",
-  lightbulb: "lightbulb",
-  user: "user",
-  flame: "flame",
-  clipboardList: "clipboard-list",
-  folder: "folder",
-  folderOpen: "folder-open",
-  target: "target",
-  zap: "zap",
-  sparkles: "sparkles",
-  sun: "sun",
-  link: "link",
-  // Actions
-  play: "play",
-  pause: "pause",
-  square: "square",
-  // stop
-  pencil: "pencil",
-  checkCircle: "check-circle",
-  x: "x",
-  plus: "plus",
-  chevronRight: "chevron-right",
-  chevronDown: "chevron-down",
-  // Status
-  circle: "circle",
-  // generic dot
-  alertTriangle: "alert-triangle",
-  info: "info",
-  refresh: "refresh-cw"
-};
+var import_obsidian31 = require("obsidian");
 
 // src/components/timeblock.ts
+init_icons();
 var E_LEVEL_PERCENT = {
   E1: 0.25,
   E2: 0.5,
@@ -5334,6 +5448,7 @@ You can embed a live-updating link from any note:
 }
 
 // src/components/em.ts
+init_icons();
 init_tier();
 
 // src/views/workspace-views.ts
@@ -9536,7 +9651,9 @@ function buildNotePathMap(app) {
 
 // src/views/sidebar.ts
 var VIEW_TYPE_EMRALD = "emrald-sidebar";
-var EmraldSidebarView = class extends import_obsidian30.ItemView {
+var BURNOUT_SNOOZE_DAYS = 3;
+var BURNOUT_MAX_MODALS_PER_EPISODE = 2;
+var EmraldSidebarView = class extends import_obsidian31.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.timeblock = null;
@@ -9614,6 +9731,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     container.empty();
     this.renderSidebar(container);
     void this.checkWelcomeBack();
+    void this.checkBurnoutWatcher();
   }
   async onClose() {
     await super.onClose();
@@ -9680,6 +9798,125 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       await this.plugin.saveData(this.plugin.settings);
     } catch (e) {
       console.warn("[EMRALD] Welcome-back check failed:", e);
+    }
+  }
+  /**
+   * Burnout watcher — plugin-side port of Emrald-freed's src/lib/BurnoutWatcher.svelte.
+   * Called on every sidebar refresh cycle (rides the same onOpen() triggers as
+   * checkWelcomeBack: manual refresh, midnight rollover, reconnect — no new timer added).
+   *
+   * Episode rules (mirrors web exactly):
+   *  - green resolves/clears any tracked episode (episode has ended); no modal.
+   *  - yellow is ambient-only; no modal.
+   *  - orange/red are modal-worthy. Episode identity prefers the latest unresolved
+   *    server-side episode (GET /burnout/history); falls back to the previously stored
+   *    episode id, or synthesizes one from today's local date if there's no history yet.
+   *    A NEW episode id (vs. what's stored) resets shown=0/snoozedUntil=null — that's the
+   *    "entering an episode" boundary.
+   *  - Snooze (3 days) and the 2-modals-per-episode cap are both respected before showing.
+   *  - The "shown" counter is incremented and persisted BEFORE the modal opens (not on
+   *    dismiss), so a hard refresh mid-modal can't re-trigger past the cap — same ordering
+   *    web uses in its writeEpisode() call.
+   *
+   * Persistence: episode/snooze state lives in plugin settings under `_burnoutEpisode`
+   * (the localStorage equivalent — same untyped-settings pattern as _welcomeBackShownDate).
+   */
+  async checkBurnoutWatcher() {
+    var _a, _b, _c, _d, _e, _f;
+    try {
+      if (!this.plugin.settings.onboardingComplete)
+        return;
+      const [stateResp, metricsResp, historyResp] = await Promise.all([
+        this.plugin.apiClient.getBurnoutState(),
+        this.plugin.apiClient.getMetrics(["D8"]),
+        this.plugin.apiClient.getBurnoutHistory()
+      ]);
+      const burnoutState = (_a = stateResp.data) != null ? _a : null;
+      const d8 = (_d = (_c = (_b = metricsResp.data) == null ? void 0 : _b.find((m) => m.metric_key === "D8")) == null ? void 0 : _c.value) != null ? _d : null;
+      const episodes = (_e = historyResp.data) != null ? _e : [];
+      const phase = this.deriveBurnoutPhase(burnoutState, d8);
+      const settingsRec = this.plugin.settings;
+      if (phase === "green") {
+        if (settingsRec._burnoutEpisode) {
+          delete settingsRec._burnoutEpisode;
+          await this.plugin.saveData(this.plugin.settings);
+        }
+        return;
+      }
+      if (phase === "yellow")
+        return;
+      const p = phase;
+      const unresolved = episodes.filter((e) => !e.resolved_at && e.started_at).map((e) => e.started_at).sort().pop();
+      let stored = settingsRec._burnoutEpisode;
+      const episodeId = (_f = unresolved != null ? unresolved : stored == null ? void 0 : stored.episodeId) != null ? _f : `synthetic-${(/* @__PURE__ */ new Date()).toLocaleDateString("en-CA")}`;
+      if (!stored || stored.episodeId !== episodeId) {
+        stored = { episodeId, shown: 0, snoozedUntil: null };
+      }
+      if (stored.snoozedUntil && Date.now() < stored.snoozedUntil)
+        return;
+      if (stored.shown >= BURNOUT_MAX_MODALS_PER_EPISODE)
+        return;
+      const factors = Array.isArray(burnoutState == null ? void 0 : burnoutState.contributing_factors) ? burnoutState.contributing_factors : [];
+      const variant = stored.shown === 0 ? "first" : "followup";
+      stored.shown += 1;
+      settingsRec._burnoutEpisode = stored;
+      await this.plugin.saveData(this.plugin.settings);
+      const episodeSnapshot = stored;
+      const { BurnoutWarningModal: BurnoutWarningModal2 } = await Promise.resolve().then(() => (init_burnout_warning(), burnout_warning_exports));
+      const modal = new BurnoutWarningModal2(
+        this.app,
+        this.plugin,
+        {
+          message: this.burnoutLede(p, variant),
+          contributingFactors: factors,
+          burnoutPhase: p,
+          variant
+        },
+        (action) => void this.handleBurnoutAction(action, episodeSnapshot)
+      );
+      modal.open();
+    } catch (e) {
+      console.warn("[EMRALD] Burnout watcher check failed:", e);
+    }
+  }
+  /** Same D8 thresholds used by the Burnout Monitor workspace view / web's derivePhase(). */
+  deriveBurnoutPhase(state, d8) {
+    if (state == null ? void 0 : state.current_phase)
+      return state.current_phase;
+    if (d8 === null)
+      return "green";
+    if (d8 >= 7)
+      return "red";
+    if (d8 >= 5)
+      return "orange";
+    if (d8 >= 3)
+      return "yellow";
+    return "green";
+  }
+  /** Mirrors BurnoutWarningModal.svelte's lede() copy. */
+  burnoutLede(phase, variant) {
+    if (variant === "followup") {
+      return "It's been a few days since we flagged this, and the patterns haven't shifted much. No pressure \u2014 just want to make sure this is on your radar, not in your blind spot.";
+    }
+    return phase === "red" ? "Your recent patterns are showing real strain. This doesn't mean something is wrong \u2014 it means your engine's been running hot, and that's worth paying attention to." : "Over the past stretch, a few of your patterns are showing some strain. Nothing alarming \u2014 just your engine running warmer than usual.";
+  }
+  /**
+   * Handle a Burnout Warning Modal action. 'take_break' and 'im_okay' both count as
+   * acknowledging the warning (dismiss), matching web semantics; 'snooze' persists a
+   * 3-day snooze locally and syncs both via the API.
+   */
+  async handleBurnoutAction(action, episode) {
+    try {
+      if (action === "snooze") {
+        episode.snoozedUntil = Date.now() + BURNOUT_SNOOZE_DAYS * 24 * 60 * 60 * 1e3;
+        this.plugin.settings._burnoutEpisode = episode;
+        await this.plugin.saveData(this.plugin.settings);
+        void this.plugin.apiClient.snoozeBurnout(BURNOUT_SNOOZE_DAYS);
+      } else {
+        void this.plugin.apiClient.acknowledgeBurnout();
+      }
+    } catch (e) {
+      console.warn("[EMRALD] Burnout action failed:", e);
     }
   }
   renderLoading(container) {
@@ -9752,7 +9989,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian30.setIcon)(iconEl, "timer");
+    (0, import_obsidian31.setIcon)(iconEl, "timer");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: dayLabel });
     const content = section.createDiv({ cls: "emerald-section-content" });
@@ -9801,7 +10038,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian30.setIcon)(iconEl, "folder");
+    (0, import_obsidian31.setIcon)(iconEl, "folder");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: "Projects" });
     const addBtn = header.createSpan({ cls: "emerald-section-action", text: "+ add" });
@@ -9810,7 +10047,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     addBtn.tabIndex = 0;
     addBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      const menu = new import_obsidian30.Menu();
+      const menu = new import_obsidian31.Menu();
       menu.addItem(
         (i) => i.setTitle("+ new project").setIcon("file-plus").onClick(() => {
           void this.handleAddNewProject();
@@ -9873,7 +10110,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian30.setIcon)(iconEl, "bar-chart-2");
+    (0, import_obsidian31.setIcon)(iconEl, "bar-chart-2");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: "Effort management" });
     const content = section.createDiv({ cls: "emerald-section-content" });
@@ -9970,10 +10207,10 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
               if (discardResp.error && !discardResp.queued) {
                 console.warn("[EMRALD] Failed to discard stale session:", discardResp.error);
               }
-              new import_obsidian30.Notice(discardResp.queued ? "Stale session queued for discard \u2014 will sync when online." : "Discarded a stale session from yesterday.");
+              new import_obsidian31.Notice(discardResp.queued ? "Stale session queued for discard \u2014 will sync when online." : "Discarded a stale session from yesterday.");
             } catch (e) {
               console.error("[EMRALD] Error discarding stale session:", e);
-              new import_obsidian30.Notice("Found a stale session but could not discard it \u2014 try refreshing.");
+              new import_obsidian31.Notice("Found a stale session but could not discard it \u2014 try refreshing.");
             }
             return;
           }
@@ -10031,19 +10268,19 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
   // ── Session Handlers ────────────────────────────────────
   handleStartSessionRequest() {
     if (!this.projects) {
-      new import_obsidian30.Notice("No projects loaded yet.");
+      new import_obsidian31.Notice("No projects loaded yet.");
       console.warn("[EMRALD] Start button: projects component is null");
       return;
     }
     const activeItems = this.projects.state.items.filter((i) => i.status === "active");
     if (activeItems.length === 0) {
-      new import_obsidian30.Notice("No active projects. Add one first.");
+      new import_obsidian31.Notice("No active projects. Add one first.");
       return;
     }
     const handleStart = (item) => {
       void this.handleStartSession(item);
     };
-    class ProjectPickerModal extends import_obsidian30.FuzzySuggestModal {
+    class ProjectPickerModal extends import_obsidian31.FuzzySuggestModal {
       getItems() {
         return activeItems;
       }
@@ -10096,7 +10333,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
         const payload = body;
         return (payload == null ? void 0 : payload.item_id) === item.id;
       })) {
-        new import_obsidian30.Notice(`Session start already queued for ${item.name}. Reconnect to sync it.`);
+        new import_obsidian31.Notice(`Session start already queued for ${item.name}. Reconnect to sync it.`);
         return;
       }
       const resp = await this.plugin.apiClient.startSession(item.id);
@@ -10107,11 +10344,11 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
           this.projects.updateState({ activeSessionItemId: item.id });
         }
         await this.persistProvisionalSession();
-        new import_obsidian30.Notice(`Offline \u2014 session started locally for ${item.name}. It will sync when you're back online.`);
+        new import_obsidian31.Notice(`Offline \u2014 session started locally for ${item.name}. It will sync when you're back online.`);
         return;
       }
       if (resp.error || !resp.data) {
-        new import_obsidian30.Notice(`Failed to start session: ${resp.error}`);
+        new import_obsidian31.Notice(`Failed to start session: ${resp.error}`);
         return;
       }
       this._loadingTodayData = false;
@@ -10121,7 +10358,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       if (this.projects) {
         this.projects.updateState({ activeSessionItemId: item.id });
       }
-      new import_obsidian30.Notice(`Session started: ${item.name}`);
+      new import_obsidian31.Notice(`Session started: ${item.name}`);
     } finally {
       this._startingSession = false;
     }
@@ -10138,7 +10375,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       if (session.isPendingSync)
         await this.persistProvisionalSession();
     } else {
-      new import_obsidian30.Notice(`Failed to pause: ${resp.error}`);
+      new import_obsidian31.Notice(`Failed to pause: ${resp.error}`);
     }
   }
   async handleResumeSession() {
@@ -10178,7 +10415,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
               var _a2, _b2, _c2, _d2, _e, _f;
               if (action === "discard") {
                 await this.plugin.apiClient.discardSession(session.sessionId);
-                new import_obsidian30.Notice("Runaway session discarded \u2014 no data recorded.");
+                new import_obsidian31.Notice("Runaway session discarded \u2014 no data recorded.");
                 (_a2 = this.timeblock) == null ? void 0 : _a2.stopSession();
                 if (this.projects) {
                   this.projects.updateState({ activeSessionItemId: null });
@@ -10210,7 +10447,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
                     void (async () => {
                       const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
                       if (!resp.error || resp.queued) {
-                        new import_obsidian30.Notice(resp.queued ? "Receipt queued \u2014 will sync when online" : "Session recorded");
+                        new import_obsidian31.Notice(resp.queued ? "Receipt queued \u2014 will sync when online" : "Session recorded");
                         void this.loadTodayData();
                         void this.loadProjects();
                         await this.updateFrontmatterStats(session.itemId);
@@ -10231,9 +10468,9 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       if (stopResp.error && !stopResp.queued) {
         if (stopResp.status === 400 || stopResp.status === 404) {
           console.warn(`[EMRALD] Stop returned ${stopResp.status} \u2014 clearing local state anyway:`, stopResp.error);
-          new import_obsidian30.Notice("Session may have already ended \u2014 clearing local state.");
+          new import_obsidian31.Notice("Session may have already ended \u2014 clearing local state.");
         } else {
-          new import_obsidian30.Notice(`Failed to stop session: ${stopResp.error}`);
+          new import_obsidian31.Notice(`Failed to stop session: ${stopResp.error}`);
           return;
         }
       }
@@ -10244,11 +10481,11 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       await this.loadTodayData();
       void this.clearPersistedProvisionalSession();
       if (stopResp.queued) {
-        new import_obsidian30.Notice(`Session stopped locally \u2014 will sync when online.`);
+        new import_obsidian31.Notice(`Session stopped locally \u2014 will sync when online.`);
       }
       const MIN_RECEIPT_MINUTES = 5;
       if (sessionMinutes < MIN_RECEIPT_MINUTES) {
-        new import_obsidian30.Notice(`Session too short for receipt (${Math.round(sessionMinutes)}m < ${MIN_RECEIPT_MINUTES}m). Recorded without receipt.`);
+        new import_obsidian31.Notice(`Session too short for receipt (${Math.round(sessionMinutes)}m < ${MIN_RECEIPT_MINUTES}m). Recorded without receipt.`);
         void this.loadTodayData();
         void this.loadProjects();
         return;
@@ -10271,7 +10508,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
             var _a2, _b2, _c2;
             const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
             if (!resp.error || resp.queued) {
-              new import_obsidian30.Notice(resp.queued ? "Receipt queued \u2014 will sync when online" : "Session recorded");
+              new import_obsidian31.Notice(resp.queued ? "Receipt queued \u2014 will sync when online" : "Session recorded");
               void this.loadTodayData();
               void this.loadProjects();
               await this.updateFrontmatterStats(session.itemId);
@@ -10342,7 +10579,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
       () => {
         var _a2;
         (_a2 = this.timeblock) == null ? void 0 : _a2.closeDay();
-        new import_obsidian30.Notice("Day closed");
+        new import_obsidian31.Notice("Day closed");
         void writeDailySummary(this.plugin);
       }
     );
@@ -10382,7 +10619,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
               this.projects.updateSessionProgress(this.timeblock.state.activeSession.elapsedMs / 6e4);
             }
           }
-          new import_obsidian30.Notice(`Today's hours set to ${hours}h`);
+          new import_obsidian31.Notice(`Today's hours set to ${hours}h`);
         })();
       }
     );
@@ -10393,7 +10630,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     var _a, _b, _c, _d, _e, _f, _g;
     const activeCount = (_d = (_c = (_b = (_a = this.projects) == null ? void 0 : _a.state) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.status === "active").length) != null ? _d : 0;
     if (activeCount >= 5) {
-      new import_obsidian30.Notice("You already have 5 active projects. Complete or deactivate one first.");
+      new import_obsidian31.Notice("You already have 5 active projects. Complete or deactivate one first.");
       return;
     }
     const availableHours = (_g = (_f = (_e = this.timeblock) == null ? void 0 : _e.state) == null ? void 0 : _f.availableHours) != null ? _g : 4;
@@ -10409,10 +10646,10 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
             obsidian_note_path: void 0
           });
           if (resp.error || !resp.data) {
-            new import_obsidian30.Notice(`Failed to create project: ${resp.error}`);
+            new import_obsidian31.Notice(`Failed to create project: ${resp.error}`);
             return;
           }
-          new import_obsidian30.Notice(`Created: ${name}`);
+          new import_obsidian31.Notice(`Created: ${name}`);
           void this.loadProjects();
           this.restoreActiveSessionHighlight();
         })();
@@ -10425,7 +10662,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     var _a, _b, _c, _d, _e, _f, _g;
     const activeCount = (_d = (_c = (_b = (_a = this.projects) == null ? void 0 : _a.state) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.status === "active").length) != null ? _d : 0;
     if (activeCount >= 5) {
-      new import_obsidian30.Notice("You already have 5 active projects. Complete or deactivate one first.");
+      new import_obsidian31.Notice("You already have 5 active projects. Complete or deactivate one first.");
       return;
     }
     const files = this.app.vault.getMarkdownFiles();
@@ -10451,11 +10688,11 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
                   obsidian_note_path: file.path
                 });
                 if (resp.error || !resp.data) {
-                  new import_obsidian30.Notice(`Failed to create project: ${resp.error}`);
+                  new import_obsidian31.Notice(`Failed to create project: ${resp.error}`);
                   return;
                 }
                 await initializeEmraldFrontmatter(this.app, file, resp.data.id, level);
-                new import_obsidian30.Notice(`Created & linked: ${name}`);
+                new import_obsidian31.Notice(`Created & linked: ${name}`);
                 void this.loadProjects();
                 this.restoreActiveSessionHighlight();
               })();
@@ -10490,7 +10727,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
         void (async () => {
           const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level });
           if (!resp.error) {
-            new import_obsidian30.Notice(`${item.name} \u2192 ${level}`);
+            new import_obsidian31.Notice(`${item.name} \u2192 ${level}`);
             void this.loadProjects();
           }
         })();
@@ -10511,7 +10748,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     if (!notePath)
       return;
     const file = this.plugin.app.vault.getAbstractFileByPath(notePath);
-    if (!file || !(file instanceof import_obsidian30.TFile))
+    if (!file || !(file instanceof import_obsidian31.TFile))
       return;
     if (!isEmraldNote(this.plugin.app, file))
       return;
@@ -10608,7 +10845,7 @@ var EmraldSidebarView = class extends import_obsidian30.ItemView {
     }
   }
 };
-var AddProjectSuggestModal = class extends import_obsidian30.SuggestModal {
+var AddProjectSuggestModal = class extends import_obsidian31.SuggestModal {
   constructor(app, files, onChoose) {
     super(app);
     this.files = files;
@@ -10631,7 +10868,7 @@ var AddProjectSuggestModal = class extends import_obsidian30.SuggestModal {
     this.onChoose(file);
   }
 };
-var RunawaySessionModal = class extends import_obsidian30.Modal {
+var RunawaySessionModal = class extends import_obsidian31.Modal {
   constructor(app, itemName, sessionMinutes, onAction) {
     super(app);
     this.itemName = itemName;
@@ -10678,7 +10915,7 @@ var RunawaySessionModal = class extends import_obsidian30.Modal {
 init_tier();
 
 // src/api/client.ts
-var import_obsidian31 = require("obsidian");
+var import_obsidian32 = require("obsidian");
 var EmraldAPIClient = class {
   constructor(apiKey, baseUrl) {
     this.offlineQueue = null;
@@ -10759,7 +10996,7 @@ var EmraldAPIClient = class {
       }
       const timeoutMs = method === "GET" ? 15e3 : attempt === 0 ? 3e3 : 1e4;
       const response = await Promise.race([
-        (0, import_obsidian31.requestUrl)(params),
+        (0, import_obsidian32.requestUrl)(params),
         new Promise(
           (_, reject) => window.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
         )
@@ -10901,7 +11138,7 @@ var EmraldAPIClient = class {
     try {
       const localIds = this.offlineQueue.getLocalSessionIds();
       if (localIds.length > 0) {
-        new import_obsidian31.Notice(`Reconciling ${localIds.length} offline session(s)...`);
+        new import_obsidian32.Notice(`Reconciling ${localIds.length} offline session(s)...`);
         for (const localId of localIds) {
           const startActions = this.offlineQueue.getStartActions();
           const startAction = startActions[0];
@@ -10910,7 +11147,7 @@ var EmraldAPIClient = class {
             for (const a of orphaned) {
               this.offlineQueue.remove(a.id);
             }
-            new import_obsidian31.Notice(`Dropped orphaned offline session (no start action found)`);
+            new import_obsidian32.Notice(`Dropped orphaned offline session (no start action found)`);
             continue;
           }
           const body = startAction.body;
@@ -10930,18 +11167,18 @@ var EmraldAPIClient = class {
               if (remoteId) {
                 this.offlineQueue.removeById(startAction.id);
                 this.offlineQueue.remapSessionId(localId, remoteId);
-                new import_obsidian31.Notice(`Session reconciled: ${localId.slice(0, 12)}... \u2192 ${remoteId.slice(0, 8)}...`);
+                new import_obsidian32.Notice(`Session reconciled: ${localId.slice(0, 12)}... \u2192 ${remoteId.slice(0, 8)}...`);
                 await this.replayUntilNextStart();
               } else {
                 this.offlineQueue.removeById(startAction.id);
-                new import_obsidian31.Notice("Session created but could not extract id \u2014 dependent actions dropped");
+                new import_obsidian32.Notice("Session created but could not extract id \u2014 dependent actions dropped");
                 const deps = this.offlineQueue.getPendingActions().filter((a) => a.path.includes(localId));
                 for (const d of deps)
                   this.offlineQueue.remove(d.id);
               }
             } else {
               const errMsg = result.error || `HTTP ${result.status}`;
-              new import_obsidian31.Notice(`Failed to reconcile offline session: ${errMsg}`);
+              new import_obsidian32.Notice(`Failed to reconcile offline session: ${errMsg}`);
               if (result.status >= 400 && result.status < 500) {
                 this.offlineQueue.removeById(startAction.id);
                 const deps = this.offlineQueue.getPendingActions().filter((a) => a.path.includes(localId));
@@ -10950,7 +11187,7 @@ var EmraldAPIClient = class {
               }
             }
           } catch (e) {
-            new import_obsidian31.Notice("Network error during session reconciliation \u2014 will retry later");
+            new import_obsidian32.Notice("Network error during session reconciliation \u2014 will retry later");
           }
         }
       }
@@ -11008,7 +11245,7 @@ var EmraldAPIClient = class {
         parts.push(`${synced} synced`);
       if (failed > 0)
         parts.push(`${failed} failed`);
-      new import_obsidian31.Notice(`Session actions: ${parts.join(", ")}`);
+      new import_obsidian32.Notice(`Session actions: ${parts.join(", ")}`);
     }
   }
   async executeQueuedRequest(method, path, body) {
@@ -11024,7 +11261,7 @@ var EmraldAPIClient = class {
       if (body && (method === "POST" || method === "PATCH" || method === "PUT" || method === "DELETE")) {
         params.body = JSON.stringify(body);
       }
-      const response = await (0, import_obsidian31.requestUrl)(params);
+      const response = await (0, import_obsidian32.requestUrl)(params);
       return {
         ok: response.status >= 200 && response.status < 300,
         status: response.status,
@@ -11234,6 +11471,14 @@ var EmraldAPIClient = class {
   async getBurnoutHistory() {
     return this.request("GET", "/burnout/history");
   }
+  /** Acknowledge the current burnout warning (no body — server stamps last_warning_at). */
+  async acknowledgeBurnout() {
+    return this.request("POST", "/burnout/acknowledge");
+  }
+  /** Snooze the burnout warning for `days` (server default 3 if omitted). */
+  async snoozeBurnout(days = 3) {
+    return this.request("POST", "/burnout/snooze", { days });
+  }
   // ── Recovery ─────────────────────────────────────────
   async getRecoveryProtocols(opts) {
     return this.request("GET", "/recovery-protocols", void 0, opts);
@@ -11389,7 +11634,7 @@ function normalizeEffortProfile(profile) {
 }
 
 // src/sync/folder-sync.ts
-var import_obsidian32 = require("obsidian");
+var import_obsidian33 = require("obsidian");
 var FolderSync = class {
   // emrald-id → item
   constructor(app, apiClient, config) {
@@ -11405,13 +11650,13 @@ var FolderSync = class {
    */
   start() {
     const createRef = this.app.vault.on("create", (file) => {
-      if (file instanceof import_obsidian32.TFile && file.extension === "md") {
+      if (file instanceof import_obsidian33.TFile && file.extension === "md") {
         void this.handleFileCreate(file);
       }
     });
     this.eventRefs.push(createRef);
     const renameRef = this.app.vault.on("rename", (file, oldPath) => {
-      if (file instanceof import_obsidian32.TFile && file.extension === "md") {
+      if (file instanceof import_obsidian33.TFile && file.extension === "md") {
         void this.handleFileMove(file, oldPath);
       }
     });
@@ -11459,8 +11704,8 @@ var FolderSync = class {
       }
       const activeFolder = this.app.vault.getAbstractFileByPath(this.config.activeFolderPath);
       const inactiveFolder = this.app.vault.getAbstractFileByPath(this.config.inactiveFolderPath);
-      const activeFiles = activeFolder instanceof import_obsidian32.TFolder ? this.getMarkdownFiles(activeFolder) : [];
-      const inactiveFiles = inactiveFolder instanceof import_obsidian32.TFolder ? this.getMarkdownFiles(inactiveFolder) : [];
+      const activeFiles = activeFolder instanceof import_obsidian33.TFolder ? this.getMarkdownFiles(activeFolder) : [];
+      const inactiveFiles = inactiveFolder instanceof import_obsidian33.TFolder ? this.getMarkdownFiles(inactiveFolder) : [];
       for (const file of [...activeFiles, ...inactiveFiles]) {
         await this.syncFileWithAPI(file, apiItems);
       }
@@ -11484,9 +11729,9 @@ var FolderSync = class {
   getMarkdownFiles(folder) {
     const files = [];
     for (const child of folder.children) {
-      if (child instanceof import_obsidian32.TFile && child.extension === "md") {
+      if (child instanceof import_obsidian33.TFile && child.extension === "md") {
         files.push(child);
-      } else if (child instanceof import_obsidian32.TFolder) {
+      } else if (child instanceof import_obsidian33.TFolder) {
         files.push(...this.getMarkdownFiles(child));
       }
     }
@@ -11514,7 +11759,7 @@ var FolderSync = class {
     await sleep(500);
     if (isEmraldNote(this.app, file))
       return;
-    new import_obsidian32.Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
+    new import_obsidian33.Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
   }
   /**
    * Handle file rename/move between folders.
@@ -11533,14 +11778,14 @@ var FolderSync = class {
       const response = await this.apiClient.updateItem(emeraldId, { status: "paused" });
       if (!response.error) {
         await writeEmraldFrontmatter(this.app, file, { "status": "paused" });
-        new import_obsidian32.Notice(`"${file.basename}" paused.`);
+        new import_obsidian33.Notice(`"${file.basename}" paused.`);
       }
     }
     if (wasInactive && nowActive) {
       const response = await this.apiClient.updateItem(emeraldId, { status: "active" });
       if (!response.error) {
         await writeEmraldFrontmatter(this.app, file, { "status": "active" });
-        new import_obsidian32.Notice(`"${file.basename}" reactivated.`);
+        new import_obsidian33.Notice(`"${file.basename}" reactivated.`);
       }
     }
   }
@@ -11565,7 +11810,7 @@ var FolderSync = class {
       });
       if (!response.error && response.data) {
         this.localItemCache.set(emeraldId, response.data);
-        new import_obsidian32.Notice(`E-level updated: ${file.basename} \u2192 ${currentLevel}`);
+        new import_obsidian33.Notice(`E-level updated: ${file.basename} \u2192 ${currentLevel}`);
       }
     }
   }
@@ -11600,7 +11845,7 @@ function sleep(ms) {
 }
 
 // src/sync/offline-queue.ts
-var import_obsidian33 = require("obsidian");
+var import_obsidian34 = require("obsidian");
 var OfflineQueue = class {
   constructor() {
     this.queue = [];
@@ -11632,7 +11877,7 @@ var OfflineQueue = class {
     };
     this.queue.push(action);
     this.notifyChange();
-    new import_obsidian33.Notice(`Queued offline: ${action.description} (${this.queue.length} pending)`);
+    new import_obsidian34.Notice(`Queued offline: ${action.description} (${this.queue.length} pending)`);
   }
   /**
    * Get pending action count.
@@ -11676,7 +11921,7 @@ var OfflineQueue = class {
     if (changed) {
       this.notifyChange();
       if (online && this.queue.length > 0) {
-        new import_obsidian33.Notice(`Back online \u2014 ${this.queue.length} actions queued for replay`);
+        new import_obsidian34.Notice(`Back online \u2014 ${this.queue.length} actions queued for replay`);
       }
     }
   }
@@ -11700,7 +11945,7 @@ var OfflineQueue = class {
     let success = 0;
     let failed = 0;
     const remaining = [];
-    new import_obsidian33.Notice(`Replaying ${this.queue.length} queued actions...`);
+    new import_obsidian34.Notice(`Replaying ${this.queue.length} queued actions...`);
     for (const action of this.queue) {
       try {
         const result = await executor(action.method, action.path, action.body);
@@ -11739,7 +11984,7 @@ var OfflineQueue = class {
       msg.push(`${failed} dropped`);
     if (remaining.length > 0)
       msg.push(`${remaining.length} still pending`);
-    new import_obsidian33.Notice(`Replay complete: ${msg.join(", ")}`);
+    new import_obsidian34.Notice(`Replay complete: ${msg.join(", ")}`);
     return { success, failed, remaining: remaining.length };
   }
   /**
@@ -12061,7 +12306,7 @@ var DataCache = class {
 };
 
 // main.ts
-var EmraldPlugin = class extends import_obsidian34.Plugin {
+var EmraldPlugin = class extends import_obsidian35.Plugin {
   constructor() {
     super(...arguments);
     this.syncIntervalId = null;
@@ -12207,7 +12452,7 @@ var EmraldPlugin = class extends import_obsidian34.Plugin {
       const manifestVersion = (_a = this.manifest.version) != null ? _a : "0.0.0";
       const obsidianVersion = (_c = (_b = this.app) == null ? void 0 : _b.version) != null ? _c : "unknown";
       const apiUrl = this.settings.apiUrl || "https://api.effortmastery.com/v1";
-      const resp = await (0, import_obsidian34.requestUrl)({
+      const resp = await (0, import_obsidian35.requestUrl)({
         url: `${apiUrl}/plugins/install`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -12321,14 +12566,14 @@ var EmraldPlugin = class extends import_obsidian34.Plugin {
             const rawMsg = (_b = resp.error) == null ? void 0 : _b.message;
             msg = typeof rawMsg === "string" ? rawMsg : "unknown error";
           }
-          new import_obsidian34.Notice(`Digest schedule sync failed: ${msg}`);
+          new import_obsidian35.Notice(`Digest schedule sync failed: ${msg}`);
         } else {
-          new import_obsidian34.Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
+          new import_obsidian35.Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
         }
       }
     } catch (err) {
       if (!silent)
-        new import_obsidian34.Notice(`Digest schedule sync failed: ${String((_c = err == null ? void 0 : err.message) != null ? _c : err)}`);
+        new import_obsidian35.Notice(`Digest schedule sync failed: ${String((_c = err == null ? void 0 : err.message) != null ? _c : err)}`);
       if (this.settings.debugLogging)
         console.warn("[EMRALD] syncDigestPreferences failed:", err);
     }

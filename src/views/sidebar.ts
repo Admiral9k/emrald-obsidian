@@ -3,12 +3,23 @@ import EmraldPlugin from '../../main';
 import { TimeblockComponent } from '../components/timeblock';
 import { ProjectsComponent } from '../components/projects';
 import { EMComponent } from '../components/em';
-import { TrackedItem } from '../api/client';
+import { TrackedItem, BurnoutState } from '../api/client';
+import type { BurnoutAction } from '../modals/burnout-warning';
 import { tierState } from '../tier';
 import { updateSessionStats, isEmraldNote, initializeEmraldFrontmatter, buildNotePathMap } from '../sync/frontmatter';
 import { writeDailySummary } from '../sync/daily-summary';
 
 export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
+
+// Burnout watcher constants — mirrors Emrald-freed's BurnoutWatcher.svelte (SNOOZE_DAYS,
+// MAX_MODALS_PER_EPISODE). Persisted episode/snooze state shape (localStorage equivalent).
+const BURNOUT_SNOOZE_DAYS = 3;
+const BURNOUT_MAX_MODALS_PER_EPISODE = 2;
+interface BurnoutEpisodeState {
+	episodeId: string;
+	shown: number;
+	snoozedUntil: number | null;
+}
 
 export class EmraldSidebarView extends ItemView {
 	plugin: EmraldPlugin;
@@ -116,6 +127,11 @@ export class EmraldSidebarView extends ItemView {
 
 		// Welcome-back check (non-blocking): show modal if 3+ days since last session
 		void this.checkWelcomeBack();
+
+		// Burnout watcher (non-blocking): surface the burnout warning modal on the existing
+		// refresh cycle — same reconnect/midnight/manual-refresh triggers as checkWelcomeBack,
+		// no separate timer. See checkBurnoutWatcher() for the web-parity episode/snooze logic.
+		void this.checkBurnoutWatcher();
 	}
 
 	async onClose() {
@@ -200,6 +216,151 @@ export class EmraldSidebarView extends ItemView {
 		} catch (e) {
 			// Non-critical — don't let this break the sidebar
 			console.warn('[EMRALD] Welcome-back check failed:', e);
+		}
+	}
+
+	/**
+	 * Burnout watcher — plugin-side port of Emrald-freed's src/lib/BurnoutWatcher.svelte.
+	 * Called on every sidebar refresh cycle (rides the same onOpen() triggers as
+	 * checkWelcomeBack: manual refresh, midnight rollover, reconnect — no new timer added).
+	 *
+	 * Episode rules (mirrors web exactly):
+	 *  - green resolves/clears any tracked episode (episode has ended); no modal.
+	 *  - yellow is ambient-only; no modal.
+	 *  - orange/red are modal-worthy. Episode identity prefers the latest unresolved
+	 *    server-side episode (GET /burnout/history); falls back to the previously stored
+	 *    episode id, or synthesizes one from today's local date if there's no history yet.
+	 *    A NEW episode id (vs. what's stored) resets shown=0/snoozedUntil=null — that's the
+	 *    "entering an episode" boundary.
+	 *  - Snooze (3 days) and the 2-modals-per-episode cap are both respected before showing.
+	 *  - The "shown" counter is incremented and persisted BEFORE the modal opens (not on
+	 *    dismiss), so a hard refresh mid-modal can't re-trigger past the cap — same ordering
+	 *    web uses in its writeEpisode() call.
+	 *
+	 * Persistence: episode/snooze state lives in plugin settings under `_burnoutEpisode`
+	 * (the localStorage equivalent — same untyped-settings pattern as _welcomeBackShownDate).
+	 */
+	private async checkBurnoutWatcher() {
+		try {
+			// Don't ambush a user who hasn't finished onboarding (web: routeAllows skips
+			// /app/onboarding and /app/check-in routes — the plugin has no route concept, so
+			// onboarding-incomplete is the closest equivalent gate).
+			if (!this.plugin.settings.onboardingComplete) return;
+
+			const [stateResp, metricsResp, historyResp] = await Promise.all([
+				this.plugin.apiClient.getBurnoutState(),
+				this.plugin.apiClient.getMetrics(['D8']),
+				this.plugin.apiClient.getBurnoutHistory(),
+			]);
+
+			const burnoutState = stateResp.data ?? null;
+			const d8 = metricsResp.data?.find((m) => m.metric_key === 'D8')?.value ?? null;
+			const episodes = historyResp.data ?? [];
+
+			const phase = this.deriveBurnoutPhase(burnoutState, d8);
+			const settingsRec = this.plugin.settings as unknown as Record<string, unknown>;
+
+			// Green resolves any tracked episode.
+			if (phase === 'green') {
+				if (settingsRec._burnoutEpisode) {
+					delete settingsRec._burnoutEpisode;
+					await this.plugin.saveData(this.plugin.settings);
+				}
+				return;
+			}
+			// Yellow is ambient-only.
+			if (phase === 'yellow') return;
+
+			const p = phase as 'orange' | 'red';
+
+			// Episode identity: prefer the latest unresolved server episode; else keep/synthesize.
+			const unresolved = episodes
+				.filter((e) => !e.resolved_at && e.started_at)
+				.map((e) => e.started_at)
+				.sort()
+				.pop();
+
+			let stored = settingsRec._burnoutEpisode as BurnoutEpisodeState | undefined;
+			const episodeId = unresolved ?? stored?.episodeId ?? `synthetic-${new Date().toLocaleDateString('en-CA')}`;
+
+			if (!stored || stored.episodeId !== episodeId) {
+				stored = { episodeId, shown: 0, snoozedUntil: null };
+			}
+
+			// Respect snooze.
+			if (stored.snoozedUntil && Date.now() < stored.snoozedUntil) return;
+			// Respect the per-episode modal cap — back off to ambient (Burnout Monitor workspace
+			// view is still available for the user to check manually).
+			if (stored.shown >= BURNOUT_MAX_MODALS_PER_EPISODE) return;
+
+			const factors = Array.isArray(burnoutState?.contributing_factors)
+				? burnoutState!.contributing_factors
+				: [];
+			const variant: 'first' | 'followup' = stored.shown === 0 ? 'first' : 'followup';
+
+			// Count this surfacing immediately, before opening the modal, so a hard refresh
+			// can't re-trigger past the cap.
+			stored.shown += 1;
+			settingsRec._burnoutEpisode = stored;
+			await this.plugin.saveData(this.plugin.settings);
+
+			const episodeSnapshot = stored;
+			const { BurnoutWarningModal } = await import('../modals/burnout-warning');
+			const modal = new BurnoutWarningModal(
+				this.app,
+				this.plugin,
+				{
+					message: this.burnoutLede(p, variant),
+					contributingFactors: factors,
+					burnoutPhase: p,
+					variant,
+				},
+				(action) => void this.handleBurnoutAction(action, episodeSnapshot)
+			);
+			modal.open();
+		} catch (e) {
+			// Non-fatal — never trap the user behind a failed burnout check.
+			console.warn('[EMRALD] Burnout watcher check failed:', e);
+		}
+	}
+
+	/** Same D8 thresholds used by the Burnout Monitor workspace view / web's derivePhase(). */
+	private deriveBurnoutPhase(state: BurnoutState | null, d8: number | null): 'green' | 'yellow' | 'orange' | 'red' {
+		if (state?.current_phase) return state.current_phase;
+		if (d8 === null) return 'green';
+		if (d8 >= 7) return 'red';
+		if (d8 >= 5) return 'orange';
+		if (d8 >= 3) return 'yellow';
+		return 'green';
+	}
+
+	/** Mirrors BurnoutWarningModal.svelte's lede() copy. */
+	private burnoutLede(phase: 'orange' | 'red', variant: 'first' | 'followup'): string {
+		if (variant === 'followup') {
+			return "It's been a few days since we flagged this, and the patterns haven't shifted much. No pressure — just want to make sure this is on your radar, not in your blind spot.";
+		}
+		return phase === 'red'
+			? "Your recent patterns are showing real strain. This doesn't mean something is wrong — it means your engine's been running hot, and that's worth paying attention to."
+			: 'Over the past stretch, a few of your patterns are showing some strain. Nothing alarming — just your engine running warmer than usual.';
+	}
+
+	/**
+	 * Handle a Burnout Warning Modal action. 'take_break' and 'im_okay' both count as
+	 * acknowledging the warning (dismiss), matching web semantics; 'snooze' persists a
+	 * 3-day snooze locally and syncs both via the API.
+	 */
+	private async handleBurnoutAction(action: BurnoutAction, episode: BurnoutEpisodeState) {
+		try {
+			if (action === 'snooze') {
+				episode.snoozedUntil = Date.now() + BURNOUT_SNOOZE_DAYS * 24 * 60 * 60 * 1000;
+				(this.plugin.settings as unknown as Record<string, unknown>)._burnoutEpisode = episode;
+				await this.plugin.saveData(this.plugin.settings);
+				void this.plugin.apiClient.snoozeBurnout(BURNOUT_SNOOZE_DAYS);
+			} else {
+				void this.plugin.apiClient.acknowledgeBurnout();
+			}
+		} catch (e) {
+			console.warn('[EMRALD] Burnout action failed:', e);
 		}
 	}
 

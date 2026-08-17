@@ -14,6 +14,9 @@ export class BurnoutWarningModal extends Modal {
 	private message: string;
 	private contributingFactors: string[];
 	private burnoutPhase: 'yellow' | 'orange' | 'red';
+	/** 'first' = full modal copy. 'followup' = 2nd-of-episode, slightly more direct tone
+	 *  (mirrors web BurnoutWatcher.svelte's modalVariant: stored.shown === 0 ? 'first' : 'followup'). */
+	private variant: 'first' | 'followup';
 	private onAction: (action: BurnoutAction) => void;
 
 	constructor(
@@ -23,6 +26,7 @@ export class BurnoutWarningModal extends Modal {
 			message: string;
 			contributingFactors?: string[];
 			burnoutPhase?: 'yellow' | 'orange' | 'red';
+			variant?: 'first' | 'followup';
 		},
 		onAction: (action: BurnoutAction) => void
 	) {
@@ -31,6 +35,7 @@ export class BurnoutWarningModal extends Modal {
 		this.message = opts.message;
 		this.contributingFactors = opts.contributingFactors ?? [];
 		this.burnoutPhase = opts.burnoutPhase ?? 'yellow';
+		this.variant = opts.variant ?? 'first';
 		this.onAction = onAction;
 	}
 
@@ -52,8 +57,9 @@ export class BurnoutWarningModal extends Modal {
 		const msgEl = contentEl.createEl('p', { cls: 'emerald-burnout-message', text: this.message });
 		msgEl.id = 'emerald-burnout-desc';
 
-		// Contributing factors (if any)
-		if (this.contributingFactors.length > 0) {
+		// Contributing factors (if any) — only on the first showing of an episode,
+		// mirroring web's `variant === 'first' && factors.length > 0` gate.
+		if (this.variant === 'first' && this.contributingFactors.length > 0) {
 			const factorsEl = contentEl.createDiv({ cls: 'emerald-burnout-factors' });
 			factorsEl.createDiv({ cls: 'emerald-burnout-factors-label', text: "What's contributing:" });
 			const list = factorsEl.createEl('ul', { cls: 'emerald-burnout-factors-list' });
@@ -103,6 +109,7 @@ export class BurnoutWarningModal extends Modal {
 	}
 
 	private phaseTitle(): string {
+		if (this.variant === 'followup') return 'Checking back in';
 		switch (this.burnoutPhase) {
 			case 'yellow': return 'Hey — just checking in';
 			case 'orange': return "You're pushing pretty hard";
