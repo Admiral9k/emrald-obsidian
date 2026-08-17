@@ -4,6 +4,18 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.2.2] — 2026-08-17
+
+Small quality-of-life release: minor fixes and a couple of quiet additions.
+
+### Added
+- Burnout warnings now surface proactively in the sidebar when patterns warrant it (snoozeable; capped so it never nags)
+- Check-in streak counter in the sidebar's EM section
+
+### Fixed
+- Hour-override modal copy now accurately describes how the adjustment applies
+- Effort-profile modal sliders render full-width, matching the other modals
+
 ## [1.2.1] — 2026-08-08
 
 Fix release. The 1.2.0 assets were built before these fixes landed, so 1.2.1 is the build that actually contains them. Update if you installed 1.2.0.
