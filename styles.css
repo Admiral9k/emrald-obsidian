@@ -4720,6 +4720,16 @@ span.emerald-pro-pill {
 .emerald-effort-profile-modal .modal-content {
 	max-width: 640px;
 }
+/* Full-width sliders — same pattern as receipt/checkin/houroverride/onboarding
+   modals; this was the only slider-bearing modal missing these rules, leaving
+   its sliders at the browser's ~130px default width. */
+.emerald-effort-profile-modal .emerald-slider {
+	width: 100%;
+	min-width: 280px;
+}
+.emerald-effort-profile-modal .emerald-form-group {
+	width: 100%;
+}
 
 .emerald-modal-subtitle-row {
 	display: flex;
