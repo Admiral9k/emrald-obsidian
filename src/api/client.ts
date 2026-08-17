@@ -743,6 +743,9 @@ export class EmraldAPIClient {
 		return this.request('GET', '/recovery-logs');
 	}
 
+	// DORMANT: zero callers in src/ (verified via git grep, parity audit 2026-08-17 item C3).
+	// Kept for API-surface completeness. Related dormant API routes no client touches:
+	// /life-events, /imports/completions, /profile/reassessment-status.
 	async logRecovery(entry: CreateRecoveryPayload): Promise<APIResponse<RecoveryLog>> {
 		return this.request('POST', '/recovery-logs', entry);
 	}
@@ -807,6 +810,9 @@ export class EmraldAPIClient {
 
 	// ── Suggestions ─────────────────────────────────────
 
+	// DORMANT: zero callers in src/ (verified via git grep, parity audit 2026-08-17 item C3).
+	// The getSuggestions overrides in area-picker.ts/sidebar.ts are unrelated Obsidian
+	// SuggestModal methods. Kept for API-surface completeness.
 	async getSuggestions(): Promise<APIResponse<Suggestion[]>> {
 		return this.request('GET', '/suggestions');
 	}
