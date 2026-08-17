@@ -18,6 +18,18 @@ const SPARK_WIDTH = 80;
 const SPARK_HEIGHT = 20;
 const SPARK_DOT_RADIUS = 2;
 
+/**
+ * Local calendar-day key — NOT toISOString(), which is UTC and shifts the day near
+ * midnight in any timezone behind UTC. Mirrors Emrald-freed's +page.svelte dateKey()
+ * exactly (web has a comment there about this being a deliberate fix for that bug).
+ */
+function dateKey(d: Date): string {
+	const y = d.getFullYear();
+	const m = String(d.getMonth() + 1).padStart(2, '0');
+	const day = String(d.getDate()).padStart(2, '0');
+	return `${y}-${m}-${day}`;
+}
+
 export class EMComponent {
 	private plugin: EmraldPlugin;
 	private containerEl: HTMLElement;
@@ -30,9 +42,13 @@ export class EMComponent {
 	private unreadCount: number = 0;
 	private currentInsightIndex: number = 0;
 	private checkinDone: boolean = false;
+	// Check-in streak (web parity — src/routes/app/+page.svelte loadCheckins()): consecutive
+	// local calendar days with a check-in, ending today (or yesterday if today isn't logged yet).
+	private streak: number | null = null;
 
 	// DOM refs for targeted updates
 	private checkinBannerEl: HTMLElement | null = null;
+	private streakEl: HTMLElement | null = null;
 	private sparklinesEl: HTMLElement | null = null;
 	private insightEl: HTMLElement | null = null;
 
@@ -59,6 +75,11 @@ export class EMComponent {
 
 		// Energy check-in banner (placeholder — filled by loadData)
 		this.checkinBannerEl = this.containerEl.createDiv({ cls: 'emerald-checkin-banner is-hidden' });
+
+		// Check-in streak (placeholder — filled by loadData). Lives right next to the
+		// check-in banner and stays visible even after today's check-in is done, matching
+		// the web dashboard's always-on "Streak" card.
+		this.streakEl = this.containerEl.createDiv({ cls: 'emerald-streak is-hidden' });
 
 		// Sparklines (Pro only — Pinned Metrics)
 		if (tierState.isPro()) {
@@ -156,6 +177,27 @@ export class EMComponent {
 				);
 				modal.open();
 			})();
+		});
+	}
+
+	// ── Check-in Streak ─────────────────────────────────────
+
+	private renderStreak() {
+		if (!this.streakEl) return;
+		this.streakEl.empty();
+
+		if (this.streak === null) {
+			this.streakEl.addClass('is-hidden');
+			return;
+		}
+		this.streakEl.removeClass('is-hidden');
+
+		const row = this.streakEl.createDiv({ cls: 'emerald-streak-row' });
+		createIconEl(row, ICONS.flame, 'emerald-streak-icon');
+		row.createSpan({ cls: 'emerald-streak-value', text: String(this.streak) });
+		row.createSpan({
+			cls: 'emerald-streak-label',
+			text: `day${this.streak === 1 ? '' : 's'} checked in a row`
 		});
 	}
 
@@ -468,6 +510,37 @@ export class EMComponent {
 			this.checkinDone = false;
 		}
 		this.renderCheckinBanner();
+
+		// Check-in streak (web parity — client-side from history, local calendar-day keys;
+		// no toISOString()/UTC, which shifts the day near midnight). Reuses the existing
+		// getCheckins() client method — no new API call added, since check-in history is
+		// already fetchable through the client.
+		try {
+			const to = new Date();
+			const from = new Date(Date.now() - 60 * 86400000);
+			const histResp = await this.plugin.apiClient.getCheckins({
+				from: dateKey(from),
+				to: dateKey(to),
+				limit: 60
+			});
+			const days = new Set(
+				(histResp.data ?? [])
+					.map((c) => c.checkin_date?.split('T')[0])
+					.filter((d): d is string => !!d)
+			);
+			// Count consecutive days ending today (or yesterday, if today isn't logged yet).
+			let count = 0;
+			let cursor = new Date();
+			if (!days.has(dateKey(cursor))) cursor = new Date(cursor.getTime() - 86400000);
+			while (days.has(dateKey(cursor))) {
+				count += 1;
+				cursor = new Date(cursor.getTime() - 86400000);
+			}
+			this.streak = count;
+		} catch { /* non-fatal */
+			this.streak = null;
+		}
+		this.renderStreak();
 
 		// Load sparkline history data (Pro only — Pinned Metrics)
 		if (tierState.isPro()) {

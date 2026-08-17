@@ -7010,10 +7010,10 @@ var DataCenterView = class extends EmraldWorkspaceView {
     var _a, _b;
     const byDate = /* @__PURE__ */ new Map();
     for (const entry of history) {
-      const dateKey = entry.computed_at.split("T")[0];
-      const existing = byDate.get(dateKey);
+      const dateKey2 = entry.computed_at.split("T")[0];
+      const existing = byDate.get(dateKey2);
       if (!existing) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
         continue;
       }
       const existingVal = (_a = existing.value) != null ? _a : 0;
@@ -7021,11 +7021,11 @@ var DataCenterView = class extends EmraldWorkspaceView {
       const existingMeaningful = existing.value !== null && existingVal !== 0;
       const candidateMeaningful = entry.value !== null && candidateVal !== 0;
       if (candidateMeaningful && !existingMeaningful) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
         continue;
       }
       if (candidateMeaningful === existingMeaningful && entry.computed_at > existing.computed_at) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
       }
     }
     return Array.from(byDate.values()).sort((a, b) => a.computed_at.localeCompare(b.computed_at));
@@ -8151,9 +8151,9 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     headerRow.createSpan({ cls: "emerald-wv-burnout-spark-label", text: "Burnout risk trend" });
     const byDate = /* @__PURE__ */ new Map();
     for (const entry of history) {
-      const dateKey = entry.computed_at.split("T")[0];
-      if (!byDate.has(dateKey) || entry.computed_at > byDate.get(dateKey).computed_at) {
-        byDate.set(dateKey, entry);
+      const dateKey2 = entry.computed_at.split("T")[0];
+      if (!byDate.has(dateKey2) || entry.computed_at > byDate.get(dateKey2).computed_at) {
+        byDate.set(dateKey2, entry);
       }
     }
     const dedupedHistory = Array.from(byDate.values()).sort((a, b) => b.computed_at.localeCompare(a.computed_at));
@@ -9108,14 +9108,24 @@ var AboutView = class extends EmraldWorkspaceView {
 var SPARK_WIDTH = 80;
 var SPARK_HEIGHT = 20;
 var SPARK_DOT_RADIUS = 2;
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 var _EMComponent = class {
   constructor(plugin, containerEl) {
     this.insights = [];
     this.unreadCount = 0;
     this.currentInsightIndex = 0;
     this.checkinDone = false;
+    // Check-in streak (web parity — src/routes/app/+page.svelte loadCheckins()): consecutive
+    // local calendar days with a check-in, ending today (or yesterday if today isn't logged yet).
+    this.streak = null;
     // DOM refs for targeted updates
     this.checkinBannerEl = null;
+    this.streakEl = null;
     this.sparklinesEl = null;
     this.insightEl = null;
     this.insightRotationTimer = null;
@@ -9141,6 +9151,7 @@ var _EMComponent = class {
     this.containerEl.empty();
     this.containerEl.addClass("emerald-em-content");
     this.checkinBannerEl = this.containerEl.createDiv({ cls: "emerald-checkin-banner is-hidden" });
+    this.streakEl = this.containerEl.createDiv({ cls: "emerald-streak is-hidden" });
     if (tierState.isPro()) {
       this.sparklinesEl = this.containerEl.createDiv({ cls: "emerald-sparklines" });
       this.sparklinesEl.createDiv({ cls: "emerald-sparklines-title", text: "Pinned metrics" });
@@ -9218,6 +9229,24 @@ var _EMComponent = class {
       })();
     });
   }
+  // ── Check-in Streak ─────────────────────────────────────
+  renderStreak() {
+    if (!this.streakEl)
+      return;
+    this.streakEl.empty();
+    if (this.streak === null) {
+      this.streakEl.addClass("is-hidden");
+      return;
+    }
+    this.streakEl.removeClass("is-hidden");
+    const row = this.streakEl.createDiv({ cls: "emerald-streak-row" });
+    createIconEl(row, ICONS.flame, "emerald-streak-icon");
+    row.createSpan({ cls: "emerald-streak-value", text: String(this.streak) });
+    row.createSpan({
+      cls: "emerald-streak-label",
+      text: `day${this.streak === 1 ? "" : "s"} checked in a row`
+    });
+  }
   // ── Sparklines ──────────────────────────────────────────
   renderSparklinePlaceholders() {
     if (!this.sparklinesEl)
@@ -9276,10 +9305,10 @@ var _EMComponent = class {
     var _a, _b;
     const byDate = /* @__PURE__ */ new Map();
     for (const entry of history) {
-      const dateKey = entry.computed_at.split("T")[0];
-      const existing = byDate.get(dateKey);
+      const dateKey2 = entry.computed_at.split("T")[0];
+      const existing = byDate.get(dateKey2);
       if (!existing) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
         continue;
       }
       const existingVal = (_a = existing.value) != null ? _a : 0;
@@ -9287,11 +9316,11 @@ var _EMComponent = class {
       const existingMeaningful = existing.value !== null && existingVal !== 0;
       const candidateMeaningful = entry.value !== null && candidateVal !== 0;
       if (candidateMeaningful && !existingMeaningful) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
         continue;
       }
       if (candidateMeaningful === existingMeaningful && entry.computed_at > existing.computed_at) {
-        byDate.set(dateKey, entry);
+        byDate.set(dateKey2, entry);
       }
     }
     return Array.from(byDate.values()).sort((a, b) => a.computed_at.localeCompare(b.computed_at));
@@ -9460,6 +9489,7 @@ var _EMComponent = class {
   }
   // ── Data Loading ────────────────────────────────────────
   async loadData() {
+    var _a;
     try {
       const checkinResp = await this.plugin.apiClient.getTodayCheckin();
       this.checkinDone = !!checkinResp.data;
@@ -9467,6 +9497,33 @@ var _EMComponent = class {
       this.checkinDone = false;
     }
     this.renderCheckinBanner();
+    try {
+      const to = /* @__PURE__ */ new Date();
+      const from = new Date(Date.now() - 60 * 864e5);
+      const histResp = await this.plugin.apiClient.getCheckins({
+        from: dateKey(from),
+        to: dateKey(to),
+        limit: 60
+      });
+      const days = new Set(
+        ((_a = histResp.data) != null ? _a : []).map((c) => {
+          var _a2;
+          return (_a2 = c.checkin_date) == null ? void 0 : _a2.split("T")[0];
+        }).filter((d) => !!d)
+      );
+      let count = 0;
+      let cursor = /* @__PURE__ */ new Date();
+      if (!days.has(dateKey(cursor)))
+        cursor = new Date(cursor.getTime() - 864e5);
+      while (days.has(dateKey(cursor))) {
+        count += 1;
+        cursor = new Date(cursor.getTime() - 864e5);
+      }
+      this.streak = count;
+    } catch (e) {
+      this.streak = null;
+    }
+    this.renderStreak();
     if (tierState.isPro()) {
       try {
         await this.loadSparklineData();

@@ -697,6 +697,27 @@
 	padding: 4px 10px;
 	font-size: 12px;
 }
+/* Check-in Streak — minimal, matches checkin-banner's density/spacing */
+.emerald-streak {
+	margin-bottom: 4px;
+}
+.emerald-streak-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 12px 8px;
+	font-size: 12px;
+	color: var(--text-muted);
+}
+.emerald-streak-icon {
+	display: flex;
+	align-items: center;
+	color: var(--text-warning, #e0a030);
+}
+.emerald-streak-value {
+	font-weight: 600;
+	color: var(--text-normal);
+}
 /* Sparklines */
 
 .emerald-sparklines {
