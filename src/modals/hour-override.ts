@@ -1,5 +1,6 @@
 // EMRALD Hour Override Modal
-// Adjust today's available hours. Resets at midnight.
+// Adjust this weekday's available hours. Permanently updates the weekday's
+// schedule row (setAvailabilityOverride) — it does NOT reset at midnight.
 // Shows base schedule (day of week), half-hour steps, 0-12h range.
 
 import { App, Modal } from 'obsidian';
@@ -80,8 +81,8 @@ export class HourOverrideModal extends Modal {
 			slider.setAttribute('aria-valuetext', `${this.selectedHours} hours`);
 		});
 
-		// Reset note
-		form.createDiv({ cls: 'emerald-form-desc emerald-houroverride-note', text: 'This override resets at midnight.' });
+		// Persistence note — this permanently updates the weekday's schedule
+		form.createDiv({ cls: 'emerald-form-desc emerald-houroverride-note', text: `This updates your regular ${dayName} schedule — future ${dayName}s will use it too.` });
 
 		// Actions
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

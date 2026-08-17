@@ -3676,7 +3676,7 @@ var init_hour_override = __esm({
           slider.setAttribute("aria-valuenow", String(this.selectedHours));
           slider.setAttribute("aria-valuetext", `${this.selectedHours} hours`);
         });
-        form.createDiv({ cls: "emerald-form-desc emerald-houroverride-note", text: "This override resets at midnight." });
+        form.createDiv({ cls: "emerald-form-desc emerald-houroverride-note", text: `This updates your regular ${dayName} schedule \u2014 future ${dayName}s will use it too.` });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
         const saveBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary",
