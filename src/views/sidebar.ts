@@ -271,7 +271,8 @@ export class EmraldSidebarView extends ItemView {
 			// Yellow is ambient-only.
 			if (phase === 'yellow') return;
 
-			const p = phase as 'orange' | 'red';
+			// TS narrows phase to 'orange' | 'red' via the early returns above.
+			const p = phase;
 
 			// Episode identity: prefer the latest unresolved server episode; else keep/synthesize.
 			const unresolved = episodes
