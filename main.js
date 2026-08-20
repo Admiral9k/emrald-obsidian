@@ -5261,12 +5261,13 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     setting.addExtraButton((btn) => {
       btn.setIcon("percent").setTooltip(locked ? `Percent is locked \u2014 ${refCountLabel(level.ref_count)}` : "Change percent").onClick(() => {
         if (locked) {
-          new import_obsidian7.Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}.`);
+          new import_obsidian7.Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}. Archive it and create a new one to change the percent.`);
           return;
         }
         this.openELevelEditor("percent", level);
       });
-      btn.setDisabled(locked);
+      if (locked)
+        btn.extraSettingsEl.addClass("emerald-elevel-percent-locked");
     });
     setting.addExtraButton((btn) => btn.setIcon("trash-2").setTooltip("Remove").onClick(() => {
       void this.confirmRemoveLevel(level);

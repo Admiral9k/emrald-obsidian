@@ -5268,6 +5268,27 @@ span.emerald-pro-pill {
 .emerald-elevel-editor-modal .emerald-slider {
 	width: 100%;
 }
+/* Modal content can exceed the window on shorter viewports (slider + preview +
+   actions) — scroll inside rather than clipping the submit button. */
+.emerald-elevel-editor-modal .modal-content {
+	max-height: 70vh;
+	overflow-y: auto;
+}
+/* Custom rows pack badge+name left with a fixed gap; the default
+   space-between pushed the name to the far edge, reading as a huge gap
+   after the short "EC" badge (Devon smoke test). */
+.emerald-elevel-option-custom .emerald-elevel-option-label {
+	justify-content: flex-start;
+	gap: 10px;
+}
+.emerald-elevel-option-custom .emerald-elevel-option-level {
+	min-width: 24px;
+}
+/* Locked percent button: clickable (so the explanatory notice fires) but
+   visibly muted. */
+.emerald-elevel-percent-locked {
+	opacity: 0.45;
+}
 .emerald-elevel-editor-modal .emerald-form-group {
 	width: 100%;
 }

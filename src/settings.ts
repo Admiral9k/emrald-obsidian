@@ -611,12 +611,16 @@ export class EmraldSettingTab extends PluginSettingTab {
 					: 'Change percent')
 				.onClick(() => {
 					if (locked) {
-						new Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}.`);
+						new Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}. Archive it and create a new one to change the percent.`);
 						return;
 					}
 					this.openELevelEditor('percent', level);
 				});
-			btn.setDisabled(locked);
+			// NOT setDisabled(locked): a disabled button swallows the click, so the
+			// explanatory Notice above never fires and the button feels dead
+			// (Devon smoke test 2026-08-24). Locked state is conveyed by tooltip,
+			// notice, and the muted styling below instead.
+			if (locked) btn.extraSettingsEl.addClass('emerald-elevel-percent-locked');
 		});
 
 		setting.addExtraButton(btn => btn
