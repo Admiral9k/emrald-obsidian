@@ -4832,18 +4832,17 @@ var ELEVEL_PRO_PITCH = "Custom e-levels are a Pro feature. Name your own effort 
 var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
-    /** Guards the network refresh kicked off from display()/update(). */
+    /** Guards the network refresh kicked off from update(). */
     this.refreshingTabState = false;
     this.plugin = plugin;
   }
   // ── P1: declarative settings (Obsidian 1.13.0+) ─────
-  // Dual-support migration (docs "Path B"): getSettingDefinitions() is what
-  // 1.13+ renders and indexes for settings search; display() below stays for
-  // the manifest's minAppVersion floor (1.7.2) and is bypassed on 1.13+.
-  // The two must stay in sync — every row here has a twin in display().
+  // Declarative settings (Obsidian 1.13+, minAppVersion-gated): what the app
+  // renders and indexes for settings search. The legacy imperative display()
+  // twin was removed when minAppVersion moved to 1.13.0.
   //
   // Kept cheap on purpose: no I/O, no network. The custom-level list is read
-  // from the in-memory store; refreshing it happens in update()/display().
+  // from the in-memory store; refreshing it happens in update().
   getSettingDefinitions() {
     return [
       {
@@ -5022,110 +5021,10 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     super.update();
     void this.refreshTabState();
   }
-  // ── Legacy imperative tab (Obsidian < 1.13.0) ───────
-  // Bypassed on 1.13+ because getSettingDefinitions() returns a non-empty
-  // array. Kept because manifest.minAppVersion is 1.7.2.
-  display() {
-    const { containerEl } = this;
-    containerEl.empty();
-    void this.refreshTabState();
-    new import_obsidian7.Setting(containerEl).setName("Account").setHeading();
-    this.renderApiKeyControl(
-      new import_obsidian7.Setting(containerEl).setName("API key").setDesc("Your EMRALD API key from effortmastery.com")
-    );
-    new import_obsidian7.Setting(containerEl).setName("API URL").setDesc("EMRALD API endpoint").addText((text) => text.setValue(this.plugin.settings.apiUrl).onChange((value) => {
-      this.plugin.settings.apiUrl = value;
-      void this.plugin.saveSettings();
-    }));
-    this.renderConnectionStatus(new import_obsidian7.Setting(containerEl).setName("Connection status"));
-    new import_obsidian7.Setting(containerEl).setName("Timeblock").setHeading();
-    new import_obsidian7.Setting(containerEl).setName("Show overtime indicator").setDesc("Yellow bar + counter when exceeding daily hours").addToggle((toggle) => toggle.setValue(this.plugin.settings.showOvertime).onChange((value) => {
-      this.plugin.settings.showOvertime = value;
-      void this.plugin.saveSettings();
-    }));
-    this.renderELevelSection(containerEl);
-    new import_obsidian7.Setting(containerEl).setName("Notifications").setHeading();
-    new import_obsidian7.Setting(containerEl).setName("Burnout warning modals").setDesc("Show burnout warning modals when d8 crosses threshold").addToggle((toggle) => toggle.setValue(this.plugin.settings.burnoutModalEnabled).onChange((value) => {
-      this.plugin.settings.burnoutModalEnabled = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian7.Setting(containerEl).setName("Insight rotation speed").setDesc("Seconds between rotating bulletin cards (5-60)").addSlider((slider) => slider.setLimits(5, 60, 5).setValue(this.plugin.settings.insightRotationSeconds).setDynamicTooltip().onChange((value) => {
-      this.plugin.settings.insightRotationSeconds = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian7.Setting(containerEl).setName("Display").setHeading();
-    new import_obsidian7.Setting(containerEl).setName("Timer style").setDesc("How the session timer is displayed").addDropdown((drop) => drop.addOption("digital", "Digital").addOption("analog", "Analog (post-mvp)").addOption("timetimer", "Time timer (post-mvp)").setValue(this.plugin.settings.timerStyle).onChange((value) => {
-      this.plugin.settings.timerStyle = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian7.Setting(containerEl).setName("Data").setHeading();
-    new import_obsidian7.Setting(containerEl).setName("Frontmatter sync").setDesc("Write EMRALD metadata to note frontmatter").addToggle((toggle) => toggle.setValue(this.plugin.settings.frontmatterEnabled).onChange((value) => {
-      this.plugin.settings.frontmatterEnabled = value;
-      void this.plugin.saveSettings();
-    }));
-    new import_obsidian7.Setting(containerEl).setName("Debug logging").setDesc("Log API calls and state changes to console").addToggle((toggle) => toggle.setValue(this.plugin.settings.debugLogging).onChange((value) => {
-      this.plugin.settings.debugLogging = value;
-      void this.plugin.saveSettings();
-    }));
-    this.renderQueueStatus(new import_obsidian7.Setting(containerEl).setName("Offline queue status"));
-    const pending = this.plugin.offlineQueue.getPendingActions();
-    if (pending.length > 0) {
-      containerEl.createDiv({ text: "Pending queued actions:", cls: "setting-item-description" });
-      for (const action of pending) {
-        new import_obsidian7.Setting(containerEl).setName(action.path).setDesc(this.pendingActionDesc(action)).addButton((btn) => btn.setButtonText("Remove").onClick(() => {
-          this.plugin.offlineQueue.remove(action.id);
-          void this.plugin.saveData(this.plugin.settings);
-          this.display();
-        }));
-      }
-    }
-    new import_obsidian7.Setting(containerEl).setName("Privacy").setHeading();
-    this.renderResearchOptIn(
-      new import_obsidian7.Setting(containerEl).setName("Help improve EMRALD").setDesc(RESEARCH_OPT_IN_DESC)
-    );
-    new import_obsidian7.Setting(containerEl).setName("Digest").setHeading();
-    new import_obsidian7.Setting(containerEl).setName("Digest delivery day").setDesc("Day of the week your weekly digest is generated").addDropdown((drop) => {
-      for (const [value, label] of Object.entries(DIGEST_DAY_OPTIONS)) {
-        drop.addOption(value, label);
-      }
-      drop.setValue(this.plugin.settings.digestDay);
-      drop.onChange((value) => {
-        this.plugin.settings.digestDay = value;
-        void this.plugin.saveSettings();
-        void this.plugin.syncDigestPreferences();
-      });
-    });
-    new import_obsidian7.Setting(containerEl).setName("Digest delivery time").setDesc("Hour of day in UTC (e.g. 09:00 = 4am est). Digests run on the hour.").addDropdown((drop) => {
-      for (const [value, label] of Object.entries(digestTimeOptions())) {
-        drop.addOption(value, label);
-      }
-      drop.setValue(this.normalizedDigestTime());
-      drop.onChange(async (value) => {
-        this.plugin.settings.digestTime = value;
-        await this.plugin.saveSettings();
-        await this.plugin.syncDigestPreferences();
-      });
-    });
-    new import_obsidian7.Setting(containerEl).setName("Data").setHeading();
-    this.renderExportButton(
-      new import_obsidian7.Setting(containerEl).setName("Export data").setDesc(EXPORT_DESC)
-    );
-    new import_obsidian7.Setting(containerEl).setName("Setup").setHeading();
-    this.renderResetOnboarding(
-      new import_obsidian7.Setting(containerEl).setName("Re-run onboarding").setDesc("Reset and show the first-time setup wizard again")
-    );
-    new import_obsidian7.Setting(containerEl).setName("Feedback & support").setHeading();
-    this.renderFeedbackButton(
-      new import_obsidian7.Setting(containerEl).setName("Send feedback").setDesc("Help us improve EMRALD \u2014 report bugs, request features, or share your experience")
-    );
-    this.renderWebsiteButton(
-      new import_obsidian7.Setting(containerEl).setName("Website").setDesc("Learn more about EMRALD and effort management")
-    );
-  }
   // ── Declarative storage hooks ───────────────────────
   // Every `control` binding routes through these. saveSettings() (not bare
   // saveData) so credential re-wiring, folder-sync config, and the sync timer
-  // restart keep happening exactly as they do in display().
+  // restart keep happening on every declarative control change.
   getControlValue(key) {
     if (key === "digestTime")
       return this.normalizedDigestTime();
@@ -5181,7 +5080,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   renderQueueStatus(setting) {
     setting.setDesc(this.queueStatusDesc());
     setting.addButton((btn) => btn.setButtonText("Refresh").onClick(() => this.redraw()));
-    setting.addButton((btn) => btn.setWarning().setButtonText("Clear queue").onClick(() => {
+    setting.addButton((btn) => btn.setDestructive().setButtonText("Clear queue").onClick(() => {
       this.plugin.offlineQueue.clear();
       void this.plugin.saveData(this.plugin.settings);
       new import_obsidian7.Notice("Offline queue cleared.");
@@ -5431,24 +5330,11 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   }
   // ── Plumbing ────────────────────────────────────────
   /**
-   * True when Obsidian is new enough to render getSettingDefinitions().
-   * Checked off the base prototype (our own override is on the subclass), so
-   * this reflects the host version rather than our code.
-   */
-  get declarativeSupported() {
-    const proto = import_obsidian7.PluginSettingTab.prototype;
-    return typeof proto.update === "function";
-  }
-  /**
-   * Re-render whichever path is live. display() is a no-op for declarative
-   * content on 1.13+, and update() doesn't exist below it.
+   * Re-render the declarative tab. minAppVersion is 1.13.0, so update() is
+   * always available — the legacy display() fallback was removed with it.
    */
   redraw() {
-    if (this.declarativeSupported) {
-      this.update();
-    } else {
-      this.display();
-    }
+    this.update();
   }
   /**
    * Pull fresh tier + custom-level state, then redraw only if something
