@@ -9,7 +9,8 @@ import { tierState } from '../tier';
 import { updateSessionStats, isEmraldNote, initializeEmraldFrontmatter, buildNotePathMap } from '../sync/frontmatter';
 import { writeDailySummary } from '../sync/daily-summary';
 import type { LevelRef } from '../e-levels';
-import { levelLabel } from '../e-levels';
+import { levelLabel, prescribedMinutes } from '../e-levels';
+import { VIEW_BURNOUT_MONITOR } from './workspace/base';
 
 export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
 
@@ -349,7 +350,9 @@ export class EmraldSidebarView extends ItemView {
 	/**
 	 * Handle a Burnout Warning Modal action. 'take_break' and 'im_okay' both count as
 	 * acknowledging the warning (dismiss), matching web semantics; 'snooze' persists a
-	 * 3-day snooze locally and syncs both via the API.
+	 * 3-day snooze locally and syncs both via the API. 'show_data' (P2) acknowledges the
+	 * warning the same way and additionally deep-links to the Burnout Monitor workspace
+	 * view — the closest Obsidian equivalent to web's show_data route action.
 	 */
 	private async handleBurnoutAction(action: BurnoutAction, episode: BurnoutEpisodeState) {
 		try {
@@ -358,6 +361,9 @@ export class EmraldSidebarView extends ItemView {
 				(this.plugin.settings as unknown as Record<string, unknown>)._burnoutEpisode = episode;
 				await this.plugin.saveData(this.plugin.settings);
 				void this.plugin.apiClient.snoozeBurnout(BURNOUT_SNOOZE_DAYS);
+			} else if (action === 'show_data') {
+				void this.plugin.apiClient.acknowledgeBurnout();
+				void this.plugin.openWorkspaceView(VIEW_BURNOUT_MONITOR);
 			} else {
 				void this.plugin.apiClient.acknowledgeBurnout();
 			}
@@ -484,6 +490,7 @@ export class EmraldSidebarView extends ItemView {
 			if (this.projects) {
 				this.projects.updateSessionProgress(elapsedMin);
 			}
+			this.checkOvertimeAutoPause(elapsedMin);
 		};
 
 		// Load today's session data
@@ -941,7 +948,57 @@ export class EmraldSidebarView extends ItemView {
 		const resp = await this.plugin.apiClient.resumeSession(session.sessionId);
 		if (!resp.error || resp.queued) {
 			this.timeblock.resumeSession();
+			// C1: re-arm the overtime auto-pause guard on every manual resume — a session
+			// that's still past prescribed+2h after resuming is allowed to fire again.
+			session.overtimeAutoPaused = false;
 			if (session.isPendingSync) await this.persistProvisionalSession();
+		}
+	}
+
+	/**
+	 * C1-plugin — overtime auto-pause (+2h past prescribed).
+	 * Piggybacks on TimeblockComponent's existing per-second onSessionTick callback (the
+	 * same tick that drives the project-card progress bar) rather than adding a second
+	 * interval. onSessionTick only fires while the session is running (not paused), which
+	 * combined with the pause call below naturally stops further checks until resume.
+	 */
+	private checkOvertimeAutoPause(elapsedMin: number) {
+		if (!this.timeblock) return;
+		const session = this.timeblock.state.activeSession;
+		if (!session || session.overtimeAutoPaused) return;
+
+		// Never fire when prescribed time can't be resolved (no daily availability set).
+		const availableHours = this.timeblock.state.availableHours;
+		if (availableHours <= 0) return;
+		const prescribedMin = prescribedMinutes(session.effortLevel, availableHours);
+		if (prescribedMin <= 0) return;
+
+		if (elapsedMin > prescribedMin + 120) {
+			// Mark fired before the async pause round-trip so a fast-firing second tick
+			// can't double-trigger while the request is in flight.
+			session.overtimeAutoPaused = true;
+			void this.handleOvertimeAutoPause();
+		}
+	}
+
+	/**
+	 * Mirrors handlePauseSession's server-sync flow exactly (same endpoint, same local
+	 * pause bookkeeping, same offline-queue tolerance) — only the pause reason and the
+	 * user-facing notice differ.
+	 */
+	private async handleOvertimeAutoPause() {
+		if (!this.timeblock) return;
+		const session = this.timeblock.state.activeSession;
+		if (!session) return;
+
+		const resp = await this.plugin.apiClient.pauseSession(session.sessionId, 'overtime');
+		if (!resp.error || resp.queued) {
+			this.timeblock.pauseSession();
+			if (session.isPendingSync) await this.persistProvisionalSession();
+			new Notice("Auto-paused — 2h past your prescribed effort for today. Resume if you're still going.");
+		} else {
+			// Sync failed — allow the next tick to retry rather than getting stuck unfired.
+			session.overtimeAutoPaused = false;
 		}
 	}
 

@@ -7,7 +7,7 @@ import { App, Modal } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { createIconEl, ICONS } from '../utils/icons';
 
-export type BurnoutAction = 'take_break' | 'im_okay' | 'snooze';
+export type BurnoutAction = 'take_break' | 'im_okay' | 'snooze' | 'show_data';
 
 export class BurnoutWarningModal extends Modal {
 	private plugin: EmraldPlugin;
@@ -94,6 +94,18 @@ export class BurnoutWarningModal extends Modal {
 		});
 		okayBtn.addEventListener('click', () => {
 			this.onAction('im_okay');
+			this.close();
+		});
+
+		// P2: deep-links to the Burnout Monitor workspace view instead of a plain
+		// acknowledge — lets the user see the data behind the warning before deciding.
+		const showDataBtn = actions.createEl('button', {
+			cls: 'emerald-btn emerald-btn-subtle',
+			text: 'Show me the data',
+			attr: { 'aria-label': 'Show me the data' }
+		});
+		showDataBtn.addEventListener('click', () => {
+			this.onAction('show_data');
 			this.close();
 		});
 

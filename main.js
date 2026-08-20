@@ -3974,6 +3974,15 @@ var init_burnout_warning = __esm({
           this.onAction("im_okay");
           this.close();
         });
+        const showDataBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-subtle",
+          text: "Show me the data",
+          attr: { "aria-label": "Show me the data" }
+        });
+        showDataBtn.addEventListener("click", () => {
+          this.onAction("show_data");
+          this.close();
+        });
         const snoozeBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-subtle",
           text: "Snooze for today",
@@ -5499,7 +5508,8 @@ var TimeblockComponent = class {
       pausedAt: session.status === "paused" ? /* @__PURE__ */ new Date() : null,
       elapsedMs: wallElapsed - totalPausedMs,
       totalPausedMs,
-      priorMinutesToday
+      priorMinutesToday,
+      overtimeAutoPaused: false
     };
     this.stopIdleAnimation();
     this.startSessionAnimation();
@@ -5527,7 +5537,8 @@ var TimeblockComponent = class {
       elapsedMs: 0,
       totalPausedMs: 0,
       priorMinutesToday,
-      isPendingSync: true
+      isPendingSync: true,
+      overtimeAutoPaused: false
     };
     this.stopIdleAnimation();
     this.startSessionAnimation();
@@ -5558,14 +5569,15 @@ var TimeblockComponent = class {
       elapsedMs: s.elapsedMs,
       totalPausedMs: s.totalPausedMs,
       priorMinutesToday: s.priorMinutesToday,
-      isPendingSync: (_a = s.isPendingSync) != null ? _a : false
+      isPendingSync: (_a = s.isPendingSync) != null ? _a : false,
+      overtimeAutoPaused: s.overtimeAutoPaused
     };
   }
   /**
    * Restore active session state from persisted data.
    */
   restoreActiveSession(data) {
-    var _a;
+    var _a, _b;
     this.state.activeSession = {
       sessionId: data.sessionId,
       itemId: data.itemId,
@@ -5578,7 +5590,8 @@ var TimeblockComponent = class {
       elapsedMs: data.elapsedMs,
       totalPausedMs: data.totalPausedMs,
       priorMinutesToday: data.priorMinutesToday,
-      isPendingSync: (_a = data.isPendingSync) != null ? _a : false
+      isPendingSync: (_a = data.isPendingSync) != null ? _a : false,
+      overtimeAutoPaused: (_b = data.overtimeAutoPaused) != null ? _b : false
     };
     this.stopIdleAnimation();
     this.startSessionAnimation();
@@ -10920,6 +10933,7 @@ function buildNotePathMap(app) {
 
 // src/views/sidebar.ts
 init_e_levels();
+init_base();
 var VIEW_TYPE_EMRALD = "emrald-sidebar";
 var BURNOUT_SNOOZE_DAYS = 3;
 var BURNOUT_MAX_MODALS_PER_EPISODE = 2;
@@ -11174,7 +11188,9 @@ var EmraldSidebarView = class extends import_obsidian33.ItemView {
   /**
    * Handle a Burnout Warning Modal action. 'take_break' and 'im_okay' both count as
    * acknowledging the warning (dismiss), matching web semantics; 'snooze' persists a
-   * 3-day snooze locally and syncs both via the API.
+   * 3-day snooze locally and syncs both via the API. 'show_data' (P2) acknowledges the
+   * warning the same way and additionally deep-links to the Burnout Monitor workspace
+   * view — the closest Obsidian equivalent to web's show_data route action.
    */
   async handleBurnoutAction(action, episode) {
     try {
@@ -11183,6 +11199,9 @@ var EmraldSidebarView = class extends import_obsidian33.ItemView {
         this.plugin.settings._burnoutEpisode = episode;
         await this.plugin.saveData(this.plugin.settings);
         void this.plugin.apiClient.snoozeBurnout(BURNOUT_SNOOZE_DAYS);
+      } else if (action === "show_data") {
+        void this.plugin.apiClient.acknowledgeBurnout();
+        void this.plugin.openWorkspaceView(VIEW_BURNOUT_MONITOR);
       } else {
         void this.plugin.apiClient.acknowledgeBurnout();
       }
@@ -11295,6 +11314,7 @@ var EmraldSidebarView = class extends import_obsidian33.ItemView {
       if (this.projects) {
         this.projects.updateSessionProgress(elapsedMin);
       }
+      this.checkOvertimeAutoPause(elapsedMin);
     };
     void this.loadTodayData();
   }
@@ -11658,8 +11678,54 @@ var EmraldSidebarView = class extends import_obsidian33.ItemView {
     const resp = await this.plugin.apiClient.resumeSession(session.sessionId);
     if (!resp.error || resp.queued) {
       this.timeblock.resumeSession();
+      session.overtimeAutoPaused = false;
       if (session.isPendingSync)
         await this.persistProvisionalSession();
+    }
+  }
+  /**
+   * C1-plugin — overtime auto-pause (+2h past prescribed).
+   * Piggybacks on TimeblockComponent's existing per-second onSessionTick callback (the
+   * same tick that drives the project-card progress bar) rather than adding a second
+   * interval. onSessionTick only fires while the session is running (not paused), which
+   * combined with the pause call below naturally stops further checks until resume.
+   */
+  checkOvertimeAutoPause(elapsedMin) {
+    if (!this.timeblock)
+      return;
+    const session = this.timeblock.state.activeSession;
+    if (!session || session.overtimeAutoPaused)
+      return;
+    const availableHours = this.timeblock.state.availableHours;
+    if (availableHours <= 0)
+      return;
+    const prescribedMin = prescribedMinutes(session.effortLevel, availableHours);
+    if (prescribedMin <= 0)
+      return;
+    if (elapsedMin > prescribedMin + 120) {
+      session.overtimeAutoPaused = true;
+      void this.handleOvertimeAutoPause();
+    }
+  }
+  /**
+   * Mirrors handlePauseSession's server-sync flow exactly (same endpoint, same local
+   * pause bookkeeping, same offline-queue tolerance) — only the pause reason and the
+   * user-facing notice differ.
+   */
+  async handleOvertimeAutoPause() {
+    if (!this.timeblock)
+      return;
+    const session = this.timeblock.state.activeSession;
+    if (!session)
+      return;
+    const resp = await this.plugin.apiClient.pauseSession(session.sessionId, "overtime");
+    if (!resp.error || resp.queued) {
+      this.timeblock.pauseSession();
+      if (session.isPendingSync)
+        await this.persistProvisionalSession();
+      new import_obsidian33.Notice("Auto-paused \u2014 2h past your prescribed effort for today. Resume if you're still going.");
+    } else {
+      session.overtimeAutoPaused = false;
     }
   }
   async handleStopSession() {

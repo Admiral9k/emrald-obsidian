@@ -26,6 +26,10 @@ export interface ActiveSessionState {
 	totalPausedMs: number;        // Cumulative time spent paused
 	priorMinutesToday: number;    // Minutes already worked on this project today
 	isPendingSync?: boolean;      // True if session was started offline and hasn't synced yet
+	overtimeAutoPaused: boolean;  // C1: true once the +2h-past-prescribed auto-pause has fired
+	                              // for the current run; cleared on manual resume so a session
+	                              // that crosses again after resuming may re-fire (matches the
+	                              // web lane's chosen refire semantics).
 }
 
 export class TimeblockComponent {
@@ -136,7 +140,8 @@ export class TimeblockComponent {
 			pausedAt: session.status === 'paused' ? new Date() : null,
 			elapsedMs: wallElapsed - totalPausedMs,
 			totalPausedMs: totalPausedMs,
-			priorMinutesToday: priorMinutesToday
+			priorMinutesToday: priorMinutesToday,
+			overtimeAutoPaused: false
 		};
 
 		this.stopIdleAnimation();
@@ -164,7 +169,8 @@ export class TimeblockComponent {
 			elapsedMs: 0,
 			totalPausedMs: 0,
 			priorMinutesToday: priorMinutesToday,
-			isPendingSync: true
+			isPendingSync: true,
+			overtimeAutoPaused: false
 		};
 
 		this.stopIdleAnimation();
@@ -193,7 +199,8 @@ export class TimeblockComponent {
 			elapsedMs: s.elapsedMs,
 			totalPausedMs: s.totalPausedMs,
 			priorMinutesToday: s.priorMinutesToday,
-			isPendingSync: s.isPendingSync ?? false
+			isPendingSync: s.isPendingSync ?? false,
+			overtimeAutoPaused: s.overtimeAutoPaused
 		};
 	}
 
@@ -213,7 +220,8 @@ export class TimeblockComponent {
 			elapsedMs: data.elapsedMs as number,
 			totalPausedMs: data.totalPausedMs as number,
 			priorMinutesToday: data.priorMinutesToday as number,
-			isPendingSync: (data.isPendingSync as boolean) ?? false
+			isPendingSync: (data.isPendingSync as boolean) ?? false,
+			overtimeAutoPaused: (data.overtimeAutoPaused as boolean) ?? false
 		};
 
 		this.stopIdleAnimation();
