@@ -5363,6 +5363,7 @@ span.emerald-pro-pill {
 	background: transparent;
 	border-style: dashed;
 	cursor: pointer;
+	text-align: center;
 }
 .emerald-elevel-option-pointer:hover {
 	color: var(--text-normal);
