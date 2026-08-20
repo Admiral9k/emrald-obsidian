@@ -5274,16 +5274,10 @@ span.emerald-pro-pill {
 	max-height: 70vh;
 	overflow-y: auto;
 }
-/* Custom rows pack badge+name left with a fixed gap; the default
-   space-between pushed the name to the far edge, reading as a huge gap
-   after the short "EC" badge (Devon smoke test). */
-.emerald-elevel-option-custom .emerald-elevel-option-label {
-	justify-content: flex-start;
-	gap: 10px;
-}
-.emerald-elevel-option-custom .emerald-elevel-option-level {
-	min-width: 24px;
-}
+/* Custom rows intentionally have NO layout overrides: they must render with
+   the exact structure as the built-in E1-E4 rows (badge, desc, hours inline).
+   An earlier display:block override caused the label row to stretch full
+   width and the hours line to overflow the button (Devon smoke test x2). */
 /* Locked percent button: clickable (so the explanatory notice fires) but
    visibly muted. */
 .emerald-elevel-percent-locked {
@@ -5364,9 +5358,6 @@ span.emerald-pro-pill {
 	height: 1px;
 	background: var(--background-modifier-border);
 	margin: 6px 0;
-}
-.emerald-elevel-option-custom {
-	display: block;
 }
 /* Free tier: existing customs render as labels, not choices. */
 .emerald-elevel-option.is-inert {
