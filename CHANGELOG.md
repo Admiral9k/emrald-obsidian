@@ -4,6 +4,29 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-08-27
+
+Custom effort levels, plus a rebuilt settings tab.
+
+### Added
+- Custom effort levels (Pro): define your own levels at any 5% step of daily
+  work time, alongside E1–E4. Named, colored by intensity, and available
+  everywhere levels appear — pickers, project badges, the timeline marker,
+  and the E-Level Overview. Managed in Settings → Manage effort levels.
+- Sessions auto-pause two hours past the day's prescribed effort, with a
+  notice — resume anytime if you're still going.
+- The burnout warning can open the Burnout Monitor view directly
+  ("Show me the data").
+
+### Changed
+- Settings tab rebuilt on Obsidian's declarative settings API — EMRALD
+  settings now appear in Obsidian's global settings search. Requires
+  Obsidian 1.13 or newer.
+
+### Fixed
+- Slider values shown inline (native), clearer wording when a level's
+  percent can't be changed, assorted picker polish.
+
 ## [1.2.2] — 2026-08-17
 
 Small quality-of-life release: minor fixes and a couple of quiet additions.
