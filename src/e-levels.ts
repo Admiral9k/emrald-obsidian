@@ -416,7 +416,7 @@ class ELevelStore {
 	}
 
 	private async doRefresh(plugin: EmraldPlugin): Promise<boolean> {
-		if (!plugin.settings.apiKey) return false;
+		if (!plugin.hasApiKey()) return false;
 		let resp;
 		try {
 			resp = await plugin.apiClient.listELevels();

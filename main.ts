@@ -29,6 +29,7 @@ export default class EmraldPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		await this.migrateApiKeyToSecretStorage();
 
 		// Restore the custom e-level cache from settings so the first paint can
 		// resolve 'EC:<uuid>' refs before the network answers.
@@ -49,7 +50,7 @@ export default class EmraldPlugin extends Plugin {
 		}
 
 		// Initialize API client
-		this.apiClient = new EmraldAPIClient(this.settings.apiKey, this.settings.apiUrl);
+		this.apiClient = new EmraldAPIClient(this.getApiKey(), this.settings.apiUrl);
 
 		// Wire offline queue and data cache into API client
 		this.apiClient.setOfflineQueue(this.offlineQueue);
@@ -112,7 +113,7 @@ export default class EmraldPlugin extends Plugin {
 			id: 'start-session',
 			name: 'Start session',
 			checkCallback: (checking) => {
-				if (!this.settings.apiKey) return false;
+				if (!this.hasApiKey()) return false;
 				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
 				if (leaves.length === 0) return false;
 				const view = leaves[0].view as EmraldSidebarView;
@@ -126,7 +127,7 @@ export default class EmraldPlugin extends Plugin {
 			id: 'stop-session',
 			name: 'Stop session',
 			checkCallback: (checking) => {
-				if (!this.settings.apiKey) return false;
+				if (!this.hasApiKey()) return false;
 				const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
 				if (leaves.length === 0) return false;
 				const view = leaves[0].view as EmraldSidebarView;
@@ -151,7 +152,7 @@ export default class EmraldPlugin extends Plugin {
 		this.addSettingTab(new EmraldSettingTab(this.app, this));
 
 		// Start folder sync and periodic refresh if API key is configured
-		if (this.settings.apiKey) {
+		if (this.hasApiKey()) {
 			this.startSync();
 			this.startMidnightCheck();
 
@@ -181,7 +182,7 @@ export default class EmraldPlugin extends Plugin {
 					const modal = new OnboardingModal(this.app, this, () => {
 						// After onboarding completes, activate sidebar + start sync
 						void this.activateView();
-						if (this.settings.apiKey) {
+						if (this.hasApiKey()) {
 							this.startSync();
 						}
 					});
@@ -198,7 +199,7 @@ export default class EmraldPlugin extends Plugin {
 		// Pre-launch fix: existing installs had local digestDay/digestTime that never
 		// reached the API, so cron was using the Sunday 18:00 default. This pushes
 		// the local truth to the database so the cron uses the right schedule.
-		if (this.settings.apiKey) {
+		if (this.hasApiKey()) {
 			void this.syncDigestPreferences(true); // silent on startup
 			void this.reconcileResearchOptIn(); // pull API truth into local settings
 			void this.syncTimezone(); // S102 follow-on: auto-set IANA tz for chronotype↔D11
@@ -254,6 +255,65 @@ export default class EmraldPlugin extends Plugin {
 		this.offlineQueue.destroy();
 	}
 
+	/**
+	 * The API key lives in Obsidian's keychain (SecretStorage); settings hold only its NAME.
+	 * The legacy plaintext field is read only while a migration is still pending.
+	 */
+	getApiKey(): string {
+		const name = this.settings.apiKeySecretName;
+		if (name) {
+			const secret = this.app.secretStorage.getSecret(name);
+			if (secret) return secret;
+		}
+		return this.settings.apiKey;
+	}
+
+	hasApiKey(): boolean {
+		return this.getApiKey().length > 0;
+	}
+
+	/** Store a key in the keychain and point settings at it. Caller persists with saveSettings(). */
+	setApiKey(value: string): void {
+		const id = this.settings.apiKeySecretName || this.pickApiKeySecretId(value);
+		this.app.secretStorage.setSecret(id, value);
+		this.settings.apiKeySecretName = id;
+		this.settings.apiKey = '';
+	}
+
+	/**
+	 * Mobile keychains are shared across vaults while desktop is per-vault, so the default id
+	 * can already hold a DIFFERENT key (another vault, another account). Never overwrite it:
+	 * fall back to a per-install id.
+	 */
+	private pickApiKeySecretId(value: string): string {
+		const base = 'emrald-api-key';
+		const existing = this.app.secretStorage.getSecret(base);
+		if (!existing || existing === value) return base;
+		const raw = this.settings.installId || Math.random().toString(36).slice(2);
+		return `${base}-${raw.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8)}`;
+	}
+
+	/**
+	 * One-time move of a pre-1.3.1 plaintext key into the keychain. Order matters: write the
+	 * secret, read it back, and only then blank the legacy field. Any failure leaves the
+	 * legacy key in place and the migration retries on the next load.
+	 */
+	private async migrateApiKeyToSecretStorage(): Promise<void> {
+		const legacy = this.settings.apiKey;
+		if (!legacy || this.settings.apiKeySecretName) return;
+		try {
+			const id = this.pickApiKeySecretId(legacy);
+			this.app.secretStorage.setSecret(id, legacy);
+			if (this.app.secretStorage.getSecret(id) !== legacy) return;
+			this.settings.apiKeySecretName = id;
+			this.settings.apiKey = '';
+			await this.saveData(this.settings);
+			new Notice('Your API key is now stored in the keychain.');
+		} catch (err) {
+			if (this.settings.debugLogging) console.warn('[EMRALD] API key migration failed:', err);
+		}
+	}
+
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Record<string, unknown>);
 	}
@@ -271,7 +331,7 @@ export default class EmraldPlugin extends Plugin {
 	 */
 	private async reconcileResearchOptIn(): Promise<void> {
 		try {
-			if (!this.settings.apiKey) return;
+			if (!this.hasApiKey()) return;
 			const resp = await this.apiClient.getPreferences();
 			if (resp.data && typeof resp.data.research_opt_in === 'boolean') {
 				if (this.settings.researchOptIn !== resp.data.research_opt_in) {
@@ -293,7 +353,7 @@ export default class EmraldPlugin extends Plugin {
 	 */
 	private async syncTimezone(): Promise<void> {
 		try {
-			if (!this.settings.apiKey) return;
+			if (!this.hasApiKey()) return;
 			if (this.settings.timezoneSynced) return;
 			let detected: string | null = null;
 			try { detected = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch { detected = null; }
@@ -318,7 +378,7 @@ export default class EmraldPlugin extends Plugin {
 
 	async syncDigestPreferences(silent: boolean = false): Promise<void> {
 		try {
-			if (!this.settings.apiKey) return;
+			if (!this.hasApiKey()) return;
 			const dayMap: Record<string, number> = {
 				sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
 				thursday: 4, friday: 5, saturday: 6
@@ -352,7 +412,7 @@ export default class EmraldPlugin extends Plugin {
 		await this.saveData(this.settings);
 
 		// Update API client credentials without recreating (preserves offline queue + cache wiring)
-		this.apiClient.updateCredentials(this.settings.apiKey, this.settings.apiUrl);
+		this.apiClient.updateCredentials(this.getApiKey(), this.settings.apiUrl);
 
 		// Update folder sync config
 		this.folderSync.updateConfig({
@@ -362,7 +422,7 @@ export default class EmraldPlugin extends Plugin {
 
 		// Restart sync if API key changed
 		this.stopSync();
-		if (this.settings.apiKey) {
+		if (this.hasApiKey()) {
 			this.startSync();
 		}
 	}

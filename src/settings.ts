@@ -14,6 +14,9 @@ import {
 
 export interface EmraldSettings {
 	// Auth
+	/** Name of the Obsidian keychain secret that holds the API key. The key itself never lives in data.json. */
+	apiKeySecretName: string;
+	/** LEGACY: plaintext key from releases before 1.3.1. Read only so it can be migrated, then blanked. */
 	apiKey: string;
 	apiUrl: string;
 
@@ -64,6 +67,7 @@ export interface EmraldSettings {
 }
 
 export const DEFAULT_SETTINGS: EmraldSettings = {
+	apiKeySecretName: '',
 	apiKey: '',
 	apiUrl: 'https://api.effortmastery.com/v1',
 	activeFolderPath: 'Active',
@@ -159,7 +163,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'API key',
-						desc: 'Your EMRALD API key from effortmastery.com',
+						desc: 'Your EMRALD API key from effortmastery.com. Stored in the keychain on this device.',
 						// render, not a text control: the input needs type=password.
 						render: (setting: Setting) => { this.renderApiKeyControl(setting); }
 					},
@@ -340,9 +344,9 @@ export class EmraldSettingTab extends PluginSettingTab {
 		setting.addText(text => {
 			text
 				.setPlaceholder('Em_...')
-				.setValue(this.plugin.settings.apiKey)
+				.setValue(this.plugin.getApiKey())
 				.onChange((value) => {
-					this.plugin.settings.apiKey = value;
+					this.plugin.setApiKey(value);
 					void this.plugin.saveSettings();
 				});
 			text.inputEl.type = 'password';
@@ -355,10 +359,12 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setButtonText('Re-test')
 			.onClick(() => { void this.runConnectionTest(setting); }));
 
-		if (this.plugin.settings.apiKey) {
+		if (this.plugin.hasApiKey()) {
 			void this.runConnectionTest(setting);
 		} else {
-			setting.setDesc('No API key configured');
+			setting.setDesc(this.plugin.settings.apiKeySecretName
+				? 'No API key on this device yet. Paste your key above.'
+				: 'No API key configured');
 		}
 	}
 
@@ -711,7 +717,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 	 */
 	private async refreshTabState(): Promise<void> {
 		if (this.refreshingTabState) return;
-		if (!this.plugin.settings.apiKey) return;
+		if (!this.plugin.hasApiKey()) return;
 
 		this.refreshingTabState = true;
 		try {

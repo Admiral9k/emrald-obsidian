@@ -4,6 +4,19 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-07
+
+Your API key now lives in Obsidian's keychain.
+
+### Changed
+- The API key is stored in Obsidian's keychain (SecretStorage) instead of the
+  plugin's data file. Existing keys move over automatically on first load.
+- The keychain is per device: on a new device or a synced vault, paste your key
+  once in Settings. The connection status says so when no key is found.
+
+### Fixed
+- Setup keeps your saved key if a new one fails the connection test.
+
 ## [1.3.0] — 2026-08-27
 
 Custom effort levels, plus a rebuilt settings tab.

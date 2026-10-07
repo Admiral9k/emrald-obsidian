@@ -223,6 +223,7 @@ export class OnboardingModal extends Modal {
 				const result = await this.plugin.apiClient.testConnection();
 
 				if (result.error) {
+					this.restoreCredentials();
 					statusEl.textContent = `Connection failed: ${result.error}`;
 					statusEl.className = 'emerald-onboard-status is-error';
 				} else {
@@ -230,7 +231,7 @@ export class OnboardingModal extends Modal {
 					statusEl.className = 'emerald-onboard-status is-success';
 
 					// Save credentials
-					this.plugin.settings.apiKey = this.apiKey;
+					this.plugin.setApiKey(this.apiKey);
 					this.plugin.settings.apiUrl = apiUrl;
 					await this.plugin.saveSettings();
 
@@ -241,7 +242,7 @@ export class OnboardingModal extends Modal {
 					// New users get full flow; returning users skip profile/availability but see calibration
 					window.setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
 				}
-			} catch { /* non-fatal */ }
+			} catch { this.restoreCredentials(); }
 		})(); });
 
 		const skipBtn = actions.createEl('button', {
@@ -982,6 +983,11 @@ export class OnboardingModal extends Modal {
 			text: 'Keep it simple for now'
 		});
 		laterBtn.addEventListener('click', () => { void this.finish(); });
+	}
+
+	/** A failed connection test must not leave the typed key live in place of the saved one. */
+	private restoreCredentials() {
+		this.plugin.apiClient.updateCredentials(this.plugin.getApiKey(), this.plugin.settings.apiUrl);
 	}
 
 	// ── Navigation ───────────────────────────────────────

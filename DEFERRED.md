@@ -2,31 +2,6 @@
 
 Tracked items intentionally not done yet, with the reasoning. Kept in-repo so the decision survives.
 
-## Adopt Obsidian's declarative settings API (`getSettingDefinitions`)
-
-**Status:** deferred, tracked
-**Raised by:** Obsidian community review, warning on `src/settings.ts:82`
-**Effect while deferred:** on Obsidian 1.13.0+, EMRALD's settings do not appear in the global settings *search*. The settings tab itself works normally on every version.
-
-**Why deferred rather than done:**
-
-- The installed typings are `obsidian@1.12.3`, and neither `getSettingDefinitions` nor `SettingDefinition` exists in `obsidian.d.ts`. The API postdates the typings we build against, so implementing now means casting through `unknown` or hand-rolling a guessed interface.
-- The official migration guide (`docs.obsidian.md/plugins/guides/migrate-declarative-settings`) is Catalyst-gated, so the exact shape can't be confirmed from public docs.
-- Obsidian supports the existing `display()` approach indefinitely. This is a recommended migration, not a deprecation with a deadline.
-- `minAppVersion` is 1.7.2, so the affected users are a subset, and the only lost capability is settings search.
-
-Writing an API surface from a summary rather than a spec risks shipping settings that silently render nothing, which is worse than the current warning.
-
-**To do it properly:**
-
-1. Bump the `obsidian` dev dependency to typings that include the declarative settings API
-2. Read the real migration guide
-3. Convert the **12 migratable settings** in `EmraldSettingTab`. Of the 28 `new Setting()` calls in the file, 10 are `setHeading()` section labels and 6 are interactive-only (Connection status, Offline queue status, Export data, Re-run onboarding, Send feedback, Website) — buttons and live status readouts, not persisted values, so they don't belong in settings search. The 12 real ones: API key, API URL, Show overtime indicator, Burnout warning modals, Insight rotation speed, Timer style, Frontmatter sync, Debug logging, Help improve EMRALD, Digest delivery day, Digest delivery time, timeblock hours.
-4. Keep `display()` in place indefinitely — it's the only path for the 6 interactive-only controls *and* for users below 1.13.0
-5. Verify on 1.13.0+ that the settings actually surface in global search
-
-**Also sweep while in there:** stray no-op `;` at `src/settings.ts:92`, pre-existing since the round-3 review fixes. Harmless, no lint complaint.
-
 ## Enforce the daily API call quota
 
 **Status:** deferred, tracked
@@ -50,3 +25,5 @@ Left as-is deliberately during the 1.2.x review-fix batch — the parameter was 
 ## Resolved
 
 - **Dead `version` npm lifecycle hook** (removed `03831d9`) — `package.json` declared `"version": "node version-bump.mjs && git add manifest.json versions.json"` but `version-bump.mjs` never existed in this repo; git history confirms it was never added, not deleted. It came from Obsidian's sample plugin, which ships both the entry and the file — only the entry was copied. Inert in practice, since npm's `version` **lifecycle hook** only fires on `npm version <x>` and CI calls `esbuild` directly, but `npm version patch` would have failed on a missing module at exactly the wrong moment. Removed rather than backfilled: version bumps are done by hand across manifest/package/versions together, as 1.2.1 was.
+- **Declarative settings API** (done in 1.3.0) - settings tab rebuilt on `getSettingDefinitions()`, legacy `display()` removed, `minAppVersion` 1.13.0. The five open questions that deferred it were answered by the 1.13.1 typings. The "stray no-op `;`" sweep went with the rewrite.
+- **API key in plaintext `data.json`** (done in 1.3.1) - moved to Obsidian SecretStorage; settings keep only the secret name.

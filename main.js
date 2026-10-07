@@ -412,7 +412,7 @@ var init_e_levels = __esm({
       }
       async doRefresh(plugin) {
         var _a;
-        if (!plugin.settings.apiKey)
+        if (!plugin.hasApiKey())
           return false;
         let resp;
         try {
@@ -1419,12 +1419,13 @@ var init_onboarding = __esm({
               this.plugin.apiClient.updateCredentials(this.apiKey, apiUrl);
               const result = await this.plugin.apiClient.testConnection();
               if (result.error) {
+                this.restoreCredentials();
                 statusEl.textContent = `Connection failed: ${result.error}`;
                 statusEl.className = "emerald-onboard-status is-error";
               } else {
                 statusEl.textContent = "Connected!";
                 statusEl.className = "emerald-onboard-status is-success";
-                this.plugin.settings.apiKey = this.apiKey;
+                this.plugin.setApiKey(this.apiKey);
                 this.plugin.settings.apiUrl = apiUrl;
                 await this.plugin.saveSettings();
                 const itemsResp = await this.plugin.apiClient.getItems();
@@ -1432,6 +1433,7 @@ var init_onboarding = __esm({
                 window.setTimeout(() => this.goTo(this.isNewUser ? "profile" : "calibration"), 800);
               }
             } catch (e) {
+              this.restoreCredentials();
             }
           })();
         });
@@ -1961,6 +1963,10 @@ var init_onboarding = __esm({
         laterBtn.addEventListener("click", () => {
           void this.finish();
         });
+      }
+      /** A failed connection test must not leave the typed key live in place of the saved one. */
+      restoreCredentials() {
+        this.plugin.apiClient.updateCredentials(this.plugin.getApiKey(), this.plugin.settings.apiUrl);
       }
       // ── Navigation ───────────────────────────────────────
       goTo(step) {
@@ -4783,6 +4789,7 @@ var import_obsidian7 = require("obsidian");
 init_tier();
 init_e_levels();
 var DEFAULT_SETTINGS = {
+  apiKeySecretName: "",
   apiKey: "",
   apiUrl: "https://api.effortmastery.com/v1",
   activeFolderPath: "Active",
@@ -4860,7 +4867,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
         items: [
           {
             name: "API key",
-            desc: "Your EMRALD API key from effortmastery.com",
+            desc: "Your EMRALD API key from effortmastery.com. Stored in the keychain on this device.",
             // render, not a text control: the input needs type=password.
             render: (setting) => {
               this.renderApiKeyControl(setting);
@@ -5049,8 +5056,8 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   // ── Shared row renderers (used by BOTH paths) ───────
   renderApiKeyControl(setting) {
     setting.addText((text) => {
-      text.setPlaceholder("Em_...").setValue(this.plugin.settings.apiKey).onChange((value) => {
-        this.plugin.settings.apiKey = value;
+      text.setPlaceholder("Em_...").setValue(this.plugin.getApiKey()).onChange((value) => {
+        this.plugin.setApiKey(value);
         void this.plugin.saveSettings();
       });
       text.inputEl.type = "password";
@@ -5061,10 +5068,10 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     setting.addButton((btn) => btn.setButtonText("Re-test").onClick(() => {
       void this.runConnectionTest(setting);
     }));
-    if (this.plugin.settings.apiKey) {
+    if (this.plugin.hasApiKey()) {
       void this.runConnectionTest(setting);
     } else {
-      setting.setDesc("No API key configured");
+      setting.setDesc(this.plugin.settings.apiKeySecretName ? "No API key on this device yet. Paste your key above." : "No API key configured");
     }
   }
   async runConnectionTest(setting) {
@@ -5354,7 +5361,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   async refreshTabState() {
     if (this.refreshingTabState)
       return;
-    if (!this.plugin.settings.apiKey)
+    if (!this.plugin.hasApiKey())
       return;
     this.refreshingTabState = true;
     try {
@@ -13739,6 +13746,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
   // YYYY-MM-DD local
   async onload() {
     await this.loadSettings();
+    await this.migrateApiKeyToSecretStorage();
     hydrateELevelStore(this);
     this.offlineQueue = new OfflineQueue();
     const savedQueue = this.settings._offlineQueue;
@@ -13750,7 +13758,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
     if (savedCache && typeof savedCache === "object") {
       this.dataCache.fromJSON(savedCache);
     }
-    this.apiClient = new EmraldAPIClient(this.settings.apiKey, this.settings.apiUrl);
+    this.apiClient = new EmraldAPIClient(this.getApiKey(), this.settings.apiUrl);
     this.apiClient.setOfflineQueue(this.offlineQueue);
     this.apiClient.setDataCache(this.dataCache);
     let wasOffline = false;
@@ -13792,7 +13800,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
       name: "Start session",
       checkCallback: (checking) => {
         var _a;
-        if (!this.settings.apiKey)
+        if (!this.hasApiKey())
           return false;
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
         if (leaves.length === 0)
@@ -13808,7 +13816,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
       name: "Stop session",
       checkCallback: (checking) => {
         var _a, _b, _c;
-        if (!this.settings.apiKey)
+        if (!this.hasApiKey())
           return false;
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_EMRALD);
         if (leaves.length === 0)
@@ -13828,7 +13836,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
       }
     });
     this.addSettingTab(new EmraldSettingTab(this.app, this));
-    if (this.settings.apiKey) {
+    if (this.hasApiKey()) {
       this.startSync();
       this.startMidnightCheck();
       this.app.workspace.onLayoutReady(() => {
@@ -13845,7 +13853,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
           const { OnboardingModal: OnboardingModal2 } = await Promise.resolve().then(() => (init_onboarding(), onboarding_exports));
           const modal = new OnboardingModal2(this.app, this, () => {
             void this.activateView();
-            if (this.settings.apiKey) {
+            if (this.hasApiKey()) {
               this.startSync();
             }
           });
@@ -13854,7 +13862,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
       }, 1e3);
     }
     void this.pingInstallTracking();
-    if (this.settings.apiKey) {
+    if (this.hasApiKey()) {
       void this.syncDigestPreferences(true);
       void this.reconcileResearchOptIn();
       void this.syncTimezone();
@@ -13900,6 +13908,65 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
     this.stopMidnightCheck();
     this.offlineQueue.destroy();
   }
+  /**
+   * The API key lives in Obsidian's keychain (SecretStorage); settings hold only its NAME.
+   * The legacy plaintext field is read only while a migration is still pending.
+   */
+  getApiKey() {
+    const name = this.settings.apiKeySecretName;
+    if (name) {
+      const secret = this.app.secretStorage.getSecret(name);
+      if (secret)
+        return secret;
+    }
+    return this.settings.apiKey;
+  }
+  hasApiKey() {
+    return this.getApiKey().length > 0;
+  }
+  /** Store a key in the keychain and point settings at it. Caller persists with saveSettings(). */
+  setApiKey(value) {
+    const id = this.settings.apiKeySecretName || this.pickApiKeySecretId(value);
+    this.app.secretStorage.setSecret(id, value);
+    this.settings.apiKeySecretName = id;
+    this.settings.apiKey = "";
+  }
+  /**
+   * Mobile keychains are shared across vaults while desktop is per-vault, so the default id
+   * can already hold a DIFFERENT key (another vault, another account). Never overwrite it:
+   * fall back to a per-install id.
+   */
+  pickApiKeySecretId(value) {
+    const base = "emrald-api-key";
+    const existing = this.app.secretStorage.getSecret(base);
+    if (!existing || existing === value)
+      return base;
+    const raw = this.settings.installId || Math.random().toString(36).slice(2);
+    return `${base}-${raw.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)}`;
+  }
+  /**
+   * One-time move of a pre-1.3.1 plaintext key into the keychain. Order matters: write the
+   * secret, read it back, and only then blank the legacy field. Any failure leaves the
+   * legacy key in place and the migration retries on the next load.
+   */
+  async migrateApiKeyToSecretStorage() {
+    const legacy = this.settings.apiKey;
+    if (!legacy || this.settings.apiKeySecretName)
+      return;
+    try {
+      const id = this.pickApiKeySecretId(legacy);
+      this.app.secretStorage.setSecret(id, legacy);
+      if (this.app.secretStorage.getSecret(id) !== legacy)
+        return;
+      this.settings.apiKeySecretName = id;
+      this.settings.apiKey = "";
+      await this.saveData(this.settings);
+      new import_obsidian37.Notice("Your API key is now stored in the keychain.");
+    } catch (err) {
+      if (this.settings.debugLogging)
+        console.warn("[EMRALD] API key migration failed:", err);
+    }
+  }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
@@ -13916,7 +13983,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
    */
   async reconcileResearchOptIn() {
     try {
-      if (!this.settings.apiKey)
+      if (!this.hasApiKey())
         return;
       const resp = await this.apiClient.getPreferences();
       if (resp.data && typeof resp.data.research_opt_in === "boolean") {
@@ -13937,7 +14004,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
    */
   async syncTimezone() {
     try {
-      if (!this.settings.apiKey)
+      if (!this.hasApiKey())
         return;
       if (this.settings.timezoneSynced)
         return;
@@ -13967,7 +14034,7 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
   async syncDigestPreferences(silent = false) {
     var _a, _b, _c;
     try {
-      if (!this.settings.apiKey)
+      if (!this.hasApiKey())
         return;
       const dayMap = {
         sunday: 0,
@@ -14005,13 +14072,13 @@ var EmraldPlugin = class extends import_obsidian37.Plugin {
   }
   async saveSettings() {
     await this.saveData(this.settings);
-    this.apiClient.updateCredentials(this.settings.apiKey, this.settings.apiUrl);
+    this.apiClient.updateCredentials(this.getApiKey(), this.settings.apiUrl);
     this.folderSync.updateConfig({
       activeFolderPath: this.settings.activeFolderPath,
       inactiveFolderPath: this.settings.inactiveFolderPath
     });
     this.stopSync();
-    if (this.settings.apiKey) {
+    if (this.hasApiKey()) {
       this.startSync();
     }
   }
