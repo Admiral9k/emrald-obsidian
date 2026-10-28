@@ -81,7 +81,7 @@ A full session flow — Start → work → Stop → Effort Receipt:
 1. Create an account at **app.effortmastery.com**
 2. Sign in and generate your API key
 3. Install the EMRALD plugin in Obsidian
-4. Open EMRALD settings and paste in your API key
+4. Open EMRALD settings and paste in your API key (once per device; Obsidian keeps it in its keychain)
 5. Start your first session
 
 If this is your first time using EMRALD, expect the value to build over time.
