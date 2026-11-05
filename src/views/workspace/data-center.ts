@@ -116,7 +116,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Data center', 'All 20 D-metrics — your effort fingerprint', 'trending-up');
+		this.renderHeader(container, 'Data center', 'All 20 metrics: your effort fingerprint', 'trending-up');
 
 		// Pinned metrics note
 		const pinnedNote = container.createDiv({ cls: 'emerald-wv-dc-pinned-note' });
