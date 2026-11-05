@@ -4,6 +4,16 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-11-05
+
+Small quality-of-life release.
+
+### Changed
+- Metrics go by their names throughout the plugin; the numbered labels are gone from the screens.
+- "AI insights" now reads "Extra insights".
+- Pinned sparklines in the sidebar are labelled with the metric name.
+- A paused session is left for you to resume or end, even after a day, instead of being cleared automatically.
+
 ## [1.3.1] - 2026-10-07
 
 Your API key now lives in Obsidian's keychain.
