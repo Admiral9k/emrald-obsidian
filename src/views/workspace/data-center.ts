@@ -104,6 +104,11 @@ export class DataCenterView extends EmraldWorkspaceView {
 	private timeRange: '7d' | '14d' | '30d' | '90d' = '14d';
 	private pinnedKeys: Set<string>;
 	private pinnedNoteText: HTMLElement;
+
+	/** Pinned sparkline names for the note under the header (keys stay internal). */
+	private pinnedNames(): string {
+		return Array.from(this.pinnedKeys).map(k => D_METRICS[k]?.name ?? k).join(', ');
+	}
 	private gridContainer: Element | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
@@ -123,7 +128,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const pinIcon = pinnedNote.createSpan({ cls: 'emerald-wv-dc-pin-icon' });
 		setIcon(pinIcon, 'pin');
 		this.pinnedNoteText = pinnedNote.createSpan({
-			text: `Sidebar sparklines: ${Array.from(this.pinnedKeys).join(', ')}. Click any metric's ★ to change.`
+			text: `Sidebar sparklines: ${this.pinnedNames()}. Click any metric's ★ to change.`
 		});
 
 		// Time range selector
@@ -754,7 +759,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 		// Refresh note
 		if (this.pinnedNoteText) {
-			this.pinnedNoteText.textContent = `Sidebar sparklines: ${Array.from(this.pinnedKeys).join(', ')}. Click any metric's ★ to change.`;
+			this.pinnedNoteText.textContent = `Sidebar sparklines: ${this.pinnedNames()}. Click any metric's ★ to change.`;
 		}
 
 		// Tell the live sidebar EM component to re-render immediately
