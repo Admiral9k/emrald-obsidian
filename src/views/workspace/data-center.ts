@@ -20,7 +20,7 @@ interface MetricInfo {
 	category: string;
 }
 
-const D_METRICS: Record<string, MetricInfo> = {
+export const D_METRICS: Record<string, MetricInfo> = {
 	D1:  { name: 'Effort Balance',           unit: '/10',  category: 'Effort',       goodDirection: 'up',
 	       desc: 'How well your effort matches task demands',
 	       explainer: '10 = perfectly balanced. Lower scores mean a growing gap between what tasks demand and what you invest. Chronic imbalance in either direction (over-investing or under-investing) is a signal to adjust.' },
@@ -28,11 +28,11 @@ const D_METRICS: Record<string, MetricInfo> = {
 	       desc: 'Is your effort balance improving or worsening?',
 	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate — it compares two halves of a 30-day window, so you need sessions spread across at least 2–3 weeks.' },
 	D3:  { name: 'E-Level Accuracy',         unit: '/10',  category: 'Calibration',  goodDirection: 'up',
-	       desc: 'How well E-levels predict actual effort',
+	       desc: 'How closely your E-level estimates match your actual effort',
 	       explainer: 'Compares your E-level assignments to actual perceived effort from receipts. Higher = better calibration. Low accuracy suggests your E-levels need adjusting.' },
 	D4:  { name: 'Context Switching',        unit: '/10',  category: 'Productivity', goodDirection: 'down',
 	       desc: 'How often you jump between projects in a day',
-	       explainer: 'Higher = more switching. Some variety is healthy, but frequent switching fragments focus and increases cognitive load. Look at this alongside D7 (Flow Frequency).' },
+	       explainer: 'Higher = more switching. Some variety is healthy, but frequent switching fragments focus and increases cognitive load. Look at this alongside Flow Frequency.' },
 	D5:  { name: 'Task Initiation',          unit: '/10',  category: 'Productivity', goodDirection: 'down',
 	       desc: 'How long before you start working on new projects',
 	       explainer: `Measures days between creating a project and starting your first session. Higher = longer delays. Persistent high values may signal procrastination or overwhelm. Only counts active projects — set projects to Inactive if they're intentionally "on deck" so they don't inflate this metric.` },
@@ -41,7 +41,7 @@ const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Flags projects with no sessions, very short sessions, discarded sessions, or long gaps since last session. Higher = more avoidance signals detected.' },
 	D7:  { name: 'Flow Frequency',           unit: '/10',  category: 'Effort',       goodDirection: 'up',
 	       desc: 'How often you enter deep focus states',
-	       explainer: 'Percentage of sessions where you reported flow. Higher is better — flow is where your best work happens. Compare with D11 (Peak Hours) to find when flow happens most.' },
+	       explainer: 'Percentage of sessions where you reported flow. Higher is better: flow is where your best work happens. Compare with Peak Hours to find when flow happens most.' },
 	D8:  { name: 'Burnout Risk',             unit: '/100', category: 'Energy',       goodDirection: 'down',
 	       desc: 'Combined risk score from multiple fatigue signals',
 	       explainer: 'The big one. Combines rising effort, declining enjoyment, low flow, emotional strain, and context switching. 0-30 = green, 30-50 = watch it, 50-70 = slow down, 70+ = recharge needed.' },
@@ -235,7 +235,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			if (d7.value >= 6) {
 				sentences.push("You're hitting flow states regularly — that's where your best work happens.");
 			} else if (d7.value >= 3) {
-				sentences.push('Flow is occasional. Check D11 (Peak Hours) to find when focus comes easiest.');
+				sentences.push('Flow is occasional. Check Peak Hours to find when focus comes easiest.');
 			} else {
 				sentences.push('Flow has been rare lately. Consider fewer context switches and longer uninterrupted blocks.');
 			}
@@ -311,7 +311,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			const teaserIcon = teaser.createSpan({ cls: 'emerald-wv-dc-pro-teaser-icon' });
 			setIcon(teaserIcon, 'sparkles');
 			const teaserText = teaser.createSpan({ cls: 'emerald-wv-dc-pro-teaser-text' });
-			teaserText.createSpan({ text: 'Unlock D9\u2013D20: ' });
+			teaserText.createSpan({ text: 'Unlock 12 more metrics: ' });
 			teaserText.createSpan({
 				cls: 'emerald-wv-dc-pro-teaser-detail',
 				text: 'recovery effectiveness, effort volatility, calibration drift, project momentum, and more.'
@@ -350,7 +350,6 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const header = card.createDiv({ cls: 'emerald-wv-metric-header' });
 
 		const keyRow = header.createDiv({ cls: 'emerald-wv-metric-key-row' });
-		keyRow.createSpan({ cls: 'emerald-wv-metric-key', text: key });
 
 		// Pin toggle (not on locked cards)
 		if (!isLocked) {

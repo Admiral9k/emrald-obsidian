@@ -125,7 +125,7 @@ const RESEARCH_OPT_IN_DESC =
 	'features and may be used in published research by Effort Mastery LLC. You can change this anytime.';
 
 const EXPORT_DESC =
-	"Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk — it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + D1-D8 metrics. Pro: everything.";
+	"Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. Pro: everything.";
 
 const ELEVEL_MANAGE_HEADING = 'Manage effort levels';
 const PRO_UPGRADE_URL = 'https://effortmastery.com/pro';

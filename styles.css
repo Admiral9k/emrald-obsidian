@@ -750,7 +750,11 @@
 .emerald-sparkline-key {
 	font-weight: 600;
 	color: var(--interactive-accent);
-	width: 24px;
+	width: 84px;
+	flex: 0 0 84px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 .emerald-sparkline-graph {
 	flex: 0 1 auto;

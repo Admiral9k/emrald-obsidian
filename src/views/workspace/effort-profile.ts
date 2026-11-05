@@ -320,7 +320,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		setIcon(iconEl, icon);
 		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
-			text: `D19 Calibration Drift: ${level}`
+			text: `Calibration Drift: ${level}`
 		});
 		headerRow.createSpan({ cls: 'emerald-wv-drift-value', text: `(${driftValue.toFixed(2)})` });
 
@@ -351,7 +351,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		setIcon(iconEl, 'sparkles');
 		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
-			text: 'Calibration Drift (D19) — Collecting Data'
+			text: 'Calibration Drift: Collecting Data'
 		});
 
 		section.createEl('p', {

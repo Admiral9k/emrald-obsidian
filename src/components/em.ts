@@ -8,6 +8,7 @@ import EmraldPlugin from '../../main';
 import { ComputedMetricHistory, AIInsight } from '../api/client';
 import { createIconEl, ICONS } from '../utils/icons';
 import { tierState } from '../tier';
+import { D_METRICS } from '../views/workspace/data-center';
 import {
 	VIEW_ELEVEL_OVERVIEW, VIEW_INSIGHT_LOG, VIEW_DATA_CENTER,
 	VIEW_EFFORT_PROFILE, VIEW_BURNOUT_MONITOR, VIEW_DIGEST, VIEW_ABOUT
@@ -214,7 +215,8 @@ export class EMComponent {
 		for (const key of this.pinnedMetrics) {
 			const row = this.sparklinesEl.createDiv({ cls: 'emerald-sparkline-row' });
 			row.dataset.metricKey = key;
-			row.createSpan({ cls: 'emerald-sparkline-key', text: key });
+			const keyEl = row.createSpan({ cls: 'emerald-sparkline-key', text: D_METRICS[key]?.name ?? key });
+			keyEl.title = D_METRICS[key]?.name ?? key;
 			row.createSpan({ cls: 'emerald-sparkline-graph', text: '·······' });
 			row.createSpan({ cls: 'emerald-sparkline-value', text: '—' });
 		}
@@ -487,7 +489,7 @@ export class EMComponent {
 
 		card.createEl('p', {
 			cls: 'emerald-upgrade-desc',
-			text: 'Pinned metrics, AI insights, daily digests, and advanced analytics — all with PRO.'
+			text: 'Pinned metrics, extra insights, daily digests, and advanced analytics, all with PRO.'
 		});
 
 		const btn = card.createEl('a', {

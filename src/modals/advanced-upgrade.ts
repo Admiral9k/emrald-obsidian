@@ -42,7 +42,7 @@ export class AdvancedUpgradeModal extends Modal {
 			{ icon: 'target', text: 'More accurate effort predictions' },
 			{ icon: 'brain', text: 'Deeper personality-aware insights' },
 			{ icon: 'flame', text: 'Earlier burnout pattern detection' },
-			{ icon: 'trending-up', text: 'Better calibration drift tracking (D19)' }
+			{ icon: 'trending-up', text: 'Better calibration drift tracking' }
 		];
 
 		for (const item of items) {

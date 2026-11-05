@@ -71,10 +71,10 @@ export class AboutView extends EmraldWorkspaceView {
 
 		const specs = hero.createDiv( { cls: 'emerald-wv-about-specstrip' });
 		const specItems = [
-			{ icon: 'bar-chart-2', label: '20 D-Metrics' },
+			{ icon: 'bar-chart-2', label: '20 Metrics' },
 			{ icon: 'zap', label: '4 E-Levels' },
 			{ icon: 'alert-triangle', label: 'Burnout Monitoring' },
-			{ icon: 'lightbulb', label: 'AI Insights' },
+			{ icon: 'lightbulb', label: 'Extra insights' },
 			{ icon: 'folder', label: 'Built for Obsidian' },
 			{ icon: 'trending-up', label: 'Gets Smarter Over Time' },
 		];
@@ -133,8 +133,8 @@ export class AboutView extends EmraldWorkspaceView {
 		this.makeSection(container, 'what-you-get', 'gift', 'What EMRALD Gives Back', el => {
 			this.para(el as HTMLElement, "The more you use EMRALD honestly, the more it gives back. Here's what you'll see accumulate over time:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'D-Metrics (D1–D20): Twenty diagnostic measurements of your effort patterns, energy balance, and work rhythm');
-			this.bullet(list, 'AI Insight Logs: Observations, suggestions, and discoveries about your patterns across 5 categories');
+			this.bullet(list, 'Metrics: Twenty diagnostic measurements of your effort patterns, energy balance, and work rhythm');
+			this.bullet(list, 'Insight Logs: Observations, suggestions, and discoveries about your patterns across 5 categories');
 			this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you're heading toward exhaustion");
 			this.bullet(list, 'Effort Digests: Weekly and monthly summaries of where your energy went');
 			this.bullet(list, 'Completion Rate: Clarity on which projects you finish versus abandon');
@@ -161,7 +161,7 @@ export class AboutView extends EmraldWorkspaceView {
 			this.para(el as HTMLElement, "Six things make EMRALD work. Here's what each one does:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 			this.bullet(list, 'E-Levels (E1–E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
-			this.bullet(list, 'D-Metrics (D1–D20): Twenty computed measurements of your effort patterns. D1–D8 are available to all users; D9–D20 unlock with Pro.');
+			this.bullet(list, 'Metrics: Twenty computed measurements of your effort patterns. Eight are available to all users; the other twelve unlock with Pro.');
 			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
 			this.bullet(list, 'Data Center: The visual home of all your D-metrics, with charts and context for each measurement.');
 			this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
@@ -228,7 +228,7 @@ export class AboutView extends EmraldWorkspaceView {
 			const featureGrid = proContent.createDiv( { cls: 'emerald-wv-pro-feature-grid' });
 			const features = [
 				{ icon: 'lightbulb', text: 'AI-powered insight logs across 5 distinct categories' },
-				{ icon: 'trending-up', text: 'Supercharged data center with 11 additional metrics (D9–D20)' },
+				{ icon: 'trending-up', text: 'Supercharged data center with 12 additional metrics' },
 				{ icon: 'calendar-range', text: 'Weekly + monthly digests' },
 				{ icon: 'target', text: 'Personalized AI suggestions' },
 				{ icon: 'pin', text: 'Pinned sidebar sparklines' },

@@ -216,7 +216,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const score = typeof state.score === 'number' ? state.score : 0;
 		const scoreRow = section.createDiv({ cls: 'emerald-wv-burnout-score-row' });
 		const scoreLabelWrap = scoreRow.createSpan({ cls: 'emerald-wv-burnout-score-label-wrap' });
-		scoreLabelWrap.createSpan({ cls: 'emerald-wv-burnout-score-label', text: 'D8 Burnout Risk Score' });
+		scoreLabelWrap.createSpan({ cls: 'emerald-wv-burnout-score-label', text: 'Burnout Risk Score' });
 
 		// ⓘ explainer tooltip
 		const infoBtn = scoreLabelWrap.createSpan({
@@ -362,7 +362,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		setIcon(sparkInfo, 'info');
 		const sparkExplainer = section.createDiv({
 			cls: 'emerald-wv-burnout-score-explainer',
-			text: 'This tracks your D8 Burnout Risk Score over time. Each point is the daily score (0–100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating.'
+			text: 'This tracks your Burnout Risk Score over time. Each point is the daily score (0–100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating.'
 		});
 		sparkExplainer.addClass('emrald-hidden');
 		sparkInfo.addEventListener('click', (e) => {
