@@ -707,10 +707,12 @@ export class EmraldSidebarView extends ItemView {
 					// Active session has queued stop — skip re-init
 					return;
 				}
-				// Guard: auto-discard stale sessions older than 24h
+				// Guard: auto-discard stale sessions older than 24h.
+				// S9 11/5: never a PAUSED one. /sessions/active now returns paused sessions (they used to be invisible),
+				// and a paused session is the user's to resume or end, not ours to throw away.
 				const sessionAge = Date.now() - new Date(session.started_at).getTime();
 				const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-				if (sessionAge > TWENTY_FOUR_HOURS) {
+				if (sessionAge > TWENTY_FOUR_HOURS && session.status !== 'paused') {
 					try {
 						const discardResp = await this.plugin.apiClient.discardSession(session.id);
 						if (discardResp.error && !discardResp.queued) {
