@@ -293,7 +293,7 @@ export class EffortReceiptModal extends Modal {
 			hedonic_valence: this.hedonicValence,
 			flow_occurred: this.flowOccurred,
 			demand_investment_balance: this.demandInvestmentBalance,
-			effort_source: this.effortSource.length > 0 ? this.effortSource : ['complexity'],
+			effort_source: this.effortSource,
 			notes: this.notes || undefined
 		};
 
