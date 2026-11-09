@@ -923,7 +923,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: "You're all set!" });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "You're all set. Start a session before you start your work, and EMRALD keeps the clock. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
+			text: "You're all set. Start a session before you start your work, and EMRALD will track the work time for you. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
 		});
 
 		container.createEl('p', {
@@ -945,7 +945,7 @@ export class OnboardingModal extends Modal {
 				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
 		})(); });
-		researchToggle.appendText(' Help improve EMRALD: contribute anonymous usage data to build better features and advance effort management research. ');
+		researchToggle.appendText(' Help improve EMRALD: contribute anonymous usage data to build additional features and improve existing ones, and to advance effort management research. ');
 		researchToggle.createSpan({
 			cls: 'emerald-link',
 			text: 'Change anytime in Settings → Privacy.'

@@ -122,8 +122,8 @@ function digestTimeOptions(): Record<string, string> {
 
 const RESEARCH_OPT_IN_DESC =
 	'Effort management is a new field, and every data point helps make it better. ' +
-	'Your anonymized usage patterns (never notes, names, or identifiers) help us build better ' +
-	'features and may be used in published research by Effort Mastery LLC. You can change this anytime.';
+	'Your anonymized usage patterns (never notes, names, or identifiers) help us build additional features and improve existing ones, and ' +
+	'may be used in published research by Effort Mastery LLC. You can change this anytime.';
 
 const EXPORT_DESC =
 	"Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. Pro: everything.";

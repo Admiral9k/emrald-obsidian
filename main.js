@@ -1903,7 +1903,7 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "You're all set!" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "You're all set. Start a session before you start your work, and EMRALD keeps the clock. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
+          text: "You're all set. Start a session before you start your work, and EMRALD will track the work time for you. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
         });
         container.createEl("p", {
           cls: "emerald-onboard-desc emerald-onboard-profile-nudge",
@@ -1926,7 +1926,7 @@ var init_onboarding = __esm({
             }
           })();
         });
-        researchToggle.appendText(" Help improve EMRALD: contribute anonymous usage data to build better features and advance effort management research. ");
+        researchToggle.appendText(" Help improve EMRALD: contribute anonymous usage data to build additional features and improve existing ones, and to advance effort management research. ");
         researchToggle.createSpan({
           cls: "emerald-link",
           text: "Change anytime in Settings \u2192 Privacy."
@@ -4855,7 +4855,7 @@ function digestTimeOptions() {
   }
   return options;
 }
-var RESEARCH_OPT_IN_DESC = "Effort management is a new field, and every data point helps make it better. Your anonymized usage patterns (never notes, names, or identifiers) help us build better features and may be used in published research by Effort Mastery LLC. You can change this anytime.";
+var RESEARCH_OPT_IN_DESC = "Effort management is a new field, and every data point helps make it better. Your anonymized usage patterns (never notes, names, or identifiers) help us build additional features and improve existing ones, and may be used in published research by Effort Mastery LLC. You can change this anytime.";
 var EXPORT_DESC = "Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. Pro: everything.";
 var ELEVEL_MANAGE_HEADING = "Manage effort levels";
 var PRO_UPGRADE_URL = "https://effortmastery.com/pro";
