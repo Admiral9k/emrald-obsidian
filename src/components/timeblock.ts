@@ -26,6 +26,7 @@ export interface ActiveSessionState {
 	totalPausedMs: number;        // Cumulative time spent paused
 	priorMinutesToday: number;    // Minutes already worked on this project today
 	isPendingSync?: boolean;      // True if session was started offline and hasn't synced yet
+	overtimeSnoozeMin?: number;   // S14: elapsed work minutes at the last manual resume; the auto-pause next fires 2h of work after it
 	overtimeAutoPaused: boolean;  // C1: true once the +2h-past-prescribed auto-pause has fired
 	                              // for the current run; cleared on manual resume so a session
 	                              // that crosses again after resuming may re-fire (matches the
@@ -200,7 +201,8 @@ export class TimeblockComponent {
 			totalPausedMs: s.totalPausedMs,
 			priorMinutesToday: s.priorMinutesToday,
 			isPendingSync: s.isPendingSync ?? false,
-			overtimeAutoPaused: s.overtimeAutoPaused
+			overtimeAutoPaused: s.overtimeAutoPaused,
+			overtimeSnoozeMin: s.overtimeSnoozeMin
 		};
 	}
 
@@ -221,7 +223,8 @@ export class TimeblockComponent {
 			totalPausedMs: data.totalPausedMs as number,
 			priorMinutesToday: data.priorMinutesToday as number,
 			isPendingSync: (data.isPendingSync as boolean) ?? false,
-			overtimeAutoPaused: (data.overtimeAutoPaused as boolean) ?? false
+			overtimeAutoPaused: (data.overtimeAutoPaused as boolean) ?? false,
+			overtimeSnoozeMin: typeof data.overtimeSnoozeMin === 'number' ? data.overtimeSnoozeMin : undefined
 		};
 
 		this.stopIdleAnimation();

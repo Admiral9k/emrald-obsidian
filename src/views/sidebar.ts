@@ -10,6 +10,7 @@ import { updateSessionStats, isEmraldNote, initializeEmraldFrontmatter, buildNot
 import { writeDailySummary } from '../sync/daily-summary';
 import type { LevelRef } from '../e-levels';
 import { levelLabel, prescribedMinutes } from '../e-levels';
+import { overtimeAutoPauseDue } from '../components/overtimeAutoPause';
 import { VIEW_BURNOUT_MONITOR } from './workspace/base';
 
 export const VIEW_TYPE_EMRALD = 'emrald-sidebar';
@@ -947,11 +948,16 @@ export class EmraldSidebarView extends ItemView {
 		const session = this.timeblock.state.activeSession;
 		if (!session) return;
 
+		// S14: work minutes at the moment of resume (elapsedMs is frozen while paused).
+		const workMinAtResume = session.elapsedMs / 60000;
 		const resp = await this.plugin.apiClient.resumeSession(session.sessionId);
 		if (!resp.error || resp.queued) {
 			this.timeblock.resumeSession();
-			// C1: re-arm the overtime auto-pause guard on every manual resume — a session
-			// that's still past prescribed+2h after resuming is allowed to fire again.
+			// C1 + S14: re-arm the overtime auto-pause guard on a manual resume, but snooze it from the
+			// current work time. elapsedMin excludes pauses, so a session already past prescribed+2h used
+			// to re-pause on the next tick and could not be resumed; now it fires again only after 2h of
+			// further work.
+			session.overtimeSnoozeMin = workMinAtResume;
 			session.overtimeAutoPaused = false;
 			if (session.isPendingSync) await this.persistProvisionalSession();
 		}
@@ -975,7 +981,7 @@ export class EmraldSidebarView extends ItemView {
 		const prescribedMin = prescribedMinutes(session.effortLevel, availableHours);
 		if (prescribedMin <= 0) return;
 
-		if (elapsedMin > prescribedMin + 120) {
+		if (overtimeAutoPauseDue(elapsedMin, prescribedMin, session.overtimeSnoozeMin)) {
 			// Mark fired before the async pause round-trip so a fast-firing second tick
 			// can't double-trigger while the request is in flight.
 			session.overtimeAutoPaused = true;
