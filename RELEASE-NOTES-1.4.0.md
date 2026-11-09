@@ -4,7 +4,7 @@ Your receipts, project by project.
 
 New:
 
-- A receipt graph for each project. In Effort Allocations, the new graph button on a project row opens a panel under it. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), see every receipt for that project as a line of dots, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Filter by 7, 14, 30 or 60 days, and step with Earlier and Later. Free for everyone.
+- A receipt graph for each project. In the E-Level Overview, the new graph button on a project row opens a panel under it. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), see every receipt for that project as a line of dots, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Filter by 7, 14, 30 or 60 days, and step with Earlier and Later. Free for everyone.
 - An info button next to Export data, in Settings and in Effort Profile, explaining what an export includes.
 - The Data Center now explains when Toggl projects are left out of a metric.
 

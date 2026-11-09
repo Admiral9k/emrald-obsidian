@@ -9,7 +9,7 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 Your receipts, project by project.
 
 ### Added
-- A receipt graph for each project in Effort Allocations: pick a receipt value, see the project's receipts as a line of dots, and click a dot to read that session. Free for everyone.
+- A receipt graph for each project in the E-Level Overview: pick a receipt value, see the project's receipts as a line of dots, and click a dot to read that session. Free for everyone.
 - An info button next to Export data (Settings and Effort Profile).
 - A note in the Data Center when Toggl projects are left out of a metric.
 

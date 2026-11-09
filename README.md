@@ -1,6 +1,6 @@
 # EMRALD for Obsidian
 
-**Track what work costs you, not just what you finish.**
+**Track what work costs you, beyond what you finish.**
 
 ![EMRALD for Obsidian](screenshots/hero.png)
 
@@ -19,7 +19,7 @@ EMRALD was built for that gap.
 
 Instead of forcing you into a brand-new productivity system, it adds an effort-aware layer to Obsidian so you can keep the workflow you already trust and gain a clearer picture of how your work affects you over time.
 
-**Keep your stuff. We'll make it smarter.**
+**Keep your stuff. EMRALD adds the effort layer.**
 
 ---
 
@@ -41,36 +41,36 @@ EMRALD is especially useful if you:
 - already manage work or life systems inside Obsidian
 - want more than time tracking or task completion
 - regularly feel "productive" but still end the day cooked
-- care about sustainable output, not just maximum output
+- care about sustainable output over maximum output
 - want your system to reflect real capacity, not fantasy capacity
 
 ---
 
 ## Screenshots
 
-### The sidebar — your daily workspace
-Timeblock timer, projects, and effort tools — always one click away.
+### The sidebar: your daily workspace
+Timeblock timer, projects, and effort tools, always one click away.
 
 | Timeblock (active session) | Projects |
 | :---: | :---: |
 | ![Timer running](screenshots/timer-running-dark.png) | ![Projects](screenshots/sidebar-projects-dark.png) |
 
-### The workspace views — your patterns over time
+### The workspace views: your patterns over time
 
-**E-Level Overview** — see how your day breaks down across effort tiers.
+**E-Level Overview**: see how your day breaks down across effort tiers.
 ![E-Level Overview](screenshots/elevel-overview-dark.png)
 
-**Effort Profile** — how EMRALD sees your capacity, endurance, and motivation.
+**Effort Profile**: how EMRALD sees your capacity, endurance, and motivation.
 ![Effort Profile](screenshots/effort-profile-dark.png)
 
-**Burnout Monitor** — sustained-effort signal watching, before patterns get obvious.
+**Burnout Monitor**: sustained-effort signal watching, before patterns get obvious.
 ![Burnout Monitor](screenshots/burnout-monitor-dark.png)
 
 _Screenshots show dark mode. EMRALD adapts to your active Obsidian theme._
 
 ### See it in action
 
-A full session flow — Start → work → Stop → Effort Receipt:
+A full session flow: Start → work → Stop → Effort Receipt:
 
 ![EMRALD demo](screenshots/demo.gif)
 
@@ -85,19 +85,21 @@ A full session flow — Start → work → Stop → Effort Receipt:
 5. Start your first session
 
 If this is your first time using EMRALD, expect the value to build over time.
-The first few sessions establish the baseline. The pattern recognition gets stronger as the data accumulates.
+The first few sessions give you a starting point. Keep filling in your receipts for a month and the full picture is yours.
 
 ---
 
-## What's new: effort profiles, area grouping, and forecasting
+## What's new: receipt graphs, effort profiles, area grouping, and forecasting
 
-**Per-project effort profiles.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your prediction next to what actually happened, side by side. It never blends the two into a fake composite score.
+**Receipt graph.** In the E-Level Overview, each project row has a graph button. It opens that project's receipts as a line of dots, right under the row. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), filter by 7, 14, 30 or 60 days, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Free for everyone.
 
-**Effort forecasting.** For multi-day projects, EMRALD can suggest a starting effort level and field hints. Drawn from how similar past projects actually went for you, not some generic guess. If there isn't enough history yet, it tells you that plainly.
+**Per-project effort profiles.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your forecast next to what actually happened, side by side. It never blends the two into a fake composite score.
+
+**Effort forecasting.** For multi-day projects, EMRALD can suggest a starting effort level and field hints. Drawn from how similar past projects actually went for you. If there isn't enough history yet, it tells you that plainly.
 
 **Area grouping.** Tag projects by area (Work, Health, Family, or whatever fits your life) and see across your workspace.
 
-**(PRO mode) Smarter insights.** The insight engine now varies its phrasing instead of repeating the same sentence. It also learns from insights you dismiss and surfaces new insights in two categories: Discovery (patterns in your own data) and expanded Warnings (early heads-ups on sleep and effort volatility). Burnout warnings are unchanged. Same high bar as always.
+**Extra insights (Pro).** Phrasing varies instead of repeating the same sentence, it learns from insights you dismiss, and it adds two categories: Discovery (patterns in your own data) and expanded Warnings (early heads-ups on sleep and effort volatility). Burnout warnings are identical on every plan.
 
 ## Templater & Periodic Notes integration
 
@@ -122,9 +124,9 @@ If you use **Templater** and **Periodic Notes**, you can pull this data into you
 ### What the summary includes
 
 - **Session count and total hours** for the day
-- **Project breakdown** — which projects you worked on, how long, what effort level, how many sessions
-- **Check-in scores** — energy, focus, stress, sleep quality, mental clarity
-- **Burnout risk level** — Low / Moderate / High / Critical with score
+- **Project breakdown**: which projects you worked on, how long, what effort level, how many sessions
+- **Check-in scores**: energy, focus, stress, sleep quality, mental clarity
+- **Burnout risk level**: Low / Moderate / High / Critical with score
 
 ### Example output
 
@@ -142,9 +144,9 @@ If you use **Templater** and **Periodic Notes**, you can pull this data into you
 ### Notes
 
 - The `.emrald` folder is created automatically the first time EMRALD writes the summary.
-- A `README.md` inside `.emrald/` has setup instructions and use case ideas — it’s created once and never overwritten.
-- The file updates in place — it always reflects _today's_ data, not historical.
-- If you don't use Templater, you can still open `.emrald/daily-summary.md` directly — it's a plain markdown file on disk.
+- A `README.md` inside `.emrald/` has setup instructions and use case ideas. It’s created once and never overwritten.
+- The file updates in place. It always reflects _today's_ data, not historical.
+- If you don't use Templater, you can still open `.emrald/daily-summary.md` directly. It's a plain markdown file on disk.
 
 ### Suggested uses
 
@@ -163,12 +165,12 @@ The summary gives you the raw data. Your daily note is where you add the meaning
 
 **Track patterns over time:**
 - Compare your check-in scores with how the day actually went
-- Notice when high-stress days cluster — that’s a burnout signal your task list won’t show
-- Catch effort drift — spending hours on the wrong project without realizing it
+- Notice when high-stress days cluster. That’s a burnout signal your task list won’t show
+- Catch effort drift: spending hours on the wrong project without realizing it
 
 **Use it as an accountability mirror:**
 - "I planned to focus on Project X but spent 80% of my effort on Project Y"
-- "Burnout risk has been Moderate three days straight — time to ease off"
+- "Burnout risk has been Moderate three days straight, time to ease off"
 - "My clarity was 9/10 and I wasted it on admin tasks"
 
 ---
@@ -182,17 +184,17 @@ It is built to match the workspace visually, but it is completely optional and c
 
 ## Privacy and data
 
-EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync session data, metrics, and insights. This is how the plugin works — there is no local-only mode.
+EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync session data, metrics, and insights. This is how the plugin works: there is no local-only mode.
 
 **What EMRALD sends:**
 - Session data (start/stop times, effort level, project association)
 - Daily check-in responses (energy, readiness)
-- Project metadata (name, folder, effort level)
+- Project metadata (name, folder, effort level, linked note path)
 
 **What EMRALD never sends:**
-- Note content — EMRALD does not read, upload, or modify the body of your notes
+- Note content: EMRALD does not read, upload, or modify the body of your notes
 - File contents, attachments, or images
-- Vault structure beyond the folders you designate as Active/Inactive during onboarding
+- Vault structure beyond the folders you designate as Active/Inactive during onboarding and the note path you choose for a linked project
 
 **Vault access:**
 - EMRALD lists your vault's markdown files so you can pick a note to link to a project (in onboarding and from the sidebar) and to find a project's note again when its path has changed. It reads no note content.
@@ -200,9 +202,9 @@ EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync sess
 - No background vault scanning occurs outside of the folder sync you configure
 
 **External domains:**
-- `api.effortmastery.com` — API (session sync, metrics, insights, authentication)
-- `app.effortmastery.com` — linked from settings for account management
-- `getemrald.com` — linked from the About view for documentation
+- `api.effortmastery.com`: API (session sync, metrics, insights, authentication)
+- `app.effortmastery.com`: linked from settings for account management
+- `getemrald.com`: linked from the About view for documentation
 
 No data is shared with third parties. No analytics or tracking SDKs are included.
 Full privacy policy: [effortmastery.com/privacy](https://effortmastery.com/privacy)
@@ -226,4 +228,4 @@ npm run build
 
 ## License
 
-MIT — Effort Mastery LLC
+MIT, Effort Mastery LLC
