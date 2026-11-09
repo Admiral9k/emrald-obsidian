@@ -1903,11 +1903,11 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: "You're all set!" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "EMRALD has enough data to start working for you. Track your sessions, check your metrics, and if you're a PRO user, get insights right away."
+          text: "You're all set. Start a session before you start your work, and EMRALD keeps the clock. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
         });
         container.createEl("p", {
           cls: "emerald-onboard-desc emerald-onboard-profile-nudge",
-          text: "Want even smarter insights? Complete your effort profile \u2014 it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier."
+          text: "Want more from your insights? Complete your effort profile. It helps EMRALD fit effort levels to your work style and watch for burnout patterns."
         });
         const researchRow = container.createDiv({ cls: "emerald-onboard-research" });
         const researchToggle = researchRow.createEl("label", { cls: "emerald-onboard-research-label" });
@@ -1926,7 +1926,7 @@ var init_onboarding = __esm({
             }
           })();
         });
-        researchToggle.appendText(" Help improve EMRALD \u2014 contribute anonymous usage data to build smarter features and advance effort management research. ");
+        researchToggle.appendText(" Help improve EMRALD: contribute anonymous usage data to build better features and advance effort management research. ");
         researchToggle.createSpan({
           cls: "emerald-link",
           text: "Change anytime in Settings \u2192 Privacy."
@@ -4300,10 +4300,10 @@ var init_celebration = __esm({
         contentEl.addClass("emerald-modal", "emerald-celebration-modal");
         const iconEl = contentEl.createDiv({ cls: "emerald-celebration-icon" });
         iconEl.textContent = "\u{1F389}";
-        contentEl.createEl("h2", { text: "Your first effort receipt!" });
+        contentEl.createEl("h2", { text: "First receipt filed." });
         const body = contentEl.createDiv({ cls: "emerald-celebration-body" });
         body.createEl("p", {
-          text: `You just logged ${this.formatDuration(this.sessionMinutes)} on ${this.itemName}. That's real data about how you spend your effort.`
+          text: "Done! That's your first effort receipt filed. Check out the other core elements of EMRALD."
         });
         if (this.effortLevel && this.availableHours > 0) {
           const budgetInfo = this.getBudgetContext();
@@ -4312,9 +4312,22 @@ var init_celebration = __esm({
             text: budgetInfo
           });
         }
+        const list = body.createEl("ul", { cls: "emerald-celebration-list" });
+        const items = [
+          ["Check-in", "Give context to the day's weight to better understand your effort."],
+          ["Projects", "Choose what to work on next, and set how much of your day it takes."],
+          ["Session timer", "Start (and stop) your project sessions."],
+          ["Data Center and effort profile", "Built from your numbers and receipts. Pro unlocks the whole catalog."],
+          ["Burnout", "A heads-up, free on every plan."]
+        ];
+        for (const [label, text] of items) {
+          const li = list.createEl("li");
+          li.createEl("strong", { text: `${label}: ` });
+          li.appendText(text);
+        }
         body.createEl("p", {
           cls: "emerald-celebration-encouragement",
-          text: "Every receipt you submit makes EMRALD smarter about your effort patterns. Keep going \u2014 your data tells a story no task list ever could."
+          text: "Your receipts land in your numbers from here on out. Keep filling them out for a month and the full picture is yours!"
         });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions emerald-celebration-actions" });
         const btn = actions.createEl("button", {
@@ -4328,9 +4341,9 @@ var init_celebration = __esm({
         const levelName = levelDisplayName(this.effortLevel) || "effort";
         const percentUsed = prescribedMin > 0 ? Math.round(this.sessionMinutes / prescribedMin * 100) : 0;
         if (percentUsed >= 100) {
-          return `That session covered your full ${levelName} budget for ${this.itemName} today. Well spent.`;
+          return `That session covered your full ${levelName} budget for ${this.itemName} today.`;
         } else {
-          return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
+          return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}.`;
         }
       }
       formatDuration(minutes) {
@@ -4842,7 +4855,7 @@ function digestTimeOptions() {
   }
   return options;
 }
-var RESEARCH_OPT_IN_DESC = "Effort management is a new field, and every data point helps make it better. Your anonymized usage patterns (never notes, names, or identifiers) help us build smarter features and may be used in published research by Effort Mastery LLC. You can change this anytime.";
+var RESEARCH_OPT_IN_DESC = "Effort management is a new field, and every data point helps make it better. Your anonymized usage patterns (never notes, names, or identifiers) help us build better features and may be used in published research by Effort Mastery LLC. You can change this anytime.";
 var EXPORT_DESC = "Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. Pro: everything.";
 var ELEVEL_MANAGE_HEADING = "Manage effort levels";
 var PRO_UPGRADE_URL = "https://effortmastery.com/pro";
@@ -8779,7 +8792,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
     empty.createEl("h3", { text: "No insights yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
-      text: "EMRALD generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets."
+      text: "EMRALD generates insights from your own sessions and receipts. Keep filling in your receipts for a month and the full picture is yours."
     });
     const checklist = empty.createDiv({ cls: "emerald-wv-empty-checklist" });
     checklist.createDiv({ cls: "emerald-wv-empty-check", text: "\u2022 Complete work sessions with effort receipts" });
@@ -10839,7 +10852,7 @@ var AboutView = class extends EmraldWorkspaceView {
       { icon: "alert-triangle", label: "Burnout Monitoring" },
       { icon: "lightbulb", label: "Extra insights" },
       { icon: "folder", label: "Built for Obsidian" },
-      { icon: "trending-up", label: "Gets Smarter Over Time" }
+      { icon: "trending-up", label: "A Fuller Picture Over Time" }
     ];
     for (const s of specItems) {
       const chip = specs.createSpan({ cls: "emerald-wv-about-speckchip" });

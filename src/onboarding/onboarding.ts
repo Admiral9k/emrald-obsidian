@@ -923,12 +923,12 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: "You're all set!" });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "EMRALD has enough data to start working for you. Track your sessions, check your metrics, and if you're a PRO user, get insights right away."
+			text: "You're all set. Start a session before you start your work, and EMRALD keeps the clock. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
 		});
 
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want even smarter insights? Complete your effort profile — it helps EMRALD understand your work style, calibrate effort levels, and catch burnout patterns earlier.'
+			text: 'Want more from your insights? Complete your effort profile. It helps EMRALD fit effort levels to your work style and watch for burnout patterns.'
 		});
 
 		// Research opt-in
@@ -945,7 +945,7 @@ export class OnboardingModal extends Modal {
 				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
 		})(); });
-		researchToggle.appendText(' Help improve EMRALD — contribute anonymous usage data to build smarter features and advance effort management research. ');
+		researchToggle.appendText(' Help improve EMRALD: contribute anonymous usage data to build better features and advance effort management research. ');
 		researchToggle.createSpan({
 			cls: 'emerald-link',
 			text: 'Change anytime in Settings → Privacy.'

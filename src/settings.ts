@@ -122,7 +122,7 @@ function digestTimeOptions(): Record<string, string> {
 
 const RESEARCH_OPT_IN_DESC =
 	'Effort management is a new field, and every data point helps make it better. ' +
-	'Your anonymized usage patterns (never notes, names, or identifiers) help us build smarter ' +
+	'Your anonymized usage patterns (never notes, names, or identifiers) help us build better ' +
 	'features and may be used in published research by Effort Mastery LLC. You can change this anytime.';
 
 const EXPORT_DESC =

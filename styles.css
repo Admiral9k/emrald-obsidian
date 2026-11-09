@@ -4555,6 +4555,16 @@ span.emerald-pro-pill {
 	color: var(--text-muted);
 	font-size: 13px;
 }
+.emerald-celebration-list {
+	margin: 0 0 12px;
+	padding-left: 18px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--text-normal);
+}
+.emerald-celebration-list li {
+	margin-bottom: 6px;
+}
 .emerald-celebration-actions {
 	justify-content: center;
 }

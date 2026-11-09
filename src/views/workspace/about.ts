@@ -76,7 +76,7 @@ export class AboutView extends EmraldWorkspaceView {
 			{ icon: 'alert-triangle', label: 'Burnout Monitoring' },
 			{ icon: 'lightbulb', label: 'Extra insights' },
 			{ icon: 'folder', label: 'Built for Obsidian' },
-			{ icon: 'trending-up', label: 'Gets Smarter Over Time' },
+			{ icon: 'trending-up', label: 'A Fuller Picture Over Time' },
 		];
 		for (const s of specItems) {
 			const chip = specs.createSpan( { cls: 'emerald-wv-about-speckchip' });

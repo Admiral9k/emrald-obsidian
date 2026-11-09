@@ -109,7 +109,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'No insights yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'EMRALD generates insights as it learns your work patterns. The more sessions you complete and receipts you fill out, the smarter it gets.'
+			text: 'EMRALD generates insights from your own sessions and receipts. Keep filling in your receipts for a month and the full picture is yours.'
 		});
 
 		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });

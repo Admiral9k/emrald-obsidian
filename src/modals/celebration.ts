@@ -42,13 +42,13 @@ export class CelebrationModal extends Modal {
 		iconEl.textContent = '🎉';
 
 		// Title
-		contentEl.createEl('h2', { text: 'Your first effort receipt!' });
+		contentEl.createEl('h2', { text: 'First receipt filed.' });
 
 		// Body — contextualizes against E-level budget
 		const body = contentEl.createDiv({ cls: 'emerald-celebration-body' });
 
 		body.createEl('p', {
-			text: `You just logged ${this.formatDuration(this.sessionMinutes)} on ${this.itemName}. That's real data about how you spend your effort.`
+			text: "Done! That's your first effort receipt filed. Check out the other core elements of EMRALD."
 		});
 
 		// Budget context
@@ -60,10 +60,25 @@ export class CelebrationModal extends Modal {
 			});
 		}
 
-		// Encouragement
+		// What else to look at (Devon's approved text, 11/9)
+		const list = body.createEl('ul', { cls: 'emerald-celebration-list' });
+		const items: Array<[string, string]> = [
+			['Check-in', "Give context to the day's weight to better understand your effort."],
+			['Projects', 'Choose what to work on next, and set how much of your day it takes.'],
+			['Session timer', 'Start (and stop) your project sessions.'],
+			['Data Center and effort profile', 'Built from your numbers and receipts. Pro unlocks the whole catalog.'],
+			['Burnout', 'A heads-up, free on every plan.'],
+		];
+		for (const [label, text] of items) {
+			const li = list.createEl('li');
+			li.createEl('strong', { text: `${label}: ` });
+			li.appendText(text);
+		}
+
+		// Closer
 		body.createEl('p', {
 			cls: 'emerald-celebration-encouragement',
-			text: 'Every receipt you submit makes EMRALD smarter about your effort patterns. Keep going — your data tells a story no task list ever could.'
+			text: 'Your receipts land in your numbers from here on out. Keep filling them out for a month and the full picture is yours!'
 		});
 
 		// Single dismiss button
@@ -85,9 +100,9 @@ export class CelebrationModal extends Modal {
 			: 0;
 
 		if (percentUsed >= 100) {
-			return `That session covered your full ${levelName} budget for ${this.itemName} today. Well spent.`;
+			return `That session covered your full ${levelName} budget for ${this.itemName} today.`;
 		} else {
-			return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}. EMRALD tracks this so you don't have to guess.`;
+			return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}.`;
 		}
 	}
 
