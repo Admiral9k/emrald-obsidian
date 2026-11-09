@@ -354,6 +354,34 @@ function fakeApi(all, log = []) {
     ok(v.openGraph === null && events.docListeners.length === 0, 'closing the view destroys the panel and its listener');
   }
 
+  // 6. Bundled siblings: D5/D6 Toggl "left out" note (C1c) and the export tooltip copy
+  {
+    const pn = require(bundle('src/views/workspace/provider-note.ts', 'provider-note.cjs'));
+    const { providerNoteState, providerLeftOut, renderProviderNote, PROVIDER_TOOLTIP } = pn;
+    ok(providerNoteState('D5', { reason: 'provider_projects_excluded' }) === 'empty' && providerNoteState('D6', { reason: 'provider_projects_excluded', excluded_provider_items: 2 }) === 'empty', 'D5/D6 reason => empty state');
+    ok(providerNoteState('D5', { excluded_provider_items: 3 }) === 'partial' && providerNoteState('D6', { excluded_provider_items: '1' }) === 'partial', 'excluded items > 0 => footnote (string numbers too)');
+    ok(providerNoteState('D5', {}) === null && providerNoteState('D5', null) === null && providerNoteState('D5', { excluded_provider_items: 0 }) === null, 'no Toggl fields => no note');
+    ok(providerNoteState('D1', { reason: 'provider_projects_excluded', excluded_provider_items: 4 }) === null, 'other metrics never show the note');
+    ok(providerLeftOut({ excluded_provider_items: 1 }) === '1 Toggl project left out' && providerLeftOut({ excluded_provider_items: 3 }) === '3 Toggl projects left out', 'plural rule');
+    const host = new FakeEl('div');
+    renderProviderNote(host, 'D5', { reason: 'provider_projects_excluded' });
+    const strong = host.all().find((e) => e.tag === 'strong');
+    const rest = strong.parent.text;
+    ok(strong.text + rest === 'No data yet. This metric covers projects you manage in EMRALD. Your Toggl projects are left out of it, and they still count in your other metrics. Add a project in EMRALD to see this one.', 'state A copy is the approved text verbatim (bold lead + rest)');
+    const host2 = new FakeEl('div');
+    renderProviderNote(host2, 'D6', { excluded_provider_items: 2 });
+    ok(host2.textContent === 'Based on your EMRALD projects. 2 Toggl projects left out.', 'state B copy is the approved text verbatim');
+    ok(renderProviderNote(new FakeEl('div'), 'D8', { excluded_provider_items: 2 }) === false, 'no note for D8');
+    const webTip = webPath ? path.join(path.dirname(webPath), 'exportTip.ts') : '';
+    const { EXPORT_TIP } = require(bundle('src/utils/export-tip.ts', 'export-tip.cjs'));
+    if (webTip && fs.existsSync(webTip)) {
+      const js = esbuild.transformSync(fs.readFileSync(webTip, 'utf8'), { loader: 'ts', format: 'cjs' }).code;
+      const m = { exports: {} }; new Function('module', 'exports', js)(m, m.exports);
+      ok(m.exports.EXPORT_TIP === EXPORT_TIP, 'export tooltip is byte-identical to the web twin (cmo-gated copy)');
+    }
+    ok(!/\u2014|\u2013/.test(EXPORT_TIP + PROVIDER_TOOLTIP), 'no em or en dashes in the new tooltip strings');
+  }
+
   console.log(fails ? `\n${fails} FAILED` : '\nALL PASSED');
   fs.rmSync(out, { recursive: true, force: true });
   process.exit(fails ? 1 : 0);

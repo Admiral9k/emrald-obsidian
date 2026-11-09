@@ -151,9 +151,9 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		type: 'enum',
 		options: [
 			{ value: 'under_1h', label: 'Under 1 hour' },
-			{ value: '1_2h', label: '1–2 hours' },
-			{ value: '2_3h', label: '2–3 hours' },
-			{ value: '3_4h', label: '3–4 hours' },
+			{ value: '1_2h', label: '1 to 2 hours' },
+			{ value: '2_3h', label: '2 to 3 hours' },
+			{ value: '3_4h', label: '3 to 4 hours' },
 			{ value: 'over_4h', label: 'Over 4 hours' }
 		]
 	},
@@ -173,9 +173,9 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		question: 'How many distinct areas of your life do you actively manage?',
 		type: 'enum',
 		options: [
-			{ value: '2_3', label: '2–3 areas' },
-			{ value: '4_5', label: '4–5 areas' },
-			{ value: '6_7', label: '6–7 areas' },
+			{ value: '2_3', label: '2 to 3 areas' },
+			{ value: '4_5', label: '4 to 5 areas' },
+			{ value: '6_7', label: '6 to 7 areas' },
 			{ value: '8_plus', label: '8 or more' }
 		]
 	},

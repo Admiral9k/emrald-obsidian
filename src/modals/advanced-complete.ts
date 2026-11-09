@@ -24,7 +24,7 @@ export class AdvancedCompleteModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'EMRALD now has the fullest picture of how you work. Your effort predictions, burnout detection, and insights will be at their most accurate.'
+			text: 'EMRALD now has the fullest picture of how you work. Your effort forecasts, burnout detection, and insights will draw on all of your answers.'
 		});
 
 		contentEl.createEl('p', {

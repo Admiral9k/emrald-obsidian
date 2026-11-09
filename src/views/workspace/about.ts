@@ -93,7 +93,7 @@ export class AboutView extends EmraldWorkspaceView {
 			callout.createDiv( { cls: 'emerald-wv-about-callout-title', text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
 			callout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. EMRALD tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
 
-			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1–E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
+			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1 to E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
 			const quoteWhatItIs = el.createDiv( { cls: 'emerald-wv-about-thesis' });
 			quoteWhatItIs.createEl('blockquote', { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
 		});
@@ -138,7 +138,7 @@ export class AboutView extends EmraldWorkspaceView {
 			this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you're heading toward exhaustion");
 			this.bullet(list, 'Effort Digests: Weekly and monthly summaries of where your energy went');
 			this.bullet(list, 'Completion Rate: Clarity on which projects you finish versus abandon');
-			this.bullet(list, 'Calibration Over Time: EMRALD adjusts its model of you the more data it has, getting smarter and more accurate');
+			this.bullet(list, 'Calibration Over Time: as you complete receipts, EMRALD keeps your forecast beside the actual values, so you can see how close your estimate ran');
 			this.bullet(list, "75+ data points feed into every metric: EMRALD processes your sessions, energy, and calibration data across 20 metrics and layered internal measurements to surface patterns you'd never catch on your own.");
 			this.para(el as HTMLElement, "Early on, some views will be sparse. That's normal. The system needs weeks of real data to unlock its full value. This isn't a flaw, it's how EMRALD learns your specific rhythm.");
 		});
@@ -160,7 +160,7 @@ export class AboutView extends EmraldWorkspaceView {
 		this.makeSection(container, 'core-systems', 'layers', 'Core Systems', el => {
 			this.para(el as HTMLElement, "Six things make EMRALD work. Here's what each one does:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'E-Levels (E1–E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
+			this.bullet(list, 'E-Levels (E1 to E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
 			this.bullet(list, 'Metrics: Twenty computed measurements of your effort patterns. Eight are available to all users; the other twelve unlock with Pro.');
 			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
 			this.bullet(list, 'Data Center: The visual home of all your metrics, with charts and context for each measurement.');
@@ -191,9 +191,9 @@ export class AboutView extends EmraldWorkspaceView {
 		// 8. How EMRALD Learns
 		this.makeSection(container, 'how-it-learns', 'brain', 'How EMRALD Learns', el => {
 			this.para(el as HTMLElement, "EMRALD is a recursive feedback system. It's only as smart as the signal you give it.");
-			this.para(el as HTMLElement, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're teaching EMRALD what your work actually costs. The more honest and consistent you are, the more accurate its model of you becomes.");
+			this.para(el as HTMLElement, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're giving EMRALD a record of what your work actually costs. The more honest and consistent you are, the clearer that record becomes.");
 			this.para(el as HTMLElement, "The first few weeks will feel light. Charts won't show much. Insights will be sparse. This isn't the system failing — it's the system learning. EMRALD needs a baseline before it can tell you meaningful things about deviations from it.");
-			this.para(el as HTMLElement, 'Around the 2–3 week mark, you\'ll start seeing real patterns emerge. Around week 4–6, the insights become genuinely personalized. And the longer you use it, the more it adapts to your specific rhythm, strengths, and vulnerability points.');
+			this.para(el as HTMLElement, 'The more sessions, receipts, and check-ins you log, the more of your own patterns there are to read: your rhythm, your strengths, and your vulnerability points.');
 			const quoteLearns = el.createDiv( { cls: 'emerald-wv-about-thesis' });
 			quoteLearns.createEl('blockquote', { text: "EMRALD isn't going to dazzle you on day one. But if you stick with it, it will show you things about yourself that no other system can." });
 		});

@@ -215,7 +215,7 @@ export class EffortReceiptModal extends Modal {
 		labelRow.createSpan({ cls: 'emerald-pill emerald-pill-experimental', text: 'Multi-day' });
 		group.createDiv({
 			cls: 'emerald-form-desc',
-			text: 'The actual side of your task-clarity + novelty predictions.',
+			text: 'The actual side of your task-clarity + novelty forecasts.',
 		});
 
 		const btnRow = group.createDiv({ cls: 'emerald-btn-group' });

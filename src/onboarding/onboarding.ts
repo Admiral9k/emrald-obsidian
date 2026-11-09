@@ -327,10 +327,10 @@ export class OnboardingModal extends Modal {
 			question: 'When do you do your best, most focused work?',
 			type: 'enum',
 			options: [
-				{ value: 'early_morning', label: 'Early morning (5–8am)' },
-				{ value: 'mid_morning', label: 'Mid-morning (8–11am)' },
-				{ value: 'afternoon', label: 'Afternoon (12–4pm)' },
-				{ value: 'evening', label: 'Evening (5–9pm)' },
+				{ value: 'early_morning', label: 'Early morning (5 to 8am)' },
+				{ value: 'mid_morning', label: 'Mid-morning (8 to 11am)' },
+				{ value: 'afternoon', label: 'Afternoon (12 to 4pm)' },
+				{ value: 'evening', label: 'Evening (5 to 9pm)' },
 				{ value: 'late_night', label: 'Late night (10pm+)' }
 			]
 		},
@@ -453,7 +453,7 @@ export class OnboardingModal extends Modal {
 		// Page counter
 		container.createDiv({
 			cls: 'emerald-onboard-step-label',
-			text: `Page ${this.calibrationPage + 1} of ${totalPages}  •  Question ${this.calibrationPage * perPage + 1}–${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
+			text: `Page ${this.calibrationPage + 1} of ${totalPages}  •  Question ${this.calibrationPage * perPage + 1} to ${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });

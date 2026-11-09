@@ -3,7 +3,8 @@
 // profile history timeline, D19 drift indicator, reassessment trigger.
 // Obsidian-native: ungrouped answer cards, clean trait bars, warm language.
 
-import { WorkspaceLeaf, Notice, Modal, Setting, setIcon, App } from 'obsidian';
+import { WorkspaceLeaf, Notice, Modal, Setting, setIcon, setTooltip, App } from 'obsidian';
+import { EXPORT_TIP } from '../../utils/export-tip';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_EFFORT_PROFILE, VIEW_DATA_CENTER } from './base';
 import { RecoveryProtocol, TraitComparison } from '../../api/client';
@@ -127,11 +128,11 @@ const ENUM_DISPLAY: Record<string, string> = {
 	// Competition
 	uncomfortable: 'Uncomfortable',
 	// Focus session capacity
-	under_1h: 'Under 1h', '1_2h': '1–2h', '2_3h': '2–3h', '3_4h': '3–4h', over_4h: 'Over 4h',
+	under_1h: 'Under 1h', '1_2h': '1 to 2h', '2_3h': '2 to 3h', '3_4h': '3 to 4h', over_4h: 'Over 4h',
 	// Recovery rate
 	'15min': '15min', '30min': '30min', '1h': 'About an hour', over_2h: 'Over 2h',
 	// Life domains
-	'2_3': '2–3 areas', '4_5': '4–5 areas', '6_7': '6–7 areas', '8_plus': '8+',
+	'2_3': '2 to 3 areas', '4_5': '4 to 5 areas', '6_7': '6 to 7 areas', '8_plus': '8+',
 	// Duration
 	days: 'Days', weeks: 'Weeks', months: 'Months', years: 'Years',
 	// Task switching
@@ -867,6 +868,12 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				}
 			})();
 		});
+
+		// The "i" next to Export (hover on desktop; a click or tap shows the same text as a notice for touch screens).
+		const exportTip = btnRow.createEl('button', { cls: 'emerald-btn emerald-btn-subtle emerald-export-tip', attr: { type: 'button' } });
+		setIcon(exportTip, 'info');
+		setTooltip(exportTip, EXPORT_TIP, { placement: 'top' });
+		exportTip.addEventListener('click', () => { new Notice(EXPORT_TIP, 20000); });
 	}
 
 	// ── Data Center Cross-Link ─────────────────────────

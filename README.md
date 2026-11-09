@@ -195,8 +195,8 @@ EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync sess
 - Vault structure beyond the folders you designate as Active/Inactive during onboarding
 
 **Vault access:**
-- EMRALD uses `vault.getFiles()` during onboarding to let you pick Active and Inactive project folders
-- `processFrontMatter` writes metadata (effort-level, session info) to note YAML — never note content
+- EMRALD lists your vault's markdown files so you can pick a note to link to a project (in onboarding and from the sidebar) and to find a project's note again when its path has changed. It reads no note content.
+- `processFrontMatter` writes metadata (effort-level, session info) to note YAML, never note content
 - No background vault scanning occurs outside of the folder sync you configure
 
 **External domains:**

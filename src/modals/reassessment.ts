@@ -29,10 +29,10 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		question: 'When do you do your best, most focused work?',
 		type: 'enum',
 		options: [
-			{ value: 'early_morning', label: 'Early morning (5–8am)' },
-			{ value: 'mid_morning', label: 'Mid-morning (8–11am)' },
-			{ value: 'afternoon', label: 'Afternoon (12–4pm)' },
-			{ value: 'evening', label: 'Evening (5–9pm)' },
+			{ value: 'early_morning', label: 'Early morning (5 to 8am)' },
+			{ value: 'mid_morning', label: 'Mid-morning (8 to 11am)' },
+			{ value: 'afternoon', label: 'Afternoon (12 to 4pm)' },
+			{ value: 'evening', label: 'Evening (5 to 9pm)' },
 			{ value: 'late_night', label: 'Late night (10pm+)' }
 		]
 	},
@@ -181,8 +181,8 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		{ value: 'months', label: 'Months' }, { value: 'years', label: 'Years' }
 	] },
 	{ key: 'focus_session_capacity', question: 'How many hours of focused work before quality drops?', type: 'enum', options: [
-		{ value: 'under_1h', label: 'Under 1 hour' }, { value: '1_2h', label: '1–2 hours' },
-		{ value: '2_3h', label: '2–3 hours' }, { value: '3_4h', label: '3–4 hours' },
+		{ value: 'under_1h', label: 'Under 1 hour' }, { value: '1_2h', label: '1 to 2 hours' },
+		{ value: '2_3h', label: '2 to 3 hours' }, { value: '3_4h', label: '3 to 4 hours' },
 		{ value: 'over_4h', label: 'Over 4 hours' }
 	] },
 	{ key: 'recovery_rate', question: 'After an intense 90-minute session, how long do you need to recover?', type: 'enum', options: [
@@ -190,8 +190,8 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		{ value: '1h', label: 'About an hour' }, { value: 'over_2h', label: 'Over 2 hours' }
 	] },
 	{ key: 'life_domains_count', question: 'How many distinct areas of your life do you actively manage?', type: 'enum', options: [
-		{ value: '2_3', label: '2–3 areas' }, { value: '4_5', label: '4–5 areas' },
-		{ value: '6_7', label: '6–7 areas' }, { value: '8_plus', label: '8 or more' }
+		{ value: '2_3', label: '2 to 3 areas' }, { value: '4_5', label: '4 to 5 areas' },
+		{ value: '6_7', label: '6 to 7 areas' }, { value: '8_plus', label: '8 or more' }
 	] },
 	{ key: 'overcommitment_tendency', question: "How often do you feel like you're juggling too many projects?", type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Never', endpointRight: 'Constantly' },
 	{ key: 'task_switching_preference', question: 'Would you rather have 4 different tasks or 1 deep task?', type: 'enum', options: [
@@ -326,14 +326,14 @@ export class ReassessmentModal extends Modal {
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: isInAdvancedSection
-				? 'Review your advanced calibration answers. These help EMRALD fine-tune effort predictions.'
+				? 'Review your advanced calibration answers. These help EMRALD fine-tune your effort forecasts.'
 				: 'Review and update your answers. Your previous responses are pre-filled — change what feels different now.'
 		});
 
 		// Page counter
 		contentEl.createDiv({
 			cls: 'emerald-onboard-step-label',
-			text: `Page ${this.page + 1} of ${totalPages}  •  Question ${this.page * QUESTIONS_PER_PAGE + 1}–${Math.min((this.page + 1) * QUESTIONS_PER_PAGE, this.allQuestions.length)} of ${this.allQuestions.length}`
+			text: `Page ${this.page + 1} of ${totalPages}  •  Question ${this.page * QUESTIONS_PER_PAGE + 1} to ${Math.min((this.page + 1) * QUESTIONS_PER_PAGE, this.allQuestions.length)} of ${this.allQuestions.length}`
 		});
 
 		const form = contentEl.createDiv({ cls: 'emerald-form' });

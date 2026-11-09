@@ -118,7 +118,7 @@ export class EffortProfileModal extends Modal {
 		// Preamble — explain what this is for, honestly
 		const preamble = contentEl.createDiv({ cls: 'emerald-form-desc emerald-effort-profile-preamble' });
 		preamble.createEl('p', {
-			text: 'Your best guess about how this project will feel. All fields are optional — leave any slider untouched to skip it. Later, EMRALD compares your predictions to how it actually played out, so you can hone your estimating instincts.',
+			text: 'Your best guess about how this project will feel. All fields are optional, so leave any slider untouched to skip it. Later, EMRALD compares your forecast to how it actually played out.',
 		});
 		preamble.createEl('p', {
 			cls: 'emerald-form-note',
@@ -128,7 +128,7 @@ export class EffortProfileModal extends Modal {
 		const form = contentEl.createDiv({ cls: 'emerald-form emerald-effort-profile-form' });
 
 		// ── CORE block ─────────────────────────────────────────────
-		this.renderSectionHeader(form, 'Core', 'Clean prediction vs. actual comparisons.');
+		this.renderSectionHeader(form, 'Core', 'Clean forecast vs. actual comparisons.');
 
 		this.renderHoursInput(
 			form,
@@ -175,7 +175,7 @@ export class EffortProfileModal extends Modal {
 		});
 		toggleRow.createSpan({
 			cls: 'emerald-form-note',
-			text: 'Extra predictions we\'re still learning how to use. Optional.',
+			text: 'Extra forecasts we\'re still learning how to use. Optional.',
 		});
 
 		this.extendedContainer = form.createDiv({ cls: 'emerald-effort-profile-extended emrald-hidden' });

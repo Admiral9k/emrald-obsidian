@@ -1,5 +1,6 @@
 import { App, Notice, PluginSettingTab, Setting, setTooltip } from 'obsidian';
 import type { SettingDefinitionItem } from 'obsidian';
+import { EXPORT_TIP } from './utils/export-tip';
 import EmraldPlugin from '../main';
 import type { CustomELevel } from './api/client';
 import { tierState } from './tier';
@@ -446,6 +447,12 @@ export class EmraldSettingTab extends PluginSettingTab {
 					btn.setButtonText('Export');
 				}
 			});
+		});
+		// The "i" next to Export (hover on desktop; a click or tap shows the same text as a notice for touch screens).
+		setting.addExtraButton(btn => {
+			btn.setIcon('info')
+				.setTooltip(EXPORT_TIP)
+				.onClick(() => { new Notice(EXPORT_TIP, 20000); });
 		});
 	}
 

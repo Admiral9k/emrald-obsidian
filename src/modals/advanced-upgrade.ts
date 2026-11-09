@@ -39,7 +39,7 @@ export class AdvancedUpgradeModal extends Modal {
 
 		const benefits = contentEl.createDiv({ cls: 'emerald-onboard-features' });
 		const items = [
-			{ icon: 'target', text: 'More accurate effort predictions' },
+			{ icon: 'target', text: 'Effort forecasts built on more of your answers' },
 			{ icon: 'brain', text: 'Deeper personality-aware insights' },
 			{ icon: 'flame', text: 'Earlier burnout pattern detection' },
 			{ icon: 'trending-up', text: 'Better calibration drift tracking' }

@@ -5816,3 +5816,37 @@ button.emerald-rg-link {
 		width: 100%;
 	}
 }
+
+/* ── D5 / D6 Toggl "left out" note (Data Center cards) ── */
+.emerald-wv-provider-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	margin: 6px 0 0;
+	font-size: var(--font-ui-smaller);
+	line-height: 1.45;
+	color: var(--text-muted);
+}
+.emerald-wv-provider-note strong {
+	color: var(--text-normal);
+	font-weight: 600;
+}
+.emerald-wv-provider-note-icon {
+	display: inline-flex;
+	flex: none;
+	margin-top: 2px;
+	cursor: help;
+}
+.emerald-wv-provider-note-icon svg {
+	width: 13px;
+	height: 13px;
+}
+/* Export "i" button next to Export data (Effort Profile actions row) */
+.emerald-btn.emerald-export-tip {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+.emerald-export-tip svg {
+	width: 15px;
+	height: 15px;
+}

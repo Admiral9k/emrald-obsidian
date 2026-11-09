@@ -8,6 +8,7 @@ import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_DATA_CENTER } from './base';
 import { ComputedMetric, ComputedMetricHistory } from '../../api/client';
 import { tierState } from '../../tier';
+import { providerNoteState, renderProviderNote } from './provider-note';
 
 // ── D-Metric Catalog ────────────────────────────────────
 
@@ -26,7 +27,7 @@ export const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: '10 = perfectly balanced. Lower scores mean a growing gap between what tasks demand and what you invest. Chronic imbalance in either direction (over-investing or under-investing) is a signal to adjust.' },
 	D2:  { name: 'Effort Balance Trend',     unit: '/10',  category: 'Effort',       goodDirection: 'stable',
 	       desc: 'Is your effort balance improving or worsening?',
-	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate — it compares two halves of a 30-day window, so you need sessions spread across at least 2–3 weeks.' },
+	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate. It compares two halves of a 30-day window, so you need sessions spread across at least 2 to 3 weeks.' },
 	D3:  { name: 'E-Level Accuracy',         unit: '/10',  category: 'Calibration',  goodDirection: 'up',
 	       desc: 'How closely your E-level estimates match your actual effort',
 	       explainer: 'Compares your E-level assignments to actual perceived effort from receipts. Higher = better calibration. Low accuracy suggests your E-levels need adjusting.' },
@@ -420,7 +421,10 @@ export class DataCenterView extends EmraldWorkspaceView {
 		card.createDiv({ cls: 'emerald-wv-metric-desc', text: info.desc });
 
 		// ── No Data State ──
-		if (!hasData && !isLocked) {
+		// D5 and D6 leave Toggl projects out (C1c): the note replaces 'Need more data' when Toggl is the whole reason
+		// (empty state) and sits under the number as a footnote otherwise; every other metric keeps the plain line.
+		if (!isLocked) renderProviderNote(card, key, metric?.metadata);
+		if (!hasData && !isLocked && providerNoteState(key, metric?.metadata) !== 'empty') {
 			const noData = card.createDiv({ cls: 'emerald-wv-metric-nodata' });
 			noData.createSpan({ text: 'Need more data' });
 		}

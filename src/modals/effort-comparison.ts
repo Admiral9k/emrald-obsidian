@@ -52,7 +52,7 @@ export class EffortComparisonModal extends Modal {
 
 		const preamble = contentEl.createDiv({ cls: 'emerald-form-desc emerald-effort-comparison-preamble' });
 		preamble.createEl('p', {
-			text: 'How your predictions for this project line up against how it actually played out. Each row shows your guess beside the behavioral reality — never blended into one score.',
+			text: 'How your forecasts for this project line up against how it actually played out. Each row shows your guess beside the behavioral reality, never blended into one score.',
 		});
 
 		const body = contentEl.createDiv({ cls: 'emerald-effort-comparison-body' });
@@ -91,7 +91,7 @@ export class EffortComparisonModal extends Modal {
 		if (cmp.status === 'no_profile') {
 			this.renderMessage(
 				container,
-				'No effort profile captured for this project yet. Add one from the project menu to start comparing your predictions against reality.',
+				'No effort profile captured for this project yet. Add one from the project menu to start comparing your forecasts against reality.',
 			);
 			this.renderBehavioralSummary(container, cmp);
 			return;
