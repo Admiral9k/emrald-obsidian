@@ -5600,7 +5600,8 @@ var TimeblockComponent = class {
       totalPausedMs: s.totalPausedMs,
       priorMinutesToday: s.priorMinutesToday,
       isPendingSync: (_a = s.isPendingSync) != null ? _a : false,
-      overtimeAutoPaused: s.overtimeAutoPaused
+      overtimeAutoPaused: s.overtimeAutoPaused,
+      overtimeSnoozeMin: s.overtimeSnoozeMin
     };
   }
   /**
@@ -5621,7 +5622,8 @@ var TimeblockComponent = class {
       totalPausedMs: data.totalPausedMs,
       priorMinutesToday: data.priorMinutesToday,
       isPendingSync: (_a = data.isPendingSync) != null ? _a : false,
-      overtimeAutoPaused: (_b = data.overtimeAutoPaused) != null ? _b : false
+      overtimeAutoPaused: (_b = data.overtimeAutoPaused) != null ? _b : false,
+      overtimeSnoozeMin: typeof data.overtimeSnoozeMin === "number" ? data.overtimeSnoozeMin : void 0
     };
     this.stopIdleAnimation();
     this.startSessionAnimation();
@@ -11604,6 +11606,22 @@ function buildNotePathMap(app) {
 
 // src/views/sidebar.ts
 init_e_levels();
+
+// src/components/overtimeAutoPause.ts
+var OVERTIME_AUTOPAUSE_MINUTES = 120;
+function overtimeThresholdMin(goalpostMin, snoozeFromMin) {
+  if (!(goalpostMin > 0))
+    return Infinity;
+  const base = goalpostMin + OVERTIME_AUTOPAUSE_MINUTES;
+  if (typeof snoozeFromMin !== "number" || !Number.isFinite(snoozeFromMin))
+    return base;
+  return Math.max(base, snoozeFromMin + OVERTIME_AUTOPAUSE_MINUTES);
+}
+function overtimeAutoPauseDue(elapsedMin, goalpostMin, snoozeFromMin) {
+  return elapsedMin > overtimeThresholdMin(goalpostMin, snoozeFromMin);
+}
+
+// src/views/sidebar.ts
 init_base();
 var VIEW_TYPE_EMRALD = "emrald-sidebar";
 var BURNOUT_SNOOZE_DAYS = 3;
@@ -12346,9 +12364,11 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     const session = this.timeblock.state.activeSession;
     if (!session)
       return;
+    const workMinAtResume = session.elapsedMs / 6e4;
     const resp = await this.plugin.apiClient.resumeSession(session.sessionId);
     if (!resp.error || resp.queued) {
       this.timeblock.resumeSession();
+      session.overtimeSnoozeMin = workMinAtResume;
       session.overtimeAutoPaused = false;
       if (session.isPendingSync)
         await this.persistProvisionalSession();
@@ -12373,7 +12393,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     const prescribedMin = prescribedMinutes(session.effortLevel, availableHours);
     if (prescribedMin <= 0)
       return;
-    if (elapsedMin > prescribedMin + 120) {
+    if (overtimeAutoPauseDue(elapsedMin, prescribedMin, session.overtimeSnoozeMin)) {
       session.overtimeAutoPaused = true;
       void this.handleOvertimeAutoPause();
     }
