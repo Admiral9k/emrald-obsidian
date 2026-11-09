@@ -99,7 +99,7 @@ export class EffortComparisonModal extends Modal {
 		if (cmp.status === 'no_behavioral_data') {
 			this.renderMessage(
 				container,
-				'Predictions captured, but no sessions have run on this project yet. Once you log some work, your estimates get compared here.',
+				'Forecasts captured, but no sessions have run on this project yet. Once you log some work, your estimates get compared here.',
 			);
 			this.renderBehavioralSummary(container, cmp);
 			return;

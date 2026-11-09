@@ -78,7 +78,7 @@ export const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Composite of enjoyment (40%), flow rate (30%), and effort balance (30%). A holistic view of how your sessions are going — not just productive, but fulfilling.' },
 	D19: { name: 'Calibration Drift',        unit: '/10',  category: 'Calibration',  goodDirection: 'down',
 	       desc: 'How much your behavior diverges from your profile',
-	       explainer: 'Compares your actual effort patterns to what your calibration profile predicts. High drift = time to recalibrate. Your work habits may have shifted since you last answered the profile questions.' },
+	       explainer: 'Compares your actual effort patterns to what your calibration profile expects. High drift = time to recalibrate. Your work habits may have shifted since you last answered the profile questions.' },
 	D20: { name: 'Recharge Effectiveness',   unit: '/10',  category: 'Energy',       goodDirection: 'up',
 	       desc: 'How well your recharge routines restore energy',
 	       explainer: 'Average effectiveness of your logged recharge activities. If this is low, your current routines may not be working — try experimenting with different activities.' }

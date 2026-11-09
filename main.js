@@ -6849,7 +6849,7 @@ var D_METRICS = {
     category: "Calibration",
     goodDirection: "down",
     desc: "How much your behavior diverges from your profile",
-    explainer: "Compares your actual effort patterns to what your calibration profile predicts. High drift = time to recalibrate. Your work habits may have shifted since you last answered the profile questions."
+    explainer: "Compares your actual effort patterns to what your calibration profile expects. High drift = time to recalibrate. Your work habits may have shifted since you last answered the profile questions."
   },
   D20: {
     name: "Recharge Effectiveness",
@@ -7519,7 +7519,7 @@ var EffortComparisonModal = class extends import_obsidian15.Modal {
     if (cmp.status === "no_behavioral_data") {
       this.renderMessage(
         container,
-        "Predictions captured, but no sessions have run on this project yet. Once you log some work, your estimates get compared here."
+        "Forecasts captured, but no sessions have run on this project yet. Once you log some work, your estimates get compared here."
       );
       this.renderBehavioralSummary(container, cmp);
       return;
