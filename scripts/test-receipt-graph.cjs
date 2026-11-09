@@ -34,7 +34,12 @@ class FakeEl {
   }
   _add(tag, o, ns) { const e = new FakeEl(tag, o || {}, ns); e.parent = this; this.children.push(e); return e; }
   createDiv(o) { return this._add('div', o); } createEl(t, o) { return this._add(t, o); } createSpan(o) { return this._add('span', o); }
-  createSvg(t, o) { return this._add(t, o, 'svg'); }
+  // Obsidian's createSvg does classList.add(cls): a string with a space throws InvalidCharacterError (arrays are fine). Mirror that.
+  createSvg(t, o) {
+    const c = typeof o === 'string' ? o : o && o.cls;
+    if (typeof c === 'string' && /\s/.test(c)) throw new Error('InvalidCharacterError: createSvg cls must be one token or an array: ' + c);
+    return this._add(t, o, 'svg');
+  }
   empty() { this.children = []; this.text = ''; }
   addClass(c) { this.classes.add(c); } removeClass(c) { this.classes.delete(c); } hasClass(c) { return this.classes.has(c); }
   toggleClass(c, on) { on ? this.classes.add(c) : this.classes.delete(c); }

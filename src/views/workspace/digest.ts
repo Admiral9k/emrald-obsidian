@@ -187,7 +187,7 @@ export class DigestView extends EmraldWorkspaceView {
 		const startDate = this.formatDateShort(digest.period_start);
 		const endDate = this.formatDateShort(digest.period_end);
 		periodIcon.createSpan({
-			text: `${this.formatPeriodType(digest.period_type)}: ${startDate} to ${endDate}`
+			text: `${this.formatPeriodType(digest.period_type)}: ${startDate} – ${endDate}`
 		});
 
 		// Counter

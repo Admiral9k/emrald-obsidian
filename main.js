@@ -855,9 +855,9 @@ var init_advanced_calibration = __esm({
         type: "enum",
         options: [
           { value: "under_1h", label: "Under 1 hour" },
-          { value: "1_2h", label: "1 to 2 hours" },
-          { value: "2_3h", label: "2 to 3 hours" },
-          { value: "3_4h", label: "3 to 4 hours" },
+          { value: "1_2h", label: "1\u20132 hours" },
+          { value: "2_3h", label: "2\u20133 hours" },
+          { value: "3_4h", label: "3\u20134 hours" },
           { value: "over_4h", label: "Over 4 hours" }
         ]
       },
@@ -877,9 +877,9 @@ var init_advanced_calibration = __esm({
         question: "How many distinct areas of your life do you actively manage?",
         type: "enum",
         options: [
-          { value: "2_3", label: "2 to 3 areas" },
-          { value: "4_5", label: "4 to 5 areas" },
-          { value: "6_7", label: "6 to 7 areas" },
+          { value: "2_3", label: "2\u20133 areas" },
+          { value: "4_5", label: "4\u20135 areas" },
+          { value: "6_7", label: "6\u20137 areas" },
           { value: "8_plus", label: "8 or more" }
         ]
       },
@@ -1506,7 +1506,7 @@ var init_onboarding = __esm({
         });
         container.createDiv({
           cls: "emerald-onboard-step-label",
-          text: `Page ${this.calibrationPage + 1} of ${totalPages}  \u2022  Question ${this.calibrationPage * perPage + 1} to ${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
+          text: `Page ${this.calibrationPage + 1} of ${totalPages}  \u2022  Question ${this.calibrationPage * perPage + 1}\u2013${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
         });
         const form = container.createDiv({ cls: "emerald-form" });
         for (const q of pageQuestions) {
@@ -1993,10 +1993,10 @@ var init_onboarding = __esm({
         question: "When do you do your best, most focused work?",
         type: "enum",
         options: [
-          { value: "early_morning", label: "Early morning (5 to 8am)" },
-          { value: "mid_morning", label: "Mid-morning (8 to 11am)" },
-          { value: "afternoon", label: "Afternoon (12 to 4pm)" },
-          { value: "evening", label: "Evening (5 to 9pm)" },
+          { value: "early_morning", label: "Early morning (5\u20138am)" },
+          { value: "mid_morning", label: "Mid-morning (8\u201311am)" },
+          { value: "afternoon", label: "Afternoon (12\u20134pm)" },
+          { value: "evening", label: "Evening (5\u20139pm)" },
           { value: "late_night", label: "Late night (10pm+)" }
         ]
       },
@@ -2197,7 +2197,7 @@ var init_custom_elevel_editor = __esm({
           });
           nameGroup.createDiv({
             cls: "emerald-form-hint",
-            text: `Up to ${NAME_MAX_LENGTH} characters. E1 to E4 are reserved.`
+            text: `Up to ${NAME_MAX_LENGTH} characters. E1\u2013E4 are reserved.`
           });
         }
         if (this.mode === "create" || this.mode === "percent") {
@@ -3209,10 +3209,10 @@ var init_reassessment = __esm({
         question: "When do you do your best, most focused work?",
         type: "enum",
         options: [
-          { value: "early_morning", label: "Early morning (5 to 8am)" },
-          { value: "mid_morning", label: "Mid-morning (8 to 11am)" },
-          { value: "afternoon", label: "Afternoon (12 to 4pm)" },
-          { value: "evening", label: "Evening (5 to 9pm)" },
+          { value: "early_morning", label: "Early morning (5\u20138am)" },
+          { value: "mid_morning", label: "Mid-morning (8\u201311am)" },
+          { value: "afternoon", label: "Afternoon (12\u20134pm)" },
+          { value: "evening", label: "Evening (5\u20139pm)" },
           { value: "late_night", label: "Late night (10pm+)" }
         ]
       },
@@ -3380,9 +3380,9 @@ var init_reassessment = __esm({
       ] },
       { key: "focus_session_capacity", question: "How many hours of focused work before quality drops?", type: "enum", options: [
         { value: "under_1h", label: "Under 1 hour" },
-        { value: "1_2h", label: "1 to 2 hours" },
-        { value: "2_3h", label: "2 to 3 hours" },
-        { value: "3_4h", label: "3 to 4 hours" },
+        { value: "1_2h", label: "1\u20132 hours" },
+        { value: "2_3h", label: "2\u20133 hours" },
+        { value: "3_4h", label: "3\u20134 hours" },
         { value: "over_4h", label: "Over 4 hours" }
       ] },
       { key: "recovery_rate", question: "After an intense 90-minute session, how long do you need to recover?", type: "enum", options: [
@@ -3392,9 +3392,9 @@ var init_reassessment = __esm({
         { value: "over_2h", label: "Over 2 hours" }
       ] },
       { key: "life_domains_count", question: "How many distinct areas of your life do you actively manage?", type: "enum", options: [
-        { value: "2_3", label: "2 to 3 areas" },
-        { value: "4_5", label: "4 to 5 areas" },
-        { value: "6_7", label: "6 to 7 areas" },
+        { value: "2_3", label: "2\u20133 areas" },
+        { value: "4_5", label: "4\u20135 areas" },
+        { value: "6_7", label: "6\u20137 areas" },
         { value: "8_plus", label: "8 or more" }
       ] },
       { key: "overcommitment_tendency", question: "How often do you feel like you're juggling too many projects?", type: "slider", min: 1, max: 5, default: 3, endpointLeft: "Never", endpointRight: "Constantly" },
@@ -3507,7 +3507,7 @@ var init_reassessment = __esm({
         });
         contentEl.createDiv({
           cls: "emerald-onboard-step-label",
-          text: `Page ${this.page + 1} of ${totalPages}  \u2022  Question ${this.page * QUESTIONS_PER_PAGE + 1} to ${Math.min((this.page + 1) * QUESTIONS_PER_PAGE, this.allQuestions.length)} of ${this.allQuestions.length}`
+          text: `Page ${this.page + 1} of ${totalPages}  \u2022  Question ${this.page * QUESTIONS_PER_PAGE + 1}\u2013${Math.min((this.page + 1) * QUESTIONS_PER_PAGE, this.allQuestions.length)} of ${this.allQuestions.length}`
         });
         const form = contentEl.createDiv({ cls: "emerald-form" });
         let optionalSeparatorShown = false;
@@ -6713,7 +6713,7 @@ var D_METRICS = {
     category: "Effort",
     goodDirection: "stable",
     desc: "Is your effort balance improving or worsening?",
-    explainer: "5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate. It compares two halves of a 30-day window, so you need sessions spread across at least 2 to 3 weeks."
+    explainer: "5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate. It compares two halves of a 30-day window, so you need sessions spread across at least 2\u20133 weeks."
   },
   D3: {
     name: "E-Level Accuracy",
@@ -8009,7 +8009,7 @@ function mountReceiptGraph(host, opts) {
     guideEl = svg.createSvg("line", { cls: "emerald-rg-guide", attr: { y1: PAD_T, y2: HEIGHT - PAD_B, x1: 0, x2: 0 } });
     guideEl.addClass("emrald-hidden");
     const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${xAt(i).toFixed(1)} ${yAt(p[m.key]).toFixed(1)}`).join(" ");
-    svg.createSvg("path", { cls: `emerald-rg-line${m.dir === null ? " is-neutral" : ""}`, attr: { d: path } });
+    svg.createSvg("path", { cls: m.dir === null ? ["emerald-rg-line", "is-neutral"] : "emerald-rg-line", attr: { d: path } });
     pts.forEach((p, i) => {
       const v = p[m.key];
       if (showX(i)) {
@@ -8030,7 +8030,7 @@ function mountReceiptGraph(host, opts) {
       if (p.id === selectedId)
         g.addClass("is-sel");
       g.createSvg("circle", { cls: "emerald-rg-ring", attr: { cx: xAt(i), cy: yAt(v), r: dotR + 4 } });
-      g.createSvg("circle", { cls: `emerald-rg-dot ${z ? "is-" + z : "is-neutral"}`, attr: { cx: xAt(i), cy: yAt(v), r: dotR } });
+      g.createSvg("circle", { cls: ["emerald-rg-dot", z ? "is-" + z : "is-neutral"], attr: { cx: xAt(i), cy: yAt(v), r: dotR } });
       g.addEventListener("keydown", (e) => onPointKey(e, i, pts));
       dotEls.set(p.id, g);
     });
@@ -9063,9 +9063,9 @@ var ENUM_DISPLAY = {
   uncomfortable: "Uncomfortable",
   // Focus session capacity
   under_1h: "Under 1h",
-  "1_2h": "1 to 2h",
-  "2_3h": "2 to 3h",
-  "3_4h": "3 to 4h",
+  "1_2h": "1\u20132h",
+  "2_3h": "2\u20133h",
+  "3_4h": "3\u20134h",
   over_4h: "Over 4h",
   // Recovery rate
   "15min": "15min",
@@ -9073,9 +9073,9 @@ var ENUM_DISPLAY = {
   "1h": "About an hour",
   over_2h: "Over 2h",
   // Life domains
-  "2_3": "2 to 3 areas",
-  "4_5": "4 to 5 areas",
-  "6_7": "6 to 7 areas",
+  "2_3": "2\u20133 areas",
+  "4_5": "4\u20135 areas",
+  "6_7": "6\u20137 areas",
   "8_plus": "8+",
   // Duration
   days: "Days",
@@ -10060,7 +10060,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     (0, import_obsidian21.setIcon)(sparkInfo, "info");
     const sparkExplainer = section.createDiv({
       cls: "emerald-wv-burnout-score-explainer",
-      text: "This tracks your Burnout Risk Score over time. Each point is the daily score (0 to 100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating."
+      text: "This tracks your Burnout Risk Score over time. Each point is the daily score (0\u2013100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating."
     });
     sparkExplainer.addClass("emrald-hidden");
     sparkInfo.addEventListener("click", (e) => {
@@ -10403,7 +10403,7 @@ var DigestView = class extends EmraldWorkspaceView {
     const startDate = this.formatDateShort(digest.period_start);
     const endDate = this.formatDateShort(digest.period_end);
     periodIcon.createSpan({
-      text: `${this.formatPeriodType(digest.period_type)}: ${startDate} to ${endDate}`
+      text: `${this.formatPeriodType(digest.period_type)}: ${startDate} \u2013 ${endDate}`
     });
     periodIcon.createSpan({
       cls: "emerald-wv-digest-counter",
@@ -10851,7 +10851,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const callout = el.createDiv({ cls: "emerald-wv-about-callout" });
       callout.createDiv({ cls: "emerald-wv-about-callout-title", text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
       callout.createEl("p", { cls: "emerald-wv-about-callout-body", text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. EMRALD tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
-      this.para(el, "It works by asking you to assign effort levels (E1 to E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.");
+      this.para(el, "It works by asking you to assign effort levels (E1\u2013E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.");
       const quoteWhatItIs = el.createDiv({ cls: "emerald-wv-about-thesis" });
       quoteWhatItIs.createEl("blockquote", { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
     });
@@ -10909,7 +10909,7 @@ var AboutView = class extends EmraldWorkspaceView {
     this.makeSection(container, "core-systems", "layers", "Core Systems", (el) => {
       this.para(el, "Six things make EMRALD work. Here's what each one does:");
       const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
-      this.bullet(list, "E-Levels (E1 to E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.");
+      this.bullet(list, "E-Levels (E1\u2013E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.");
       this.bullet(list, "Metrics: Twenty computed measurements of your effort patterns. Eight are available to all users; the other twelve unlock with Pro.");
       this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
       this.bullet(list, "Data Center: The visual home of all your metrics, with charts and context for each measurement.");

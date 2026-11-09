@@ -27,7 +27,7 @@ export const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: '10 = perfectly balanced. Lower scores mean a growing gap between what tasks demand and what you invest. Chronic imbalance in either direction (over-investing or under-investing) is a signal to adjust.' },
 	D2:  { name: 'Effort Balance Trend',     unit: '/10',  category: 'Effort',       goodDirection: 'stable',
 	       desc: 'Is your effort balance improving or worsening?',
-	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate. It compares two halves of a 30-day window, so you need sessions spread across at least 2 to 3 weeks.' },
+	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric takes time to populate. It compares two halves of a 30-day window, so you need sessions spread across at least 2–3 weeks.' },
 	D3:  { name: 'E-Level Accuracy',         unit: '/10',  category: 'Calibration',  goodDirection: 'up',
 	       desc: 'How closely your E-level estimates match your actual effort',
 	       explainer: 'Compares your E-level assignments to actual perceived effort from receipts. Higher = better calibration. Low accuracy suggests your E-levels need adjusting.' },

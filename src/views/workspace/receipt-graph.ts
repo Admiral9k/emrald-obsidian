@@ -286,7 +286,7 @@ export function mountReceiptGraph(host: HTMLElement, opts: ReceiptGraphOptions):
 		guideEl.addClass('emrald-hidden');
 
 		const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(1)} ${yAt(p[m.key] as number).toFixed(1)}`).join(' ');
-		svg.createSvg('path', { cls: `emerald-rg-line${m.dir === null ? ' is-neutral' : ''}`, attr: { d: path } });
+		svg.createSvg('path', { cls: m.dir === null ? ['emerald-rg-line', 'is-neutral'] : 'emerald-rg-line', attr: { d: path } });
 
 		pts.forEach((p, i) => {
 			const v = p[m.key] as number;
@@ -307,7 +307,7 @@ export function mountReceiptGraph(host: HTMLElement, opts: ReceiptGraphOptions):
 			});
 			if (p.id === selectedId) g.addClass('is-sel');
 			g.createSvg('circle', { cls: 'emerald-rg-ring', attr: { cx: xAt(i), cy: yAt(v), r: dotR + 4 } });
-			g.createSvg('circle', { cls: `emerald-rg-dot ${z ? 'is-' + z : 'is-neutral'}`, attr: { cx: xAt(i), cy: yAt(v), r: dotR } });
+			g.createSvg('circle', { cls: ['emerald-rg-dot', z ? 'is-' + z : 'is-neutral'], attr: { cx: xAt(i), cy: yAt(v), r: dotR } });
 			g.addEventListener('keydown', (e: KeyboardEvent) => onPointKey(e, i, pts));
 			dotEls.set(p.id, g);
 		});

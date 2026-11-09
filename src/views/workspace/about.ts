@@ -93,7 +93,7 @@ export class AboutView extends EmraldWorkspaceView {
 			callout.createDiv( { cls: 'emerald-wv-about-callout-title', text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
 			callout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. EMRALD tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
 
-			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1 to E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
+			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1–E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
 			const quoteWhatItIs = el.createDiv( { cls: 'emerald-wv-about-thesis' });
 			quoteWhatItIs.createEl('blockquote', { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
 		});
@@ -160,7 +160,7 @@ export class AboutView extends EmraldWorkspaceView {
 		this.makeSection(container, 'core-systems', 'layers', 'Core Systems', el => {
 			this.para(el as HTMLElement, "Six things make EMRALD work. Here's what each one does:");
 			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'E-Levels (E1 to E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
+			this.bullet(list, 'E-Levels (E1–E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
 			this.bullet(list, 'Metrics: Twenty computed measurements of your effort patterns. Eight are available to all users; the other twelve unlock with Pro.');
 			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
 			this.bullet(list, 'Data Center: The visual home of all your metrics, with charts and context for each measurement.');

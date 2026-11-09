@@ -128,11 +128,11 @@ const ENUM_DISPLAY: Record<string, string> = {
 	// Competition
 	uncomfortable: 'Uncomfortable',
 	// Focus session capacity
-	under_1h: 'Under 1h', '1_2h': '1 to 2h', '2_3h': '2 to 3h', '3_4h': '3 to 4h', over_4h: 'Over 4h',
+	under_1h: 'Under 1h', '1_2h': '1–2h', '2_3h': '2–3h', '3_4h': '3–4h', over_4h: 'Over 4h',
 	// Recovery rate
 	'15min': '15min', '30min': '30min', '1h': 'About an hour', over_2h: 'Over 2h',
 	// Life domains
-	'2_3': '2 to 3 areas', '4_5': '4 to 5 areas', '6_7': '6 to 7 areas', '8_plus': '8+',
+	'2_3': '2–3 areas', '4_5': '4–5 areas', '6_7': '6–7 areas', '8_plus': '8+',
 	// Duration
 	days: 'Days', weeks: 'Weeks', months: 'Months', years: 'Years',
 	// Task switching

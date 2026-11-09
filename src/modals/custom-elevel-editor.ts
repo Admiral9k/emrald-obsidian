@@ -94,7 +94,7 @@ export class CustomELevelEditorModal extends Modal {
 			});
 			nameGroup.createDiv({
 				cls: 'emerald-form-hint',
-				text: `Up to ${NAME_MAX_LENGTH} characters. E1 to E4 are reserved.`
+				text: `Up to ${NAME_MAX_LENGTH} characters. E1–E4 are reserved.`
 			});
 		}
 
