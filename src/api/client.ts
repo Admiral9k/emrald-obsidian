@@ -712,6 +712,20 @@ export class EmraldAPIClient {
 		return this.request('GET', `/receipts?${params.toString()}`);
 	}
 
+	/**
+	 * One project's receipts, newest first, for the per-project receipt graph. The API filters by
+	 * item_id (emrald-api 915e0dde) and returns `{data, total}`; the total is the project's own
+	 * count, so the envelope is kept (rawEnvelope) and the response is never served from the cache.
+	 */
+	async getProjectReceipts(itemId: string, opts?: { from?: string; limit?: number; offset?: number }): Promise<APIResponse<ProjectReceiptPage>> {
+		const params = new URLSearchParams();
+		params.set('item_id', itemId);
+		if (opts?.from) params.set('from', opts.from);
+		params.set('limit', String(Math.min(100, opts?.limit ?? 50)));
+		params.set('offset', String(opts?.offset ?? 0));
+		return this.request('GET', `/receipts?${params.toString()}`, undefined, { rawEnvelope: true, skipCache: true });
+	}
+
 	// ── Energy Check-ins ─────────────────────────────────
 
 	async submitEnergyCheckin(checkin: CreateEnergyCheckinPayload): Promise<APIResponse<EnergyCheckin>> {
@@ -1101,6 +1115,29 @@ export interface EffortReceipt {
 	unexpected_complications?: number; // SEQ-3 (migration 012). 0=none, 1=some, 2=you-wouldn't-believe-me.
 	notes: string | null;
 	created_at: string;
+}
+
+// A receipt as GET /receipts?item_id= returns it (receipt columns plus the session embed).
+// Numeric values are nullable: old receipts have no flow, most projects have no AI verification.
+export interface ProjectReceipt {
+	id: string;
+	created_at: string;
+	perceived_effort: number | null;
+	demand_investment_balance: number | null;
+	hedonic_valence: number | null;
+	flow_occurred: number | null;
+	verification_share: number | null;
+	unexpected_complications: number | null;
+	work_type: string | null;
+	ai_summary: string | null;
+	ai_authored: boolean | null;
+	ai_edited_by_user: boolean | null;
+	session: { started_at: string; duration_minutes: number | null } | null;
+}
+
+export interface ProjectReceiptPage {
+	data: ProjectReceipt[];
+	total?: number;
 }
 
 export interface EffortReceiptWithContext extends EffortReceipt {

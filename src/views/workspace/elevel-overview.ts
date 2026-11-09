@@ -10,6 +10,8 @@ import { EmraldWorkspaceView, VIEW_ELEVEL_OVERVIEW } from './base';
 import { VIEW_ABOUT } from './base';
 import { TrackedItem } from '../../api/client';
 import { EffortComparisonModal } from '../../modals/effort-comparison';
+import { mountReceiptGraph } from './receipt-graph';
+import type { ReceiptGraphHandle } from './receipt-graph';
 import type { LevelRef } from '../../e-levels';
 import {
 	BUILT_IN_LEVELS,
@@ -41,6 +43,8 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	private availableHours: number = 4;
 	private activeFilter: LevelRef | null = null; // null = all, else a level ref ('E1'..'E4' or a custom ref)
 	private projectContainer: Element | null = null;
+	// The one open per-project receipt graph (inline panel under a project row). One at a time.
+	private openGraph: { itemId: string; row: HTMLElement; btn: HTMLElement; handle: ReceiptGraphHandle } | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
 		super(leaf, plugin, 'E-Level Overview', 'bar-chart-2');
@@ -335,6 +339,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 	private renderProjectTable() {
 		if (!this.projectContainer) return;
+		this.closeReceiptGraph(); // the table is rebuilt below, so any open panel goes with it
 		this.projectContainer.empty();
 
 		const section = this.projectContainer.createDiv({ cls: 'emerald-wv-section' });
@@ -451,8 +456,10 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 			// Compare (SEQ-6 Block 1): open per-project predicted-vs-behavioral comparison.
 			// "Judging what I'm doing now" = Track. Read-only detail surface.
+			// Receipts (spec RECEIPT-GRAPH-SPEC v1.1): second button, opens the receipt graph inline below the row.
 			const compareCell = row.createEl('td');
-			const compareBtn = compareCell.createSpan({
+			const actions = compareCell.createDiv({ cls: 'emerald-wv-row-actions' });
+			const compareBtn = actions.createSpan({
 				cls: 'emerald-wv-compare-btn emrald-clickable',
 				attr: { 'aria-label': `Compare predictions vs. actual for ${item.name}`, title: 'Predicted vs. actual' },
 			});
@@ -461,7 +468,62 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				e.stopPropagation();
 				this.openComparison(item);
 			});
+
+			// Never a dead button: a project with no receipts still opens the panel (it shows the empty state).
+			const graphBtn = actions.createEl('button', {
+				cls: 'emerald-wv-compare-btn emerald-wv-receipts-btn',
+				attr: { type: 'button', 'aria-label': `Receipt graph for ${item.name}`, 'aria-expanded': 'false', title: 'Receipt graph' }
+			});
+			setIcon(graphBtn, 'line-chart');
+			graphBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.toggleReceiptGraph(item, row, graphBtn);
+			});
 		}
+	}
+
+	// ── Receipt graph (inline panel) ─────────────────────
+
+	private closeReceiptGraph() {
+		const open = this.openGraph;
+		if (!open) return;
+		this.openGraph = null;
+		open.handle.destroy();
+		open.row.remove();
+		open.btn.setAttribute('aria-expanded', 'false');
+		open.btn.removeClass('is-open');
+	}
+
+	private toggleReceiptGraph(item: TrackedItem, row: HTMLElement, btn: HTMLElement) {
+		const wasThis = this.openGraph?.itemId === item.id;
+		this.closeReceiptGraph();
+		if (wasThis) return;
+
+		// A full-width row directly below the project's row; the rows under it move down.
+		const panelRow = createEl('tr', { cls: 'emerald-rg-row' });
+		row.after(panelRow);
+		const cell = panelRow.createEl('td', { attr: { colspan: String(row.children.length) } });
+		const handle = mountReceiptGraph(cell, {
+			api: this.plugin.apiClient,
+			itemId: item.id,
+			itemName: item.name,
+			onClose: () => {
+				// Esc and the X both land here; focus goes back to the button that opened it.
+				if (this.openGraph?.handle === handle) {
+					this.closeReceiptGraph();
+					btn.focus({ preventScroll: true });
+				}
+			}
+		});
+		btn.setAttribute('aria-expanded', 'true');
+		btn.addClass('is-open');
+		this.openGraph = { itemId: item.id, row: panelRow, btn, handle };
+		panelRow.scrollIntoView({ block: 'nearest' });
+	}
+
+	async onClose() {
+		this.closeReceiptGraph();
+		await super.onClose();
 	}
 
 	// ── Open Note ────────────────────────────────────────
