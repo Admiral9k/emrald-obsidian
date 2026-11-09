@@ -126,7 +126,7 @@ const RESEARCH_OPT_IN_DESC =
 	'may be used in published research by Effort Mastery LLC. You can change this anytime.';
 
 const EXPORT_DESC =
-	"Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. Pro: everything.";
+	"Download all your EMRALD data as a JSON file. The file saves to your vault's root folder on disk, so it won't appear in Obsidian's file explorer since .json files aren't indexed. Free tier: 90-day history + the 8 core metrics. PRO: everything.";
 
 const ELEVEL_MANAGE_HEADING = 'Manage effort levels';
 const PRO_UPGRADE_URL = 'https://effortmastery.com/pro';
@@ -135,7 +135,7 @@ const ELEVEL_ANCHOR_CLASS = 'emerald-elevel-manage-anchor';
 const ELEVEL_EMPTY_STATE =
 	'No custom levels yet. Create one to prescribe a share of your day that E1-E4 does not cover.';
 const ELEVEL_PRO_PITCH =
-	'Custom e-levels are a Pro feature. Name your own effort levels at any percent of your daily work time — EMRALD prescribes time, tracks overtime, and colours them just like E1-E4.';
+	'Custom e-levels are a PRO feature. Name your own effort levels at any percent of your daily work time — EMRALD prescribes time, tracks overtime, and colours them just like E1-E4.';
 
 export class EmraldSettingTab extends PluginSettingTab {
 	plugin: EmraldPlugin;

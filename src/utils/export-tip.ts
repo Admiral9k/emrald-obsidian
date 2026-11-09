@@ -5,4 +5,4 @@
 // are never pruned; Pro export includes metric_history_daily; free export = last 90 days + current values.
 // Do not edit without a cmo re-gate. Zero em-dashes.
 export const EXPORT_TIP =
-	'Saves your EMRALD data as a portable JSON file. Receipts, sessions and check-ins are never deleted. Pro exports include your full daily metric history, kept indefinitely (intra-day snapshots are consolidated into daily values after 120 days). Free exports cover the last 90 days and current metric values.';
+	'Saves your EMRALD data as a portable JSON file. Receipts, sessions and check-ins are never deleted. PRO exports include your full daily metric history, kept indefinitely (intra-day snapshots are consolidated into daily values after 120 days). Free exports cover the last 90 days and current metric values.';

@@ -131,7 +131,7 @@ export class DigestView extends EmraldWorkspaceView {
 						this.renderUpgradeGate(this.contentContainer, {
 							icon: 'lock',
 							title: period.charAt(0).toUpperCase() + period.slice(1) + ' Digest',
-							description: 'Daily and monthly digests are available with EMRALD Pro.',
+							description: 'Daily and monthly digests are available with EMRALD PRO.',
 						});
 					}
 				});

@@ -66,7 +66,7 @@ export class CelebrationModal extends Modal {
 			['Check-in', "Give context to the day's weight to better understand your effort."],
 			['Projects', 'Choose what to work on next, and set how much of your day it takes.'],
 			['Session timer', 'Start (and stop) your project sessions.'],
-			['Data Center and effort profile', 'Built from your numbers and receipts. Pro unlocks the whole catalog.'],
+			['Data Center and effort profile', 'Built from your numbers and receipts. PRO unlocks the whole catalog.'],
 			['Burnout', 'A heads-up, free on every plan.'],
 		];
 		for (const [label, text] of items) {

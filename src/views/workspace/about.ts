@@ -1,7 +1,5 @@
-// EMRALD About View — In-app field guide, explainer, and trust-builder.
-// Replaces the original minimal about page with a rich, marketing-forward
-// onboarding explainer covering: what EMRALD is, what you bring,
-// what you get, guardrails, core systems, who it’s for, and how it learns.
+// EMRALD About View: in-app field guide. Copy rewritten 2026-11-09 (S14) to the grunt-approved standard,
+// gated by emrald-cmo (engine/briefs/cmo-gate-about-rewrite-result-2026-11-09.md). Web twin: src/routes/app/about/+page.svelte.
 
 import { WorkspaceLeaf, setIcon } from 'obsidian';
 import EmraldPlugin from '../../../main';
@@ -58,25 +56,25 @@ export class AboutView extends EmraldWorkspaceView {
 	async onOpen() {
 		await super.onOpen();
 		const container = this.getContainer();
-		this.renderHeader(container, 'About EMRALD', 'Effort Management Recursive AI Learning Driver', 'gem');
+		this.renderHeader(container, 'About EMRALD', "A record of what your work costs", 'gem');
 
 		// ── Hero ─────────────────────
 		const hero = container.createDiv( { cls: 'emerald-wv-about-hero' });
 		hero.createEl('p', { cls: 'emerald-wv-about-hero-tagline',
-			text: 'EMRALD helps you manage the effort of your life, not just your tasks.' });
+			text: "EMRALD keeps a record of how heavy your work felt and how long it really took." });
 		hero.createEl('p', { cls: 'emerald-wv-about-hero-sub',
-			text: 'It learns from your sessions, your energy, and your honest feedback to show you what your projects are really costing you.' });
+			text: "It shows you where your effort goes, so you can see your day before you plan the next one." });
 		hero.createEl('p', { cls: 'emerald-wv-about-hero-mission',
-			text: 'EMRALD exists to make the invisible cost of your work visible, enabling you to protect your energy, spot burnout before it hits, and make honest decisions about where your effort goes.' });
+			text: "Spend yourself wisely." });
 
 		const specs = hero.createDiv( { cls: 'emerald-wv-about-specstrip' });
 		const specItems = [
-			{ icon: 'bar-chart-2', label: '20 Metrics' },
-			{ icon: 'zap', label: '4 E-Levels' },
-			{ icon: 'alert-triangle', label: 'Burnout Monitoring' },
-			{ icon: 'lightbulb', label: 'Extra insights' },
-			{ icon: 'folder', label: 'Built for Obsidian' },
-			{ icon: 'trending-up', label: 'A Fuller Picture Over Time' },
+			{ icon: 'bar-chart-2', label: "20 metrics" },
+			{ icon: 'zap', label: "4 effort levels" },
+			{ icon: 'lightbulb', label: "5-question receipt" },
+			{ icon: 'trending-up', label: "Forecast beside actual" },
+			{ icon: 'alert-triangle', label: "Free burnout monitor" },
+			{ icon: 'globe', label: "Plugin and web, one account" },
 		];
 		for (const s of specItems) {
 			const chip = specs.createSpan( { cls: 'emerald-wv-about-speckchip' });
@@ -84,131 +82,117 @@ export class AboutView extends EmraldWorkspaceView {
 			chip.createSpan( { cls: 'emerald-wv-about-speckchip-label', text: s.label });
 		}
 
-		// 1. What EMRALD Is
-		this.makeSection(container, 'what-it-is', 'gem', 'What EMRALD Is', el => {
-			this.para(el as HTMLElement, 'EMRALD is an effort tracker that lives inside Obsidian. While other tools count tasks completed or hours logged, EMRALD asks a different question: what did that work actually cost you?');
-
-			// Effort ≠ Energy callout
-			const callout = el.createDiv( { cls: 'emerald-wv-about-callout' });
-			callout.createDiv( { cls: 'emerald-wv-about-callout-title', text: "Effort isn\u2019t energy \u2014 it\u2019s what you spend your energy on." });
-			callout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "Energy is your tank. Effort is how you draw from it \u2014 the conscious cost of choosing to push through something hard, and the subconscious cost of effort misalignment that quietly builds into mental fatigue. EMRALD tracks both: not just how tired you feel, but what made you tired, and whether it was worth it." });
-
-			this.para(el as HTMLElement, 'It works by asking you to assign effort levels (E1–E4) to your projects, then watching how you actually spend your time. Over days and weeks it builds a picture of your patterns, flags burnout risk before you feel it, and shows you what your work is really taking from you.');
-			const quoteWhatItIs = el.createDiv( { cls: 'emerald-wv-about-thesis' });
-			quoteWhatItIs.createEl('blockquote', { text: "You don't burn out from too many tasks. You burn out from too much effort in the wrong places." });
+		// 1. What EMRALD is
+		this.makeSection(container, 'what-it-is', 'gem', "What EMRALD is", el => {
+			this.para(el as HTMLElement, "EMRALD is a record of how your own work days went. It runs as this Obsidian plugin and as a web app, and one account works on both.");
+			el.createDiv( { cls: 'emerald-wv-about-thesis' }).createEl('blockquote', { text: "Every productivity app measures what you get done. EMRALD measures what it costs you." });
+			{
+				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
+				this.bullet(list, "\"Effort\" here means how heavy the work felt, in your own ratings.");
+				this.bullet(list, "You time your work sessions.");
+				this.bullet(list, "After each one, you rate how it felt.");
+				this.bullet(list, "EMRALD turns those ratings and times into numbers about your effort, your energy, and your burnout risk.");
+			}
+			this.para(el as HTMLElement, "You get a record of where your time went and what it took out of you.");
 		});
 
-		// 2. What EMRALD Is Not
-		this.makeSection(container, 'what-it-isnt', 'x-circle', 'What EMRALD Is Not', el => {
-			this.para(el as HTMLElement, "EMRALD won't make you more productive in the traditional sense. It isn't built to help you do more, faster, or better than yesterday. Here's what it deliberately isn't:");
-			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'A checklist or to-do tracker — It doesn\'t tell you what to do');
-			this.bullet(list, 'A calendar or time-blocking app — It doesn\'t schedule your day');
-			this.bullet(list, 'A deliverables manager — It doesn\'t track whether things got done');
-			this.bullet(list, 'A hustle optimizer — It won\'t push you to do more with less');
-			this.bullet(list, 'A replacement for your brain — It works with your existing projects in Obsidian');
-			this.para(el as HTMLElement, "EMRALD is a mirror for your effort. It shows you where your energy is going, whether that's sustainable, and what's really driving the patterns you live with every day.");
+		// 2. What EMRALD does not do
+		this.makeSection(container, 'what-it-isnt', 'x-circle', "What EMRALD does not do", el => {
+			this.para(el as HTMLElement, "Some things people expect from a work app are missing here, on purpose.");
+			{
+				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
+				this.bullet(list, "EMRALD does not keep your to-do list.");
+				this.bullet(list, "EMRALD does not run your calendar.");
+				this.bullet(list, "EMRALD does not schedule your day.");
+				this.bullet(list, "EMRALD does not grade your days.");
+				this.bullet(list, "EMRALD does not read your notes or your work.");
+			}
+			this.para(el as HTMLElement, "Whether work got finished is one of the metrics. It sits next to the others and gets no special weight.");
 		});
 
-		// 3. What You Bring
-		this.makeSection(container, 'what-you-bring', 'play-circle', 'What You Bring', el => {
-			this.para(el as HTMLElement, "EMRALD is deliberately low-friction. There's no new app to learn, no complex setup, and no ongoing habit to build from scratch. Everything you need already exists: your projects live in Obsidian, and EMRALD just starts watching how you work.");
-			this.para(el as HTMLElement, "Here's everything EMRALD asks of you:");
-			const list = el.createEl('ol', { cls: 'emerald-wv-about-numbered-list' });
-			const steps = [
-				'Add your projects to EMRALD using the "+Add" button in the sidebar.',
-				'Assign an E-level to each project, based on the percentage of your daily work day you think it deserves.',
-				'Click Start Session when you begin working on a project.',
-				'Click Stop Session when you\'re done.',
-				'Complete the 15-second effort receipt at the end of each session. Just be honest about how hard it felt.',
-				'Once a day, take 15 seconds for the Daily Check-in: how is your energy level today?',
-				'If you finish your planned work before the day ends, click Close Day. It helps EMRALD calibrate faster.',
-			];
-			for (const s of steps) this.bullet(list, s);
-			const quoteYouBring = el.createDiv( { cls: 'emerald-wv-about-thesis' });
-			quoteYouBring.createEl('blockquote', { text: "Honest data in, honest insights out." });
+		// 3. What you do
+		this.makeSection(container, 'what-you-bring', 'play-circle', "What you do", el => {
+			this.para(el as HTMLElement, "Each step is small. You do them in this order.");
+			{
+				const list = el.createEl('ol', { cls: 'emerald-wv-about-numbered-list' });
+				this.bullet(list, "Add a project and pick its effort level. An effort level is the share of your daily work time you set aside for that project.");
+				this.bullet(list, "Press the play button, then pick a project. A session is one stretch of work.");
+				this.bullet(list, "Stop the session when you are done.");
+				this.bullet(list, "Fill in the receipt. It is five questions, about ten seconds, and you can skip it. A skip still records the session.");
+				this.bullet(list, "Optional: fill in the daily check-in. It covers sleep, energy, and how you feel.");
+				this.bullet(list, "At the end of the day, press Close Day to see a summary of the day.");
+			}
+			this.para(el as HTMLElement, "Sessions under 5 minutes skip the receipt and still count.");
 		});
 
-		// 4. What EMRALD Gives Back
-		this.makeSection(container, 'what-you-get', 'gift', 'What EMRALD Gives Back', el => {
-			this.para(el as HTMLElement, "The more you use EMRALD honestly, the more it gives back. Here's what you'll see accumulate over time:");
-			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'Metrics: Twenty diagnostic measurements of your effort patterns, energy balance, and work rhythm');
-			this.bullet(list, 'Insight Logs: Observations, suggestions, and discoveries about your patterns across 5 categories');
-			this.bullet(list, "Burnout Monitoring: Early warnings when your effort distribution suggests you're heading toward exhaustion");
-			this.bullet(list, 'Effort Digests: Weekly and monthly summaries of where your energy went');
-			this.bullet(list, 'Completion Rate: Clarity on which projects you finish versus abandon');
-			this.bullet(list, 'Calibration Over Time: as you complete receipts, EMRALD keeps your forecast beside the actual values, so you can see how close your estimate ran');
-			this.bullet(list, "75+ data points feed into every metric: EMRALD processes your sessions, energy, and calibration data across 20 metrics and layered internal measurements to surface patterns you'd never catch on your own.");
-			this.para(el as HTMLElement, "Early on, some views will be sparse. That's normal. The system needs weeks of real data to unlock its full value. This isn't a flaw, it's how EMRALD learns your specific rhythm.");
+		// 4. What you get back
+		this.makeSection(container, 'what-you-get', 'gift', "What you get back", el => {
+			this.para(el as HTMLElement, "Your numbers come back to you in a few places.");
+			{
+				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
+				this.bullet(list, "Metrics: 20 measurements of your work, such as Completion Rate (PRO). Free has the first 8. PRO has all 20.");
+				this.bullet(list, "Forecast (free): for a multi-day project, EMRALD suggests an effort level and shows the forecast next to what actually happened.");
+				this.bullet(list, "Burnout monitor: free on every plan.");
+				this.bullet(list, "Insight log: short notes sorted into observations, suggestions, warnings, celebrations, and discoveries.");
+				this.bullet(list, "Digests: a weekly summary on free. PRO adds daily and monthly.");
+			}
+			this.para(el as HTMLElement, "Keep filling them in for a month and the full picture is yours.");
 		});
 
-		// 5. Why the Guardrails Exist
-		this.makeSection(container, 'guardrails', 'shield', 'Why the Guardrails Exist', el => {
-			this.para(el as HTMLElement, "If you've wondered why EMRALD limits how much E-level work you can assign in a day, or why it nudges you toward balance instead of pushing you to maximize — this is why.");
-			this.para(el as HTMLElement, "The system is built on a simple truth: burnout doesn't come from too many tasks. It comes from too much effort in the wrong distribution, for too long, without recovery.");
-			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, "Your day has a finite capacity, whatever hours you've set in your schedule. EMRALD won't let you pretend you have more.");
-			this.bullet(list, 'E4 work is genuinely exhausting. You can only do so much of it before the quality of everything drops.');
-			this.bullet(list, "Filling your day to 100% with demanding work is a fast path to burnout — EMRALD's allocation system is designed to prevent exactly that.");
-			this.bullet(list, "Early data will look incomplete. Charts won't fill in nicely for the first couple weeks. This is normal — the system is learning your baseline before it can tell you meaningful things about deviations.");
-			const quoteGuardrails = el.createDiv( { cls: 'emerald-wv-about-thesis' });
-			quoteGuardrails.createEl('blockquote', { text: "The promise of EMRALD is not instant insight. It's real insight, earned through consistent, honest use over time." });
+		// 5. Why your day shows as shares
+		this.makeSection(container, 'guardrails', 'shield', "Why your day shows as shares", el => {
+			this.para(el as HTMLElement, "Every project takes a share of your day. Its effort level sets the size.");
+			{
+				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
+				this.bullet(list, "An E3 project takes 75 percent. An E2 project takes 50 percent.");
+				this.bullet(list, "The Session timer shows your time against that share.");
+				this.bullet(list, "You can have five active projects at a time, on free and PRO.");
+			}
 		});
 
-		// 6. Core Systems
-		this.makeSection(container, 'core-systems', 'layers', 'Core Systems', el => {
-			this.para(el as HTMLElement, "Six things make EMRALD work. Here's what each one does:");
-			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'E-Levels (E1–E4): Four effort tiers from light to maximum. You assign them to projects to set expectations for how much energy a session will cost.');
-			this.bullet(list, 'Metrics: Twenty computed measurements of your effort patterns. Eight are available to all users; the other twelve unlock with Pro.');
-			this.bullet(list, "Burnout Monitor: Tracks your effort distribution across E-levels and warns you when patterns suggest you're overextended.");
-			this.bullet(list, 'Data Center: The visual home of all your metrics, with charts and context for each measurement.');
-			this.bullet(list, "Insight Log: AI-generated observations, suggestions, and discoveries about your effort patterns.");
-			this.bullet(list, 'Daily Check-in & Effort Receipt: The two feedback inputs that power the entire system.');
-			this.para(el as HTMLElement, "Effort management is a growing field: new research surfaces regularly on how people experience, misallocate, and recover from the effort they spend. EMRALD tracks that research closely, so the system is evolving alongside the science. If you've tried productivity tools that felt right at first but eventually stopped helping, this is part of why: they were built on static assumptions about how you work. EMRALD isn't.");
+		// 6. The six parts
+		this.makeSection(container, 'core-systems', 'layers', "The six parts", el => {
+			{
+				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
+				this.bullet(list, "Effort levels: the four sizes of work (E1 to E4) you pick for each project. PRO adds your own custom levels.");
+				this.bullet(list, "Metrics: your numbers, built from your sessions and receipts.");
+				this.bullet(list, "Burnout monitor: one score from several of your metrics. You check it any time.");
+				this.bullet(list, "Data Center: the screen where you read all your metrics.");
+				this.bullet(list, "Insight log: where EMRALD writes up what stands out in your numbers.");
+				this.bullet(list, "Daily check-in and receipt: two short forms you fill in. They feed the rest.");
+			}
 		});
 
-		// 7. Who EMRALD Helps
-		this.makeSection(container, 'who-its-for', 'users', 'Who EMRALD Helps', el => {
-			this.para(el as HTMLElement, "EMRALD was designed for people who refuse to simplify their lives to fit a productivity system. If any of these describe you, EMRALD was probably built for you:");
-			const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-			this.bullet(list, 'Polymath Operators — people who run multiple creative or professional projects simultaneously and need to understand how their energy divides across them');
-			this.bullet(list, "Neurodivergent Individuals — people who experience energy and focus differently and need a system that adapts to them, not the other way around");
-			this.bullet(list, 'Students — people managing coursework, side projects, and exam prep across the same finite week');
-			this.bullet(list, "Creators — writers, artists, builders who work on long-horizon projects that don't fit into a task-tracker");
-			this.bullet(list, "Knowledge Workers — people whose output isn't easily measured by hours logged or tasks checked off");
-			this.bullet(list, 'Anyone Juggling Multiple Identities — parent, professional, hobbyist, student — all in the same person, all with legitimate energy claims on your day');
-
-			// Whole-life callout
-			const wholeLife = el.createDiv( { cls: 'emerald-wv-about-callout' });
-			wholeLife.createDiv( { cls: 'emerald-wv-about-callout-title', text: 'EMRALD works across your whole life' });
-			wholeLife.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "Your novel. Learning piano. A home renovation. Family commitments. Side projects. EMRALD doesn\u2019t care if it\u2019s a work task or a personal one \u2014 if it takes focused time and costs you something, it belongs here." });
-
-			this.para(el as HTMLElement, "If you've tried every productivity system and found that none of them actually helped you understand where your energy goes, you're probably the person EMRALD was made for.");
+		// 7. Who it's for
+		this.makeSection(container, 'who-its-for', 'users', "Who it's for", el => {
+			this.para(el as HTMLElement, "EMRALD is for people who lose track of time. People who end a day drained and cannot say why. People who tried a tracker once and felt graded by it.");
+			this.para(el as HTMLElement, "EMRALD records how long things really took and how heavy they felt. Nothing in it grades you.");
+			this.para(el as HTMLElement, "It also suits anyone who works on several projects at once and wants to see what each one takes. Students fit too: classes, projects, and exams all share the same week.");
 		});
 
-		// 8. How EMRALD Learns
-		this.makeSection(container, 'how-it-learns', 'brain', 'How EMRALD Learns', el => {
-			this.para(el as HTMLElement, "EMRALD is a recursive feedback system. It's only as smart as the signal you give it.");
-			this.para(el as HTMLElement, "Every time you start a session, submit an effort receipt, or complete a daily check-in, you're giving EMRALD a record of what your work actually costs. The more honest and consistent you are, the clearer that record becomes.");
-			this.para(el as HTMLElement, "The first few weeks will feel light. Charts won't show much. Insights will be sparse. This isn't the system failing — it's the system learning. EMRALD needs a baseline before it can tell you meaningful things about deviations from it.");
-			this.para(el as HTMLElement, 'The more sessions, receipts, and check-ins you log, the more of your own patterns there are to read: your rhythm, your strengths, and your vulnerability points.');
-			const quoteLearns = el.createDiv( { cls: 'emerald-wv-about-thesis' });
-			quoteLearns.createEl('blockquote', { text: "EMRALD isn't going to dazzle you on day one. But if you stick with it, it will show you things about yourself that no other system can." });
+		// 8. How your record builds
+		this.makeSection(container, 'how-it-learns', 'brain', "How your record builds", el => {
+			this.para(el as HTMLElement, "Your record grows one receipt at a time.");
+			{
+				const list = el.createEl('ol', { cls: 'emerald-wv-about-numbered-list' });
+				this.bullet(list, "You stop a session and fill in the receipt.");
+				this.bullet(list, "Your receipts land in your numbers the day you start.");
+				this.bullet(list, "For a multi-day project, you fill in a short effort profile. That is a few questions about the project. EMRALD compares your answers to your own past projects and suggests an effort level, with a confidence indicator.");
+				this.bullet(list, "As receipts come in, EMRALD keeps the forecast next to the actual. You see how close your estimate ran.");
+			}
+			this.para(el as HTMLElement, "Some numbers need more receipts before they fill in.");
 		});
 
-		// 9. Learn More
-		this.makeSection(container, 'learn-more', 'book-open', 'Learn More', el => {
-			this.para(el as HTMLElement, "This page is the field guide. The full story of effort management — the research behind it, the sources, the methodology, and the reasoning — lives online.");
+		// 9. Learn more
+		this.makeSection(container, 'learn-more', 'book-open', "Learn more", el => {
 			const linkWrap = el.createDiv( { cls: 'emerald-wv-about-link-row' });
-			this.link(linkWrap, 'https://getemrald.com/learn', 'getemrald.com/learn — deeper reading on effort management and the research behind it');
-			this.link(linkWrap, 'https://app.effortmastery.com', 'app.effortmastery.com — manage your EMRALD account');
+			this.link(linkWrap, 'https://getemrald.com/learn', 'The research and reasoning behind effort management: getemrald.com/learn');
+			this.link(linkWrap, 'https://app.effortmastery.com/app/billing', 'Plans and billing: Manage your plan');
 
 			// Privacy callout
 			const privacyCallout = el.createDiv( { cls: 'emerald-wv-about-callout' });
-			privacyCallout.createDiv( { cls: 'emerald-wv-about-callout-title', text: 'Your notes stay yours.' });
-			privacyCallout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried." });
+			privacyCallout.createDiv( { cls: 'emerald-wv-about-callout-title', text: 'Privacy' });
+			privacyCallout.createEl('p', { cls: 'emerald-wv-about-callout-body', text: "EMRALD sees your session data. That means timestamps, effort ratings, and project names. The plugin adds only frontmatter to your notes and never reads what you wrote. The plugin code is public." });
 		});
 
 		// Pro Teaser (free users only)
@@ -217,22 +201,21 @@ export class AboutView extends EmraldWorkspaceView {
 			const proHeader = proSection.createDiv( { cls: 'emerald-wv-about-section-header' });
 			const proIcon = proHeader.createSpan( { cls: 'emerald-wv-about-section-icon' });
 			setIcon(proIcon, 'sparkles');
-			proHeader.createEl('h3', { cls: 'emerald-wv-about-section-title', text: 'Want the full picture?' });
+			proHeader.createEl('h3', { cls: 'emerald-wv-about-section-title', text: 'What PRO adds' });
 
 			const proContent = proSection.createDiv( { cls: 'emerald-wv-about-section-content' });
 			proContent.createEl('p', {
 				cls: 'emerald-wv-about-p',
-				text: 'EMRALD PRO unlocks the full intelligence layer — 11 additional metrics, all 5 insight categories, weekly and monthly digests, AI suggestions, and more.'
+				text: 'PRO adds the rest of the metrics and the extra views.'
 			});
 
 			const featureGrid = proContent.createDiv( { cls: 'emerald-wv-pro-feature-grid' });
 			const features = [
-				{ icon: 'lightbulb', text: 'AI-powered insight logs across 5 distinct categories' },
-				{ icon: 'trending-up', text: 'Supercharged data center with 12 additional metrics' },
-				{ icon: 'calendar-range', text: 'Weekly + monthly digests' },
-				{ icon: 'target', text: 'Personalized AI suggestions' },
-				{ icon: 'pin', text: 'Pinned sidebar sparklines' },
-				{ icon: 'zap', text: '1-minute sync times (vs 5-minute in Basic)' },
+				{ icon: 'bar-chart-2', text: 'All 20 metrics' },
+				{ icon: 'lightbulb', text: 'Extra insights' },
+				{ icon: 'sliders-horizontal', text: 'Custom effort levels' },
+				{ icon: 'calendar-range', text: 'Daily and monthly digests' },
+				{ icon: 'pin', text: 'Pinned metrics in your sidebar' },
 			];
 			for (const feat of features) {
 				const item = featureGrid.createDiv( { cls: 'emerald-wv-pro-feature-cell' });
@@ -244,7 +227,7 @@ export class AboutView extends EmraldWorkspaceView {
 			const ctaRow = proSection.createDiv( { cls: 'emerald-wv-pro-cta-row' });
 			const cta = ctaRow.createEl('a', {
 				cls: 'emerald-btn emerald-btn-upgrade',
-				text: 'Upgrade to PRO',
+				text: 'Get PRO',
 				href: 'https://app.effortmastery.com/app/billing'
 			});
 			cta.setAttribute('target', '_blank');

@@ -205,7 +205,7 @@ export class EmraldAPIClient {
 
 			// 403 Forbidden — free tier limit hit
 			if (response.status === 403) {
-				const msg = this.extractErrorMessage(response) || 'Feature requires EMRALD Pro';
+				const msg = this.extractErrorMessage(response) || 'Feature requires EMRALD PRO';
 				return {
 					data: null,
 					error: `Free tier limit: ${msg}. Upgrade at effortmastery.com/pro`,
@@ -299,7 +299,7 @@ export class EmraldAPIClient {
 					return { data: null, error: 'Invalid API key — please check your key in Settings.', status: 401 };
 				}
 				if (thrownStatus === 403) {
-					return { data: null, error: 'Feature requires EMRALD Pro. Upgrade at effortmastery.com/pro', status: 403 };
+					return { data: null, error: 'Feature requires EMRALD PRO. Upgrade at effortmastery.com/pro', status: 403 };
 				}
 				if (thrownStatus === 404) {
 					return { data: null, error: null, status: 404 };
