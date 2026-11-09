@@ -4,6 +4,23 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-09
+
+Your receipts, project by project.
+
+### Added
+- A receipt graph for each project in Effort Allocations: pick a receipt value, see the project's receipts as a line of dots, and click a dot to read that session. Free for everyone.
+- An info button next to Export data (Settings and Effort Profile).
+- A note in the Data Center when Toggl projects are left out of a metric.
+
+### Changed
+- EMRALD views use the full width of their pane.
+- Wording says "forecast" instead of "prediction" and no longer promises accuracy.
+- README describes exactly where EMRALD lists your vault's markdown files.
+
+### Fixed
+- Picking no effort source on a receipt now records none.
+
 ## [1.3.2] - 2026-11-05
 
 Small quality-of-life release.
