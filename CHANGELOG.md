@@ -4,6 +4,24 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-11-12
+
+A plainer EMRALD.
+
+### Added
+- A short welcome after your first receipt, with a quick look at the other parts of EMRALD.
+- A friendlier welcome-back message after a few days away.
+
+### Changed
+- The About view is rewritten in plainer words.
+- The last step of setup explains what happens when you start a session.
+- Pro labels read the same everywhere in the plugin.
+- Clearer empty states in the Insight Log, plus a small nudge to finish your effort profile.
+- Wording throughout is shorter and plainer.
+
+### Fixed
+- A resumed session keeps running after the two-hour auto-pause and asks again after two more hours of work.
+
 ## [1.4.0] - 2026-11-09
 
 Your receipts, project by project.
