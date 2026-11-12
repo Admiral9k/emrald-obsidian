@@ -10897,7 +10897,7 @@ var AboutView = class extends EmraldWorkspaceView {
       this.para(el, "Finishing things is tracked too, but it's just one number. It doesn't outrank how the work felt.");
     });
     this.makeSection(container, "what-you-bring", "play-circle", "What you do", (el) => {
-      this.para(el, "Each step is small. Here's what you do:");
+      this.para(el, "Each step is small:");
       {
         const list = el.createEl("ol", { cls: "emerald-wv-about-numbered-list" });
         this.bullet(list, "Add a project and pick how heavy it is: Light, Moderate, Demanding, or Maximum (effort levels E1 to E4). In between? PRO lets you make your own. That sets how much of your day it gets.");
@@ -10911,7 +10911,7 @@ var AboutView = class extends EmraldWorkspaceView {
       this.para(el, "Use your data to see your trends and habits. Want EMRALD to spot patterns for you? That's the Insight Log, on PRO.");
     });
     this.makeSection(container, "what-you-get", "gift", "What you get back", (el) => {
-      this.para(el, "Here's what you get for those 10 seconds of answers:");
+      this.para(el, "For those 10 seconds of answers, you get:");
       {
         const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
         this.bullet(list, "Your numbers: things like how often you get in the zone and how much context switching eats your day. 8 are free. PRO unlocks all 20.");
