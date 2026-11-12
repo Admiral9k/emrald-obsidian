@@ -49,20 +49,20 @@ export class WelcomeBackModal extends Modal {
 			: `${this.daysSinceLastSession} days`;
 
 		body.createEl('p', {
-			text: `It's been ${gapText} since your last session. No judgment — life happens.`
+			text: `It's been ${gapText} since your last session.`
 		});
 
 		// Where they left off (if we have context)
 		if (this.lastProjectName) {
 			body.createEl('p', {
-				text: `Last time you were working on ${this.lastProjectName}. Pick up where you left off, or start something fresh.`
+				text: `You were working on ${this.lastProjectName}.`
 			});
 		}
 
 		// Encouragement — gentle nudge, not guilt
 		body.createEl('p', {
 			cls: 'emerald-welcomeback-encouragement',
-			text: 'Every session — even a short one — gives EMRALD better data to work with. Start small if you need to.'
+			text: 'No judgment, life happens. Even a 5-minute session counts.'
 		});
 
 		// Single dismiss button

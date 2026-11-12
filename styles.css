@@ -4317,11 +4317,15 @@ span.emerald-pro-pill {
 }
 .emerald-wv-about-link {
 	font-size: 13px;
-	color: var(--text-accent);
-	text-decoration: none;
+	color: #D8B976;
+	text-decoration: underline;
+}
+.emerald-wv-about-p .emerald-wv-about-link,
+.emerald-wv-about-bullet .emerald-wv-about-link {
+	font-size: inherit;
 }
 .emerald-wv-about-link:hover {
-	text-decoration: underline;
+	color: #C9A96E;
 }
 /* ═══════════════════════════════════════════════════════════
    GOLD TIER UI/UX — Animations, Transitions & Polish
