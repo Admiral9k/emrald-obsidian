@@ -7728,7 +7728,7 @@ var METRICS = [
   { key: "demand_investment_balance", label: "Right amount of effort", question: "Did you give the right amount of effort for what this needed?", min: 1, max: 10, dir: "center" },
   { key: "hedonic_valence", label: "How enjoyable", question: "How pleasant was this work?", min: 1, max: 10, dir: "up" },
   { key: "flow_occurred", label: "Flow state", question: "Were you in the zone?", min: 0, max: 2, dir: "up", words: ["No", "Somewhat", "Yes"], axis: ["No", "Some", "Yes"] },
-  { key: "verification_share", label: "AI verification", question: "How much of the work was checking what the AI produced? (Qarett receipts)", min: 1, max: 10, dir: null },
+  { key: "verification_share", label: "Verification share", question: "How much of the work was checking what the AI produced? (Qarett receipts)", min: 1, max: 10, dir: null },
   { key: "unexpected_complications", label: "Any complications", question: "Any unexpected complications?", min: 0, max: 2, dir: "down", words: ["None", "Some", "You wouldn't believe me"], axis: ["None", "Some", "Lots"] }
 ];
 var RANGES = [

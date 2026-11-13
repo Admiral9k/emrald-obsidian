@@ -141,7 +141,7 @@ function fakeApi(all, log = []) {
   ok(legend('demand_investment_balance') === 'good 5-6 | caution 3-4 and 7-8 | risk 1-2 and 9-10', 'legend Right amount of effort: ' + legend('demand_investment_balance'));
   ok(legend('hedonic_valence') === 'good 6-10 | caution 3-5 | risk 1-2', 'legend How enjoyable: ' + legend('hedonic_valence'));
   ok(legend('flow_occurred') === 'No | Somewhat | Yes', 'legend Flow state shows only the receipt words');
-  ok(legend('verification_share') === '', 'AI verification has no zones (neutral blue)');
+  ok(legend('verification_share') === '', 'Verification share has no zones (neutral blue)');
   ok(zoneOf(METRICS[3], 0) === 'risk' && zoneOf(METRICS[3], 2) === 'good', 'flow 0 = risk, 2 = good');
   ok(zoneOf(METRICS[5], 0) === 'good' && zoneOf(METRICS[5], 2) === 'risk', 'complications 0 = good, 2 = risk');
   ok(wantedCount(false, 900) === 50 && wantedCount(false, 700) === 20 && wantedCount(true, 300) === 500 && wantedCount(false, 0) === 50, 'wantedCount: 50 wide, 20 narrow (<=720), 500 on Show all');
@@ -190,8 +190,8 @@ function fakeApi(all, log = []) {
     ok(panel.getAttribute('aria-label') === 'Receipt graph for Alpha', 'panel aria-label names the project');
     ok(api.log[0].itemId === 'P1' && api.log[0].limit === 50 && api.log[0].offset === 0, 'first load: item_id, newest 50');
     const chips = panel.all().filter((e) => e.classes.has('emerald-rg-chip'));
-    ok(['How hard', 'Right amount of effort', 'How enjoyable', 'Flow state', 'AI verification', 'Any complications', 'All', '7 days', '14 days', '30 days', '60 days'].every((t) => chips.some((c) => c.text === t)), 'six value chips and five range chips present');
-    ok(chips.find((c) => c.text === 'AI verification').hasClass('is-muted') && !chips.find((c) => c.text === 'How hard').hasClass('is-muted'), 'a value with zero points stays in the selector, muted');
+    ok(['How hard', 'Right amount of effort', 'How enjoyable', 'Flow state', 'Verification share', 'Any complications', 'All', '7 days', '14 days', '30 days', '60 days'].every((t) => chips.some((c) => c.text === t)), 'six value chips and five range chips present');
+    ok(chips.find((c) => c.text === 'Verification share').hasClass('is-muted') && !chips.find((c) => c.text === 'How hard').hasClass('is-muted'), 'a value with zero points stays in the selector, muted');
     const dots = () => panel.all().filter((e) => e.classes.has('emerald-rg-pt'));
     ok(dots().length === 12, '12 dots for 12 receipts (How hard)');
     const svg = panel.all().find((e) => e.classes.has('emerald-rg-svg'));
@@ -229,9 +229,9 @@ function fakeApi(all, log = []) {
     ok(panel.textContent.includes('NoSomewhatYes') || (panel.textContent.includes('No') && panel.textContent.includes('Somewhat') && panel.textContent.includes('Yes')), 'Flow state legend shows only the receipt words');
     ok(!panel.textContent.includes('Good 0'), 'no numeric zone text on the word scale');
     ok(panel.all().filter((e) => e.classes.has('emerald-rg-pt')).length === 12, 'flow 0 is a real value (a dot), 12 dots');
-    // AI verification: zero points -> empty line state, still selectable
-    panel.all().find((e) => e.classes.has('emerald-rg-chip') && e.text === 'AI verification').dispatch('click');
-    ok(panel.textContent.includes('No receipts have a "AI verification" rating yet.'), 'zero-point value shows its own empty line state');
+    // Verification share: zero points -> empty line state, still selectable
+    panel.all().find((e) => e.classes.has('emerald-rg-chip') && e.text === 'Verification share').dispatch('click');
+    ok(panel.textContent.includes('No receipts have a "Verification share" rating yet.'), 'zero-point value shows its own empty line state');
     // Esc closes via onClose; destroy removes the listener
     const before = events.docListeners.length;
     events.docListeners.forEach((f) => f({ key: 'Escape', defaultPrevented: false }));

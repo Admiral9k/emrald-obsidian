@@ -4,6 +4,20 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-11-13
+
+Plainer words.
+
+### Changed
+- The plugin's wording matches the web app: recaps instead of digests, Effort Allocations instead of E-Level Overview, and plain names for the metrics and the effort profile.
+- The recap day and time are set in your local time.
+- The sidebar counts check-ins this week in place of a streak.
+- The Burnout Monitor says "Not enough data yet" when there is no score to judge from.
+- Dashes in on-screen text are gone, and warnings and notices are shorter.
+
+### Fixed
+- The plugin no longer overwrites a recap schedule you changed on the web.
+
 ## [1.4.1] - 2026-11-12
 
 A plainer EMRALD.

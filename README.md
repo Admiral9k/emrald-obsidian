@@ -60,10 +60,10 @@ Timeblock timer, projects, and effort tools, always one click away.
 **Effort Allocations**: see how your day breaks down across effort levels.
 ![Effort Allocations](screenshots/elevel-overview-dark.png)
 
-**Effort Profile**: how EMRALD sees your capacity, endurance, and motivation.
+**Effort Profile**: your capacity, endurance, and motivation at a glance.
 ![Effort Profile](screenshots/effort-profile-dark.png)
 
-**Burnout Monitor**: sustained-effort signal watching, before patterns get obvious.
+**Burnout Monitor**: watches for sustained effort, before patterns get obvious.
 ![Burnout Monitor](screenshots/burnout-monitor-dark.png)
 
 _Screenshots show dark mode. EMRALD adapts to your active Obsidian theme._
@@ -89,17 +89,24 @@ The first few sessions give you a starting point. Keep filling in your receipts 
 
 ---
 
-## What's new: receipt graphs, effort profiles, area grouping, and forecasting
+## What's new
 
-**Receipt graph.** In Effort Allocations, each project row has a graph button. It opens that project's receipts as a line of dots, right under the row. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), filter by 7, 14, 30 or 60 days, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Free for everyone.
+**Plainer words throughout (1.4.2).** The plugin now reads the same as the web app, in everyday words instead of jargon. Digests are recaps, the E-Level Overview is Effort Allocations, "Calibration" is "Guesses" and "Drift from your profile", and the Burnout Monitor says "Not enough data yet" instead of "All Clear" when there is no score to judge from.
 
-**Per-project effort profiles.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your forecast next to what actually happened, side by side. It never blends the two into a fake composite score.
+**Your recap time, in your time zone.** Pick the day and hour of your weekly recap in your own local time. The plugin reads your saved schedule when it starts, so a change made on the web stays changed.
+
+**Check-ins this week.** The sidebar counts your check-ins over the last seven days in place of a streak.
+
+
+**Receipt graph.** In Effort Allocations, each project row has a graph button. It opens that project's receipts as a line of dots, right under the row. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, any complications, and the verification share on Qarett receipts), filter by 7, 14, 30 or 60 days, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Free for everyone.
+
+**Per-project questions.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your forecast next to what actually happened, side by side. It never blends the two into a fake composite score.
 
 **Effort forecasting.** For multi-day projects, EMRALD can suggest a starting effort level and field hints. Drawn from how similar past projects actually went for you. If there isn't enough history yet, it tells you that plainly.
 
 **Area grouping.** Tag projects by area (Work, Health, Family, or whatever fits your life) and see across your workspace.
 
-**Extra insights (Pro).** Phrasing varies instead of repeating the same sentence, it learns from insights you dismiss, and it adds two categories: Discovery (patterns in your own data) and expanded Warnings (early heads-ups on sleep and effort volatility). Burnout warnings are identical on every plan.
+**Extra insights (PRO).** Phrasing varies instead of repeating the same sentence, and it adds two categories: Discovery (patterns in your own data) and expanded Warnings (early heads-ups on sleep and effort volatility). Burnout warnings are identical on every plan.
 
 ## Templater & Periodic Notes integration
 
