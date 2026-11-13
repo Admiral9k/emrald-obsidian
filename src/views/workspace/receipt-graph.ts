@@ -1,4 +1,4 @@
-// EMRALD per-project receipt graph: the inline panel under a project row in the E-level overview.
+// EMRALD per-project receipt graph: the inline panel under a project row in Effort Allocations.
 // Port of the web app's ReceiptGraph.svelte (spec: emrald-mcp docs/RECEIPT-GRAPH-SPEC.md v1.1).
 // Pick one receipt value, see every receipt for the project as a line of dots (oldest left, evenly
 // spaced), click a dot to see that session: date, length, ratings, work type and the approved

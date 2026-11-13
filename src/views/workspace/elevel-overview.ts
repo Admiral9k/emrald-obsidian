@@ -1,4 +1,4 @@
-// EMRALD E-Level Overview — Bird's-eye view of all projects and effort allocation.
+// EMRALD Effort Allocations (file and view id keep the elevel-overview name so saved layouts still open). Bird's-eye view of all projects and effort allocation.
 // Shows: E-level filter cards, project table, allocation summary.
 // Click an E-level card to filter the project list.
 // Expandable ⓘ info on each card, clickable project names → open note,
@@ -47,7 +47,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 	private openGraph: { itemId: string; row: HTMLElement; btn: HTMLElement; handle: ReceiptGraphHandle } | null = null;
 
 	constructor(leaf: WorkspaceLeaf, plugin: EmraldPlugin) {
-		super(leaf, plugin, 'E-Level Overview', 'bar-chart-2');
+		super(leaf, plugin, 'Effort Allocations', 'bar-chart-2');
 	}
 
 	getViewType(): string { return VIEW_ELEVEL_OVERVIEW; }
@@ -55,7 +55,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'E-level overview', 'Your projects by effort level', 'bar-chart-2');
+		this.renderHeader(container, 'Effort allocations', 'Your projects by effort level', 'bar-chart-2');
 
 		// Custom-level names and percents are resolved from the store, so warm it
 		// before the first badge renders. Runs concurrently with the data fetch

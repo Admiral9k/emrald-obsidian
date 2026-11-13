@@ -175,7 +175,7 @@ export class AboutView extends EmraldWorkspaceView {
 				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
 				this.bullet(list, "Daily check-in and receipt: two quick forms. Everything else runs on them.");
 				this.bullet(list, "Effort levels: Light, Moderate, Demanding, Maximum. Pick one per project. PRO lets you make your own.");
-				this.bullet(list, "E-Level Overview: how much of today each project takes.");
+				this.bullet(list, "Effort Allocations: how much of today each project takes.");
 				this.bullet(list, "Data Center: every number, with a plain explanation.");
 				this.bullet(list, "Burnout Monitor: one score that shows your burnout risk. Check it any time.");
 				this.bullet(list, "Insight Log (PRO): what EMRALD spots in your numbers, in plain words.");

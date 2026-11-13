@@ -57,8 +57,8 @@ Timeblock timer, projects, and effort tools, always one click away.
 
 ### The workspace views: your patterns over time
 
-**E-Level Overview**: see how your day breaks down across effort tiers.
-![E-Level Overview](screenshots/elevel-overview-dark.png)
+**Effort Allocations**: see how your day breaks down across effort levels.
+![Effort Allocations](screenshots/elevel-overview-dark.png)
 
 **Effort Profile**: how EMRALD sees your capacity, endurance, and motivation.
 ![Effort Profile](screenshots/effort-profile-dark.png)
@@ -91,7 +91,7 @@ The first few sessions give you a starting point. Keep filling in your receipts 
 
 ## What's new: receipt graphs, effort profiles, area grouping, and forecasting
 
-**Receipt graph.** In the E-Level Overview, each project row has a graph button. It opens that project's receipts as a line of dots, right under the row. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), filter by 7, 14, 30 or 60 days, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Free for everyone.
+**Receipt graph.** In Effort Allocations, each project row has a graph button. It opens that project's receipts as a line of dots, right under the row. Pick one receipt value (how hard, right amount of effort, how enjoyable, flow state, AI verification, any complications), filter by 7, 14, 30 or 60 days, and click a dot to read that session: date, length, ratings, work type and the one-line summary. Free for everyone.
 
 **Per-project effort profiles.** Tell EMRALD what a project will cost you before you start. Complexity, how familiar the work is, whether it's the kind of thing you get pulled into. Once you've logged sessions, EMRALD shows your forecast next to what actually happened, side by side. It never blends the two into a fake composite score.
 

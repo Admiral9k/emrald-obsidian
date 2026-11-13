@@ -436,7 +436,7 @@ export class EMComponent {
 		section.createDiv({ cls: 'emerald-workspace-title', text: 'Workspace views' });
 
 		const buttons = [
-			{ icon: ICONS.barChart, label: 'E-level overview', view: VIEW_ELEVEL_OVERVIEW },
+			{ icon: ICONS.barChart, label: 'Effort allocations', view: VIEW_ELEVEL_OVERVIEW },
 			{ icon: ICONS.lightbulb, label: 'Insight log', view: VIEW_INSIGHT_LOG, badge: this.unreadCount },
 			{ icon: ICONS.trendingUp, label: 'Data center', view: VIEW_DATA_CENTER },
 			{ icon: ICONS.user, label: 'Effort Profile', view: VIEW_EFFORT_PROFILE },

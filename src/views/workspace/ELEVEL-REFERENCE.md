@@ -24,7 +24,7 @@ This could live in:
 1. The Effort Profile workspace view (already shows calibration)
 2. A tooltip/popover when hovering E-level selectors in the sidebar
 3. The onboarding flow (it was shown there too)
-4. A dedicated "E-Level Guide" section accessible from the E-Level Overview workspace view
+4. A dedicated "E-Level Guide" section accessible from the Effort Allocations workspace view
 5. The website (effortmastery.com) — best fit for the full breakdown with examples
 
 ## Original Source

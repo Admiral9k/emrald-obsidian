@@ -7,7 +7,7 @@ import { EmraldAPIClient } from './src/api/client';
 import { FolderSync } from './src/sync/folder-sync';
 import { OfflineQueue, QueuedAction } from './src/sync/offline-queue';
 import { DataCache } from './src/sync/data-cache';
-import { DIGEST_DAY_NAMES, formatTime12, utcSlotToLocal } from './src/utils/digest-schedule';
+import { DIGEST_DAYS, DIGEST_DAY_NAMES, formatTime12, utcSlotToLocal } from './src/utils/digest-schedule';
 import {
 	VIEW_ELEVEL_OVERVIEW, ELevelOverviewView,
 	VIEW_INSIGHT_LOG, InsightLogView,
@@ -167,7 +167,7 @@ export default class EmraldPlugin extends Plugin {
 				// Never throws; a failure just leaves the hydrated cache in place.
 				void eLevelStore.refresh(this);
 
-				// Auto-open E-Level Overview as "home screen" for returning users
+				// Auto-open Effort Allocations as "home screen" for returning users
 				if (this.settings.onboardingComplete) {
 					void this.openWorkspaceView(VIEW_ELEVEL_OVERVIEW);
 				}
@@ -196,13 +196,13 @@ export default class EmraldPlugin extends Plugin {
 		// Only pings once per install (installPinged flag persists across sessions).
 		void this.pingInstallTracking();
 
-		// Reconcile digest preferences with API on startup (one-shot).
-		// Pre-launch fix: existing installs had local digestDay/digestTime that never
-		// reached the API, so cron was using the Sunday 18:00 default. This pushes
-		// the local truth to the database so the cron uses the right schedule.
+		// Reconcile preferences with the API on startup (one-shot, PULL only).
+		// The server holds the recap schedule (UTC); the web app edits it too, so the
+		// plugin reads it here and only writes when the user changes it in Settings.
 		if (this.hasApiKey()) {
-			void this.syncDigestPreferences(true); // silent on startup
-			void this.reconcileResearchOptIn(); // pull API truth into local settings
+			// Pull the server's preferences (recap schedule, research opt-in) into local settings.
+			// Never push the local schedule at launch: a schedule changed on the web must stay changed.
+			void this.reconcilePreferences();
 			void this.syncTimezone(); // S102 follow-on: auto-set IANA tz for chronotype↔D11
 		}
 	}
@@ -330,16 +330,31 @@ export default class EmraldPlugin extends Plugin {
 	 * Ensures the toggle in Settings reflects server truth.
 	 * Silently fails — must never block UX.
 	 */
-	private async reconcileResearchOptIn(): Promise<void> {
+	private async reconcilePreferences(): Promise<void> {
 		try {
 			if (!this.hasApiKey()) return;
 			const resp = await this.apiClient.getPreferences();
-			if (resp.data && typeof resp.data.research_opt_in === 'boolean') {
-				if (this.settings.researchOptIn !== resp.data.research_opt_in) {
-					this.settings.researchOptIn = resp.data.research_opt_in;
-					await this.saveData(this.settings);
+			const data = resp.data;
+			if (!data) return;
+			let changed = false;
+			if (typeof data.research_opt_in === 'boolean' && this.settings.researchOptIn !== data.research_opt_in) {
+				this.settings.researchOptIn = data.research_opt_in;
+				changed = true;
+			}
+			// Recap schedule: the API stores day 0 = Sunday and a UTC time (HH:MM:SS).
+			const day = typeof data.digest_day === 'number' ? DIGEST_DAYS[data.digest_day] : undefined;
+			if (day && this.settings.digestDay !== day) {
+				this.settings.digestDay = day;
+				changed = true;
+			}
+			if (typeof data.digest_time === 'string' && /^\d{2}:\d{2}/.test(data.digest_time)) {
+				const time = data.digest_time.substring(0, 5);
+				if (this.settings.digestTime !== time) {
+					this.settings.digestTime = time;
+					changed = true;
 				}
 			}
+			if (changed) await this.saveData(this.settings);
 		} catch { /* non-fatal */
 			// Non-fatal
 		}

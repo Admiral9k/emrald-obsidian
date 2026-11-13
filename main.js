@@ -8264,7 +8264,7 @@ var BUILT_IN_DETAIL = {
 };
 var ELevelOverviewView = class extends EmraldWorkspaceView {
   constructor(leaf, plugin) {
-    super(leaf, plugin, "E-Level Overview", "bar-chart-2");
+    super(leaf, plugin, "Effort Allocations", "bar-chart-2");
     this.items = [];
     this.minutesByItem = /* @__PURE__ */ new Map();
     this.availableHours = 4;
@@ -8283,7 +8283,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   async onOpen() {
     var _a, _b, _c, _d, _e;
     const container = this.getContainer();
-    this.renderHeader(container, "E-level overview", "Your projects by effort level", "bar-chart-2");
+    this.renderHeader(container, "Effort allocations", "Your projects by effort level", "bar-chart-2");
     const levelsReady = eLevelStore.isStale() ? eLevelStore.refresh(this.plugin) : Promise.resolve(false);
     let itemsResp, sessionsResp, availResp;
     try {
@@ -10986,7 +10986,7 @@ var AboutView = class extends EmraldWorkspaceView {
         const list = el.createEl("ul", { cls: "emerald-wv-about-bullet-list" });
         this.bullet(list, "Daily check-in and receipt: two quick forms. Everything else runs on them.");
         this.bullet(list, "Effort levels: Light, Moderate, Demanding, Maximum. Pick one per project. PRO lets you make your own.");
-        this.bullet(list, "E-Level Overview: how much of today each project takes.");
+        this.bullet(list, "Effort Allocations: how much of today each project takes.");
         this.bullet(list, "Data Center: every number, with a plain explanation.");
         this.bullet(list, "Burnout Monitor: one score that shows your burnout risk. Check it any time.");
         this.bullet(list, "Insight Log (PRO): what EMRALD spots in your numbers, in plain words.");
@@ -11378,7 +11378,7 @@ var _EMComponent = class {
     const section = this.containerEl.createDiv({ cls: "emerald-workspace-buttons" });
     section.createDiv({ cls: "emerald-workspace-title", text: "Workspace views" });
     const buttons = [
-      { icon: ICONS.barChart, label: "E-level overview", view: VIEW_ELEVEL_OVERVIEW },
+      { icon: ICONS.barChart, label: "Effort allocations", view: VIEW_ELEVEL_OVERVIEW },
       { icon: ICONS.lightbulb, label: "Insight log", view: VIEW_INSIGHT_LOG, badge: this.unreadCount },
       { icon: ICONS.trendingUp, label: "Data center", view: VIEW_DATA_CENTER },
       { icon: ICONS.user, label: "Effort Profile", view: VIEW_EFFORT_PROFILE },
@@ -14605,8 +14605,7 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
     }
     void this.pingInstallTracking();
     if (this.hasApiKey()) {
-      void this.syncDigestPreferences(true);
-      void this.reconcileResearchOptIn();
+      void this.reconcilePreferences();
       void this.syncTimezone();
     }
   }
@@ -14723,17 +14722,33 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
    * Ensures the toggle in Settings reflects server truth.
    * Silently fails — must never block UX.
    */
-  async reconcileResearchOptIn() {
+  async reconcilePreferences() {
     try {
       if (!this.hasApiKey())
         return;
       const resp = await this.apiClient.getPreferences();
-      if (resp.data && typeof resp.data.research_opt_in === "boolean") {
-        if (this.settings.researchOptIn !== resp.data.research_opt_in) {
-          this.settings.researchOptIn = resp.data.research_opt_in;
-          await this.saveData(this.settings);
+      const data = resp.data;
+      if (!data)
+        return;
+      let changed = false;
+      if (typeof data.research_opt_in === "boolean" && this.settings.researchOptIn !== data.research_opt_in) {
+        this.settings.researchOptIn = data.research_opt_in;
+        changed = true;
+      }
+      const day = typeof data.digest_day === "number" ? DIGEST_DAYS[data.digest_day] : void 0;
+      if (day && this.settings.digestDay !== day) {
+        this.settings.digestDay = day;
+        changed = true;
+      }
+      if (typeof data.digest_time === "string" && /^\d{2}:\d{2}/.test(data.digest_time)) {
+        const time = data.digest_time.substring(0, 5);
+        if (this.settings.digestTime !== time) {
+          this.settings.digestTime = time;
+          changed = true;
         }
       }
+      if (changed)
+        await this.saveData(this.settings);
     } catch (e) {
     }
   }
