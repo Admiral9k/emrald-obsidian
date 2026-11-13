@@ -4,6 +4,7 @@ import { EXPORT_TIP } from './utils/export-tip';
 import EmraldPlugin from '../main';
 import type { CustomELevel } from './api/client';
 import { tierState } from './tier';
+import { DIGEST_DAYS, DIGEST_DAY_INDEX, DIGEST_DAY_NAMES, formatTime12, localSlotToUtc, utcSlotToLocal } from './utils/digest-schedule';
 import {
 	CUSTOM_BADGE,
 	assumeReferenced,
@@ -92,7 +93,7 @@ export const DEFAULT_SETTINGS: EmraldSettings = {
 	celebrationShown: false,
 	researchOptIn: false,
 	digestDay: 'sunday',
-	digestTime: '09:00'
+	digestTime: '18:00'
 };
 
 const TIMER_STYLE_OPTIONS: Record<string, string> = {
@@ -101,21 +102,16 @@ const TIMER_STYLE_OPTIONS: Record<string, string> = {
 	timetimer: 'Time timer (post-mvp)'
 };
 
-const DIGEST_DAY_OPTIONS: Record<string, string> = {
-	sunday: 'Sunday',
-	monday: 'Monday',
-	tuesday: 'Tuesday',
-	wednesday: 'Wednesday',
-	thursday: 'Thursday',
-	friday: 'Friday',
-	saturday: 'Saturday'
-};
+const DIGEST_DAY_OPTIONS: Record<string, string> = Object.fromEntries(
+	DIGEST_DAYS.map((d, i) => [d, DIGEST_DAY_NAMES[i] ?? d])
+);
 
+// Recap time options are local hours. The stored value stays UTC (see digest-schedule.ts).
 function digestTimeOptions(): Record<string, string> {
 	const options: Record<string, string> = {};
 	for (let h = 0; h < 24; h++) {
-		const label = `${String(h).padStart(2, '0')}:00`;
-		options[label] = label;
+		const value = `${String(h).padStart(2, '0')}:00`;
+		options[value] = formatTime12(value);
 	}
 	return options;
 }
@@ -135,7 +131,7 @@ const ELEVEL_ANCHOR_CLASS = 'emerald-elevel-manage-anchor';
 const ELEVEL_EMPTY_STATE =
 	'No custom levels yet. Create one to prescribe a share of your day that E1-E4 does not cover.';
 const ELEVEL_PRO_PITCH =
-	'Custom e-levels are a PRO feature. Name your own effort levels at any percent of your daily work time — EMRALD prescribes time, tracks overtime, and colours them just like E1-E4.';
+	'Custom effort levels are a PRO feature. Name your own effort levels at any percent of your work hours. EMRALD prescribes time, tracks overtime, and colours them just like the built-in levels.';
 
 export class EmraldSettingTab extends PluginSettingTab {
 	plugin: EmraldPlugin;
@@ -256,17 +252,17 @@ export class EmraldSettingTab extends PluginSettingTab {
 			},
 			{
 				type: 'group',
-				heading: 'Digest',
+				heading: 'Recaps',
 				items: [
 					{
-						name: 'Digest delivery day',
-						desc: 'Day of the week your weekly digest is generated',
-						control: { type: 'dropdown', key: 'digestDay', defaultValue: 'sunday', options: DIGEST_DAY_OPTIONS }
+						name: 'Recap day',
+						desc: 'Day of the week your weekly recap is generated, in your local time.',
+						control: { type: 'dropdown', key: 'digestDay', defaultValue: this.localDigest({ day: 'sunday', time: '18:00' }).day, options: DIGEST_DAY_OPTIONS }
 					},
 					{
-						name: 'Digest delivery time',
-						desc: 'Hour of day in UTC (e.g. 09:00 = 4am est). Digests run on the hour.',
-						control: { type: 'dropdown', key: 'digestTime', defaultValue: '09:00', options: digestTimeOptions() }
+						name: 'Recap time',
+						desc: 'Hour of day in your local time. Recaps run on the hour.',
+						control: { type: 'dropdown', key: 'digestTime', defaultValue: this.localDigest({ day: 'sunday', time: '18:00' }).time, options: digestTimeOptions() }
 					}
 				]
 			},
@@ -301,7 +297,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 				items: [
 					{
 						name: 'Send feedback',
-						desc: 'Help us improve EMRALD — report bugs, request features, or share your experience',
+						desc: 'Help us improve EMRALD. Report bugs, request features, or share your experience.',
 						render: (setting: Setting) => { this.renderFeedbackButton(setting); }
 					},
 					{
@@ -327,12 +323,34 @@ export class EmraldSettingTab extends PluginSettingTab {
 	// restart keep happening on every declarative control change.
 
 	getControlValue(key: string): unknown {
-		if (key === 'digestTime') return this.normalizedDigestTime();
+		// The recap schedule is stored in UTC and shown in local time (same as the web recap page).
+		if (key === 'digestDay' || key === 'digestTime') {
+			const local = this.localDigest({
+				day: this.plugin.settings.digestDay || 'sunday',
+				time: this.normalizedDigestTime()
+			});
+			return key === 'digestDay' ? local.day : local.time;
+		}
 		return (this.plugin.settings as unknown as Record<string, unknown>)[key];
 	}
 
 	async setControlValue(key: string, value: unknown): Promise<void> {
-		(this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+		if (key === 'digestDay' || key === 'digestTime') {
+			// Swap in the changed local part, then store the UTC equivalent.
+			const local = this.localDigest({
+				day: this.plugin.settings.digestDay || 'sunday',
+				time: this.normalizedDigestTime()
+			});
+			const pick = {
+				day: key === 'digestDay' ? String(value) : local.day,
+				time: key === 'digestTime' ? String(value) : local.time
+			};
+			const utc = localSlotToUtc({ day: DIGEST_DAY_INDEX[pick.day] ?? 0, time: pick.time });
+			this.plugin.settings.digestDay = (DIGEST_DAYS[utc.day] ?? 'sunday');
+			this.plugin.settings.digestTime = utc.time;
+		} else {
+			(this.plugin.settings as unknown as Record<string, unknown>)[key] = value;
+		}
 		await this.plugin.saveSettings();
 		if (key === 'digestDay' || key === 'digestTime') {
 			await this.plugin.syncDigestPreferences();
@@ -418,7 +436,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 				void this.plugin.apiClient.updatePreferences({ research_opt_in: value }).then(() => {
 					new Notice(value ? 'Thank you! Research opt-in saved.' : 'Research opt-in removed.');
 				}).catch(() => {
-					new Notice('Failed to save preference — try again.');
+					new Notice('Failed to save preference. Try again.');
 				});
 			}));
 	}
@@ -565,7 +583,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('New effort level')
-			.setDesc('Name a level and set its share of your daily work time.')
+			.setDesc('Name a level and set its share of your work hours.')
 			.addButton(btn => btn
 				.setCta()
 				.setButtonText('Create')
@@ -600,7 +618,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 			setting.nameEl.createSpan({ cls: 'emerald-elevel-row-archived', text: 'Archived' });
 		}
 
-		setting.setDesc(`${level.percent}% of your daily work time • ${refCountLabel(level.ref_count)}`);
+		setting.setDesc(`${level.percent}% of your work hours • ${refCountLabel(level.ref_count)}`);
 		setting.settingEl.addClass('emerald-elevel-row');
 
 		if (archived) {
@@ -620,7 +638,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 		setting.addExtraButton(btn => {
 			btn.setIcon('percent')
 				.setTooltip(locked
-					? `Percent is locked — ${refCountLabel(level.ref_count)}`
+					? `Percent is locked: ${refCountLabel(level.ref_count)}`
 					: 'Change percent')
 				.onClick(() => {
 					if (locked) {
@@ -680,7 +698,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 		const resp = await this.plugin.apiClient.deleteELevel(level.id);
 
 		if (resp.queued) {
-			new Notice('You\'re offline — the removal will sync when you reconnect.');
+			new Notice('You\'re offline. The removal will sync when you reconnect.');
 			return;
 		}
 		if (resp.error || !resp.data) {
@@ -696,7 +714,7 @@ export class EmraldSettingTab extends PluginSettingTab {
 
 		// One client intent, two server outcomes — say which one happened.
 		if (resp.data.archived) {
-			new Notice(`Archived ${level.name} — projects already using it keep their label.`);
+			new Notice(`Archived ${level.name}. Projects already using it keep their label.`);
 		} else {
 			new Notice(`Deleted ${level.name}.`);
 			eLevelStore.remove(level.id);
@@ -744,9 +762,15 @@ export class EmraldSettingTab extends PluginSettingTab {
 	}
 
 	private normalizedDigestTime(): string {
-		const stored = this.plugin.settings.digestTime || '09:00';
-		const hourPart = (stored.split(':')[0] || '09').padStart(2, '0');
-		return `${hourPart}:00`;
+		const stored = this.plugin.settings.digestTime || '18:00';
+		const hourPart = (stored.split(':')[0] || '18').padStart(2, '0');
+		return `${hourPart}:${(stored.split(':')[1] || '00').padStart(2, '0')}`;
+	}
+
+	/** A stored UTC slot ({ day name, HH:MM }) as the viewer's local day name and whole-hour time. */
+	private localDigest(utc: { day: string; time: string }): { day: string; time: string } {
+		const local = utcSlotToLocal({ day: DIGEST_DAY_INDEX[utc.day] ?? 0, time: utc.time });
+		return { day: DIGEST_DAYS[local.day] ?? 'sunday', time: `${local.time.split(':')[0]}:00` };
 	}
 
 	private pendingQueueDefinitions(): SettingDefinitionItem[] {

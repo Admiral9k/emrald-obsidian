@@ -7,6 +7,7 @@ import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_DIGEST, VIEW_DATA_CENTER } from './base';
 import { Digest, DigestContent } from '../../api/client';
 import { tierState } from '../../tier';
+import { DIGEST_DAY_INDEX, DIGEST_DAY_NAMES, formatTime12, utcSlotToLocal } from '../../utils/digest-schedule';
 
 const PERIOD_ICONS: Record<string, string> = {
 	daily: 'calendar',
@@ -30,20 +31,20 @@ export class DigestView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Digest', 'Your effort story, summarized', 'clipboard-list');
+		this.renderHeader(container, 'Digest', 'Your week, summed up', 'clipboard-list');
 
 		let resp;
 		try {
 			resp = await this.plugin.apiClient.getDigests();
 		} catch {
-			this.renderError(container, 'Could not load digests — check your connection.');
+			this.renderError(container, 'Could not load recaps. Check your connection.');
 			return;
 		}
 
 		if (!resp.data || resp.data.length === 0) {
 			// Distinguish offline from genuinely empty (P15 fix)
 			if (resp.data === null && (resp.status === 0 || resp.error)) {
-				this.renderError(container, 'Offline — digests will load when you reconnect.');
+				this.renderError(container, 'Offline. Recaps will load when you reconnect.');
 			} else {
 				this.renderEmptyState(container);
 			}
@@ -96,10 +97,10 @@ export class DigestView extends EmraldWorkspaceView {
 		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'clipboard-list');
 
-		empty.createEl('h3', { text: 'No digests yet' });
+		empty.createEl('h3', { text: 'No recaps yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'EMRALD generates weekly and monthly summaries automatically as you work. Complete a few sessions and your first digest will appear here.'
+			text: 'A new recap arrives every week. Log a few sessions and your first one shows up here.'
 		});
 
 		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });
@@ -124,14 +125,14 @@ export class DigestView extends EmraldWorkspaceView {
 			// Free users: daily/monthly are Pro-only — show lock tooltip, don't switch
 			if (!isPro && (period === 'daily' || period === 'monthly')) {
 				btn.addClass('is-locked');
-				btn.title = 'Daily and monthly digests require EMRALD PRO';
+				btn.title = 'Daily and monthly recaps require EMRALD PRO';
 				btn.addEventListener('click', () => {
 					if (this.contentContainer) {
 						this.contentContainer.empty();
 						this.renderUpgradeGate(this.contentContainer, {
 							icon: 'lock',
-							title: period.charAt(0).toUpperCase() + period.slice(1) + ' Digest',
-							description: 'Daily and monthly digests are available with EMRALD PRO.',
+							title: period === 'daily' ? 'Daily recaps' : 'Monthly recaps',
+							description: 'Daily and monthly recaps are available with EMRALD PRO.',
 						});
 					}
 				});
@@ -149,7 +150,7 @@ export class DigestView extends EmraldWorkspaceView {
 					this.renderDigest(filtered[0]);
 				} else if (this.contentContainer) {
 					this.contentContainer.empty();
-					this.renderPlaceholder(this.contentContainer, `No ${period} digests yet.`);
+					this.renderPlaceholder(this.contentContainer, `No ${period} recaps yet.`);
 				}
 			});
 		}
@@ -225,7 +226,7 @@ export class DigestView extends EmraldWorkspaceView {
 		this.contentContainer.empty();
 
 		if (!digest) {
-			this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} digests yet. EMRALD generates them automatically at your preferred digest hour.`);
+			this.renderPlaceholder(this.contentContainer, `No ${this.filterPeriod} recaps yet. A new one arrives at your chosen recap time.`);
 			return;
 		}
 
@@ -268,7 +269,7 @@ export class DigestView extends EmraldWorkspaceView {
 					const row = el.createDiv({ cls: 'emerald-wv-digest-completed-row' });
 					const icon = row.createSpan({ cls: 'emerald-wv-digest-check-icon' });
 					setIcon(icon, 'folder');
-					const label = `${proj.name} — ${proj.sessions} session${proj.sessions === 1 ? '' : 's'}, ${proj.hours.toFixed(1)}h`;
+					const label = `${proj.name}: ${proj.sessions} session${proj.sessions === 1 ? '' : 's'}, ${proj.hours.toFixed(1)}h`;
 					row.createSpan({ text: label });
 				}
 			});
@@ -297,11 +298,11 @@ export class DigestView extends EmraldWorkspaceView {
 		// ── Comparison to Prior Period ──
 		const cmp = content.comparison_to_prior;
 		if (cmp && (cmp.sessions_delta !== 0 || cmp.hours_delta !== 0 || cmp.flow_delta !== 0)) {
-			this.renderSection(this.contentContainer, 'trending-up', 'Compared to Prior Week', (el) => {
+			this.renderSection(this.contentContainer, 'trending-up', 'Compared to last time', (el) => {
 				const fmt = (n: number, suffix: string) => `${n > 0 ? '+' : ''}${n}${suffix}`;
 				el.createDiv({ cls: 'emerald-wv-digest-insight-row', text: `Sessions: ${fmt(cmp.sessions_delta, '')}` });
 				el.createDiv({ cls: 'emerald-wv-digest-insight-row', text: `Hours: ${fmt(+cmp.hours_delta.toFixed(1), 'h')}` });
-				el.createDiv({ cls: 'emerald-wv-digest-insight-row', text: `Flow rate: ${fmt(+(cmp.flow_delta * 100).toFixed(0), '%')}` });
+				el.createDiv({ cls: 'emerald-wv-digest-insight-row', text: `In the zone: ${fmt(+(cmp.flow_delta * 100).toFixed(0), '%')}` });
 			});
 		}
 
@@ -334,7 +335,7 @@ export class DigestView extends EmraldWorkspaceView {
 			content.burnout_status;
 
 		if (!hasContent) {
-			this.renderPlaceholder(this.contentContainer, 'This digest has no content yet. It may still be generating.');
+			this.renderPlaceholder(this.contentContainer, 'This recap has no content yet. It may still be generating.');
 		}
 
 		// ── Delivery Schedule Footer ──
@@ -396,13 +397,17 @@ export class DigestView extends EmraldWorkspaceView {
 	// ── Delivery Footer ─────────────────────────────────
 
 	private renderDeliveryFooter(container: Element) {
-		const day = this.plugin.settings?.digestDay ?? 'sunday';
-		const time = this.plugin.settings?.digestTime ?? '09:00';
-		const dayLabel = day.charAt(0).toUpperCase() + day.slice(1);
+		// Stored in UTC, shown in the viewer's local time (same as the web recap page).
+		const local = utcSlotToLocal({
+			day: DIGEST_DAY_INDEX[this.plugin.settings?.digestDay ?? 'sunday'] ?? 0,
+			time: this.plugin.settings?.digestTime ?? '18:00'
+		});
+		const dayLabel = DIGEST_DAY_NAMES[local.day] ?? 'Sunday';
+		const time = formatTime12(local.time);
 
 		const footer = container.createDiv({ cls: 'emerald-wv-digest-delivery-footer' });
 		footer.createSpan({
-			text: `Digest delivered every ${dayLabel} at ${time} · `
+			text: `Recap delivered every ${dayLabel} at ${time} (your time) · `
 		});
 		const changeLink = footer.createEl('a', {
 			cls: 'emerald-wv-digest-settings-link',
@@ -437,9 +442,8 @@ export class DigestView extends EmraldWorkspaceView {
 		if (rawFlow !== undefined && rawFlow !== null) {
 			flowPct = rawFlow <= 1 ? Math.round(rawFlow * 100) : Math.round(rawFlow);
 		}
-		this.renderStatCard(stats, 'zap', 'Flow Rate',
-			flowPct !== undefined ? `${flowPct}%` : '—',
-			flowPct !== undefined ? this.getFlowRateLabel(flowPct) : undefined);
+		this.renderStatCard(stats, 'zap', 'In the zone',
+			flowPct !== undefined ? `${flowPct}%` : '—');
 
 		// Projects: derived from top_projects.length; legacy projects_worked fallback
 		const projectsCount = content.top_projects?.length ?? content.projects_worked ?? 0;
@@ -448,9 +452,10 @@ export class DigestView extends EmraldWorkspaceView {
 		// Avg Sleep: prefer avg_energy.sleep (1-10 scale); legacy avg_sleep was 1-5
 		const sleep10 = content.avg_energy?.sleep;
 		const sleepLegacy = content.avg_sleep;
+		// No grade words (Devon 11/12): show the number, as the web recap does.
 		let sleepLabel = '—';
-		if (typeof sleep10 === 'number') sleepLabel = this.getSleepLabel10(sleep10);
-		else if (typeof sleepLegacy === 'number') sleepLabel = this.getSleepLabel(sleepLegacy);
+		if (typeof sleep10 === 'number') sleepLabel = `${(Math.round(sleep10 * 10) / 10).toString()}/10`;
+		else if (typeof sleepLegacy === 'number') sleepLabel = `${(Math.round(sleepLegacy * 10) / 10).toString()}/5`;
 		this.renderStatCard(stats, 'moon', 'Avg Sleep', sleepLabel);
 
 		// Top Project: derive from top_projects[0]; legacy top_project fallback
@@ -462,13 +467,6 @@ export class DigestView extends EmraldWorkspaceView {
 		}
 	}
 
-	private getSleepLabel10(avg: number): string {
-		if (avg >= 8) return 'Great';
-		if (avg >= 6) return 'Fair';
-		if (avg >= 4) return 'Poor';
-		return 'Critical';
-	}
-
 	private renderStatCard(container: Element, iconId: string, label: string, value: string, sublabel?: string) {
 		const card = container.createDiv({ cls: 'emerald-wv-stat-card' });
 		const iconEl = card.createDiv({ cls: 'emerald-wv-stat-icon' });
@@ -478,20 +476,6 @@ export class DigestView extends EmraldWorkspaceView {
 		if (sublabel) {
 			card.createDiv({ cls: 'emerald-wv-stat-sublabel', text: sublabel });
 		}
-	}
-
-	private getFlowRateLabel(rate: number): string {
-		if (rate >= 50) return 'Excellent';
-		if (rate >= 35) return 'Developing';
-		if (rate >= 20) return 'Building';
-		return 'Emerging';
-	}
-
-	private getSleepLabel(avg: number): string {
-		if (avg >= 4) return 'Great';
-		if (avg >= 3) return 'Fair';
-		if (avg >= 2) return 'Poor';
-		return 'Critical';
 	}
 
 	// ── Metric Movements ────────────────────────────────
@@ -622,10 +606,10 @@ export class DigestView extends EmraldWorkspaceView {
 			// Energy chips
 			const chipCell = row.createEl('td');
 			const chips = chipCell.createDiv({ cls: 'emerald-wv-note-chips' });
-			if (c.sleep_quality) chips.createSpan({ cls: 'emerald-wv-chip', text: `Sleep: ${c.sleep_quality}` });
-			if (c.physical_energy) chips.createSpan({ cls: 'emerald-wv-chip', text: `Phys: ${c.physical_energy}` });
-			if (c.emotional_state) chips.createSpan({ cls: 'emerald-wv-chip', text: `Emo: ${c.emotional_state}` });
-			if (c.mental_clarity) chips.createSpan({ cls: 'emerald-wv-chip', text: `Mental: ${c.mental_clarity}` });
+			if (c.sleep_quality) chips.createSpan({ cls: 'emerald-wv-chip', text: `Sleep ${c.sleep_quality}/10` });
+			if (c.physical_energy) chips.createSpan({ cls: 'emerald-wv-chip', text: `Physical ${c.physical_energy}/10` });
+			if (c.emotional_state) chips.createSpan({ cls: 'emerald-wv-chip', text: `Emotional ${c.emotional_state}/10` });
+			if (c.mental_clarity) chips.createSpan({ cls: 'emerald-wv-chip', text: `Mental ${c.mental_clarity}/10` });
 
 			// Notes
 			row.createEl('td', { text: c.notes ?? '' });

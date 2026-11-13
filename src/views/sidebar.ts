@@ -341,11 +341,11 @@ export class EmraldSidebarView extends ItemView {
 	/** Mirrors BurnoutWarningModal.svelte's lede() copy. */
 	private burnoutLede(phase: 'orange' | 'red', variant: 'first' | 'followup'): string {
 		if (variant === 'followup') {
-			return "It's been a few days since we flagged this, and the patterns haven't shifted much. No pressure — just want to make sure this is on your radar, not in your blind spot.";
+			return "It's been a few days since we flagged this, and the patterns haven't shifted much. No pressure. Just making sure this is on your radar.";
 		}
 		return phase === 'red'
-			? "Your recent patterns are showing real strain. This doesn't mean something is wrong — it means your engine's been running hot, and that's worth paying attention to."
-			: 'Over the past stretch, a few of your patterns are showing some strain. Nothing alarming — just your engine running warmer than usual.';
+			? 'Your recent patterns are showing real strain. You\u2019ve been running hot, and that\u2019s worth paying attention to.'
+			: 'Over the past stretch, a few of your patterns are showing some strain. Nothing alarming. You\u2019re just running warmer than usual.';
 	}
 
 	/**
@@ -402,7 +402,7 @@ export class EmraldSidebarView extends ItemView {
 		// Offline indicator (hidden by default, shown by offline queue state)
 		const offlineDot = headerRow.createSpan({ cls: 'emerald-offline-dot' });
 		offlineDot.addClass('emrald-hidden');
-		offlineDot.title = 'Offline — actions are queued';
+		offlineDot.title = 'Offline. Actions are queued';
 
 		// Check offline state
 		if (this.plugin.offlineQueue && !this.plugin.offlineQueue.isOnline) {
@@ -454,7 +454,7 @@ export class EmraldSidebarView extends ItemView {
 		const header = section.createDiv({ cls: 'emerald-section-header' });
 		header.setAttribute('role', 'button');
 		header.setAttribute('aria-expanded', 'true');
-		header.setAttribute('aria-label', `Timeblock — ${dayLabel}`);
+		header.setAttribute('aria-label', `Timeblock: ${dayLabel}`);
 		header.tabIndex = 0;
 		const headerLeft = header.createSpan({ cls: 'emerald-section-header-left' });
 		const arrowEl = headerLeft.createSpan({ cls: 'emerald-section-arrow', text: '▼' });
@@ -720,11 +720,11 @@ export class EmraldSidebarView extends ItemView {
 							console.warn('[EMRALD] Failed to discard stale session:', discardResp.error);
 						}
 						new Notice(discardResp.queued
-							? 'Stale session queued for discard — will sync when online.'
+							? 'Stale session queued for discard. Will sync when online.'
 							: 'Discarded a stale session from yesterday.');
 					} catch (e) {
 						console.error('[EMRALD] Error discarding stale session:', e);
-						new Notice('Found a stale session but could not discard it — try refreshing.');
+						new Notice('Found a stale session but could not discard it. Try refreshing.');
 					}
 					// Always return — never render a session older than 24h
 					return;
@@ -825,7 +825,7 @@ export class EmraldSidebarView extends ItemView {
 
 		class ProjectPickerModal extends FuzzySuggestModal<TrackedItem> {
 			getItems() { return activeItems; }
-			getItemText(item: TrackedItem) { return `${item.name} (${levelLabel(item.effort_level) || '—'})`; }
+			getItemText(item: TrackedItem) { return `${item.name} (${levelLabel(item.effort_level) || 'no level'})`; }
 			onChooseItem(item: TrackedItem) {
 				handleStart(item);
 			}
@@ -895,7 +895,7 @@ export class EmraldSidebarView extends ItemView {
 			// Persist provisional session for reload recovery
 			await this.persistProvisionalSession();
 
-			new Notice(`Offline — session started locally for ${item.name}. It will sync when you're back online.`);
+			new Notice(`Offline. Session started locally for ${item.name}. It will sync when you're back online.`);
 			return;
 		}
 		if (resp.error || !resp.data) {
@@ -1003,7 +1003,7 @@ export class EmraldSidebarView extends ItemView {
 		if (!resp.error || resp.queued) {
 			this.timeblock.pauseSession();
 			if (session.isPendingSync) await this.persistProvisionalSession();
-			new Notice("Auto-paused — 2h past your prescribed effort for today. Resume if you're still going.");
+			new Notice("Auto-paused. You are two hours past your prescribed effort for today. Resume if you're still going.");
 		} else {
 			// Sync failed — allow the next tick to retry rather than getting stuck unfired.
 			session.overtimeAutoPaused = false;
@@ -1035,7 +1035,7 @@ export class EmraldSidebarView extends ItemView {
 				(action: string) => { void (async () => {
 					if (action === 'discard') {
 						await this.plugin.apiClient.discardSession(session.sessionId);
-						new Notice('Runaway session discarded — no data recorded.');
+						new Notice('Runaway session discarded. No data recorded.');
 						this.timeblock?.stopSession();
 						if (this.projects) {
 							this.projects.updateState({ activeSessionItemId: null });
@@ -1068,7 +1068,7 @@ export class EmraldSidebarView extends ItemView {
 							(receipt: import("../api/client").CreateReceiptPayload, _markComplete: boolean) => { void (async () => {
 								const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 								if (!resp.error || resp.queued) {
-									new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
+									new Notice(resp.queued ? 'Receipt queued. Will sync when online' : 'Session recorded');
 									void this.loadTodayData();
 									void this.loadProjects();
 									await this.updateFrontmatterStats(session.itemId);
@@ -1090,8 +1090,8 @@ export class EmraldSidebarView extends ItemView {
 			// If the API says session is already stopped or not found (400/404),
 			// still clear local state so the user isn't stuck.
 			if (stopResp.status === 400 || stopResp.status === 404) {
-				console.warn(`[EMRALD] Stop returned ${stopResp.status} — clearing local state anyway:`, stopResp.error);
-				new Notice('Session may have already ended — clearing local state.');
+				console.warn(`[EMRALD] Stop returned ${stopResp.status}. Clearing local state anyway:`, stopResp.error);
+				new Notice('Session may have already ended. Clearing local state.');
 			} else {
 				new Notice(`Failed to stop session: ${stopResp.error}`);
 				return;
@@ -1113,7 +1113,7 @@ export class EmraldSidebarView extends ItemView {
 		void this.clearPersistedProvisionalSession();
 
 		if (stopResp.queued) {
-			new Notice(`Session stopped locally — will sync when online.`);
+			new Notice(`Session stopped locally. Will sync when online.`);
 		}
 
 		// Skip effort receipt for sessions under 5 minutes (too short for meaningful data)
@@ -1143,7 +1143,7 @@ export class EmraldSidebarView extends ItemView {
 				// Submit receipt
 				const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
 				if (!resp.error || resp.queued) {
-					new Notice(resp.queued ? 'Receipt queued — will sync when online' : 'Session recorded');
+					new Notice(resp.queued ? 'Receipt queued. Will sync when online' : 'Session recorded');
 
 					// Reload data (will use cache if offline)
 					void this.loadTodayData();
@@ -1572,7 +1572,7 @@ class RunawaySessionModal extends Modal {
 
 		contentEl.createEl('h2', { text: '⚠ Runaway session detected' });
 		contentEl.createEl('p', {
-			text: `"${this.itemName}" has been running for ${hours}h ${mins}m — that's over 24 hours. This usually means the session was left running accidentally.`
+			text: `"${this.itemName}" has been running for ${hours}h ${mins}m. That's over 24 hours. This usually means the session was left running accidentally.`
 		});
 		contentEl.createEl('p', {
 			text: 'What would you like to do?',
@@ -1583,7 +1583,7 @@ class RunawaySessionModal extends Modal {
 
 		const discardBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-secondary',
-			text: 'Discard — don\'t count it'
+			text: 'Discard: don\'t count it'
 		});
 		discardBtn.addEventListener('click', () => {
 			this.onAction('discard');
@@ -1592,7 +1592,7 @@ class RunawaySessionModal extends Modal {
 
 		const keepBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Keep — record it anyway'
+			text: 'Keep: record it anyway'
 		});
 		keepBtn.addEventListener('click', () => {
 			this.onAction('keep');

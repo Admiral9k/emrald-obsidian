@@ -47,7 +47,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		if (this.renderUpgradeGate(container, {
 			icon: 'lightbulb',
 			title: 'Insight log',
-			description: 'AI-powered observations, suggestions, and discoveries about your effort patterns — all in one place.',
+			description: 'Short notes on what EMRALD spots in your numbers: wins, warnings, and patterns.',
 			features: [
 				'5 insight categories: observations, suggestions, warnings, celebrations, discoveries',
 				'Chronological history with filter & search',
@@ -61,14 +61,14 @@ export class InsightLogView extends EmraldWorkspaceView {
 		try {
 			resp = await this.plugin.apiClient.getInsights(200);
 		} catch {
-			this.renderError(container, 'Could not load insights — check your connection.');
+			this.renderError(container, 'Could not load insights. Check your connection.');
 			return;
 		}
 
 		// Distinguish "no data yet" from "offline / unreachable" (P15 fix)
 		if (resp.data === null || resp.data === undefined) {
 			if (resp.status === 0 || resp.error) {
-				this.renderError(container, 'Offline — insights will load when you reconnect.');
+				this.renderError(container, 'Offline. Insights will load when you reconnect.');
 			} else {
 				this.renderEmptyState(container);
 			}
@@ -115,7 +115,7 @@ export class InsightLogView extends EmraldWorkspaceView {
 		const checklist = empty.createDiv({ cls: 'emerald-wv-empty-checklist' });
 		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Complete work sessions with effort receipts' });
 		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Do energy check-ins' });
-		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Use the system for a few days — patterns take time' });
+		checklist.createDiv({ cls: 'emerald-wv-empty-check', text: '• Use EMRALD for a few days. Patterns take time' });
 	}
 
 	// ── Summary Bar ─────────────────────────────────────

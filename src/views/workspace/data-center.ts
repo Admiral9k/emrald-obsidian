@@ -22,75 +22,75 @@ interface MetricInfo {
 }
 
 export const D_METRICS: Record<string, MetricInfo> = {
-	D1:  { name: 'Effort Balance',           unit: '/10',  category: 'Effort',       goodDirection: 'up',
-	       desc: 'How well your effort matches task demands',
-	       explainer: '10 = perfectly balanced. Lower scores mean a growing gap between what tasks demand and what you invest. Chronic imbalance in either direction (over-investing or under-investing) is a signal to adjust.' },
-	D2:  { name: 'Effort Balance Trend',     unit: '/10',  category: 'Effort',       goodDirection: 'stable',
+	D1:  { name: 'Effort Balance', unit: '/10', category: 'Effort', goodDirection: 'up',
+	       desc: 'Did you give each task the right amount of effort?',
+	       explainer: '10 means about right. Lower means too little or too much. This number uses your last 30 days, so one rough day will not swing it. The chart range only changes how much history you see.' },
+	D2:  { name: 'Effort Balance Trend', unit: '/10', category: 'Effort', goodDirection: 'stable',
 	       desc: 'Is your effort balance improving or worsening?',
-	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This metric compares two halves of a 30-day window, so it needs sessions spread across at least 2 to 3 weeks.' },
-	D3:  { name: 'E-Level Accuracy',         unit: '/10',  category: 'Calibration',  goodDirection: 'up',
-	       desc: 'How closely your E-level estimates match your actual effort',
-	       explainer: 'Compares your E-level assignments to actual perceived effort from receipts. Higher = better calibration. Low accuracy suggests your E-levels need adjusting.' },
-	D4:  { name: 'Context Switching',        unit: '/10',  category: 'Productivity', goodDirection: 'down',
+	       explainer: '5 = stable. Above 5 = the gap is widening (worsening). Below 5 = the gap is closing (improving). This number compares two halves of a 30-day window, so it needs sessions spread across at least 2 to 3 weeks.' },
+	D3:  { name: 'Guess vs. actual', unit: '/10', category: 'Guesses', goodDirection: 'up',
+	       desc: 'How close the effort level you pick runs to how the session felt.',
+	       explainer: 'Compares the level you chose for a project with how the work actually felt. Needs at least 2 rated sessions on a project. Based on your last 30 days.' },
+	D4:  { name: 'Context Switching', unit: '/10', category: 'Productivity', goodDirection: 'down',
 	       desc: 'How often you jump between projects in a day',
-	       explainer: 'Higher = more switching. Some variety is healthy, but frequent switching fragments focus and increases cognitive load. Look at this alongside Flow Frequency.' },
-	D5:  { name: 'Task Initiation',          unit: '/10',  category: 'Productivity', goodDirection: 'down',
+	       explainer: 'Higher = more switching. Some variety is healthy, but frequent switching fragments focus. Look at this alongside Flow Frequency.' },
+	D5:  { name: 'Getting Started', unit: '/10', category: 'Productivity', goodDirection: 'down',
 	       desc: 'How long before you start working on new projects',
-	       explainer: `Measures days between creating a project and starting your first session. Higher = longer delays. Persistent high values may signal procrastination or overwhelm. Only counts active projects — set projects to Inactive if they're intentionally "on deck" so they don't inflate this metric.` },
-	D6:  { name: 'Avoidance Pattern',        unit: '/10',  category: 'Effort',       goodDirection: 'down',
+	       explainer: 'Measures days between creating a project and starting your first session. Higher = longer delays. Persistent high values may mean avoidance or overwhelm. Only counts active projects: pause a project if it is intentionally "on deck" so it does not inflate this number.' },
+	D6:  { name: 'Avoidance Pattern', unit: '/10', category: 'Effort', goodDirection: 'down',
 	       desc: 'Projects showing signs of avoidance',
-	       explainer: 'Flags projects with no sessions, very short sessions, discarded sessions, or long gaps since last session. Higher = more avoidance signals detected.' },
-	D7:  { name: 'Flow Frequency',           unit: '/10',  category: 'Effort',       goodDirection: 'up',
+	       explainer: 'Flags projects with no sessions, very short sessions, discarded sessions, or long gaps since the last session. Higher = more avoidance signals.' },
+	D7:  { name: 'Flow Frequency', unit: '/10', category: 'Effort', goodDirection: 'up',
 	       desc: 'How often you enter deep focus states',
-	       explainer: 'Percentage of sessions where you reported flow. Higher is better: flow is where your best work happens. Compare with Peak Hours to find when flow happens most.' },
-	D8:  { name: 'Burnout Risk',             unit: '/100', category: 'Energy',       goodDirection: 'down',
+	       explainer: 'The share of sessions where you were in the zone. Higher is better: that is where your best work happens. This number uses your last 30 days, so one rough day will not swing it.' },
+	D8:  { name: 'Burnout Risk', unit: '/100', category: 'Energy', goodDirection: 'down',
 	       desc: 'Combined risk score from multiple fatigue signals',
-	       explainer: 'The big one. Combines rising effort, declining enjoyment, low flow, emotional strain, and context switching. 0-30 = green, 30-50 = watch it, 50-70 = slow down, 70+ = recharge needed.' },
-	D9:  { name: 'Effort Volatility',        unit: '/10',  category: 'Effort',       goodDirection: 'down',
+	       explainer: 'Combines rising effort, declining enjoyment, low flow, emotional strain, and context switching. 0 to 30 = low, 30 to 50 = watch it, 50 to 70 = slow down, 70+ = recharge needed.' },
+	D9:  { name: 'Effort Volatility', unit: '/10', category: 'Effort', goodDirection: 'down',
 	       desc: 'How wildly your effort varies session to session',
-	       explainer: 'Based on standard deviation of perceived effort. High volatility means unpredictable work experiences. Some variation is healthy; wild swings suggest inconsistent task matching.' },
-	D10: { name: 'Sleep Quality Trend',      unit: '/10',  category: 'Energy',       goodDirection: 'up',
+	       explainer: 'How much your effort varies day to day. Lower = more consistent. This number uses your last 30 days, so one rough day will not swing it.' },
+	D10: { name: 'Sleep Quality Trend', unit: '/10', category: 'Energy', goodDirection: 'up',
 	       desc: 'Your sleep quality from energy check-ins',
-	       explainer: 'Rolling average of sleep quality scores from your daily check-ins. Compares recent 7 days vs. prior period to detect improving or declining trends.' },
-	D11: { name: 'Peak Hours',               unit: '',     category: 'Productivity', goodDirection: 'varies',
+	       explainer: 'Rolling average of the sleep scores from your daily check-ins. Compares the last 7 days with the period before to show whether sleep is improving or declining.' },
+	D11: { name: 'Peak Hours', unit: '', category: 'Productivity', goodDirection: 'varies',
 	       desc: 'When you do your best work',
-	       explainer: 'Maps session quality (enjoyment + flow) to time of day over 60 days. Helps identify your peak hours and dead zones. Use this to schedule demanding work optimally.' },
-	D12: { name: 'Completion Rate',          unit: '/10',  category: 'Productivity', goodDirection: 'up',
-	       desc: 'Completed vs. abandoned projects',
-	       explainer: "Ratio of completed projects to completed + abandoned. Higher = you finish what you start. Note: only counts projects you've explicitly marked completed or abandoned." },
-	D13: { name: 'Energy Oscillation',       unit: '/10',  category: 'Energy',       goodDirection: 'up',
-	       desc: 'E-level variety in your daily sessions',
-	       explainer: 'Measures whether you mix E-levels throughout the day. Higher = more variety (alternating E2 and E4 work). All-E4 days score low — mixing intensity levels is healthier.' },
-	D14: { name: 'Flow Quality',             unit: '/10',  category: 'Effort',       goodDirection: 'up',
+	       explainer: 'Maps session quality (enjoyment + flow) to time of day over 60 days. Shows your peak hours and your dead zones, so you can schedule demanding work when it goes best.' },
+	D12: { name: 'Completion Rate', unit: '/10', category: 'Productivity', goodDirection: 'up',
+	       desc: 'Completed vs. dropped projects',
+	       explainer: 'Ratio of completed projects to completed + dropped. Higher = you finish what you start. Only counts projects you have marked completed or dropped.' },
+	D13: { name: 'Energy Swings', unit: '/10', category: 'Energy', goodDirection: 'up',
+	       desc: 'How much your effort level changes through the day',
+	       explainer: 'How much you mix effort levels through the day. Higher = healthier variety. Grinding one level all day can signal a rut.' },
+	D14: { name: 'Flow Quality', unit: '/10', category: 'Effort', goodDirection: 'up',
 	       desc: 'How enjoyable your flow sessions are',
-	       explainer: 'Average enjoyment (hedonic valence) during flow sessions. High flow + low enjoyment = "grinding" — technically focused but not fulfilling. Watch for that pattern.' },
-	D15: { name: 'Effort sources',           unit: '',     category: 'Effort',       goodDirection: 'varies',
+	       explainer: 'How good your in-the-zone sessions are when they happen. Higher means deeper focus. This number uses your last 30 days, so one rough day will not swing it.' },
+	D15: { name: 'Effort Sources', unit: '', category: 'Effort', goodDirection: 'varies',
 	       desc: 'Where your effort comes from (complexity, emotional, etc.)',
-	       explainer: "Shows the breakdown of what makes your work effortful. If one source dominates (e.g., emotional drain), it's worth investigating why. Balanced = healthy diversity." },
-	D16: { name: 'Disengagement Risk',       unit: '/10',  category: 'Energy',       goodDirection: 'down',
+	       explainer: 'Shows what makes your work effortful. If one source dominates (for example, emotional work), it is worth asking why. A balanced mix is healthy.' },
+	D16: { name: 'Disengagement Risk', unit: '/10', category: 'Energy', goodDirection: 'down',
 	       desc: 'High effort + low investment pattern',
-	       explainer: `Detects sessions where you worked hard but weren't really invested. This "going through the motions" pattern is a burnout precursor. Higher = more disengagement signals.` },
-	D17: { name: 'Energy-Effort Link',       unit: '/10',  category: 'Energy',       goodDirection: 'up',
-	       desc: 'How starting energy affects your work',
-	       explainer: 'Pearson correlation between your daily energy check-in scores and session effort. Positive = better energy leads to better work. Near zero = your work quality is disconnected from how you feel.' },
-	D18: { name: 'Session Quality',          unit: '/10',  category: 'Productivity', goodDirection: 'up',
+	       explainer: 'Detects sessions where you worked hard but were not really invested. This "going through the motions" pattern is a burnout warning sign. Higher = more disengagement signals.' },
+	D17: { name: 'Energy vs. effort', unit: '/10', category: 'Energy', goodDirection: 'up',
+	       desc: 'How well your starting energy matches the effort you put in.',
+	       explainer: 'Higher means your energy and your effort line up. This number uses your last 30 days, so one rough day will not swing it.' },
+	D18: { name: 'Session Quality', unit: '/10', category: 'Productivity', goodDirection: 'up',
 	       desc: 'Overall quality score for your sessions',
-	       explainer: 'Composite of enjoyment (40%), flow rate (30%), and effort balance (30%). A holistic view of how your sessions are going — not just productive, but fulfilling.' },
-	D19: { name: 'Calibration Drift',        unit: '/10',  category: 'Calibration',  goodDirection: 'down',
-	       desc: 'How much your behavior diverges from your profile',
-	       explainer: 'Compares your actual effort patterns to what your calibration profile expects. High drift = time to recalibrate. Your work habits may have shifted since you last answered the profile questions.' },
-	D20: { name: 'Recharge Effectiveness',   unit: '/10',  category: 'Energy',       goodDirection: 'up',
+	       explainer: 'Overall quality of your work sessions. Higher = better sessions. This number uses your last 30 days, so one rough day will not swing it.' },
+	D19: { name: 'Drift from your profile', unit: '/10', category: 'Guesses', goodDirection: 'down',
+	       desc: 'How far the effort you report runs from what your profile suggests.',
+	       explainer: 'Compares your profile answers with the effort you actually report. Lower means they line up. Based on your last 30 days.' },
+	D20: { name: 'Recharge Effectiveness', unit: '/10', category: 'Energy', goodDirection: 'up',
 	       desc: 'How well your recharge routines restore energy',
-	       explainer: 'Average effectiveness of your logged recharge activities. If this is low, your current routines may not be working — try experimenting with different activities.' }
+	       explainer: 'How effective your recharge time is. Higher = better recharging. Only counts recharges you log: skipped days are not measured here.' }
 };
 
-const CATEGORIES = ['Effort', 'Energy', 'Productivity', 'Calibration'];
+const CATEGORIES = ['Effort', 'Guesses', 'Productivity', 'Energy'];
 
 const CATEGORY_ICONS: Record<string, string> = {
 	Effort: 'flame',
 	Energy: 'battery-charging',
 	Productivity: 'trending-up',
-	Calibration: 'sliders'
+	Guesses: 'sliders'
 };
 
 // SVG chart constants
@@ -140,13 +140,13 @@ export class DataCenterView extends EmraldWorkspaceView {
 		try {
 			resp = await this.plugin.apiClient.getMetrics();
 		} catch {
-			this.renderError(container, 'Could not load metric data — check your connection.');
+			this.renderError(container, 'Could not load metric data. Check your connection.');
 			return;
 		}
 
 		// Offline: no data and no cache — show offline message (P15 fix)
 		if (!resp.data && (resp.status === 0 || resp.error)) {
-			this.renderError(container, 'Offline — metric data will load when you reconnect.');
+			this.renderError(container, 'Offline. Metric data will load when you reconnect.');
 			return;
 		}
 
@@ -216,43 +216,43 @@ export class DataCenterView extends EmraldWorkspaceView {
 		// Burnout risk narrative
 		const burnout = d8.value;
 		if (burnout <= 30) {
-			sentences.push("You're in a healthy zone — burnout risk is low.");
+			sentences.push('Your burnout score is low.');
 		} else if (burnout <= 50) {
-			sentences.push('Your burnout risk is moderate. Keep an eye on your energy levels.');
+			sentences.push('Your burnout score is moderate. Worth keeping an eye on.');
 		} else if (burnout <= 70) {
-			sentences.push('Burnout risk is elevated — consider scaling back or adding recharge time.');
+			sentences.push('Your burnout score is elevated. Consider scaling back or adding recharge time.');
 		} else {
-			sentences.push("Burnout risk is high. Your data strongly suggests it's time to recharge.");
+			sentences.push('Your burnout score is high. It is worth paying attention to.');
 		}
 
 		// Effort balance
 		if (d1 && d1.value !== null) {
 			if (d1.value >= 7) {
-				sentences.push("Your effort balance is strong — you're matching effort to demand well.");
+				sentences.push('You mostly give each task about the right amount of effort.');
 			} else if (d1.value >= 4) {
-				sentences.push("Effort balance is middling — there's a gap between what tasks demand and what you invest.");
+				sentences.push('Your effort mostly fits what your tasks need, with some misses either way.');
 			} else {
-				sentences.push("Effort balance is low — there's a significant mismatch in how you allocate effort.");
+				sentences.push('Your effort often misses what your tasks needed, too little or too much.');
 			}
 		}
 
 		// Flow
 		if (d7 && d7.value !== null) {
 			if (d7.value >= 6) {
-				sentences.push("You're hitting flow states regularly — that's where your best work happens.");
+				sentences.push('You are in the zone in most of your sessions.');
 			} else if (d7.value >= 3) {
-				sentences.push('Flow is occasional. Check Peak Hours to find when focus comes easiest.');
+				sentences.push('You are in the zone now and then. Check Peak Hours to find when focus comes easiest.');
 			} else {
-				sentences.push('Flow has been rare lately. Consider fewer context switches and longer uninterrupted blocks.');
+				sentences.push('Being in the zone has been rare lately. Try fewer context switches and longer uninterrupted blocks.');
 			}
 		}
 
 		// Session quality
 		if (d18 && d18.value !== null) {
 			if (d18.value >= 7) {
-				sentences.push('Overall session quality is excellent — productive and fulfilling.');
+				sentences.push('Your sessions are going well: productive and fulfilling.');
 			} else if (d18.value < 4) {
-				sentences.push('Session quality is low — you may be grinding without genuine engagement.');
+				sentences.push('Session quality is low. You may be grinding without much engagement.');
 			}
 		}
 
@@ -320,7 +320,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			teaserText.createSpan({ text: 'Unlock 12 more metrics: ' });
 			teaserText.createSpan({
 				cls: 'emerald-wv-dc-pro-teaser-detail',
-				text: 'recovery effectiveness, effort volatility, calibration drift, project momentum, and more.'
+				text: 'recharge effectiveness, effort volatility, drift from your profile, peak hours, and more.'
 			});
 			const teaserLink = teaser.createEl('a', {
 				cls: 'emerald-wv-dc-pro-teaser-link',
@@ -495,7 +495,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		} else if (entries.length >= 2) {
 			chartArea.appendChild(this.buildLineChart(entries, info, key));
 		} else {
-			chartArea.createDiv({ cls: 'emerald-wv-empty', text: 'Only 1 data point — need at least 2 for a chart.' });
+			chartArea.createDiv({ cls: 'emerald-wv-empty', text: 'One value so far. The chart needs at least two.' });
 		}
 
 		// History table (below chart) — skip for D11 and D15 (custom viz IS the data story)

@@ -57,7 +57,7 @@ export class ProjectsComponent {
 		divider.createSpan({ text: `Active: ${activeItems.length}/5` });
 
 		// Inactive accordion
-		this.renderCollapsibleSection('Inactive', inactiveItems, 'paused');
+		this.renderCollapsibleSection('Paused', inactiveItems, 'paused');
 
 		// Completed accordion
 		this.renderCollapsibleSection('Completed', completedItems, 'completed');
@@ -241,7 +241,7 @@ export class ProjectsComponent {
 		for (const item of items) {
 			const row = content.createDiv({ cls: 'emerald-inactive-item' });
 			row.setAttribute('role', 'button');
-			row.setAttribute('aria-label', `${item.name} — ${levelTooltip(item.effort_level) || 'no effort level'}`);
+			row.setAttribute('aria-label', `${item.name}: ${levelTooltip(item.effort_level) || 'no effort level'}`);
 			row.tabIndex = 0;
 			const iconEl = row.createSpan({ cls: 'emerald-inactive-icon' });
 			iconEl.setAttribute('aria-hidden', 'true');
@@ -279,7 +279,7 @@ export class ProjectsComponent {
 		if (sectionStatus === 'paused') {
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		} else {
-			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Pause').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 		}
 
 		menu.addItem(i => i.setTitle('Open note').setIcon('file-text').onClick(() => this.openNote(item)));
@@ -307,7 +307,7 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 			this.addEffortProfileMenuItems(menu, item);
 			menu.addSeparator();
-			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Pause').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		} else {
 			// No active session — full menu
@@ -317,7 +317,7 @@ export class ProjectsComponent {
 			menu.addItem(i => i.setTitle('Change e-level').setIcon('pencil').onClick(() => this.onChangeELevel(item)));
 			menu.addItem(i => i.setTitle('Set area').setIcon('tag').onClick(() => { void this.onSetArea(item); }));
 			this.addEffortProfileMenuItems(menu, item);
-			menu.addItem(i => i.setTitle('Set inactive').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
+			menu.addItem(i => i.setTitle('Pause').setIcon('arrow-down').onClick(() => this.setItemStatus(item, 'paused')));
 			menu.addItem(i => i.setTitle('Mark complete').setIcon('check-circle').onClick(() => this.setItemStatus(item, 'completed')));
 		}
 
@@ -504,7 +504,7 @@ export class ProjectsComponent {
 			if (file instanceof TFile) {
 				void this.plugin.app.workspace.getLeaf(false).openFile(file);
 			} else {
-				new Notice(`Note not found: "${item.obsidian_note_path}" — it may have been moved or deleted.`);
+				new Notice(`Note not found: "${item.obsidian_note_path}". It may have been moved or deleted.`);
 			}
 		} else {
 			new Notice(`No linked note for "${item.name}"`);

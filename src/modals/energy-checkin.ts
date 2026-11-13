@@ -151,7 +151,7 @@ export class EnergyCheckinModal extends Modal {
 			});
 			btn.setAttribute('role', 'radio');
 			btn.setAttribute('aria-checked', String(opt.value === 2));
-			btn.setAttribute('aria-label', `${opt.label} — ${opt.desc}`);
+			btn.setAttribute('aria-label', `${opt.label}: ${opt.desc}`);
 			btn.addEventListener('click', () => {
 				this.recoveryEffectiveness = opt.value;
 				effRow.querySelectorAll('.emerald-btn-radio').forEach(b => {

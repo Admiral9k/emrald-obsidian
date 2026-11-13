@@ -82,7 +82,7 @@ export class HourOverrideModal extends Modal {
 		});
 
 		// Persistence note — this permanently updates the weekday's schedule
-		form.createDiv({ cls: 'emerald-form-desc emerald-houroverride-note', text: `This updates your regular ${dayName} schedule — future ${dayName}s will use it too.` });
+		form.createDiv({ cls: 'emerald-form-desc emerald-houroverride-note', text: `This updates your regular ${dayName} schedule. Future ${dayName}s will use it too.` });
 
 		// Actions
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

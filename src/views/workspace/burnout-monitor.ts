@@ -5,6 +5,7 @@
 
 import { WorkspaceLeaf, setIcon } from 'obsidian';
 import EmraldPlugin from '../../../main';
+import { hasBurnoutData } from '../../utils/burnout-score';
 import { EmraldWorkspaceView, VIEW_BURNOUT_MONITOR, VIEW_EFFORT_PROFILE } from './base';
 
 // Phase descriptions — qualitative, warm, human
@@ -13,24 +14,24 @@ const PHASE_META: Record<string, { label: string; icon: string; message: string;
 		label: 'All Clear',
 		icon: 'sun',
 		message: "You're in a good place. Your effort patterns look healthy and sustainable. Keep doing what you're doing.",
-		tone: 'Your energy reserves are solid.'
+		tone: 'Your recent numbers look steady.'
 	},
 	yellow: {
 		label: 'Worth Watching',
 		icon: 'cloud',
-		message: 'Some signals suggest you might be pushing a bit hard. Nothing urgent — just keep an eye on your recharge.',
-		tone: 'A little wear showing — normal, but worth noticing.'
+		message: 'Some signals suggest you might be pushing a bit hard. Nothing urgent. Keep an eye on your recharge.',
+		tone: 'A little wear showing. That is normal, and worth noticing.'
 	},
 	orange: {
 		label: 'Slow Down',
 		icon: 'cloud-rain',
 		message: "Multiple indicators suggest you're running hot. Consider lighter sessions, more breaks, or activities that recharge you.",
-		tone: "Your effort debt is accumulating faster than you're recovering."
+		tone: 'A few warning signs are showing at once.'
 	},
 	red: {
 		label: 'Recharge Needed',
 		icon: 'cloud-lightning',
-		message: "Your patterns strongly suggest burnout risk. Please prioritize rest and recharge. This isn't a failure — it's your body asking for what it needs.",
+		message: 'Your recent numbers show a lot of strain. Please make room for rest and recharge. Your body is asking for what it needs.',
 		tone: 'This is important. Take care of yourself first.'
 	}
 };
@@ -62,7 +63,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getMetrics(['D8'])
 			]);
 		} catch {
-			this.renderError(container, 'Could not load burnout data — check your connection.');
+			this.renderError(container, 'Could not load burnout data. Check your connection.');
 			return;
 		}
 
@@ -71,7 +72,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 		// Offline: if burnout + metrics both failed with no cache, show offline message (P15 fix)
 		if (!burnoutResp.data && !d8CurrentResp?.data && (burnoutResp.status === 0 || burnoutResp.error)) {
-			this.renderError(container, 'Offline — burnout data will load when you reconnect.');
+			this.renderError(container, 'Offline. Burnout data will load when you reconnect.');
 			return;
 		}
 
@@ -112,11 +113,11 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 			// Convert signal_breakdown { rising_effort: 2, declining_valence: 0, ... } to readable strings
 			const signals = d8Meta.signal_breakdown as Record<string, number>;
 			const SIGNAL_LABELS: Record<string, string> = {
-				rising_effort: 'Rising perceived effort',
-				declining_valence: 'Declining work enjoyment',
-				context_switches: 'High demand-investment imbalance',
-				low_flow: 'Low flow frequency',
-				emotional_skew: 'Emotional effort dominance'
+				rising_effort: 'Effort feels higher than last week',
+				declining_valence: 'Enjoying work less than last week',
+				context_switches: 'Jumping between many projects',
+				low_flow: 'Few in-the-zone sessions',
+				emotional_skew: 'A lot of your effort is emotional work'
 			};
 			for (const [key, val] of Object.entries(signals)) {
 				if (val > 0 && SIGNAL_LABELS[key]) {
@@ -128,7 +129,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const normalizedState = { current_phase: currentPhase, score, contributing_factors: factors };
 
 		// ── NOW: Current State (Hero) ──
-		if (d8Value !== null || rawState) {
+		if (hasBurnoutData(rawState, d8Value)) {
 			this.renderHero(container, normalizedState);
 		} else {
 			this.renderEmptyState(container);
@@ -173,7 +174,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const link = container.createDiv({ cls: 'emerald-wv-cross-link' });
 		const anchor = link.createEl('a', {
 			cls: 'emerald-wv-cross-link-text',
-			text: 'Review your recharge activities \u2192'
+			text: 'What recharges you \u2192'
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -190,7 +191,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'Not enough data yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'The burnout monitor needs session data and effort receipts to understand your patterns. Complete a few work sessions and this dashboard will come alive.'
+			text: "Rate a few sessions and your score shows up here. Until then EMRALD can't tell how you're doing, so trust your gut."
 		});
 	}
 
@@ -226,7 +227,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		setIcon(infoBtn, 'info');
 		const infoDetail = section.createDiv({
 			cls: 'emerald-wv-burnout-score-explainer',
-			text: '0 = no risk signals detected. 100 = multiple burnout indicators active. Combines rising effort, declining enjoyment, low flow, emotional strain, and demand imbalance over the past 14 days.'
+			text: 'The score looks at your recent sessions for five things: effort feeling higher than the week before, enjoying work less, jumping between many projects, few in-the-zone sessions, and a lot of your effort being emotional work. 0 means no warning signs. 100 means all of them at full strength.'
 		});
 		infoDetail.addClass('emrald-hidden');
 		infoBtn.addEventListener('click', (e) => {
@@ -249,7 +250,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		section.createEl('h3', { text: "What's driving this" });
 
 		const intro = phase === 'green'
-			? 'These are the factors EMRALD is watching — all looking fine right now.'
+			? 'These are the factors EMRALD is watching. All looking fine right now.'
 			: 'These factors are contributing to your current state:';
 		section.createEl('p', { cls: 'emerald-wv-factors-intro', text: intro });
 
@@ -281,7 +282,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		if (phase === 'green') {
 			section.createEl('p', {
 				cls: 'emerald-wv-suggestion-note',
-				text: 'No action needed right now. These suggestions will become more specific as EMRALD learns your patterns.'
+				text: 'Nothing to do right now.'
 			});
 		}
 	}
@@ -290,10 +291,10 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		switch (phase) {
 			case 'green': {
 				const recoverySuggestion = hasRecoveryActivities
-					? { icon: 'check-circle', text: 'Your recharge activities are being tracked — EMRALD is learning what recharges you.' }
-					: { icon: 'calendar', text: 'Consider logging recharge activities so EMRALD can learn what recharges you.' };
+					? { icon: 'check-circle', text: 'Your recharges are saved.' }
+					: { icon: 'calendar', text: 'Add a few recharge activities in your effort profile. If your score gets high, EMRALD reminds you of one.' };
 				return [
-					{ icon: 'check', text: "Keep your current rhythm — it's working." },
+					{ icon: 'check', text: "Keep your current rhythm. It's working." },
 					recoverySuggestion
 				];
 			}
@@ -301,17 +302,17 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 				return [
 					{ icon: 'pause', text: 'Try shorter sessions this week.' },
 					{ icon: 'coffee', text: 'Schedule deliberate breaks between sessions.' },
-					{ icon: 'moon', text: "Prioritize sleep — it's your fastest recovery lever." }
+					{ icon: 'moon', text: 'Protect your sleep this week.' }
 				];
 			case 'orange':
 				return [
-					{ icon: 'arrow-down', text: 'Consider dropping one E-level on your heaviest project.' },
-					{ icon: 'heart', text: 'Do something that recharges you today — not productive, just enjoyable.' },
+					{ icon: 'arrow-down', text: 'Consider dropping one effort level on your heaviest project.' },
+					{ icon: 'heart', text: 'Do something that recharges you today. Pick something you enjoy, just for fun.' },
 					{ icon: 'calendar-x', text: 'If you can cancel or reschedule non-essential commitments, do it.' }
 				];
 			case 'red':
 				return [
-					{ icon: 'shield', text: 'Take a full rest day. Not a light day — a real rest day.' },
+					{ icon: 'shield', text: 'Take a full rest day, with nothing on your plate.' },
 					{ icon: 'heart', text: 'Reach out to someone you trust. Burnout is easier with support.' },
 					{ icon: 'pause-circle', text: "Pause non-essential projects. They'll be there when you're ready." }
 				];
@@ -326,7 +327,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		const section = container.createDiv({ cls: 'emerald-wv-section emerald-wv-burnout-sparkline-section' });
 
 		const headerRow = section.createDiv({ cls: 'emerald-wv-burnout-spark-header' });
-		headerRow.createSpan({ cls: 'emerald-wv-burnout-spark-label', text: 'Burnout risk trend' });
+		headerRow.createSpan({ cls: 'emerald-wv-burnout-spark-label', text: 'Burnout risk over time' });
 
 		// Deduplicate by date (keep latest entry per day)
 		const byDate = new Map<string, { value: number | null; computed_at: string }>();
@@ -362,7 +363,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		setIcon(sparkInfo, 'info');
 		const sparkExplainer = section.createDiv({
 			cls: 'emerald-wv-burnout-score-explainer',
-			text: 'This tracks your Burnout Risk Score over time. Each point is the daily score (0–100). A flat line near 0 means no risk signals. Rising trends mean burnout indicators are accumulating.'
+			text: "Each dot is one day's score. Flat and low is good. A line that keeps climbing means warning signs are piling up. That's your cue to ease off."
 		});
 		sparkExplainer.addClass('emrald-hidden');
 		sparkInfo.addEventListener('click', (e) => {
@@ -374,7 +375,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		// Toggle to expand
 		const toggleBtn = section.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle emerald-btn-sm emerald-wv-burnout-expand-btn',
-			text: 'Show full trendline ▼'
+			text: 'Show daily history ▼'
 		});
 
 		let expanded = false;
@@ -384,7 +385,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 		toggleBtn.addEventListener('click', () => {
 			expanded = !expanded;
 			if (expanded) { chartContainer.removeClass('emrald-hidden'); } else { chartContainer.addClass('emrald-hidden'); }
-			toggleBtn.textContent = expanded ? 'Hide trendline ▲' : 'Show full trendline ▼';
+			toggleBtn.textContent = expanded ? 'Hide daily history ▲' : 'Show daily history ▼';
 
 			if (expanded && chartContainer.childElementCount === 0) {
 				this.renderFullTrendline(chartContainer, entries);
@@ -478,7 +479,7 @@ export class BurnoutMonitorView extends EmraldWorkspaceView {
 
 			let trendText: string;
 			if (Math.abs(delta) < 2) trendText = 'Your burnout risk has been stable.';
-			else if (delta > 0) trendText = `Trending up (+${delta.toFixed(0)} pts). Pay attention to recovery.`;
+			else if (delta > 0) trendText = `Trending up (+${delta.toFixed(0)} pts). Pay attention to your recharge.`;
 			else trendText = `Trending down (${delta.toFixed(0)} pts). Nice work.`;
 
 			container.createEl('p', { cls: 'emerald-wv-burnout-trend-summary', text: trendText });

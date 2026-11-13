@@ -122,7 +122,7 @@ export class EffortProfileModal extends Modal {
 		});
 		preamble.createEl('p', {
 			cls: 'emerald-form-note',
-			text: 'This is a separate layer from your session data — it never gets mixed into your metrics.',
+			text: 'This is kept apart from your session data. It never gets mixed into your numbers.',
 		});
 
 		const form = contentEl.createDiv({ cls: 'emerald-form emerald-effort-profile-form' });
@@ -140,7 +140,7 @@ export class EffortProfileModal extends Modal {
 		this.renderSlider(
 			form,
 			'Task complexity',
-			'How intrinsically hard is this project — regardless of how good you are at it?',
+			'How hard is this project in itself, however good you are at it?',
 			'task_complexity_intrinsic',
 			'Simple',
 			'Very complex'
@@ -157,8 +157,8 @@ export class EffortProfileModal extends Modal {
 
 		this.renderSlider(
 			form,
-			'Autotelic rating',
-			'How much do you expect the work itself — not the outcome — to be its own reward?',
+			'Enjoying the work itself',
+			'How much do you expect the work itself to be its own reward, whatever the outcome?',
 			'autotelic_rating',
 			'Purely a means',
 			'Intrinsically enjoyable'
@@ -399,7 +399,7 @@ export class EffortProfileModal extends Modal {
 
 		container.createEl('p', {
 			cls: 'emerald-form-note',
-			text: 'The three below are collected to improve future insights — no direct comparison metric yet.',
+			text: 'The three below are collected for future insights. There is no comparison metric for them yet.',
 		});
 		this.renderSlider(container, 'Physical demand', 'How physically demanding is this project?',
 			'physical_demand', 'Sedentary', 'Very physical');
@@ -463,7 +463,7 @@ export class EffortProfileModal extends Modal {
 	private async submit(saveBtn: HTMLButtonElement) {
 		const payload = this.buildPayload();
 		if (Object.keys(payload).length === 0) {
-			new Notice('Nothing to save — set at least one field first.');
+			new Notice('Nothing to save. Set at least one field first.');
 			return;
 		}
 

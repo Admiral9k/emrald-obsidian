@@ -101,7 +101,7 @@ export class CustomELevelEditorModal extends Modal {
 		// ── Percent ─────────────────────────────────────
 		if (this.mode === 'create' || this.mode === 'percent') {
 			const pctGroup = form.createDiv({ cls: 'emerald-form-group' });
-			pctGroup.createEl('label', { cls: 'emerald-form-label', text: 'Percent of your daily work time' });
+			pctGroup.createEl('label', { cls: 'emerald-form-label', text: 'Percent of your work hours' });
 			const row = pctGroup.createDiv({ cls: 'emerald-slider-row' });
 			this.slider = row.createEl('input', { cls: 'emerald-slider', type: 'range' });
 			this.slider.min = String(PERCENT_MIN);
@@ -149,7 +149,7 @@ export class CustomELevelEditorModal extends Modal {
 		if (this.previewBadgeEl) this.previewBadgeEl.style.color = color;
 		if (this.previewTextEl) {
 			const shownName = this.name.trim() || 'Your level';
-			this.previewTextEl.textContent = `${shownName} — ${this.percent}% of your daily work time`;
+			this.previewTextEl.textContent = `${shownName}: ${this.percent}% of your work hours`;
 		}
 
 		const problem = this.blockingProblem();
@@ -221,7 +221,7 @@ export class CustomELevelEditorModal extends Modal {
 	private async runCreate(): Promise<void> {
 		const resp = await this.plugin.apiClient.createELevel(this.name.trim(), this.percent);
 		if (resp.queued) {
-			new Notice('You\'re offline — this level will be created when you reconnect.');
+			new Notice('You\'re offline. This level will be created when you reconnect.');
 			this.close();
 			return;
 		}
@@ -239,7 +239,7 @@ export class CustomELevelEditorModal extends Modal {
 		if (!this.level) return;
 		const resp = await this.plugin.apiClient.renameELevel(this.level.id, this.name.trim());
 		if (resp.queued) {
-			new Notice('You\'re offline — the rename will sync when you reconnect.');
+			new Notice('You\'re offline. The rename will sync when you reconnect.');
 			this.close();
 			return;
 		}
@@ -257,7 +257,7 @@ export class CustomELevelEditorModal extends Modal {
 		if (!this.level) return;
 		const resp = await this.plugin.apiClient.changeELevelPercent(this.level.id, this.percent);
 		if (resp.queued) {
-			new Notice('You\'re offline — the change will sync when you reconnect.');
+			new Notice('You\'re offline. The change will sync when you reconnect.');
 			this.close();
 			return;
 		}
@@ -284,7 +284,7 @@ export class CustomELevelEditorModal extends Modal {
 	 * supplies a fallback and, for REF_COUNT_UNAVAILABLE, a retry affordance.
 	 */
 	private showApiError(error: string | null, code: string | null | undefined, status: number): void {
-		let message = error ?? 'Something went wrong — try again.';
+		let message = error ?? 'Something went wrong. Try again.';
 		let retryable = false;
 
 		switch (code) {

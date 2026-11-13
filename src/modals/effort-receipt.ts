@@ -108,7 +108,7 @@ export class EffortReceiptModal extends Modal {
 		if (this.metPrescribedEffort) {
 			const nudge = form.createDiv({ cls: 'emerald-completion-prompt' });
 			nudge.createEl('p', {
-				text: `You've passed the ${levelName || 'prescribed'} target for ${this.itemName} today \u2014 nice effort. Consider switching to another project next.`
+				text: `You've passed the ${levelName || 'prescribed'} target for ${this.itemName} today. Nice effort. Consider switching to another project next.`
 			});
 		}
 

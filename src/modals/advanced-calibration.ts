@@ -63,15 +63,15 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		question: "I'm driven by a desire for...",
 		type: 'enum',
 		options: [
-			{ value: 'correctness', label: 'Correctness — doing things right' },
-			{ value: 'helping', label: "Helping — making others' lives better" },
-			{ value: 'achievement', label: 'Achievement — accomplishing goals' },
-			{ value: 'authenticity', label: 'Authenticity — being true to myself' },
-			{ value: 'understanding', label: 'Understanding — knowing how things work' },
-			{ value: 'security', label: 'Security — stability and safety' },
-			{ value: 'experience', label: 'Experience — variety and stimulation' },
-			{ value: 'autonomy', label: 'Autonomy — freedom and independence' },
-			{ value: 'peace', label: 'Peace — harmony and balance' }
+			{ value: 'correctness', label: 'Correctness: doing things right' },
+			{ value: 'helping', label: "Helping: making others' lives better" },
+			{ value: 'achievement', label: 'Achievement: accomplishing goals' },
+			{ value: 'authenticity', label: 'Authenticity: being true to myself' },
+			{ value: 'understanding', label: 'Understanding: knowing how things work' },
+			{ value: 'security', label: 'Security: stability and safety' },
+			{ value: 'experience', label: 'Experience: variety and stimulation' },
+			{ value: 'autonomy', label: 'Autonomy: freedom and independence' },
+			{ value: 'peace', label: 'Peace: harmony and balance' }
 		]
 	},
 	{
@@ -79,11 +79,11 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		question: 'When overwhelmed, my first response is to...',
 		type: 'enum',
 		options: [
-			{ value: 'withdraw', label: 'Withdraw — pull back and isolate' },
-			{ value: 'over_prepare', label: 'Over-prepare — plan obsessively' },
-			{ value: 'push_harder', label: 'Push harder — brute force through it' },
-			{ value: 'scatter', label: 'Scatter — jump between tasks' },
-			{ value: 'become_critical', label: 'Become critical — nitpick everything' }
+			{ value: 'withdraw', label: 'Withdraw: pull back and isolate' },
+			{ value: 'over_prepare', label: 'Over-prepare: plan obsessively' },
+			{ value: 'push_harder', label: 'Push harder: brute force through it' },
+			{ value: 'scatter', label: 'Scatter: jump between tasks' },
+			{ value: 'become_critical', label: 'Become critical: nitpick everything' }
 		]
 	},
 	{
@@ -91,9 +91,9 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		question: 'Competitive situations make me...',
 		type: 'enum',
 		options: [
-			{ value: 'energized', label: 'Energized — I thrive on competition' },
-			{ value: 'neutral', label: 'Neutral — depends on the stakes' },
-			{ value: 'uncomfortable', label: 'Uncomfortable — I prefer collaboration' }
+			{ value: 'energized', label: 'Energized: I thrive on competition' },
+			{ value: 'neutral', label: 'Neutral: depends on the stakes' },
+			{ value: 'uncomfortable', label: 'Uncomfortable: I prefer collaboration' }
 		]
 	},
 	{
@@ -191,9 +191,9 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 		question: 'Would you rather have 4 different tasks or 1 deep task?',
 		type: 'enum',
 		options: [
-			{ value: 'variety', label: '4 different tasks — I like variety' },
+			{ value: 'variety', label: '4 different tasks: I like variety' },
 			{ value: 'mix', label: 'A mix of both' },
-			{ value: 'focus', label: '1 deep task — I like going deep' }
+			{ value: 'focus', label: '1 deep task: I like going deep' }
 		]
 	},
 	{
@@ -294,7 +294,7 @@ export class AdvancedCalibrationModal extends Modal {
 		// If showAll, use all unanswered; otherwise use the batch
 		const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
 
-		contentEl.createEl('h2', { text: 'Effort profile — advanced' });
+		contentEl.createEl('h2', { text: 'Effort profile: advanced' });
 
 		const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
 		if (this.showAll) {

@@ -100,7 +100,7 @@ export abstract class EmraldWorkspaceView extends ItemView {
 		const banner = container.createDiv({ cls: 'emerald-wv-stale-banner' });
 		const iconEl = banner.createSpan({ cls: 'emerald-icon' });
 		setIcon(iconEl, 'wifi-off');
-		banner.createSpan({ text: ' Offline \u2014 showing cached data' });
+		banner.createSpan({ text: ' Offline. Showing cached data' });
 	}
 
 	/**

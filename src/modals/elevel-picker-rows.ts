@@ -64,7 +64,7 @@ export function renderCustomLevelRows(opts: CustomLevelRowOptions): void {
 		badge.style.color = colorForPercent(level.percent);
 		labelRow.createSpan({
 			cls: 'emerald-elevel-option-desc',
-			text: `${level.name} — ${level.percent}% of your daily work time`
+			text: `${level.name}: ${level.percent}% of your work hours`
 		});
 
 		btn.createDiv({

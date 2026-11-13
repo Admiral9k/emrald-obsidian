@@ -140,7 +140,7 @@ export class AboutView extends EmraldWorkspaceView {
 				this.bullet(list, "Optional: do the daily check-in (about 15 seconds). Sleep, energy, and how your body and mind feel, to give more context to your numbers.");
 				this.bullet(list, "At the end of the day, hit Close Day to see what your day really looked like.");
 			}
-			this.para(el as HTMLElement, "Under 5 minutes? No rating needed. It still counts.");
+			this.para(el as HTMLElement, "Under 5 minutes? No receipt needed. It still counts.");
 			this.para(el as HTMLElement, "Use your data to see your trends and habits. Want EMRALD to spot patterns for you? That's the Insight Log, on PRO.");
 		});
 
@@ -173,7 +173,7 @@ export class AboutView extends EmraldWorkspaceView {
 		this.makeSection(container, 'core-systems', 'layers', "What's inside", el => {
 			{
 				const list = el.createEl('ul', { cls: 'emerald-wv-about-bullet-list' });
-				this.bullet(list, "Daily check-in and session rating: two quick forms. Everything else runs on them.");
+				this.bullet(list, "Daily check-in and receipt: two quick forms. Everything else runs on them.");
 				this.bullet(list, "Effort levels: Light, Moderate, Demanding, Maximum. Pick one per project. PRO lets you make your own.");
 				this.bullet(list, "E-Level Overview: how much of today each project takes.");
 				this.bullet(list, "Data Center: every number, with a plain explanation.");

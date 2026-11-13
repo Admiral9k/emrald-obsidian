@@ -7,6 +7,7 @@ import { EmraldAPIClient } from './src/api/client';
 import { FolderSync } from './src/sync/folder-sync';
 import { OfflineQueue, QueuedAction } from './src/sync/offline-queue';
 import { DataCache } from './src/sync/data-cache';
+import { DIGEST_DAY_NAMES, formatTime12, utcSlotToLocal } from './src/utils/digest-schedule';
 import {
 	VIEW_ELEVEL_OVERVIEW, ELevelOverviewView,
 	VIEW_INSIGHT_LOG, InsightLogView,
@@ -385,7 +386,7 @@ export default class EmraldPlugin extends Plugin {
 			};
 			const digest_day = dayMap[this.settings.digestDay] ?? 0;
 			// Normalize HH:MM to HH:MM:SS for Postgres time column
-			const raw = (this.settings.digestTime || '09:00').trim();
+			const raw = (this.settings.digestTime || '18:00').trim();
 			const digest_time = raw.length === 5 ? `${raw}:00` : raw;
 			const resp = await this.apiClient.updatePreferences({ digest_day, digest_time });
 			if (!silent) {
@@ -397,13 +398,14 @@ export default class EmraldPlugin extends Plugin {
 						const rawMsg = (resp.error as unknown as Record<string, unknown>)?.message;
 						msg = typeof rawMsg === 'string' ? rawMsg : 'unknown error';
 					}
-					new Notice(`Digest schedule sync failed: ${msg}`);
+					new Notice(`Recap schedule did not save: ${msg}`);
 				} else {
-					new Notice(`Digest schedule saved: ${this.settings.digestDay} at ${raw} UTC`);
+					const local = utcSlotToLocal({ day: dayMap[this.settings.digestDay] ?? 0, time: raw });
+					new Notice(`Recap schedule saved: ${DIGEST_DAY_NAMES[local.day] ?? 'Sunday'} at ${formatTime12(local.time)} (your time).`);
 				}
 			}
 		} catch (err) {
-			if (!silent) new Notice(`Digest schedule sync failed: ${String((err as Record<string, unknown>)?.message ?? err)}`);
+			if (!silent) new Notice(`Recap schedule did not save: ${String((err as Record<string, unknown>)?.message ?? err)}`);
 			if (this.settings.debugLogging) console.warn('[EMRALD] syncDigestPreferences failed:', err);
 		}
 	}

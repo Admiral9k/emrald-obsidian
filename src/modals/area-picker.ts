@@ -31,7 +31,7 @@ export class AreaPickerModal extends SuggestModal<AreaChoice> {
 		this.labels = labels;
 		this.currentAreaId = currentAreaId;
 		this.onChoose = onChoose;
-		this.setPlaceholder('Set area — type to search or create');
+		this.setPlaceholder('Set area: type to search or create');
 		this.limit = 50;
 	}
 

@@ -525,7 +525,7 @@ export class TimeblockComponent {
 			if (this.state.activeSession.isPendingSync) {
 				const syncBadge = this.controlsEl.createDiv({
 					cls: 'emerald-pending-sync-badge',
-					text: '⚡ Pending sync — tracking locally'
+					text: '⚡ Pending sync. Tracking locally'
 				});
 				syncBadge.setAttribute('role', 'status');
 			}

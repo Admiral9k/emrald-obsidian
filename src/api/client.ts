@@ -198,7 +198,7 @@ export class EmraldAPIClient {
 			if (response.status === 401) {
 				return {
 					data: null,
-					error: 'Session expired — please re-enter your API key in Settings.',
+					error: 'Session expired. Please re-enter your API key in Settings.',
 					status: 401
 				};
 			}
@@ -237,7 +237,7 @@ export class EmraldAPIClient {
 
 				return {
 					data: null,
-					error: 'Rate limited — please wait a moment and try again.',
+					error: 'Rate limited. Please wait a moment and try again.',
 					status: 429
 				};
 			}
@@ -296,7 +296,7 @@ export class EmraldAPIClient {
 				// Return clean user-facing messages for known status codes
 				// instead of dumping raw headers/debug info
 				if (thrownStatus === 401) {
-					return { data: null, error: 'Invalid API key — please check your key in Settings.', status: 401 };
+					return { data: null, error: 'Invalid API key. Please check your key in Settings.', status: 401 };
 				}
 				if (thrownStatus === 403) {
 					return { data: null, error: 'Feature requires EMRALD PRO. Upgrade at effortmastery.com/pro', status: 403 };
@@ -305,7 +305,7 @@ export class EmraldAPIClient {
 					return { data: null, error: null, status: 404 };
 				}
 				if (thrownStatus === 429) {
-					return { data: null, error: 'Rate limited — please wait a moment and try again.', status: 429 };
+					return { data: null, error: 'Rate limited. Please wait a moment and try again.', status: 429 };
 				}
 
 				// For other errors, show a clean message (debug details in console only)
@@ -401,7 +401,7 @@ export class EmraldAPIClient {
 							await this.replayUntilNextStart();
 						} else {
 							this.offlineQueue.removeById(startAction.id);
-							new Notice('Session created but could not extract id — dependent actions dropped');
+							new Notice('Session created but could not extract id. Dependent actions dropped');
 							const deps = this.offlineQueue.getPendingActions()
 								.filter(a => a.path.includes(localId));
 							for (const d of deps) this.offlineQueue.remove(d.id);
@@ -418,7 +418,7 @@ export class EmraldAPIClient {
 						}
 					}
 				} catch { /* non-fatal */
-					new Notice('Network error during session reconciliation — will retry later');
+					new Notice('Network error during session reconciliation. Will retry later');
 				}
 			}
 		}

@@ -63,7 +63,7 @@ export class EffortComparisonModal extends Modal {
 			resp = await this.plugin.apiClient.getItemComparison(this.item.id);
 		} catch {
 			body.empty();
-			this.renderMessage(body, 'Could not load comparison — check your connection.');
+			this.renderMessage(body, 'Could not load comparison. Check your connection.');
 			this.renderCloseAction(contentEl);
 			return;
 		}
@@ -72,7 +72,7 @@ export class EffortComparisonModal extends Modal {
 
 		if (resp.data === null || resp.data === undefined) {
 			if (resp.status === 0 || resp.error) {
-				this.renderMessage(body, 'Offline — comparison will load when you reconnect.');
+				this.renderMessage(body, 'Offline. Comparison will load when you reconnect.');
 			} else {
 				this.renderMessage(body, 'No comparison data available yet.');
 			}
@@ -111,7 +111,8 @@ export class EffortComparisonModal extends Modal {
 		// ── CORE comparison pairs ──
 		if (cmp.core.length > 0) {
 			const section = container.createDiv({ cls: 'emerald-effort-comparison-section' });
-			section.createEl('h3', { text: 'Predicted vs actual' });
+			const guessHeading = 'Guess vs. actual';
+			section.createEl('h3', { text: guessHeading });
 			for (const pair of cmp.core) {
 				this.renderPair(section, pair);
 			}
@@ -147,7 +148,7 @@ export class EffortComparisonModal extends Modal {
 		const panels = card.createDiv({ cls: 'emerald-comparison-panels' });
 
 		const predPanel = panels.createDiv({ cls: 'emerald-comparison-panel emerald-comparison-panel-predicted' });
-		predPanel.createDiv({ cls: 'emerald-comparison-panel-tag', text: 'Predicted' });
+		predPanel.createDiv({ cls: 'emerald-comparison-panel-tag', text: 'Guess' });
 		predPanel.createDiv({ cls: 'emerald-comparison-panel-value', text: pair.predicted !== null ? this.fmt(pair.predicted) : '—' });
 		predPanel.createDiv({ cls: 'emerald-comparison-panel-scale', text: pair.predicted_scale });
 

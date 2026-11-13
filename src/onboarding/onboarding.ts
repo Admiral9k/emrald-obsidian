@@ -119,7 +119,7 @@ export class OnboardingModal extends Modal {
 			{ icon: 'timer', text: 'Track work sessions with effort-aware timing' },
 			{ icon: 'bar-chart-2', text: 'See 20 metrics about how you work' },
 			{ icon: 'flame', text: 'Get burnout warnings before you feel it' },
-			{ icon: 'lightbulb', text: 'Receive AI-powered effort insights' }
+			{ icon: 'lightbulb', text: 'Get short notes on what EMRALD spots in your numbers' }
 		];
 
 		for (const item of items) {
@@ -151,7 +151,7 @@ export class OnboardingModal extends Modal {
 		const privacyText = privacyEl.createEl('p', { cls: 'emerald-onboard-privacy-text' });
 		const lockIcon = privacyText.createSpan({ cls: 'emerald-onboard-privacy-icon' });
 		setIcon(lockIcon, 'lock');
-		privacyText.appendText(' EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes \u2014 it couldn\u2019t access them even if it tried.');
+		privacyText.appendText(' EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes. It couldn\u2019t access them even if it tried.');
 
 		// "Get an API key" link for community plugin store users
 		const linkEl = container.createDiv({ cls: 'emerald-onboard-link' });
@@ -247,7 +247,7 @@ export class OnboardingModal extends Modal {
 
 		const skipBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
-			text: "Skip — i'll configure later"
+			text: "Skip: i'll configure later"
 		});
 		skipBtn.addEventListener('click', () => { void this.finish(); });
 
@@ -264,7 +264,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Tell EMRALD a bit about your work capacity. This helps calibrate effort levels. You can always update these later.'
+			text: 'Tell EMRALD a bit about your work capacity. This helps set your effort levels. You can always update these later.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -349,9 +349,9 @@ export class OnboardingModal extends Modal {
 			question: 'After a day of socializing, I feel...',
 			type: 'enum',
 			options: [
-				{ value: 'energized', label: 'Energized — people charge me up' },
-				{ value: 'neutral', label: 'Neutral — depends on the people' },
-				{ value: 'drained', label: 'Drained — I need alone time to recover' }
+				{ value: 'energized', label: 'Energized: people charge me up' },
+				{ value: 'neutral', label: 'Neutral: depends on the people' },
+				{ value: 'drained', label: 'Drained: I need alone time to recover' }
 			]
 		},
 		// Page 2: Personality traits
@@ -405,12 +405,12 @@ export class OnboardingModal extends Modal {
 			question: 'Which type of work energizes you MOST?',
 			type: 'enum',
 			options: [
-				{ value: 'wonder', label: 'Wonder — asking big questions, imagining possibilities' },
-				{ value: 'invention', label: 'Invention — creating new solutions and ideas' },
-				{ value: 'discernment', label: 'Discernment — evaluating and giving feedback' },
-				{ value: 'galvanizing', label: 'Galvanizing — rallying people to take action' },
-				{ value: 'enablement', label: 'Enablement — helping others succeed' },
-				{ value: 'tenacity', label: 'Tenacity — finishing tasks and crossing the line' }
+				{ value: 'wonder', label: 'Wonder: asking big questions, imagining possibilities' },
+				{ value: 'invention', label: 'Invention: creating new solutions and ideas' },
+				{ value: 'discernment', label: 'Discernment: evaluating and giving feedback' },
+				{ value: 'galvanizing', label: 'Galvanizing: rallying people to take action' },
+				{ value: 'enablement', label: 'Enablement: helping others succeed' },
+				{ value: 'tenacity', label: 'Tenacity: finishing tasks and crossing the line' }
 			]
 		},
 		{
@@ -418,12 +418,12 @@ export class OnboardingModal extends Modal {
 			question: 'Which type of work DRAINS you MOST?',
 			type: 'enum',
 			options: [
-				{ value: 'wonder', label: 'Wonder — thinking abstractly without action' },
-				{ value: 'invention', label: 'Invention — having to create from scratch' },
-				{ value: 'discernment', label: "Discernment — evaluating others' work" },
-				{ value: 'galvanizing', label: 'Galvanizing — motivating and organizing people' },
-				{ value: 'enablement', label: "Enablement — supporting others' priorities" },
-				{ value: 'tenacity', label: 'Tenacity — grinding through repetitive details' }
+				{ value: 'wonder', label: 'Wonder: thinking abstractly without action' },
+				{ value: 'invention', label: 'Invention: having to create from scratch' },
+				{ value: 'discernment', label: "Discernment: evaluating others' work" },
+				{ value: 'galvanizing', label: 'Galvanizing: motivating and organizing people' },
+				{ value: 'enablement', label: "Enablement: supporting others' priorities" },
+				{ value: 'tenacity', label: 'Tenacity: grinding through repetitive details' }
 			]
 		},
 		{
@@ -447,7 +447,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'These questions help EMRALD calibrate effort levels to your personal style. Be honest — there are no wrong answers.'
+			text: 'These questions help EMRALD fit effort levels to your personal style. There are no wrong answers.'
 		});
 
 		// Page counter
@@ -548,7 +548,7 @@ export class OnboardingModal extends Modal {
 							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
 							new Notice('Effort profile saved ✓');
 						} catch { /* non-fatal */
-							new Notice('Profile saved locally — will sync later.');
+							new Notice('Profile saved locally: will sync later.');
 						}
 					}
 					this.goTo('recovery');
@@ -564,7 +564,7 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Recharge activities are things that restore your energy — like walking, piano, or reading. When EMRALD detects burnout risk, it will suggest these as a gentle nudge, not a prescription.'
+			text: 'Recharge activities are things that restore your energy, like walking, piano, or reading. If your burnout score gets high, EMRALD reminds you of something from this list.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -622,7 +622,7 @@ export class OnboardingModal extends Modal {
 						}
 						new Notice('Recharge processes saved');
 					} catch { /* non-fatal */
-						new Notice('Saved locally — will sync later.');
+						new Notice('Saved locally: will sync later.');
 					}
 				}
 				this.goTo('schedule');
@@ -654,7 +654,7 @@ export class OnboardingModal extends Modal {
 		});
 		trackedExplainer.createEl('br');
 		trackedExplainer.createSpan({
-			text: 'Think of it as anything worth dedicating focused time to. Your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano \u2014 not your grocery list.'
+			text: 'Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -723,9 +723,10 @@ export class OnboardingModal extends Modal {
 
 	private renderProjects(container: HTMLElement) {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add your first projects' });
+		const projectsDesc = 'What are you working on? Pick an effort level for each project: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.';
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'What are you working on? Give each project an effort level — EMRALD uses this to measure what your day actually costs you.'
+			text: projectsDesc
 		});
 
 		// Active limit guidance (P2.6)
@@ -736,15 +737,15 @@ export class OnboardingModal extends Modal {
 
 		// E-level explainer
 		const explainer = container.createDiv({ cls: 'emerald-onboard-explainer' });
-		explainer.createDiv({ text: 'E1 = Light (25% of your daily work time)' });
-		explainer.createDiv({ text: 'E2 = Moderate (50% of your daily work time)' });
-		explainer.createDiv({ text: 'E3 = Demanding (75% of your daily work time)' });
-		explainer.createDiv({ text: 'E4 = Maximum (100% of your daily work time)' });
+		explainer.createDiv({ text: 'E1 = Light (25% of your work hours)' });
+		explainer.createDiv({ text: 'E2 = Moderate (50% of your work hours)' });
+		explainer.createDiv({ text: 'E3 = Demanding (75% of your work hours)' });
+		explainer.createDiv({ text: 'E4 = Maximum (100% of your work hours)' });
 
 		// Note linking hint
 		container.createDiv({
 			cls: 'emerald-onboard-hint',
-			text: 'Tip: click the link icon to connect a project to an existing note — EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list.'
+			text: 'Tip: click the link icon to connect a project to an existing note. EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list.'
 		});
 
 		const form = container.createDiv({ cls: 'emerald-form' });
@@ -875,7 +876,7 @@ export class OnboardingModal extends Modal {
 			{
 				icon: 'timer',
 				title: 'Timeblock',
-				desc: 'This is your day. A 24-hour bar shows time passing. When you start a session, the clock freezes and a green bar fills — showing your daily effort in real time.'
+				desc: 'This is your day. A 24-hour bar shows time passing. When you start a session, the clock freezes and a green bar fills, showing your daily effort in real time.'
 			},
 			{
 				icon: 'folder',

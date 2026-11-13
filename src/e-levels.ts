@@ -247,16 +247,16 @@ export function levelDisplayName(ref: string | null | undefined, levels?: readon
  */
 export function levelLabel(ref: string | null | undefined, levels?: readonly CustomELevel[]): string {
 	if (isBuiltInLevel(ref)) return ref;
-	if (isCustomLevelRef(ref)) return `${CUSTOM_BADGE} — ${levelDisplayName(ref, levels)}`;
+	if (isCustomLevelRef(ref)) return `${CUSTOM_BADGE}: ${levelDisplayName(ref, levels)}`;
 	return '';
 }
 
-/** Tooltip text: name plus percent, e.g. 'Deep research — 40% of your daily work time'. */
+/** Tooltip text: name plus percent, e.g. 'Deep research — 40% of your work hours'. */
 export function levelTooltip(ref: string | null | undefined, levels?: readonly CustomELevel[]): string {
 	const name = levelDisplayName(ref, levels);
 	if (!name) return '';
 	const pct = resolveLevelPercent(ref, levels);
-	return `${name} — ${pct}% of your daily work time`;
+	return `${name}: ${pct}% of your work hours`;
 }
 
 /** Whether a ref points at a custom level that has been archived. */

@@ -51,9 +51,9 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		question: 'After a day of socializing, I feel...',
 		type: 'enum',
 		options: [
-			{ value: 'energized', label: 'Energized — people charge me up' },
-			{ value: 'neutral', label: 'Neutral — depends on the people' },
-			{ value: 'drained', label: 'Drained — I need alone time to recover' }
+			{ value: 'energized', label: 'Energized: people charge me up' },
+			{ value: 'neutral', label: 'Neutral: depends on the people' },
+			{ value: 'drained', label: 'Drained: I need alone time to recover' }
 		]
 	},
 	// Page 2: Personality traits
@@ -107,12 +107,12 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		question: 'Which type of work energizes you MOST?',
 		type: 'enum',
 		options: [
-			{ value: 'wonder', label: 'Wonder — asking big questions, imagining possibilities' },
-			{ value: 'invention', label: 'Invention — creating new solutions and ideas' },
-			{ value: 'discernment', label: 'Discernment — evaluating and giving feedback' },
-			{ value: 'galvanizing', label: 'Galvanizing — rallying people to take action' },
-			{ value: 'enablement', label: 'Enablement — helping others succeed' },
-			{ value: 'tenacity', label: 'Tenacity — finishing tasks and crossing the line' }
+			{ value: 'wonder', label: 'Wonder: asking big questions, imagining possibilities' },
+			{ value: 'invention', label: 'Invention: creating new solutions and ideas' },
+			{ value: 'discernment', label: 'Discernment: evaluating and giving feedback' },
+			{ value: 'galvanizing', label: 'Galvanizing: rallying people to take action' },
+			{ value: 'enablement', label: 'Enablement: helping others succeed' },
+			{ value: 'tenacity', label: 'Tenacity: finishing tasks and crossing the line' }
 		]
 	},
 	{
@@ -120,12 +120,12 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		question: 'Which type of work DRAINS you MOST?',
 		type: 'enum',
 		options: [
-			{ value: 'wonder', label: 'Wonder — thinking abstractly without action' },
-			{ value: 'invention', label: 'Invention — having to create from scratch' },
-			{ value: 'discernment', label: "Discernment — evaluating others' work" },
-			{ value: 'galvanizing', label: 'Galvanizing — motivating and organizing people' },
-			{ value: 'enablement', label: "Enablement — supporting others' priorities" },
-			{ value: 'tenacity', label: 'Tenacity — grinding through repetitive details' }
+			{ value: 'wonder', label: 'Wonder: thinking abstractly without action' },
+			{ value: 'invention', label: 'Invention: having to create from scratch' },
+			{ value: 'discernment', label: "Discernment: evaluating others' work" },
+			{ value: 'galvanizing', label: 'Galvanizing: motivating and organizing people' },
+			{ value: 'enablement', label: "Enablement: supporting others' priorities" },
+			{ value: 'tenacity', label: 'Tenacity: grinding through repetitive details' }
 		]
 	},
 	{
@@ -148,27 +148,27 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	{ key: 'delegation_comfort', question: 'I find it easy to delegate work to others.', type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Very hard', endpointRight: 'Very easy' },
 	{ key: 'decision_style', question: 'I prioritize logical consistency over impact on people.', type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'People first', endpointRight: 'Logic first' },
 	{ key: 'core_motivation', question: "I'm driven by a desire for...", type: 'enum', options: [
-		{ value: 'correctness', label: 'Correctness — doing things right' },
-		{ value: 'helping', label: "Helping — making others' lives better" },
-		{ value: 'achievement', label: 'Achievement — accomplishing goals' },
-		{ value: 'authenticity', label: 'Authenticity — being true to myself' },
-		{ value: 'understanding', label: 'Understanding — knowing how things work' },
-		{ value: 'security', label: 'Security — stability and safety' },
-		{ value: 'experience', label: 'Experience — variety and stimulation' },
-		{ value: 'autonomy', label: 'Autonomy — freedom and independence' },
-		{ value: 'peace', label: 'Peace — harmony and balance' }
+		{ value: 'correctness', label: 'Correctness: doing things right' },
+		{ value: 'helping', label: "Helping: making others' lives better" },
+		{ value: 'achievement', label: 'Achievement: accomplishing goals' },
+		{ value: 'authenticity', label: 'Authenticity: being true to myself' },
+		{ value: 'understanding', label: 'Understanding: knowing how things work' },
+		{ value: 'security', label: 'Security: stability and safety' },
+		{ value: 'experience', label: 'Experience: variety and stimulation' },
+		{ value: 'autonomy', label: 'Autonomy: freedom and independence' },
+		{ value: 'peace', label: 'Peace: harmony and balance' }
 	] },
 	{ key: 'stress_pattern_primary', question: 'When overwhelmed, my first response is to...', type: 'enum', options: [
-		{ value: 'withdraw', label: 'Withdraw — pull back and isolate' },
-		{ value: 'over_prepare', label: 'Over-prepare — plan obsessively' },
-		{ value: 'push_harder', label: 'Push harder — brute force through it' },
-		{ value: 'scatter', label: 'Scatter — jump between tasks' },
-		{ value: 'become_critical', label: 'Become critical — nitpick everything' }
+		{ value: 'withdraw', label: 'Withdraw: pull back and isolate' },
+		{ value: 'over_prepare', label: 'Over-prepare: plan obsessively' },
+		{ value: 'push_harder', label: 'Push harder: brute force through it' },
+		{ value: 'scatter', label: 'Scatter: jump between tasks' },
+		{ value: 'become_critical', label: 'Become critical: nitpick everything' }
 	] },
 	{ key: 'competition_response', question: 'Competitive situations make me...', type: 'enum', options: [
-		{ value: 'energized', label: 'Energized — I thrive on competition' },
-		{ value: 'neutral', label: 'Neutral — depends on the stakes' },
-		{ value: 'uncomfortable', label: 'Uncomfortable — I prefer collaboration' }
+		{ value: 'energized', label: 'Energized: I thrive on competition' },
+		{ value: 'neutral', label: 'Neutral: depends on the stakes' },
+		{ value: 'uncomfortable', label: 'Uncomfortable: I prefer collaboration' }
 	] },
 	{ key: 'stimulation_need', question: 'I need regular variety in my work to stay engaged.', type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Not at all', endpointRight: 'Absolutely' },
 	{ key: 'ambiguity_tolerance', question: "I'm comfortable with ambiguity and undefined outcomes.", type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Very uncomfortable', endpointRight: 'Very comfortable' },
@@ -195,9 +195,9 @@ const ADVANCED_QUESTIONS: CalibrationQuestion[] = [
 	] },
 	{ key: 'overcommitment_tendency', question: "How often do you feel like you're juggling too many projects?", type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Never', endpointRight: 'Constantly' },
 	{ key: 'task_switching_preference', question: 'Would you rather have 4 different tasks or 1 deep task?', type: 'enum', options: [
-		{ value: 'variety', label: '4 different tasks — I like variety' },
+		{ value: 'variety', label: '4 different tasks: I like variety' },
 		{ value: 'mix', label: 'A mix of both' },
-		{ value: 'focus', label: '1 deep task — I like going deep' }
+		{ value: 'focus', label: '1 deep task: I like going deep' }
 	] },
 	{ key: 'purpose_sensitivity', question: 'How important is it that your work feels meaningful?', type: 'slider', min: 1, max: 5, default: 3, endpointLeft: 'Not important', endpointRight: 'Essential' },
 	{ key: 'flow_activities', question: 'What activities put you in deep focus most easily?', type: 'text', optional: true },
@@ -322,12 +322,12 @@ export class ReassessmentModal extends Modal {
 		// Header
 		const headerIcon = contentEl.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(headerIcon, 'refresh-cw');
-		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: isInAdvancedSection ? 'Reassess — advanced profile' : 'Reassess your profile' });
+		contentEl.createEl('h2', { cls: 'emerald-onboard-title', text: isInAdvancedSection ? 'Retake the questions: advanced profile' : 'Retake your profile questions' });
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
 			text: isInAdvancedSection
-				? 'Review your advanced calibration answers. These help EMRALD fine-tune your effort forecasts.'
-				: 'Review and update your answers. Your previous responses are pre-filled — change what feels different now.'
+				? 'Review your advanced profile answers. These help your profile match how you work.'
+				: 'Review and update your answers. Your previous responses are pre-filled. Change what feels different now.'
 		});
 
 		// Page counter
@@ -348,7 +348,7 @@ export class ReassessmentModal extends Modal {
 				form.createEl('hr', { cls: 'emerald-form-separator' });
 				form.createDiv({
 					cls: 'emerald-form-desc emerald-text-muted',
-					text: 'Questions below are optional — for future integrations.'
+					text: 'Questions below are optional. They are collected for future insights.'
 				});
 			}
 
@@ -502,7 +502,7 @@ export class ReassessmentModal extends Modal {
 
 			const changedCount = Object.keys(changed).length;
 			const message = changedCount > 0
-				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history, and EMRALD will recalibrate on the next compute cycle.`
+				? `${changedCount} answer${changedCount > 1 ? 's' : ''} updated. Your previous profile has been saved to history.`
 				: 'No answers changed, but your reassessment counter has been reset. EMRALD will check in again after your next 60 days of use.';
 
 			contentEl.createEl('p', { cls: 'emerald-onboard-desc', text: message });

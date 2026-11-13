@@ -12,12 +12,12 @@ import { RecoveryProtocol, TraitComparison } from '../../api/client';
 // ── Calibration Fields (core 6) ─────────────────────────
 
 const CORE_TRAITS = [
-	{ key: 'physical_capability',   label: 'Physical Capability',     desc: 'Your physical work capacity', icon: 'dumbbell' },
-	{ key: 'mental_capability',     label: 'Mental Capability',       desc: 'Cognitive endurance and processing', icon: 'brain' },
-	{ key: 'physical_novel_endurance', label: 'Physical Endurance',   desc: 'How long you sustain physical effort', icon: 'timer' },
-	{ key: 'mental_abstract_endurance', label: 'Mental Endurance',    desc: 'How long you sustain cognitive effort', icon: 'clock' },
-	{ key: 'motivation_personal',   label: 'Intrinsic Motivation',    desc: 'Drive from internal interest/passion', icon: 'heart' },
-	{ key: 'motivation_job',        label: 'Extrinsic Motivation',    desc: 'Drive from external rewards/deadlines', icon: 'trophy' }
+	{ key: 'physical_capability',   label: 'Physical capacity',       desc: 'How much physical work you can handle', icon: 'dumbbell' },
+	{ key: 'mental_capability',     label: 'Mental capacity',         desc: 'How much hard thinking you can handle', icon: 'brain' },
+	{ key: 'physical_novel_endurance', label: 'Physical stamina',     desc: 'How long you can keep going physically', icon: 'timer' },
+	{ key: 'mental_abstract_endurance', label: 'Mental stamina',      desc: 'How long you can keep going mentally', icon: 'clock' },
+	{ key: 'motivation_personal',   label: 'Interest-driven',    desc: 'How much you are pulled by things you find interesting', icon: 'heart' },
+	{ key: 'motivation_job',        label: 'Deadline-driven',    desc: 'How much deadlines and rewards get you moving', icon: 'trophy' }
 ];
 
 // ── Calibration Question Labels ─────────────────────────
@@ -163,7 +163,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getProfileComparison({ skipCache: forceFresh }),
 			]);
 		} catch {
-			this.renderError(container, 'Could not load effort profile — check your connection.');
+			this.renderError(container, 'Could not load effort profile. Check your connection.');
 			return;
 		}
 
@@ -172,7 +172,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		// Offline: if profile fetch failed with no data and no cache, show offline message (P15 fix)
 		if (profile === null && (profileResp.status === 0 || profileResp.error)) {
-			this.renderError(container, 'Offline — your effort profile will load when you reconnect.');
+			this.renderError(container, 'Offline. Your effort profile will load when you reconnect.');
 			return;
 		}
 
@@ -255,17 +255,17 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		empty.createEl('h3', { text: 'No profile data yet' });
 		empty.createEl('p', {
 			cls: 'emerald-wv-empty-desc',
-			text: 'Complete the calibration questions during onboarding or at the start of your next session. Your effort profile helps EMRALD calibrate everything to you.'
+			text: 'Answer the questions during onboarding and your effort profile will appear here.'
 		});
 
 		const btn = empty.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Start calibration'
+			text: 'Answer the questions'
 		});
 		btn.addEventListener('click', () => { void (async () => {
 			try {
 				await this.plugin.apiClient.triggerReassessment();
-				new Notice('Calibration started');
+				new Notice('Questions started');
 			} catch { /* non-fatal */ }
 		})(); });
 	}
@@ -282,34 +282,34 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		if (confidenceStage === 'early') {
 			level = 'Early Signal';
-			msg = 'EMRALD is just starting to compare your profile against real-world effort data. This is an early read, not a warning yet.';
+			msg = 'Still building a picture. A few more rated sessions are needed before drift means anything.';
 			cls = 'emerald-wv-drift-low';
 			icon = 'sparkles';
 		} else if (confidenceStage === 'building') {
 			if (driftValue < 1.5) {
 				level = 'Review Suggested';
-				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, EMRALD will tighten its expectations.';
+				msg = 'Your profile and your recent effort data are showing some mismatch. As more sessions come in, the picture gets clearer.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			} else {
 				level = 'Review Suggested';
-				msg = 'Your recent effort patterns are diverging from your calibration enough that a review may help — but EMRALD is still building confidence.';
+				msg = 'Your recent effort patterns are drifting from your profile, but EMRALD is still building the picture.';
 				cls = 'emerald-wv-drift-moderate';
 				icon = 'alert-circle';
 			}
 		} else if (driftValue < 1.0) {
 			level = 'Aligned';
-			msg = 'Your calibration still appears to match your recent effort patterns.';
+			msg = 'Your profile lines up with the effort you report.';
 			cls = 'emerald-wv-drift-low';
 			icon = 'check-circle';
 		} else if (driftValue < 2.5) {
 			level = 'Review Suggested';
-			msg = "Your profile and your actual effort patterns may be drifting apart. A review could improve EMRALD's recommendations.";
+			msg = 'Some drift. Retaking the questions could help your profile match how you work now.';
 			cls = 'emerald-wv-drift-moderate';
 			icon = 'alert-circle';
 		} else {
 			level = 'Warning';
-			msg = 'Your calibration and observed effort patterns are meaningfully out of alignment. A reassessment would likely improve insight quality.';
+			msg = 'A lot of drift. Retaking the questions is a good idea.';
 			cls = 'emerald-wv-drift-high';
 			icon = 'alert-triangle';
 		}
@@ -321,7 +321,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		setIcon(iconEl, icon);
 		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
-			text: `Calibration Drift: ${level}`
+			text: `Drift from your profile: ${level}`
 		});
 		headerRow.createSpan({ cls: 'emerald-wv-drift-value', text: `(${driftValue.toFixed(2)})` });
 
@@ -352,7 +352,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		setIcon(iconEl, 'sparkles');
 		headerRow.createSpan({
 			cls: 'emerald-wv-drift-title',
-			text: 'Calibration Drift: Collecting Data'
+			text: 'Drift from your profile: Collecting data'
 		});
 
 		section.createEl('p', {
@@ -457,7 +457,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				fill.style.width = `${Math.min(value * 10, 100)}%`;
 				barContainer.createSpan({ cls: 'emerald-wv-trait-value', text: value.toFixed(1) });
 			} else {
-				barContainer.createSpan({ cls: 'emerald-wv-empty', text: 'Not yet calibrated' });
+				barContainer.createSpan({ cls: 'emerald-wv-empty', text: 'Not answered yet' });
 				barContainer.createSpan({
 					cls: 'emerald-wv-trait-hint',
 					text: 'Builds after ~1 week of sessions and check-ins'
@@ -524,12 +524,12 @@ export class EffortProfileView extends EmraldWorkspaceView {
 			void (async () => {
 				const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
 				if (resp.queued) {
-					new Notice('Recovery activity queued — will sync when online');
+					new Notice('Recharge activity queued. Will sync when online');
 				} else if (resp.data) {
-					new Notice('Recovery activity saved.');
+					new Notice('Recharge activity saved.');
 					await this.onOpen();
 				} else {
-					new Notice('Failed to save — try again.');
+					new Notice('Failed to save. Try again.');
 				}
 			})();
 		});
@@ -542,14 +542,14 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				if (name.trim() === '') {
 					// Empty = delete
 					const delResp = await this.plugin.apiClient.deleteRecoveryProtocol(protocol.id);
-					new Notice(delResp.queued ? 'Deletion queued — will sync when online' : 'Recovery activity removed.');
+					new Notice(delResp.queued ? 'Deletion queued. Will sync when online' : 'Recharge activity removed.');
 					if (!delResp.queued) await this.onOpen();
 					return;
 				}
 
 				if (name.trim() !== protocol.name) {
 					const updResp = await this.plugin.apiClient.updateRecoveryProtocol(protocol.id, { name: name.trim() });
-					new Notice(updResp.queued ? 'Update queued — will sync when online' : 'Recovery activity updated.');
+					new Notice(updResp.queued ? 'Update queued. Will sync when online' : 'Recharge activity updated.');
 					if (!updResp.queued) await this.onOpen();
 				}
 			})();
@@ -567,16 +567,16 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
 		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'target');
-		headerRow.createEl('h3', { text: 'Calibration score' });
+		headerRow.createEl('h3', { text: 'Profile filled in' });
 
 		const scoreRow = section.createDiv({ cls: 'emerald-wv-cal-score-row' });
-		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-value', text: (profile.calibration_score).toFixed(1) });
-		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-desc', text: 'Higher = EMRALD knows you better' });
+		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-value', text: `${Math.round(profile.calibration_score * 10)}%` });
+		scoreRow.createSpan({ cls: 'emerald-wv-cal-score-desc', text: 'It goes up as you answer more of the questions.' });
 
 		if (typeof profile.last_calibrated_at === 'string') {
 			section.createDiv({
 				cls: 'emerald-wv-cal-last',
-				text: `Last calibrated: ${this.formatRelativeTime(profile.last_calibrated_at)}`
+				text: `Last updated: ${this.formatRelativeTime(profile.last_calibrated_at)}`
 			});
 		}
 	}
@@ -596,7 +596,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				lead = 'Your behavior suggests this runs higher than you rated it.';
 				break;
 			case 'tenacity_vs_completion':
-				lead = 'You lead with finishing — but recent completion is running lower.';
+				lead = 'You lead with finishing, but recent completion is running lower.';
 				break;
 			default:
 				lead = 'This answer looks out of step with your recent behavior.';
@@ -731,7 +731,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const arrowEl = headerRow.createSpan({ cls: 'emerald-section-arrow', text: '▸' });
 		const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 		setIcon(iconEl, 'history');
-		headerRow.createEl('h3', { text: 'Calibration history' });
+		headerRow.createEl('h3', { text: 'Profile history' });
 
 		// Collapsible content (hidden by default)
 		const content = section.createDiv({ cls: 'emerald-wv-collapsible-content' });
@@ -746,7 +746,7 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 		content.createEl('p', {
 			cls: 'emerald-wv-history-intro',
-			text: 'How your calibration scores have evolved over time.'
+			text: 'How your profile has changed over time.'
 		});
 
 		const table = content.createEl('table', { cls: 'emerald-wv-table' });
@@ -756,11 +756,11 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// Column headers with explainer tooltips
 		const columns = [
 			{ label: 'Date', tip: '' },
-			{ label: 'Score', tip: 'Overall calibration confidence score — higher means EMRALD knows you better' },
-			{ label: 'Physical', tip: 'Physical capability — your physical work capacity' },
-			{ label: 'Mental', tip: 'Mental capability — cognitive endurance and processing' },
-			{ label: 'Phys. End.', tip: 'Physical endurance — how long you sustain physical effort' },
-			{ label: 'Ment. End.', tip: 'Mental endurance — how long you sustain cognitive effort' }
+			{ label: 'Score', tip: 'How filled in your profile is: higher means more of the questions are answered' },
+			{ label: 'Physical', tip: 'Physical capacity: how much physical work you can handle' },
+			{ label: 'Mental', tip: 'Mental capacity: how much hard thinking you can handle' },
+			{ label: 'Phys. End.', tip: 'Physical stamina: how long you can keep going physically' },
+			{ label: 'Ment. End.', tip: 'Mental stamina: how long you can keep going mentally' }
 		];
 
 		for (const col of columns) {
@@ -880,9 +880,10 @@ export class EffortProfileView extends EmraldWorkspaceView {
 
 	private renderDataCenterLink(container: Element) {
 		const link = container.createDiv({ cls: 'emerald-wv-cross-link' });
+		const driftLinkText = 'See Drift from your profile in Data Center \u2192';
 		const anchor = link.createEl('a', {
 			cls: 'emerald-wv-cross-link-text',
-			text: 'See your calibration data (d19) in data center \u2192'
+			text: driftLinkText
 		});
 		anchor.addEventListener('click', (e) => {
 			e.preventDefault();

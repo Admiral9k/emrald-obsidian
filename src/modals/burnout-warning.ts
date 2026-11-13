@@ -123,9 +123,9 @@ export class BurnoutWarningModal extends Modal {
 	private phaseTitle(): string {
 		if (this.variant === 'followup') return 'Checking back in';
 		switch (this.burnoutPhase) {
-			case 'yellow': return 'Hey — just checking in';
-			case 'orange': return "You're pushing pretty hard";
-			case 'red': return 'You need to stop';
+			case 'yellow': return 'You might need a breather.';
+			case 'orange': return "You've been running hot.";
+			case 'red': return "Let's talk for a sec.";
 			default: return 'Burnout Warning';
 		}
 	}
@@ -135,7 +135,7 @@ export class BurnoutWarningModal extends Modal {
 			case 'yellow':
 				return 'Your effort levels have been creeping up. Maybe ease off a bit today?';
 			case 'orange':
-				return "You've been running hot for a while now. A real break — not just a pause — would do you good.";
+				return "A real break would do you good.";
 			case 'red':
 				return "This isn't sustainable. Step away. The work will be there tomorrow, but you need to be too.";
 			default:

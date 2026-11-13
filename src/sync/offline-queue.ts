@@ -114,7 +114,7 @@ export class OfflineQueue {
 		if (changed) {
 			this.notifyChange();
 			if (online && this.queue.length > 0) {
-				new Notice(`Back online — ${this.queue.length} actions queued for replay`);
+				new Notice(`Back online. ${this.queue.length} actions queued for replay`);
 			}
 		}
 	}

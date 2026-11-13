@@ -163,7 +163,7 @@ export class EMComponent {
 							if (resp.queued) {
 								this.checkinDone = true;
 								this.renderCheckinBanner();
-								new Notice('Energy check-in queued — will sync when online');
+								new Notice('Energy check-in queued. Will sync when online');
 								void writeDailySummary(this.plugin);
 							} else if (!resp.error) {
 								this.checkinDone = true;
@@ -198,7 +198,7 @@ export class EMComponent {
 		row.createSpan({ cls: 'emerald-streak-value', text: String(this.streak) });
 		row.createSpan({
 			cls: 'emerald-streak-label',
-			text: `day${this.streak === 1 ? '' : 's'} checked in a row`
+			text: `check-in${this.streak === 1 ? '' : 's'} this week`
 		});
 	}
 
@@ -485,11 +485,12 @@ export class EMComponent {
 		const headerRow = card.createDiv({ cls: 'emerald-upgrade-header' });
 		const upgradeIcon = createIconEl(headerRow, 'sparkles', 'emerald-upgrade-icon-svg');
 		upgradeIcon.setAttribute('aria-hidden', 'true');
-		headerRow.createSpan({ cls: 'emerald-upgrade-title', text: 'Unlock full intelligence' });
+		headerRow.createSpan({ cls: 'emerald-upgrade-title', text: 'Unlock more with PRO' });
 
+		const upgradeDesc = 'All 20 metrics, the Insight Log, daily and monthly recaps, and suggestions based on your own sessions.';
 		card.createEl('p', {
 			cls: 'emerald-upgrade-desc',
-			text: 'Pinned metrics, extra insights, daily digests, and advanced analytics, all with PRO.'
+			text: upgradeDesc
 		});
 
 		const btn = card.createEl('a', {
@@ -530,13 +531,10 @@ export class EMComponent {
 					.map((c) => c.checkin_date?.split('T')[0])
 					.filter((d): d is string => !!d)
 			);
-			// Count consecutive days ending today (or yesterday, if today isn't logged yet).
+			// Check-ins this week: the last 7 local days, today included (web parity, S15).
 			let count = 0;
-			let cursor = new Date();
-			if (!days.has(dateKey(cursor))) cursor = new Date(cursor.getTime() - 86400000);
-			while (days.has(dateKey(cursor))) {
-				count += 1;
-				cursor = new Date(cursor.getTime() - 86400000);
+			for (let i = 0; i < 7; i += 1) {
+				if (days.has(dateKey(new Date(Date.now() - i * 86400000)))) count += 1;
 			}
 			this.streak = count;
 		} catch { /* non-fatal */

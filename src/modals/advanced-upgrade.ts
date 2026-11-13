@@ -29,12 +29,12 @@ export class AdvancedUpgradeModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "You've completed your basic effort profile — EMRALD is already working for you."
+			text: "You've completed your basic effort profile. EMRALD is already working for you."
 		});
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: "Advanced mode unlocks 30 additional calibration questions that help EMRALD understand your work style at a deeper level. They're presented gradually — just 3-4 questions before each session, over about 8 sessions."
+			text: "Advanced mode unlocks 30 additional profile questions that map your work style in more detail. They're presented gradually: just 3-4 questions before each session, over about 8 sessions."
 		});
 
 		const benefits = contentEl.createDiv({ cls: 'emerald-onboard-features' });
@@ -42,7 +42,7 @@ export class AdvancedUpgradeModal extends Modal {
 			{ icon: 'target', text: 'Effort forecasts built on more of your answers' },
 			{ icon: 'brain', text: 'Deeper personality-aware insights' },
 			{ icon: 'flame', text: 'Earlier burnout pattern detection' },
-			{ icon: 'trending-up', text: 'Better calibration drift tracking' }
+			{ icon: 'trending-up', text: 'Closer tracking of drift from your profile' }
 		];
 
 		for (const item of items) {
@@ -68,9 +68,9 @@ export class AdvancedUpgradeModal extends Modal {
 				// Update profile mode to advanced
 				try {
 					await this.plugin.apiClient.updateProfile({ question_mode: 'advanced' });
-					new Notice("Advanced mode enabled! You'll see calibration questions before your next session.");
+					new Notice("Advanced mode enabled! You'll see profile questions before your next session.");
 				} catch { /* non-fatal */
-					new Notice('Advanced mode enabled locally — will sync on next session.');
+					new Notice('Advanced mode enabled locally. Will sync on next session.');
 				}
 				this.close();
 
@@ -97,7 +97,7 @@ export class AdvancedUpgradeModal extends Modal {
 
 		const declineBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
-			text: 'Maybe later — keep simple mode'
+			text: 'Maybe later: keep simple mode'
 		});
 		declineBtn.addEventListener('click', () => {
 			this.close();

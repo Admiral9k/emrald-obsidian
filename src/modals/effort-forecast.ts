@@ -62,7 +62,7 @@ export class EffortForecastModal extends Modal {
 
 		const preamble = contentEl.createDiv({ cls: 'emerald-form-desc emerald-effort-forecast-preamble' });
 		preamble.createEl('p', {
-			text: 'What your own past projects with a similar complexity and expertise-match tended to run. These are hints to sanity-check your own read — never enter them for you. Set your own honest values in the effort profile.',
+			text: 'What your own past projects with a similar complexity and expertise match tended to run. These are hints to check your own read against, and they are never filled in for you. Set your own values in the project questions.',
 		});
 
 		const body = contentEl.createDiv({ cls: 'emerald-effort-forecast-body' });
@@ -75,7 +75,7 @@ export class EffortForecastModal extends Modal {
 			profile = profResp.data ?? null;
 		} catch {
 			body.empty();
-			this.renderMessage(body, 'Could not read this project’s effort profile — check your connection.');
+			this.renderMessage(body, 'Could not read this project’s effort profile. Check your connection.');
 			this.renderCloseAction(contentEl);
 			return;
 		}
@@ -89,7 +89,7 @@ export class EffortForecastModal extends Modal {
 			body.empty();
 			this.renderMessage(
 				body,
-				'Add this project’s effort profile first — set at least Task complexity or Expertise match. Forecasts are based on your own past projects in a similar band.',
+				'Answer the project questions first: set at least Task complexity or Expertise match. Forecasts are based on your own past projects in a similar band.',
 			);
 			this.renderCloseAction(contentEl);
 			return;
@@ -104,7 +104,7 @@ export class EffortForecastModal extends Modal {
 			});
 		} catch {
 			body.empty();
-			this.renderMessage(body, 'Could not load forecast — check your connection.');
+			this.renderMessage(body, 'Could not load forecast. Check your connection.');
 			this.renderCloseAction(contentEl);
 			return;
 		}
@@ -113,7 +113,7 @@ export class EffortForecastModal extends Modal {
 
 		if (resp.data === null || resp.data === undefined) {
 			if (resp.status === 0 || resp.error) {
-				this.renderMessage(body, 'Offline — the forecast will load when you reconnect.');
+				this.renderMessage(body, 'Offline. The forecast will load when you reconnect.');
 			} else {
 				this.renderMessage(body, 'No forecast available yet.');
 			}
@@ -162,7 +162,7 @@ export class EffortForecastModal extends Modal {
 			}
 			section.createDiv({
 				cls: 'emerald-forecast-hint-note',
-				text: 'A hint from your history — set your own E-level in the project menu.',
+				text: 'A hint from your history. Set your own effort level in the project menu.',
 			});
 		}
 
@@ -234,9 +234,9 @@ export class EffortForecastModal extends Modal {
 
 	private matchModeLabel(mode: EffortForecast['match_mode']): string {
 		switch (mode) {
-			case 'area': return 'Few close matches on complexity/expertise — drawing on your past projects in the same area.';
-			case 'e_level_band': return 'Few close matches — this is a coarse estimate from projects in a similar effort band.';
-			default: return 'Coarse estimate — limited comparable history.';
+			case 'area': return 'Few close matches on complexity and expertise. Drawing on your past projects in the same area.';
+			case 'e_level_band': return 'Few close matches. This is a rough estimate from projects in a similar effort band.';
+			default: return 'Rough estimate. Limited comparable history.';
 		}
 	}
 

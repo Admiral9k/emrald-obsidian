@@ -49,10 +49,10 @@ export class NewProjectModal extends Modal {
 		const form = contentEl.createDiv({ cls: 'emerald-form emerald-elevel-options' });
 
 		const levels: Array<{ level: 'E1' | 'E2' | 'E3' | 'E4'; desc: string; pct: number }> = [
-			{ level: 'E1', desc: 'Light — 25% of your daily work time', pct: 25 },
-			{ level: 'E2', desc: 'Moderate — 50% of your daily work time', pct: 50 },
-			{ level: 'E3', desc: 'Demanding — 75% of your daily work time', pct: 75 },
-			{ level: 'E4', desc: 'Maximum — 100% of your daily work time', pct: 100 }
+			{ level: 'E1', desc: 'Light: 25% of your work hours', pct: 25 },
+			{ level: 'E2', desc: 'Moderate: 50% of your work hours', pct: 50 },
+			{ level: 'E3', desc: 'Demanding: 75% of your work hours', pct: 75 },
+			{ level: 'E4', desc: 'Maximum: 100% of your work hours', pct: 100 }
 		];
 
 		for (const { level, desc, pct } of levels) {

@@ -31,10 +31,10 @@ import {
 // all come from src/e-levels.ts — this table holds nothing but the prose that
 // has nowhere else to live, so custom levels get a derived equivalent instead.
 const BUILT_IN_DETAIL: Record<string, string> = {
-	E1: 'Low-effort tasks you can sustain indefinitely — quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
-	E2: 'Meaningful work that requires focus but not peak performance — writing, planning, steady progress on familiar projects.',
-	E3: 'High-effort work that taxes your energy significantly — complex problem-solving, learning new skills, deep creative work. Limit how many E3 projects run simultaneously.',
-	E4: 'All-in effort — peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One E4 project at a time is the hard ceiling before burnout risk spikes.'
+	E1: 'Low-effort tasks you can sustain indefinitely: quick check-ins, light reading, routine maintenance. These barely dent your energy budget.',
+	E2: 'Meaningful work that requires focus but not peak performance: writing, planning, steady progress on familiar projects.',
+	E3: 'High-effort work that taxes your energy significantly: complex problem-solving, learning new skills, deep creative work. Limit how many Demanding projects run simultaneously.',
+	E4: 'Maximum effort: peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One Maximum project at a time is the hard ceiling before burnout risk spikes.'
 };
 
 export class ELevelOverviewView extends EmraldWorkspaceView {
@@ -73,7 +73,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 				this.plugin.apiClient.getAvailability()
 			]);
 		} catch {
-			this.renderError(container, 'Could not load E-Level data — check your connection.');
+			this.renderError(container, 'Could not load effort level data. Check your connection.');
 			return;
 		}
 		await levelsReady;
@@ -81,7 +81,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		// If items failed to load (offline, no cache), show offline message (P15 fix)
 		if (itemsResp.data === null || itemsResp.data === undefined) {
 			if (itemsResp.status === 0 || itemsResp.error) {
-				this.renderError(container, 'Offline — project data will load when you reconnect.');
+				this.renderError(container, 'Offline. Project data will load when you reconnect.');
 			} else {
 				this.renderEmptyState(container);
 			}
@@ -204,9 +204,9 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 		if (authored) return authored;
 		const pct = resolveLevelPercent(ref);
 		const archived = isArchivedLevel(ref)
-			? ' This level is archived — projects keep the label, but you can\'t assign it to anything new.'
+			? ' This level is archived. Projects keep the label, but you can\'t assign it to anything new.'
 			: '';
-		return `A custom effort level you created. It prescribes ${pct}% of your available hours each day — the same math the built-in levels use.${archived}`;
+		return `A custom effort level you created. It prescribes ${pct}% of your work hours each day, the same math the built-in levels use.${archived}`;
 	}
 
 	private renderELevelCards(container: Element, activeItems: TrackedItem[]) {
@@ -239,7 +239,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			labelRow.createSpan({ cls: 'emerald-wv-elevel-name', text: badgeText });
 			labelRow.createSpan({
 				cls: 'emerald-wv-elevel-desc',
-				text: isCustom ? `${name} — ${pct}% of your daily hours` : `${pct}% of your daily hours`
+				text: isCustom ? `${name}: ${pct}% of your work hours` : `${pct}% of your work hours`
 			});
 
 			// Expandable ⓘ info button
@@ -324,7 +324,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			});
 		} else if (totalPct < 50 && activeCount > 0) {
 			label.createSpan({
-				text: `${totalPct}% allocated — you have room for more projects (${this.availableHours}h available)`
+				text: `${totalPct}% of your work hours. You have room for more projects (${this.availableHours}h available)`
 			});
 		} else if (activeCount === 0) {
 			label.createSpan({ text: 'No active projects' });
@@ -461,7 +461,7 @@ export class ELevelOverviewView extends EmraldWorkspaceView {
 			const actions = compareCell.createDiv({ cls: 'emerald-wv-row-actions' });
 			const compareBtn = actions.createSpan({
 				cls: 'emerald-wv-compare-btn emrald-clickable',
-				attr: { 'aria-label': `Compare predictions vs. actual for ${item.name}`, title: 'Predicted vs. actual' },
+				attr: { 'aria-label': `Compare your guess with what happened for ${item.name}`, title: 'Guess vs. actual' },
 			});
 			setIcon(compareBtn, 'git-compare');
 			compareBtn.addEventListener('click', (e) => {
