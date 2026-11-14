@@ -1,41 +1,47 @@
 // EMRALD Onboarding Flow
-// First-time plugin experience. Goal: user feels productive by the end.
-// Steps: Welcome → API Connection → Profile Setup → Calibration → Recovery → Schedule → Projects → Tour
+// Signup (about two minutes): Connect (API key) -> Welcome -> First project -> Ready (hours, start the first session).
+// The profile questions and "what recharges you" are a separate, optional flow (mode 'questions'), never a gate.
+// Strings: ./copy.ts (master deck: LLC-Brain/_wiki/engine/briefs/onboarding-plan-2026-11.md, section 5).
+// No counter on the signup screens. The questions flow carries one counter only: "Questions a-b of 13".
 
 import { App, Modal, Notice, TFile, FuzzySuggestModal, setIcon } from 'obsidian';
 import EmraldPlugin from '../../main';
 import { VIEW_ABOUT } from '../views/workspace/base';
-import type { LevelRef } from '../e-levels';
-import { colorForLevel, levelBadgeText, levelTooltip } from '../e-levels';
+import { COPY, LEVEL_OPTIONS } from './copy';
+import { QUESTIONS, PAGE_BOUNDS, progressLine } from './questions';
 
 // ── Step Definitions ─────────────────────────────────────
 
-type OnboardingStep = 'welcome' | 'connect' | 'profile' | 'calibration' | 'recovery' | 'schedule' | 'projects' | 'tour' | 'done';
-
-const STEP_ORDER: OnboardingStep[] = ['welcome', 'connect', 'profile', 'calibration', 'recovery', 'schedule', 'projects', 'tour', 'done'];
+type OnboardingStep = 'connect' | 'welcome' | 'project' | 'ready' | 'questions' | 'recharge' | 'done';
+export type OnboardingMode = 'signup' | 'questions';
 
 // ── Main Onboarding Modal ────────────────────────────────
 
 export class OnboardingModal extends Modal {
 	private plugin: EmraldPlugin;
-	private currentStep: OnboardingStep = 'welcome';
+	private currentStep: OnboardingStep;
+	private mode: OnboardingMode;
 	private onComplete: () => void;
 
 	// State accumulated across steps
 	private apiKey: string = '';
 	private isNewUser: boolean = false;
-	// Onboarding only OFFERS the built-in levels — a brand-new account has no
-	// custom levels yet — but the field is a level ref so nothing downstream has
-	// to narrow it back to the built-in union.
-	private projects: Array<{ name: string; effortLevel: LevelRef; notePath?: string }> = [];
-	private calibrationAnswers: Record<string, unknown> = {};
-	private calibrationPage: number = 0;
-	private dailyHours: number[] = [4, 4, 4, 4, 4, 4, 4]; // Sun=0 through Sat=6
+	private projectName: string = '';
+	private projectLevel: string = 'E2';
+	private projectNotePath: string | undefined;
+	private createdItemId: string | null = null;
+	private hours: number = 4;
+	private answers: Record<string, string | number> = {};
+	private qPage: number = 0;
+	private savedSomething: boolean = false;
+	private finished: boolean = false;
 
-	constructor(app: App, plugin: EmraldPlugin, onComplete: () => void) {
+	constructor(app: App, plugin: EmraldPlugin, onComplete: () => void, mode: OnboardingMode = 'signup') {
 		super(app);
 		this.plugin = plugin;
 		this.onComplete = onComplete;
+		this.mode = mode;
+		this.currentStep = mode === 'questions' ? 'questions' : 'connect';
 	}
 
 	onOpen() {
@@ -45,9 +51,8 @@ export class OnboardingModal extends Modal {
 
 	onClose() {
 		this.contentEl.empty();
-		// If user clicks outside or hits X before finishing, still open About EMRALD
-		// (finish() already handles the completed path)
-		if (!this.plugin.settings.onboardingComplete) {
+		// Closing the signup early still counts as done, so it never nags again; the questions flow has no such flag.
+		if (this.mode === 'signup' && !this.finished && !this.plugin.settings.onboardingComplete) {
 			this.plugin.settings.onboardingComplete = true;
 			void this.plugin.saveSettings();
 			window.setTimeout(() => {
@@ -62,66 +67,32 @@ export class OnboardingModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass('emerald-modal');
 
-		// Progress indicator
-		this.renderProgress(contentEl);
-
 		switch (this.currentStep) {
-			case 'welcome': this.renderWelcome(contentEl); break;
 			case 'connect': this.renderConnect(contentEl); break;
-			case 'profile': this.renderProfile(contentEl); break;
-			case 'calibration': this.renderCalibration(contentEl); break;
-			case 'recovery': this.renderRecovery(contentEl); break;
-			case 'schedule': this.renderSchedule(contentEl); break;
-			case 'projects': this.renderProjects(contentEl); break;
-			case 'tour': this.renderTour(contentEl); break;
+			case 'welcome': this.renderWelcome(contentEl); break;
+			case 'project': this.renderProject(contentEl); break;
+			case 'ready': this.renderReady(contentEl); break;
+			case 'questions': this.renderQuestions(contentEl); break;
+			case 'recharge': this.renderRecharge(contentEl); break;
 			case 'done': this.renderDone(contentEl); break;
 		}
 	}
 
-	private renderProgress(container: HTMLElement) {
-		const stepIndex = STEP_ORDER.indexOf(this.currentStep);
-		const total = STEP_ORDER.length - 1; // Exclude 'done'
-
-		const bar = container.createDiv({ cls: 'emerald-onboard-progress' });
-
-		for (let i = 0; i < total; i++) {
-			bar.createDiv({
-				cls: `emerald-onboard-dot ${i < stepIndex ? 'is-done' : ''} ${i === stepIndex ? 'is-active' : ''}`
-			});
-			if (i < total - 1) {
-				bar.createDiv({
-					cls: `emerald-onboard-line ${i < stepIndex ? 'is-done' : ''}`
-				});
-			}
-		}
-
-		if (stepIndex > 0 && this.currentStep !== 'done') {
-			container.createDiv({
-				cls: 'emerald-onboard-step-label',
-				text: `Step ${stepIndex} of ${total - 1}`
-			});
-		}
-	}
-
-	// ── Step 1: Welcome ──────────────────────────────────
+	// ── Welcome ──────────────────────────────────────────
 
 	private renderWelcome(container: HTMLElement) {
 		const welcomeIcon = container.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(welcomeIcon, 'gem');
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Welcome to EMRALD' });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: 'Track your work sessions, measure effort in real time, and let EMRALD surface patterns you might otherwise miss.'
-		});
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['welcome.title'] });
+		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['welcome.body'] });
 
 		const features = container.createDiv({ cls: 'emerald-onboard-features' });
 		const items = [
-			{ icon: 'timer', text: 'Track work sessions with effort-aware timing' },
-			{ icon: 'bar-chart-2', text: 'See 20 metrics about how you work' },
-			{ icon: 'flame', text: 'Get burnout warnings before you feel it' },
-			{ icon: 'lightbulb', text: 'Get short notes on what EMRALD spots in your numbers' }
+			{ icon: 'timer', text: COPY['welcome.bullets.1'] },
+			{ icon: 'clock', text: COPY['welcome.bullets.2'] },
+			{ icon: 'lightbulb', text: COPY['welcome.bullets.3'] },
+			{ icon: 'flame', text: COPY['welcome.bullets.4'] }
 		];
-
 		for (const item of items) {
 			const row = features.createDiv({ cls: 'emerald-onboard-feature' });
 			const iconEl = row.createSpan({ cls: 'emerald-onboard-feature-icon' });
@@ -132,18 +103,18 @@ export class OnboardingModal extends Modal {
 		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-actions' });
 		const startBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Get started'
+			text: COPY['welcome.cta']
 		});
-		startBtn.addEventListener('click', () => this.goTo('connect'));
+		startBtn.addEventListener('click', () => this.goTo('project'));
 	}
 
-	// ── Step 2: API Connection ───────────────────────────
+	// ── Connect (first screen) ───────────────────────────
 
 	private renderConnect(container: HTMLElement) {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Connect to EMRALD' });
 		container.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'Enter your API key to connect. You can get one from your EMRALD dashboard.'
+			text: COPY['connect.body']
 		});
 
 		// Privacy reassurance (lock icon + single-line callout)
@@ -239,8 +210,8 @@ export class OnboardingModal extends Modal {
 					const itemsResp = await this.plugin.apiClient.getItems();
 					this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
 
-					// New users get full flow; returning users skip profile/availability but see calibration
-					window.setTimeout(() => this.goTo(this.isNewUser ? 'profile' : 'calibration'), 800);
+					// New accounts see Welcome, First project and Ready. An account that already has projects is done.
+					window.setTimeout(() => { if (this.isNewUser) this.goTo('welcome'); else void this.finish(false); }, 800);
 				}
 			} catch { this.restoreCredentials(); }
 		})(); });
@@ -249,338 +220,231 @@ export class OnboardingModal extends Modal {
 			cls: 'emerald-btn emerald-btn-subtle',
 			text: "Skip: i'll configure later"
 		});
-		skipBtn.addEventListener('click', () => { void this.finish(); });
+		skipBtn.addEventListener('click', () => { void this.finish(false); });
+	}
 
-		const backBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-secondary',
-			text: 'Back'
+	// ── First project (required) ─────────────────────────
+
+	private renderProject(container: HTMLElement) {
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['project.title'] });
+		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['project.body'] });
+		container.createDiv({ cls: 'emerald-onboard-hint emerald-onboard-hint-top', text: COPY['project.what'] });
+
+		const explainer = container.createDiv({ cls: 'emerald-onboard-explainer' });
+		for (const n of [1, 2, 3, 4]) explainer.createDiv({ text: COPY[`project.legend.${n}`] });
+
+		container.createDiv({ cls: 'emerald-onboard-hint', text: COPY['project.noteLink'] });
+
+		const form = container.createDiv({ cls: 'emerald-form' });
+		const addRow = form.createDiv({ cls: 'emerald-onboard-add-row' });
+		const nameInput = addRow.createEl('input', {
+			cls: 'emerald-onboard-input emerald-onboard-proj-name',
+			type: 'text',
+			placeholder: 'Project name'
 		});
+		nameInput.value = this.projectName;
+		const levelSelect = addRow.createEl('select', { cls: 'emerald-onboard-select' });
+		for (const l of LEVEL_OPTIONS) {
+			const opt = levelSelect.createEl('option', { value: l.value, text: l.label });
+			if (l.value === this.projectLevel) opt.selected = true;
+		}
+		levelSelect.addEventListener('change', () => { this.projectLevel = levelSelect.value; });
+
+		// Optional note link
+		const linkBtn = addRow.createEl('button', { cls: 'emerald-btn-tiny' });
+		const notePathEl = form.createDiv({ cls: 'emerald-onboard-note-path' });
+		const showLink = () => {
+			linkBtn.empty();
+			setIcon(linkBtn, this.projectNotePath ? 'pencil' : 'link');
+			linkBtn.title = this.projectNotePath ? 'Change linked note' : 'Link to a note';
+			notePathEl.setText(this.projectNotePath ?? '');
+		};
+		showLink();
+		linkBtn.addEventListener('click', () => {
+			new NoteSuggestModal(this.app, (file) => { this.projectNotePath = file.path; showLink(); }).open();
+		});
+
+		const requiredEl = form.createDiv({ cls: 'emerald-onboard-hint', text: COPY['project.required'] });
+		form.createDiv({ cls: 'emerald-form-desc', text: COPY['project.cap'] });
+
+		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
+		const nextBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Next' });
+		const sync = () => {
+			const ok = this.projectName.trim().length > 0;
+			nextBtn.disabled = !ok;
+			if (ok) requiredEl.addClass('emrald-hidden'); else requiredEl.removeClass('emrald-hidden');
+		};
+		nameInput.addEventListener('input', () => { this.projectName = nameInput.value; sync(); });
+		nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !nextBtn.disabled) nextBtn.click(); });
+		sync();
+		nextBtn.addEventListener('click', () => { if (this.projectName.trim()) this.goTo('ready'); });
+
+		const backBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: 'Back' });
 		backBtn.addEventListener('click', () => this.goTo('welcome'));
 	}
 
-	// ── Step 3: Profile Setup ────────────────────────────
+	// ── Ready: one hours line, then the first session ────
 
-	private renderProfile(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick profile' });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: 'Tell EMRALD a bit about your work capacity. This helps set your effort levels. You can always update these later.'
-		});
+	private renderReady(container: HTMLElement) {
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['ready.title'] });
 
 		const form = container.createDiv({ cls: 'emerald-form' });
+		const group = form.createDiv({ cls: 'emerald-form-group' });
+		group.createEl('label', { text: COPY['ready.hours'] });
+		const hoursInput = group.createEl('input', { cls: 'emerald-onboard-input emerald-onboard-hours', type: 'number' });
+		hoursInput.min = '0.5';
+		hoursInput.max = '24';
+		hoursInput.step = '0.5';
+		hoursInput.value = String(this.hours);
+		group.createDiv({ cls: 'emerald-form-desc', text: COPY['ready.hours.hint'] });
+		form.createDiv({ cls: 'emerald-form-desc', text: COPY['ready.short'] });
+		const statusEl = form.createDiv({ cls: 'emerald-onboard-status' });
 
-		// Availability — simple weekly hours
-		const availGroup = form.createDiv({ cls: 'emerald-form-group' });
-		availGroup.createEl('label', { text: 'How many hours per day do you work on projects?' });
-		availGroup.createDiv({ cls: 'emerald-form-desc', text: 'This sets your daily time budget. You can override it any day.' });
-
-		const sliderRow = availGroup.createDiv({ cls: 'emerald-form-label-row' });
-		const valueEl = sliderRow.createSpan({ cls: 'emerald-slider-value', text: '4h' });
-
-		const slider = availGroup.createEl('input', { cls: 'emerald-slider' });
-		slider.type = 'range';
-		slider.min = '2';
-		slider.max = '16';
-		slider.value = '4';
-
-		slider.addEventListener('input', () => {
-			valueEl.textContent = `${slider.value}h`;
-		});
-
-		// Actions
 		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
+		const startBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary emerald-btn-lg', text: COPY['ready.cta'] });
+		const sync = () => {
+			const h = parseFloat(hoursInput.value);
+			this.hours = h;
+			startBtn.disabled = !(Number.isFinite(h) && h > 0 && h <= 24);
+		};
+		hoursInput.addEventListener('input', sync);
+		sync();
 
-		const nextBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Next'
-		});
-		nextBtn.addEventListener('click', () => { void (async () => {
+		startBtn.addEventListener('click', () => { void (async () => {
+			if (startBtn.disabled) return;
+			startBtn.disabled = true;
+			statusEl.textContent = '';
 			try {
-				// Save availability — set same hours for all 7 days
-				const hours = parseInt(slider.value) || 4;
-				try {
-					await this.plugin.apiClient.setWeeklyAvailability(hours);
-				} catch { /* non-fatal */
-					// Non-fatal — user can always set this in settings
+				// Project, hours and the first session are saved together, once, on this button.
+				if (!this.createdItemId) {
+					const resp = await this.plugin.apiClient.createItem({
+						name: this.projectName.trim(),
+						effort_level: this.projectLevel,
+						obsidian_note_path: this.projectNotePath
+					});
+					if (resp.error || !resp.data) {
+						statusEl.textContent = `Could not create the project: ${resp.error ?? 'try again'}`;
+						statusEl.className = 'emerald-onboard-status is-error';
+						startBtn.disabled = false;
+						return;
+					}
+					this.createdItemId = resp.data.id;
 				}
-
-				this.goTo('calibration');
-			} catch { /* non-fatal */ }
+				try {
+					await this.plugin.apiClient.setWeeklyAvailability(this.hours);
+				} catch { /* non-fatal: the hours can be set from the session bar any day */ }
+				// The sidebar starts this project's session as soon as it has loaded (see sidebar.consumeFirstSession).
+				(this.plugin as unknown as Record<string, unknown>)._firstSessionItemId = this.createdItemId;
+				await this.finish(true);
+			} catch {
+				statusEl.textContent = 'Something went wrong. Try again.';
+				statusEl.className = 'emerald-onboard-status is-error';
+				startBtn.disabled = false;
+			}
 		})(); });
 
+		const backBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: 'Back' });
+		backBtn.addEventListener('click', () => this.goTo('project'));
 	}
 
-	// ── Step 3b: Calibration Questions ───────────────────
+	// ── Questions flow (optional): 13 questions, then what recharges you ──
 
-	private static readonly CALIBRATION_QUESTIONS: Array<{
-		key: string;
-		question: string;
-		type: 'slider' | 'enum';
-		options?: Array<{ value: string; label: string }>;
-		min?: number;
-		max?: number;
-		default?: unknown;
-	}> = [
-		// Page 1: Work style
-		{
-			key: 'chronotype',
-			question: 'When do you do your best, most focused work?',
-			type: 'enum',
-			options: [
-				{ value: 'early_morning', label: 'Early morning (5–8am)' },
-				{ value: 'mid_morning', label: 'Mid-morning (8–11am)' },
-				{ value: 'afternoon', label: 'Afternoon (12–4pm)' },
-				{ value: 'evening', label: 'Evening (5–9pm)' },
-				{ value: 'late_night', label: 'Late night (10pm+)' }
-			]
-		},
-		{
-			key: 'work_pace_style',
-			question: 'Do you prefer to work in intense bursts with breaks, or steady?',
-			type: 'enum',
-			options: [
-				{ value: 'burst', label: 'Intense bursts with breaks' },
-				{ value: 'mix', label: 'A mix of both' },
-				{ value: 'steady', label: 'Steady and consistent' }
-			]
-		},
-		{
-			key: 'social_energy_direction',
-			question: 'After a day of socializing, I feel...',
-			type: 'enum',
-			options: [
-				{ value: 'energized', label: 'Energized: people charge me up' },
-				{ value: 'neutral', label: 'Neutral: depends on the people' },
-				{ value: 'drained', label: 'Drained: I need alone time to recover' }
-			]
-		},
-		// Page 2: Personality traits
-		{
-			key: 'sleep_quality_baseline',
-			question: 'In general, how well do you sleep?',
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		{
-			key: 'conscientiousness',
-			question: 'I see myself as someone who is organized and follows through...',
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		{
-			key: 'stress_vulnerability',
-			question: 'I get stressed easily and worry about things going wrong.',
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		{
-			key: 'novelty_tolerance',
-			question: "I'm energized by trying new things and tackling unfamiliar challenges.",
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		// Page 3: Work patterns
-		{
-			key: 'routine_tolerance',
-			question: 'I can do routine, repetitive work for long stretches without losing focus.',
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		{
-			key: 'procrastination_tendency',
-			question: "How often do you delay starting tasks you've committed to?",
-			type: 'slider', min: 1, max: 5, default: 3
-		},
-		{
-			key: 'procrastination_trigger',
-			question: "When you procrastinate, it's usually because...",
-			type: 'enum',
-			options: [
-				{ value: 'boring', label: 'The task is boring' },
-				{ value: 'uncertain', label: "I'm unsure how to start" },
-				{ value: 'fear', label: 'Fear of failure or judgment' },
-				{ value: 'tired', label: "I'm just tired" },
-				{ value: 'distracted', label: 'I get distracted easily' },
-				{ value: 'overwhelmed', label: 'It feels too big' }
-			]
-		},
-		// Page 4: Working genius + autonomy
-		{
-			key: 'working_genius_primary',
-			question: 'Which type of work energizes you MOST?',
-			type: 'enum',
-			options: [
-				{ value: 'wonder', label: 'Wonder: asking big questions, imagining possibilities' },
-				{ value: 'invention', label: 'Invention: creating new solutions and ideas' },
-				{ value: 'discernment', label: 'Discernment: evaluating and giving feedback' },
-				{ value: 'galvanizing', label: 'Galvanizing: rallying people to take action' },
-				{ value: 'enablement', label: 'Enablement: helping others succeed' },
-				{ value: 'tenacity', label: 'Tenacity: finishing tasks and crossing the line' }
-			]
-		},
-		{
-			key: 'working_frustration_primary',
-			question: 'Which type of work DRAINS you MOST?',
-			type: 'enum',
-			options: [
-				{ value: 'wonder', label: 'Wonder: thinking abstractly without action' },
-				{ value: 'invention', label: 'Invention: having to create from scratch' },
-				{ value: 'discernment', label: "Discernment: evaluating others' work" },
-				{ value: 'galvanizing', label: 'Galvanizing: motivating and organizing people' },
-				{ value: 'enablement', label: "Enablement: supporting others' priorities" },
-				{ value: 'tenacity', label: 'Tenacity: grinding through repetitive details' }
-			]
-		},
-		{
-			key: 'autonomy_satisfaction',
-			question: 'How much control do you feel over your daily choices?',
-			type: 'slider', min: 1, max: 5, default: 3
-		}
-	];
-
-	private static readonly QUESTIONS_PER_PAGE = 3;
-
-	private renderCalibration(container: HTMLElement) {
-		const questions = OnboardingModal.CALIBRATION_QUESTIONS;
-		const perPage = OnboardingModal.QUESTIONS_PER_PAGE;
-		const totalPages = Math.ceil(questions.length / perPage);
-		const pageQuestions = questions.slice(
-			this.calibrationPage * perPage,
-			(this.calibrationPage + 1) * perPage
-		);
-
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Effort profile' });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: 'These questions help EMRALD fit effort levels to your personal style. There are no wrong answers.'
-		});
-
-		// Page counter
-		container.createDiv({
-			cls: 'emerald-onboard-step-label',
-			text: `Page ${this.calibrationPage + 1} of ${totalPages}  •  Question ${this.calibrationPage * perPage + 1}–${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
-		});
+	private renderQuestions(container: HTMLElement) {
+		const [from, to] = PAGE_BOUNDS[this.qPage];
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['questions.title'] });
+		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['questions.body'] });
+		container.createDiv({ cls: 'emerald-onboard-step-label', text: progressLine(COPY['questions.progress'], this.qPage) });
 
 		const form = container.createDiv({ cls: 'emerald-form' });
-
-		for (const q of pageQuestions) {
+		for (const q of QUESTIONS.slice(from, to)) {
 			const group = form.createDiv({ cls: 'emerald-form-group' });
 			group.createEl('label', { text: q.question });
+			const key = q.key;
 
-			if (q.type === 'slider') {
-				const currentVal = (this.calibrationAnswers[q.key] as number) ?? (q.default as number) ?? 3;
-
-				const labelRow = group.createDiv({ cls: 'emerald-form-label-row' });
-				const valueEl = labelRow.createSpan({ cls: 'emerald-slider-value', text: `${currentVal}/5` });
-
-				const endpoints = group.createDiv({ cls: 'emerald-slider-endpoints' });
-				endpoints.createSpan({ cls: 'emerald-slider-endpoint-left', text: 'Not at all' });
-				endpoints.createSpan({ cls: 'emerald-slider-endpoint-right', text: 'Very much' });
-
-				const slider = group.createEl('input', { cls: 'emerald-slider' });
-				slider.type = 'range';
-				slider.min = String(q.min ?? 1);
-				slider.max = String(q.max ?? 5);
-				slider.value = String(currentVal);
-
-				const key = q.key;
-				slider.addEventListener('input', () => {
-					const val = parseInt(slider.value);
-					valueEl.textContent = `${val}/5`;
-					this.calibrationAnswers[key] = val;
-				});
-
-				// Set initial value if not already set
-				if (this.calibrationAnswers[key] === undefined) {
-					this.calibrationAnswers[key] = currentVal;
-				}
-			} else if (q.type === 'enum' && q.options) {
-				const currentVal = this.calibrationAnswers[q.key] ?? null;
-				const btnColumn = group.createDiv({ cls: 'emerald-onboard-enum-group' });
-
-				for (const opt of q.options) {
-					const btn = btnColumn.createEl('button', {
-						cls: `emerald-onboard-enum-btn ${currentVal === opt.value ? 'is-active' : ''}`,
-						text: opt.label
-					});
-
-					const key = q.key;
+			if (q.type === 'scale') {
+				// Five buttons, nothing selected until the user picks; tapping the chosen one again clears it.
+				const row = group.createDiv({ cls: 'emerald-btn-group emerald-scale-row' });
+				row.setAttribute('role', 'radiogroup');
+				row.setAttribute('aria-label', q.question);
+				for (let v = 1; v <= 5; v++) {
+					const btn = row.createEl('button', { cls: 'emerald-btn-toggle emerald-scale-btn', text: String(v) });
+					btn.setAttribute('role', 'radio');
+					const paint = () => {
+						const on = this.answers[key] === v;
+						btn.setAttribute('aria-checked', String(on));
+						if (on) btn.addClass('is-active'); else btn.removeClass('is-active');
+					};
+					paint();
 					btn.addEventListener('click', () => {
-						this.calibrationAnswers[key] = opt.value;
-						// Update visual state
-						btnColumn.querySelectorAll('.emerald-onboard-enum-btn').forEach(b => b.removeClass('is-active'));
-						btn.addClass('is-active');
+						if (this.answers[key] === v) delete this.answers[key]; else this.answers[key] = v;
+						row.querySelectorAll('.emerald-scale-btn').forEach((b) => { b.removeClass('is-active'); b.setAttribute('aria-checked', 'false'); });
+						paint();
+					});
+				}
+				const ends = group.createDiv({ cls: 'emerald-slider-endpoints' });
+				ends.createSpan({ cls: 'emerald-slider-endpoint-left', text: q.low ?? 'Low' });
+				ends.createSpan({ cls: 'emerald-slider-endpoint-right', text: q.high ?? 'High' });
+			} else if (q.options) {
+				const col = group.createDiv({ cls: 'emerald-onboard-enum-group' });
+				for (const opt of q.options) {
+					const btn = col.createEl('button', {
+						cls: `emerald-onboard-enum-btn ${this.answers[key] === opt.value ? 'is-active' : ''}`
+					});
+					btn.setAttribute('aria-pressed', String(this.answers[key] === opt.value));
+					if (opt.desc) {
+						btn.createSpan({ cls: 'emerald-opt-label', text: opt.label });
+						btn.createSpan({ cls: 'emerald-opt-desc', text: opt.desc });
+					} else {
+						btn.setText(opt.label);
+					}
+					btn.addEventListener('click', () => {
+						if (this.answers[key] === opt.value) delete this.answers[key]; else this.answers[key] = opt.value;
+						col.querySelectorAll('.emerald-onboard-enum-btn').forEach((b) => { b.removeClass('is-active'); b.setAttribute('aria-pressed', 'false'); });
+						if (this.answers[key] === opt.value) { btn.addClass('is-active'); btn.setAttribute('aria-pressed', 'true'); }
 					});
 				}
 			}
 		}
 
-		// Actions — Back (left), Next/Save (middle), Skip (right with gap)
 		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-calibration-actions' });
-
-		if (this.calibrationPage > 0) {
-			const backBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-secondary',
-				text: 'Back'
-			});
-			backBtn.addEventListener('click', () => {
-				this.calibrationPage--;
-				this.renderStep();
-			});
+		if (this.qPage > 0) {
+			const backBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: 'Back' });
+			backBtn.addEventListener('click', () => { this.qPage--; this.renderStep(); });
 		}
-
-		if (this.calibrationPage < totalPages - 1) {
-			// Not last page — show Next
-			const nextBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Next'
-			});
-			nextBtn.addEventListener('click', () => {
-				this.calibrationPage++;
-				this.renderStep();
-			});
-		} else {
-			// Last page — show Save & Continue
-			const saveBtn = actions.createEl('button', {
-				cls: 'emerald-btn emerald-btn-primary',
-				text: 'Save & continue'
-			});
-			saveBtn.addEventListener('click', () => { void (async () => {
-				try {
-					// Save all calibration answers to API
-					if (Object.keys(this.calibrationAnswers).length > 0) {
-						try {
-							await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-							new Notice('Effort profile saved ✓');
-						} catch { /* non-fatal */
-							new Notice('Profile saved locally: will sync later.');
-						}
-					}
-					this.goTo('recovery');
-				} catch { /* non-fatal */ }
-			})(); });
-		}
+		const nextBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Next' });
+		nextBtn.addEventListener('click', () => {
+			if (this.qPage < PAGE_BOUNDS.length - 1) { this.qPage++; this.renderStep(); }
+			else void this.leaveQuestions();
+		});
+		const skipBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-subtle', text: COPY['questions.skip'] });
+		skipBtn.addEventListener('click', () => { void this.leaveQuestions(); });
 	}
 
+	/** Save only what was answered (a blank is never written), then move on to the recharge step. */
+	private async leaveQuestions() {
+		if (Object.keys(this.answers).length > 0) {
+			try {
+				await this.plugin.apiClient.updateCalibration(this.answers);
+				this.savedSomething = true;
+			} catch { /* non-fatal */
+				new Notice('Could not save your answers. Try again in a moment.');
+			}
+		}
+		this.goTo('recharge');
+	}
 
-	// ── Step 5: Recovery Protocols ─────────────────────
-
-	private renderRecovery(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'What recharges you?' });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: 'Recharge activities are things that restore your energy, like walking, piano, or reading. If your burnout score gets high, EMRALD reminds you of something from this list.'
-		});
+	private renderRecharge(container: HTMLElement) {
+		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['recharge.title'] });
+		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['recharge.body'] });
 
 		const form = container.createDiv({ cls: 'emerald-form' });
-
 		const protocolGroup = form.createDiv({ cls: 'emerald-form-group' });
-		protocolGroup.createEl('label', { text: 'Add up to 3 recharge activities' });
-
-		const hintEl = protocolGroup.createDiv({
-			cls: 'emerald-form-desc',
-			text: 'Press Enter to add another. These help EMRALD suggest recovery when it matters.'
-		});
+		protocolGroup.createEl('label', { text: COPY['recharge.label'] });
+		const hintEl = protocolGroup.createDiv({ cls: 'emerald-form-desc', text: COPY['recharge.hint'] });
 
 		let rowCount = 0;
 		const MAX_ROWS = 3;
-
-		const addRow = (prefill?: string) => {
+		const addRow = () => {
 			if (rowCount >= MAX_ROWS) return;
 			rowCount++;
 			const row = createDiv({ cls: 'emerald-recovery-row' });
@@ -589,354 +453,57 @@ export class OnboardingModal extends Modal {
 				type: 'text',
 				placeholder: 'e.g., Walking, Piano, Reading'
 			});
-			if (prefill) input.value = prefill;
 			input.addEventListener('keydown', (e) => {
 				if (e.key === 'Enter') {
 					e.preventDefault();
 					if (input.value.trim() && rowCount < MAX_ROWS) addRow();
 				}
 			});
-			// Insert new row BEFORE the hint so hint always stays at the bottom
 			protocolGroup.insertBefore(row, hintEl);
 		};
 		addRow();
 
 		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
-
-		const saveBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Next'
-		});
+		const saveBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Next' });
 		saveBtn.addEventListener('click', () => { void (async () => {
-			try {
-				const inputs = protocolGroup.querySelectorAll('input');
-				const activities: string[] = [];
-				inputs.forEach(input => {
-					const val = (input).value.trim();
-					if (val) activities.push(val);
-				});
-				if (activities.length > 0) {
-					try {
-						for (const activity of activities) {
-							await this.plugin.apiClient.createRecoveryProtocol(activity);
-						}
-						new Notice('Recharge processes saved');
-					} catch { /* non-fatal */
-						new Notice('Saved locally: will sync later.');
-					}
-				}
-				this.goTo('schedule');
-			} catch { /* non-fatal */ }
-		})(); });
-
-
-		const backBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-secondary',
-			text: 'Back'
-		});
-		backBtn.addEventListener('click', () => this.goTo('calibration'));
-	}
-
-	// ── Step 5: Weekly Schedule ──────────────────────────
-
-	private renderSchedule(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Your weekly schedule' });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: 'How many hours per day do you typically devote to tracked projects?'
-		});
-
-		// "What's a tracked project?" — first encounter with the concept
-		const trackedExplainer = container.createDiv({ cls: 'emerald-onboard-hint emerald-onboard-hint-top' });
-		trackedExplainer.createEl('strong', { text: "What's a tracked project?" });
-		trackedExplainer.createSpan({
-			text: " A tracked project is something you're actively working on: a creative pursuit, a work initiative, a learning goal, a side project. It's bigger than a single task or errand."
-		});
-		trackedExplainer.createEl('br');
-		trackedExplainer.createSpan({
-			text: 'Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list.'
-		});
-
-		const form = container.createDiv({ cls: 'emerald-form' });
-
-		const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		const dayGroup = form.createDiv({ cls: 'emerald-form-group' });
-		const dayRow = dayGroup.createDiv({ cls: 'emerald-schedule-row' });
-
-		const inputs: HTMLInputElement[] = [];
-
-		for (let d = 0; d < 7; d++) {
-			const dayCol = dayRow.createDiv({ cls: 'emerald-schedule-day' });
-			dayCol.createEl('label', { text: dayLabels[d], cls: 'emerald-schedule-label' });
-
-			const input = dayCol.createEl('input', {
-				cls: 'emerald-onboard-input emerald-schedule-input',
-				type: 'number'
+			const names: string[] = [];
+			protocolGroup.querySelectorAll('input').forEach((input) => {
+				const val = (input).value.trim();
+				if (val) names.push(val);
 			});
-			input.min = '0';
-			input.max = '24';
-			input.step = '0.5';
-			input.value = String(this.dailyHours[d]);
-
-			const dayIndex = d;
-			input.addEventListener('input', () => {
-				const val = parseFloat(input.value);
-				if (!isNaN(val) && val >= 0 && val <= 24) {
-					this.dailyHours[dayIndex] = val;
-				}
-			});
-
-			inputs.push(input);
-		}
-
-		// Actions
-		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
-
-		const nextBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Next'
-		});
-		nextBtn.addEventListener('click', () => { void (async () => {
-			try {
-				const schedule = this.dailyHours.map((hours, day) => ({
-					day,
-					available_hours: hours
-				}));
+			if (names.length > 0) {
 				try {
-					await this.plugin.apiClient.setDailyAvailability(schedule);
+					for (const name of names) await this.plugin.apiClient.createRecoveryProtocol(name);
+					this.savedSomething = true;
 				} catch { /* non-fatal */
-					// Non-fatal
+					new Notice('Could not save what recharges you. Try again in a moment.');
 				}
-				this.goTo('projects');
-			} catch { /* non-fatal */ }
+			}
+			this.afterRecharge();
 		})(); });
 
+		const skipBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-subtle', text: COPY['recharge.skip'] });
+		skipBtn.addEventListener('click', () => this.afterRecharge());
 
-		const backBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-secondary',
-			text: 'Back'
-		});
-		backBtn.addEventListener('click', () => this.goTo('recovery'));
+		const backBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: 'Back' });
+		backBtn.addEventListener('click', () => this.goTo('questions'));
 	}
 
-	// ── Step 6: Projects ─────────────────────────────
-
-	private renderProjects(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Add your first projects' });
-		const projectsDesc = 'What are you working on? Pick an effort level for each project: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.';
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: projectsDesc
-		});
-
-		// Active limit guidance (P2.6)
-		container.createDiv({
-			cls: 'emerald-onboard-hint emerald-onboard-hint-top',
-			text: 'We recommend keeping 5 or fewer active projects. Focus is a feature, not a limitation.'
-		});
-
-		// E-level explainer
-		const explainer = container.createDiv({ cls: 'emerald-onboard-explainer' });
-		explainer.createDiv({ text: 'E1 = Light (25% of your work hours)' });
-		explainer.createDiv({ text: 'E2 = Moderate (50% of your work hours)' });
-		explainer.createDiv({ text: 'E3 = Demanding (75% of your work hours)' });
-		explainer.createDiv({ text: 'E4 = Maximum (100% of your work hours)' });
-
-		// Note linking hint
-		container.createDiv({
-			cls: 'emerald-onboard-hint',
-			text: 'Tip: click the link icon to connect a project to an existing note. EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list.'
-		});
-
-		const form = container.createDiv({ cls: 'emerald-form' });
-
-		// Project list (dynamic)
-		const listEl = form.createDiv({ cls: 'emerald-onboard-project-list' });
-
-		const renderList = () => {
-			listEl.empty();
-			for (let i = 0; i < this.projects.length; i++) {
-				const proj = this.projects[i];
-				const row = listEl.createDiv({ cls: 'emerald-onboard-project-row' });
-				const infoCol = row.createDiv({ cls: 'emerald-onboard-project-info' });
-				infoCol.createSpan({ cls: 'emerald-onboard-project-name', text: proj.name });
-				// Badge text via the resolver — a raw ref must never be rendered.
-				const badge = infoCol.createSpan({
-					cls: 'emerald-elevel-badge',
-					text: levelBadgeText(proj.effortLevel),
-					attr: { 'aria-label': levelTooltip(proj.effortLevel) || 'No effort level' }
-				});
-				badge.style.color = colorForLevel(proj.effortLevel);
-
-				// Note link status
-				const noteCol = row.createDiv({ cls: 'emerald-onboard-project-note' });
-				if (proj.notePath) {
-					const noteLabel = noteCol.createSpan({ cls: 'emerald-onboard-note-path', text: proj.notePath });
-					noteLabel.title = proj.notePath;
-				}
-
-				// Link Note button
-				const linkBtn = noteCol.createEl('button', {
-					cls: 'emerald-btn-tiny'
-				});
-				if (proj.notePath) {
-					setIcon(linkBtn, 'pencil');
-					linkBtn.title = 'Change linked note';
-				} else {
-					setIcon(linkBtn, 'link');
-					linkBtn.title = 'Link to a note';
-				}
-				const idx = i; // capture for closure
-				linkBtn.addEventListener('click', () => {
-					const picker = new NoteSuggestModal(this.app, (file) => {
-						this.projects[idx].notePath = file.path;
-						renderList();
-					});
-					picker.open();
-				});
-
-				const removeBtn = row.createEl('button', { cls: 'emerald-btn-tiny' });
-				setIcon(removeBtn, 'x');
-				removeBtn.addEventListener('click', () => {
-					this.projects.splice(i, 1);
-					renderList();
-				});
-			}
-		};
-
-		// Add project form
-		const addRow = form.createDiv({ cls: 'emerald-onboard-add-row' });
-		const nameInput = addRow.createEl('input', {
-			cls: 'emerald-onboard-input emerald-onboard-proj-name',
-			type: 'text',
-			placeholder: 'Project name...'
-		});
-
-		const levelSelect = addRow.createEl('select', { cls: 'emerald-onboard-select' });
-		for (const l of ['E1', 'E2', 'E3', 'E4']) {
-			const opt = levelSelect.createEl('option', { value: l, text: l });
-			if (l === 'E2') opt.selected = true;
-		}
-
-		const addBtn = addRow.createEl('button', { cls: 'emerald-btn emerald-btn-secondary', text: '+ add' });
-		addBtn.addEventListener('click', () => {
-			const name = nameInput.value.trim();
-			if (!name) return;
-			this.projects.push({ name, effortLevel: levelSelect.value });
-			nameInput.value = '';
-			renderList();
-		});
-
-		// Enter key on input
-		nameInput.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter') addBtn.click();
-		});
-
-		renderList();
-
-		// Hint
-		container.createDiv({
-			cls: 'emerald-onboard-hint',
-			text: 'Add at least 1 to get started. You can always add more later.'
-		});
-
-		// Actions
-		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
-
-		const nextBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Next'
-		});
-		nextBtn.addEventListener('click', () => { void (async () => {
-			try {
-				// Create projects via API, including the linked note path now that the
-				// production schema has the obsidian_note_path column.
-				for (const proj of this.projects) {
-					const resp = await this.plugin.apiClient.createItem({
-						name: proj.name,
-						effort_level: proj.effortLevel,
-						obsidian_note_path: proj.notePath
-					});
-					if (resp.error) {
-						new Notice(`Failed to create project "${proj.name}": ${resp.error}`);
-					}
-				}
-				this.goTo('tour');
-			} catch { /* non-fatal */ }
-		})(); });
-
+	private afterRecharge() {
+		if (this.savedSomething) this.goTo('done');
+		else this.close();
 	}
-
-	// ── Step 7: Tour & Done ──────────────────────────
-
-	private renderTour(container: HTMLElement) {
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: 'Quick tour' });
-
-		const steps = [
-			{
-				icon: 'timer',
-				title: 'Timeblock',
-				desc: 'This is your day. A 24-hour bar shows time passing. When you start a session, the clock freezes and a green bar fills, showing your daily effort in real time.'
-			},
-			{
-				icon: 'folder',
-				title: 'Projects',
-				desc: 'Your active projects live here. Click one to start a session, open the project note, or change the location / effort level.'
-			},
-			{
-				icon: 'bar-chart-2',
-				title: 'Effort management',
-				desc: "Seven sections break down the ins and outs of your effort levels. Each one opens a detailed workspace view for you to analyze and track. If you're a PRO user, read effort insights and pinnable sparklines at a glance."
-			},
-			{
-				icon: 'flame',
-				title: 'Burnout Protection',
-				desc: "EMRALD watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
-			}
-		];
-
-		const tourList = container.createDiv({ cls: 'emerald-onboard-tour' });
-
-		for (const step of steps) {
-			const card = tourList.createDiv({ cls: 'emerald-onboard-tour-step' });
-			const iconEl = card.createSpan({ cls: 'emerald-onboard-tour-icon' });
-			setIcon(iconEl, step.icon);
-			const content = card.createDiv({ cls: 'emerald-onboard-tour-content' });
-			content.createDiv({ cls: 'emerald-onboard-tour-title', text: step.title });
-			content.createDiv({ cls: 'emerald-onboard-tour-desc', text: step.desc });
-		}
-
-		// Actions
-		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
-
-		const doneBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: "Let's go!"
-		});
-		doneBtn.addEventListener('click', () => this.goTo('done'));
-	}
-
-	// ── Done ─────────────────────────────────────────────
 
 	private renderDone(container: HTMLElement) {
 		const doneIcon = container.createDiv({ cls: 'emerald-onboard-icon' });
 		setIcon(doneIcon, 'sparkles');
-		container.createEl('h2', { cls: 'emerald-onboard-title', text: "You're all set!" });
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc',
-			text: "You're all set. Start a session before you start your work, and EMRALD will track the work time for you. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
-		});
+		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['card.done'] });
 
-		container.createEl('p', {
-			cls: 'emerald-onboard-desc emerald-onboard-profile-nudge',
-			text: 'Want more from your insights? Complete your effort profile. It helps EMRALD fit effort levels to your work style and watch for burnout patterns.'
-		});
-
-		// Research opt-in
+		// Anonymous usage data opt-in. Starts from the saved choice (unchecked for anyone who never opted in).
 		const researchRow = container.createDiv({ cls: 'emerald-onboard-research' });
 		const researchToggle = researchRow.createEl('label', { cls: 'emerald-onboard-research-label' });
 		const checkbox = researchToggle.createEl('input', { type: 'checkbox' });
-		checkbox.checked = this.plugin.settings.researchOptIn;
+		checkbox.checked = !!this.plugin.settings.researchOptIn;
 		checkbox.addEventListener('change', () => { void (async () => {
 			try {
 				this.plugin.settings.researchOptIn = checkbox.checked;
@@ -946,47 +513,14 @@ export class OnboardingModal extends Modal {
 				} catch { /* non-fatal */ }
 			} catch { /* non-fatal */ }
 		})(); });
-		researchToggle.appendText(' Help improve EMRALD: contribute anonymous usage data to build additional features and improve existing ones, and to advance effort management research. ');
-		researchToggle.createSpan({
-			cls: 'emerald-link',
-			text: 'Change anytime in Settings → Privacy.'
-		});
+		researchToggle.appendText(` ${COPY['optin.line']}`);
 
 		const actions = container.createDiv({ cls: 'emerald-modal-actions emerald-onboard-done-actions' });
-
-		const profileBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-primary emerald-btn-lg',
-			text: 'Enable advanced profile'
-		});
-		profileBtn.addEventListener('click', () => { void (async () => {
-			try {
-				// Show the Advanced mode upgrade modal
-				const { AdvancedUpgradeModal } = await import('../modals/advanced-upgrade');
-				const modal = new AdvancedUpgradeModal(
-					this.app,
-					this.plugin,
-					() => {
-						// Accepted — finish onboarding, questions will appear at session start
-						void this.finish();
-					},
-					() => {
-						// Declined — finish onboarding in Simple mode
-						void this.finish();
-					}
-				);
-				this.close();
-				modal.open();
-			} catch { /* non-fatal */ }
-		})(); });
-
-		const laterBtn = actions.createEl('button', {
-			cls: 'emerald-btn emerald-btn-subtle',
-			text: 'Keep it simple for now'
-		});
-		laterBtn.addEventListener('click', () => { void this.finish(); });
+		const doneBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary emerald-btn-lg', text: 'Done' });
+		doneBtn.addEventListener('click', () => this.close());
 	}
 
-	/** A failed connection test must not leave the typed key live in place of the saved one. */
+/** A failed connection test must not leave the typed key live in place of the saved one. */
 	private restoreCredentials() {
 		this.plugin.apiClient.updateCredentials(this.plugin.getApiKey(), this.plugin.settings.apiUrl);
 	}
@@ -998,17 +532,14 @@ export class OnboardingModal extends Modal {
 		this.renderStep();
 	}
 
-	private async finish() {
-		// Mark onboarding complete
+	/** Mark the signup done. startedSession = the Ready button was pressed (the sidebar starts the session); About opens only when the user skipped. */
+	private async finish(startedSession: boolean) {
+		this.finished = true;
 		this.plugin.settings.onboardingComplete = true;
 		await this.plugin.saveSettings();
-
-		// Open About EMRALD after onboarding — the in-app field guide.
-		// Use a tiny delay so the sidebar has time to mount first.
-		const aboutViewType = VIEW_ABOUT;
 		this.close();
 		window.setTimeout(() => {
-			void this.plugin.openWorkspaceView(aboutViewType);
+			if (!startedSession) void this.plugin.openWorkspaceView(VIEW_ABOUT);
 			this.onComplete();
 		}, 300);
 	}

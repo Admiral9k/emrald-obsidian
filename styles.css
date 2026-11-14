@@ -5863,3 +5863,10 @@ button.emerald-rg-link {
 	width: 15px;
 	height: 15px;
 }
+
+/* Onboarding questions (S16): scale buttons and two-line option buttons */
+.emerald-scale-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.emerald-scale-btn { min-width: 44px; }
+.emerald-onboard-enum-btn .emerald-opt-label { display: block; font-weight: 600; }
+.emerald-onboard-enum-btn .emerald-opt-desc { display: block; font-size: var(--font-ui-smaller); opacity: 0.8; }
+.emerald-onboard-enum-btn.is-active .emerald-opt-desc { opacity: 1; }

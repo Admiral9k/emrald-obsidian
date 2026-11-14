@@ -1149,7 +1149,7 @@ export interface EffortReceiptWithContext extends EffortReceipt {
 export interface CreateReceiptPayload {
 	perceived_effort: number;      // 1-10
 	hedonic_valence: number;       // 1-10
-	flow_occurred: number;         // 0, 1, or 2
+	flow_occurred?: number;        // 0, 1, or 2; left out when the question was not answered
 	demand_investment_balance: number; // 1-10
 	effort_source: string[];       // e.g. ['complexity', 'emotional']
 	unexpected_complications?: number; // 0/1/2 — SEQ-3 (migration 012). Only sent for multi-day projects.

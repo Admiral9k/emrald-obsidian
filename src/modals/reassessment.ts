@@ -5,6 +5,7 @@
 
 import { App, Modal, setIcon } from 'obsidian';
 import EmraldPlugin from '../../main';
+import { workTypeOptions } from '../onboarding/copy';
 
 // ── Question Definitions ────────────────────────────────
 // Mirrors OnboardingModal.CALIBRATION_QUESTIONS exactly.
@@ -106,27 +107,13 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		key: 'working_genius_primary',
 		question: 'Which type of work energizes you MOST?',
 		type: 'enum',
-		options: [
-			{ value: 'wonder', label: 'Wonder: asking big questions, imagining possibilities' },
-			{ value: 'invention', label: 'Invention: creating new solutions and ideas' },
-			{ value: 'discernment', label: 'Discernment: evaluating and giving feedback' },
-			{ value: 'galvanizing', label: 'Galvanizing: rallying people to take action' },
-			{ value: 'enablement', label: 'Enablement: helping others succeed' },
-			{ value: 'tenacity', label: 'Tenacity: finishing tasks and crossing the line' }
-		]
+		options: workTypeOptions('energy')
 	},
 	{
 		key: 'working_frustration_primary',
 		question: 'Which type of work DRAINS you MOST?',
 		type: 'enum',
-		options: [
-			{ value: 'wonder', label: 'Wonder: thinking abstractly without action' },
-			{ value: 'invention', label: 'Invention: having to create from scratch' },
-			{ value: 'discernment', label: "Discernment: evaluating others' work" },
-			{ value: 'galvanizing', label: 'Galvanizing: motivating and organizing people' },
-			{ value: 'enablement', label: "Enablement: supporting others' priorities" },
-			{ value: 'tenacity', label: 'Tenacity: grinding through repetitive details' }
-		]
+		options: workTypeOptions('drain')
 	},
 	{
 		key: 'autonomy_satisfaction',

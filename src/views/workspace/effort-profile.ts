@@ -8,6 +8,8 @@ import { EXPORT_TIP } from '../../utils/export-tip';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_EFFORT_PROFILE, VIEW_DATA_CENTER } from './base';
 import { RecoveryProtocol, TraitComparison } from '../../api/client';
+import { WORK_TYPES, COPY } from '../../onboarding/copy';
+import { QUESTIONS } from '../../onboarding/questions';
 
 // ── Calibration Fields (core 6) ─────────────────────────
 
@@ -116,8 +118,8 @@ const ENUM_DISPLAY: Record<string, string> = {
 	fear: 'Fear of failure', tired: 'Just tired',
 	distracted: 'Get distracted easily', overwhelmed: 'Overwhelmed',
 	// Working genius/frustration
-	wonder: 'Wonder', invention: 'Invention', discernment: 'Discernment',
-	galvanizing: 'Galvanizing', enablement: 'Enablement', tenacity: 'Tenacity',
+	wonder: WORK_TYPES.wonder.label, invention: WORK_TYPES.invention.label, discernment: WORK_TYPES.discernment.label,
+	galvanizing: WORK_TYPES.galvanizing.label, enablement: WORK_TYPES.enablement.label, tenacity: WORK_TYPES.tenacity.label,
 	// Core motivation
 	correctness: 'Correctness', helping: 'Helping', achievement: 'Achievement',
 	authenticity: 'Authenticity', understanding: 'Understanding',
@@ -213,6 +215,8 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		// ── Core Trait Bars ──
 		if (profile) {
 			this.renderCoreTraits(container, profile);
+			// Always offered here while the questions are unanswered (deck: card.*)
+			if (!this.hasSimpleAnswers(profile)) this.renderEmptyState(container);
 		} else {
 			this.renderEmptyState(container);
 			// Don't return early — still render recharge activities and actions below
@@ -252,22 +256,28 @@ export class EffortProfileView extends EmraldWorkspaceView {
 		const iconEl = empty.createDiv({ cls: 'emerald-wv-empty-icon' });
 		setIcon(iconEl, 'user');
 
-		empty.createEl('h3', { text: 'No profile data yet' });
-		empty.createEl('p', {
-			cls: 'emerald-wv-empty-desc',
-			text: 'Answer the questions during onboarding and your effort profile will appear here.'
-		});
+		empty.createEl('h3', { text: COPY['card.title'] });
+		empty.createEl('p', { cls: 'emerald-wv-empty-desc', text: COPY['card.body'] });
 
 		const btn = empty.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Answer the questions'
+			text: COPY['card.cta']
 		});
 		btn.addEventListener('click', () => { void (async () => {
 			try {
-				await this.plugin.apiClient.triggerReassessment();
-				new Notice('Questions started');
+				const { OnboardingModal } = await import('../../onboarding/onboarding');
+				new OnboardingModal(this.app, this.plugin, () => { void this.onOpen(); }, 'questions').open();
 			} catch { /* non-fatal */ }
 		})(); });
+	}
+
+	/** True when at least one of the 13 profile questions has an answer. */
+	private hasSimpleAnswers(profile: Record<string, unknown>): boolean {
+		const answers = {
+			...((profile.calibration_answers as Record<string, unknown>) ?? {}),
+			...((profile.advanced_answers as Record<string, unknown>) ?? {})
+		};
+		return QUESTIONS.some((q) => answers[q.key] !== undefined && answers[q.key] !== null);
 	}
 
 	// ── D19 Drift Indicator ─────────────────────────────

@@ -111,6 +111,20 @@ export default class EmraldPlugin extends Plugin {
 
 		// Cmd/Ctrl+Shift+S — Start a session (opens project picker)
 		this.addCommand({
+			id: 'fill-in-profile',
+			name: 'Fill in your profile',
+			checkCallback: (checking) => {
+				if (!this.hasApiKey()) return false;
+				if (!checking) {
+					void import('./src/onboarding/onboarding').then(({ OnboardingModal }) => {
+						new OnboardingModal(this.app, this, () => {}, 'questions').open();
+					});
+				}
+				return true;
+			}
+		});
+
+		this.addCommand({
 			id: 'start-session',
 			name: 'Start session',
 			checkCallback: (checking) => {

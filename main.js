@@ -593,630 +593,172 @@ var init_base = __esm({
   }
 });
 
-// src/modals/advanced-complete.ts
-var advanced_complete_exports = {};
-__export(advanced_complete_exports, {
-  AdvancedCompleteModal: () => AdvancedCompleteModal
-});
-var import_obsidian2, AdvancedCompleteModal;
-var init_advanced_complete = __esm({
-  "src/modals/advanced-complete.ts"() {
-    import_obsidian2 = require("obsidian");
-    AdvancedCompleteModal = class extends import_obsidian2.Modal {
-      constructor(app, onDismiss) {
-        super(app);
-        this.onDismiss = onDismiss;
-      }
-      onOpen() {
-        const { contentEl } = this;
-        contentEl.empty();
-        contentEl.addClass("emerald-modal");
-        const iconEl = contentEl.createDiv({ cls: "emerald-onboard-icon" });
-        (0, import_obsidian2.setIcon)(iconEl, "sparkles");
-        contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile complete!" });
-        contentEl.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "EMRALD now has the fullest picture of how you work. Your effort forecasts, burnout detection, and insights will draw on all of your answers."
-        });
-        contentEl.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "You can revisit and update your answers anytime in the effort profile workspace view. If your habits shift, retake the questions to keep your profile current."
-        });
-        const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
-        const goBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Let's go"
-        });
-        goBtn.addEventListener("click", () => {
-          this.close();
-          this.onDismiss();
-        });
-      }
-      onClose() {
-        this.contentEl.empty();
+// src/onboarding/copy.ts
+function workTypeOptions(kind) {
+  return Object.keys(WORK_TYPES).map((k) => ({ value: k, label: `${WORK_TYPES[k].label}: ${WORK_TYPES[k][kind]}` }));
+}
+var COPY, WORK_TYPES, LEVEL_OPTIONS;
+var init_copy = __esm({
+  "src/onboarding/copy.ts"() {
+    COPY = {
+      // 5a. Signup and ready screen
+      "welcome.title": "Welcome to EMRALD",
+      "welcome.body": "Start a session when you begin work. EMRALD keeps the time. When you stop, rate the session to get your receipt: five quick questions about how it felt. Your record builds from there.",
+      "welcome.bullets.1": "Time your work sessions",
+      "welcome.bullets.2": "See how long things really take",
+      "welcome.bullets.3": "Spot what drains you",
+      "welcome.bullets.4": "A burnout score from your own numbers",
+      "welcome.cta": "Get started",
+      "connect.body": "Paste your API key from the web app. It takes about a minute.",
+      "project.title": "Add your first project",
+      "project.body": "What are you working on? Pick an effort level for it: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.",
+      "project.what": "Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list.",
+      "project.cap": "You can have up to 5 active projects at a time, on any plan.",
+      "project.required": "Add a project to continue.",
+      "project.legend.1": "Light (E1): 25% of your work hours.",
+      "project.legend.2": "Moderate (E2): 50% of your work hours.",
+      "project.legend.3": "Demanding (E3): 75% of your work hours.",
+      "project.legend.4": "Maximum (E4): 100% of your work hours.",
+      "project.noteLink": "Tip: click the link icon to connect a project to an existing note. EMRALD syncs session data to that note. Without a link, the project lives only in your project list.",
+      "ready.title": "Ready when you are",
+      "ready.hours": "About how many hours a day do you spend on work you want to track?",
+      "ready.hours.hint": "You can change this any time.",
+      "ready.short": "Sessions under 5 minutes skip the receipt and still count.",
+      "ready.cta": "Start your first session",
+      // 5b. First-receipt celebration
+      "cel.title": "First receipt filed.",
+      "cel.win": "That's your first receipt, and it already counts in your numbers.",
+      "cel.numbers": "Your numbers: receipts fill them in. 8 free, all 20 with PRO.",
+      "cel.checkin": "Daily check-in: about 15 seconds. Sleep, energy, and how your body and mind feel. Skip any day you like.",
+      "cel.burnout": "Burnout score: if it gets high, you get a gentle heads-up and a reminder of something that recharges you.",
+      "cel.closer": "Keep filling in your receipts for a month and the full picture is yours.",
+      "cel.cta": "Got it",
+      // 5d. Profile questions and their steps (reached from Effort Profile and the command palette)
+      "card.title": "Fill in your profile",
+      "card.body": "Answer a few questions and EMRALD can show how your answers line up with what your receipts show.",
+      "card.cta": "Answer a few questions",
+      "card.dismiss": "Not now",
+      "questions.title": "A few questions about you",
+      "questions.body": "There are no wrong answers. Your answers set up your effort profile: a picture of how you tend to work.",
+      "questions.progress": "Questions {a}\u2013{b} of 13",
+      "questions.skip": "Skip for now",
+      "recharge.title": "What recharges you?",
+      "recharge.body": "Activities that restore your energy, like walking, piano, or reading. If your burnout score gets high, EMRALD reminds you of something from this list.",
+      "recharge.label": "Add up to 3 things that recharge you",
+      "recharge.hint": "Optional. You can add them later.",
+      "recharge.skip": "Skip",
+      "card.done": "Thanks. Your profile is more filled in now.",
+      "optin.line": "Share anonymous usage data to help improve EMRALD. You can change this anytime in Settings."
+    };
+    WORK_TYPES = {
+      wonder: {
+        label: "Big-picture ideas",
+        energy: "Asking big questions and imagining what could be",
+        drain: "Thinking in the abstract with nothing to act on"
+      },
+      invention: {
+        label: "Creating new things",
+        energy: "Making up new solutions and ideas",
+        drain: "Starting from a blank page"
+      },
+      discernment: {
+        label: "Giving feedback",
+        energy: "Spotting what works and what doesn't",
+        drain: "Having to critique other people's work"
+      },
+      galvanizing: {
+        label: "Rallying people",
+        energy: "Getting a group moving on something",
+        drain: "Keeping a group on track when they lose steam"
+      },
+      enablement: {
+        label: "Helping others",
+        energy: "Backing other people up so they succeed",
+        drain: "Putting your own work aside for other people's priorities"
+      },
+      tenacity: {
+        label: "Finishing things",
+        energy: "Getting tasks over the line",
+        drain: "Grinding through repetitive details"
       }
     };
-  }
-});
-
-// src/modals/advanced-calibration.ts
-var advanced_calibration_exports = {};
-__export(advanced_calibration_exports, {
-  AdvancedCalibrationModal: () => AdvancedCalibrationModal,
-  checkAdvancedCalibrationNeeded: () => checkAdvancedCalibrationNeeded,
-  getAdvancedQuestionCount: () => getAdvancedQuestionCount
-});
-async function checkAdvancedCalibrationNeeded(plugin) {
-  var _a;
-  try {
-    if (plugin.settings.advancedProfileCompleted)
-      return null;
-    const profileResp = await plugin.apiClient.getProfile();
-    if (!profileResp.data)
-      return null;
-    const profile = profileResp.data;
-    if (profile.question_mode !== "advanced")
-      return null;
-    const advancedAnswers = (_a = profile.advanced_answers) != null ? _a : {};
-    const answeredKeys = Object.keys(advancedAnswers);
-    const requiredKeys = ADVANCED_QUESTIONS.filter((q) => !q.optional).map((q) => q.key);
-    const actualRemaining = requiredKeys.filter((k) => !answeredKeys.includes(k)).length;
-    if (actualRemaining <= 0)
-      return null;
-    return { answeredKeys, remaining: actualRemaining };
-  } catch (e) {
-    return null;
-  }
-}
-function getAdvancedQuestionCount() {
-  return ADVANCED_QUESTIONS.length;
-}
-var import_obsidian3, ADVANCED_QUESTIONS, QUESTIONS_PER_SESSION, AdvancedCalibrationModal;
-var init_advanced_calibration = __esm({
-  "src/modals/advanced-calibration.ts"() {
-    import_obsidian3 = require("obsidian");
-    ADVANCED_QUESTIONS = [
-      // Batch 1 (Sessions 2-3): Personality deep-dive
-      {
-        key: "interest_consistency",
-        question: "I often set goals but later choose to pursue different ones.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Never",
-        endpointRight: "Constantly"
-      },
-      {
-        key: "achievement_drive",
-        question: "I maintain effort on long projects even when progress is slow.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Rarely",
-        endpointRight: "Always"
-      },
-      {
-        key: "impulsiveness",
-        question: "I tend to act on impulse rather than thinking things through.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Never",
-        endpointRight: "Very often"
-      },
-      {
-        key: "structure_preference",
-        question: "I prefer clear plans and structure over flexible situations.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Flexibility",
-        endpointRight: "Structure"
-      },
-      {
-        key: "delegation_comfort",
-        question: "I find it easy to delegate work to others.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Very hard",
-        endpointRight: "Very easy"
-      },
-      // Batch 2 (Sessions 3-4): Motivations & stress
-      {
-        key: "decision_style",
-        question: "I prioritize logical consistency over impact on people.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "People first",
-        endpointRight: "Logic first"
-      },
-      {
-        key: "core_motivation",
-        question: "I'm driven by a desire for...",
-        type: "enum",
-        options: [
-          { value: "correctness", label: "Correctness: doing things right" },
-          { value: "helping", label: "Helping: making others' lives better" },
-          { value: "achievement", label: "Achievement: accomplishing goals" },
-          { value: "authenticity", label: "Authenticity: being true to myself" },
-          { value: "understanding", label: "Understanding: knowing how things work" },
-          { value: "security", label: "Security: stability and safety" },
-          { value: "experience", label: "Experience: variety and stimulation" },
-          { value: "autonomy", label: "Autonomy: freedom and independence" },
-          { value: "peace", label: "Peace: harmony and balance" }
-        ]
-      },
-      {
-        key: "stress_pattern_primary",
-        question: "When overwhelmed, my first response is to...",
-        type: "enum",
-        options: [
-          { value: "withdraw", label: "Withdraw: pull back and isolate" },
-          { value: "over_prepare", label: "Over-prepare: plan obsessively" },
-          { value: "push_harder", label: "Push harder: brute force through it" },
-          { value: "scatter", label: "Scatter: jump between tasks" },
-          { value: "become_critical", label: "Become critical: nitpick everything" }
-        ]
-      },
-      {
-        key: "competition_response",
-        question: "Competitive situations make me...",
-        type: "enum",
-        options: [
-          { value: "energized", label: "Energized: I thrive on competition" },
-          { value: "neutral", label: "Neutral: depends on the stakes" },
-          { value: "uncomfortable", label: "Uncomfortable: I prefer collaboration" }
-        ]
-      },
-      {
-        key: "stimulation_need",
-        question: "I need regular variety in my work to stay engaged.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Not at all",
-        endpointRight: "Absolutely"
-      },
-      // Batch 3 (Sessions 4-5): Tolerance & needs
-      {
-        key: "ambiguity_tolerance",
-        question: "I'm comfortable with ambiguity and undefined outcomes.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Very uncomfortable",
-        endpointRight: "Very comfortable"
-      },
-      {
-        key: "enablement_tendency",
-        question: "I find helping and supporting others' projects genuinely fulfilling.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Not really",
-        endpointRight: "Absolutely"
-      },
-      {
-        key: "competence_satisfaction",
-        question: "How confident are you in handling unfamiliar challenges?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Not confident",
-        endpointRight: "Very confident"
-      },
-      {
-        key: "relatedness_satisfaction",
-        question: "How connected do you feel to people who depend on your work?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Disconnected",
-        endpointRight: "Deeply connected"
-      },
-      {
-        key: "physical_fitness_baseline",
-        question: "How would you rate your physical fitness?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Low",
-        endpointRight: "High"
-      },
-      // Batch 4 (Sessions 5-6): Capacity & patterns
-      {
-        key: "max_sustained_project_duration",
-        question: "Longest project you've sustained consistent effort on?",
-        type: "enum",
-        options: [
-          { value: "days", label: "Days" },
-          { value: "weeks", label: "Weeks" },
-          { value: "months", label: "Months" },
-          { value: "years", label: "Years" }
-        ]
-      },
-      {
-        key: "focus_session_capacity",
-        question: "How many hours of focused work before quality drops?",
-        type: "enum",
-        options: [
-          { value: "under_1h", label: "Under 1 hour" },
-          { value: "1_2h", label: "1\u20132 hours" },
-          { value: "2_3h", label: "2\u20133 hours" },
-          { value: "3_4h", label: "3\u20134 hours" },
-          { value: "over_4h", label: "Over 4 hours" }
-        ]
-      },
-      {
-        key: "recovery_rate",
-        question: "After an intense 90-minute session, how long do you need to recover?",
-        type: "enum",
-        options: [
-          { value: "15min", label: "15 minutes" },
-          { value: "30min", label: "30 minutes" },
-          { value: "1h", label: "About an hour" },
-          { value: "over_2h", label: "Over 2 hours" }
-        ]
-      },
-      {
-        key: "life_domains_count",
-        question: "How many distinct areas of your life do you actively manage?",
-        type: "enum",
-        options: [
-          { value: "2_3", label: "2\u20133 areas" },
-          { value: "4_5", label: "4\u20135 areas" },
-          { value: "6_7", label: "6\u20137 areas" },
-          { value: "8_plus", label: "8 or more" }
-        ]
-      },
-      {
-        key: "overcommitment_tendency",
-        question: "How often do you feel like you're juggling too many projects?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Never",
-        endpointRight: "Constantly"
-      },
-      // Batch 5 (Sessions 6-7): Preferences & self-knowledge
-      {
-        key: "task_switching_preference",
-        question: "Would you rather have 4 different tasks or 1 deep task?",
-        type: "enum",
-        options: [
-          { value: "variety", label: "4 different tasks: I like variety" },
-          { value: "mix", label: "A mix of both" },
-          { value: "focus", label: "1 deep task: I like going deep" }
-        ]
-      },
-      {
-        key: "purpose_sensitivity",
-        question: "How important is it that your work feels meaningful?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3,
-        endpointLeft: "Not important",
-        endpointRight: "Essential"
-      },
-      // Batch 6: Free text reflections (future integrations)
-      {
-        key: "flow_activities",
-        question: "What activities put you in deep focus most easily?",
-        type: "text",
-        optional: true
-      },
-      {
-        key: "avoidance_pattern",
-        question: "What type of task do you most consistently avoid?",
-        type: "text",
-        optional: true
-      },
-      {
-        key: "natural_gravitation",
-        question: "On a completely free day, what do you do first?",
-        type: "text",
-        optional: true
-      },
-      {
-        key: "current_frustration",
-        question: "What's your biggest productivity frustration right now?",
-        type: "text",
-        optional: true
-      },
-      // Batch 7: Optional imports
-      {
-        key: "imported_mbti",
-        question: "Do you know your MBTI type? (optional)",
-        type: "text",
-        optional: true
-      },
-      {
-        key: "imported_enneagram",
-        question: "Do you know your Enneagram type? (optional)",
-        type: "text",
-        optional: true
-      },
-      {
-        key: "imported_clifton_top5",
-        question: "CliftonStrengths top 5? (optional, comma-separated)",
-        type: "text",
-        optional: true
-      }
+    LEVEL_OPTIONS = [
+      { value: "E1", label: "Light (E1)" },
+      { value: "E2", label: "Moderate (E2)" },
+      { value: "E3", label: "Demanding (E3)" },
+      { value: "E4", label: "Maximum (E4)" }
     ];
-    QUESTIONS_PER_SESSION = 4;
-    AdvancedCalibrationModal = class extends import_obsidian3.Modal {
-      constructor(app, plugin, answeredKeys, remaining, onComplete, onSkip) {
-        super(app);
-        this.answers = {};
-        this.showAll = false;
-        this.plugin = plugin;
-        this.onComplete = onComplete;
-        this.onSkip = onSkip;
-        this.remaining = remaining;
-        this.allUnanswered = ADVANCED_QUESTIONS.filter((q) => !answeredKeys.includes(q.key));
-        this.questions = this.allUnanswered.slice(0, QUESTIONS_PER_SESSION);
-      }
-      onOpen() {
-        this.renderContent();
-      }
-      renderContent() {
-        var _a, _b, _c, _d, _e;
-        const { contentEl } = this;
-        contentEl.empty();
-        contentEl.addClass("emerald-modal", "emerald-calibration-modal");
-        const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
-        contentEl.createEl("h2", { text: "Effort profile: advanced" });
-        const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
-        if (this.showAll) {
-          contentEl.createEl("p", {
-            cls: "emerald-modal-subtitle",
-            text: `All ${displayQuestions.length} remaining questions. Take your time.`
-          });
-        } else {
-          contentEl.createEl("p", {
-            cls: "emerald-modal-subtitle",
-            text: `${displayQuestions.length} quick questions before your session. ${remainingAfter} remaining after this.`
-          });
-          if (this.allUnanswered.length > QUESTIONS_PER_SESSION) {
-            const allBtn = contentEl.createEl("button", {
-              cls: "emerald-btn emerald-btn-subtle emerald-btn-sm",
-              text: `Answer all ${this.allUnanswered.length} remaining at once`
-            });
-            allBtn.addEventListener("click", () => {
-              this.showAll = true;
-              this.renderContent();
-            });
-          }
-        }
-        const form = contentEl.createDiv({ cls: "emerald-form" });
-        let optionalSeparatorShown = false;
-        for (const q of displayQuestions) {
-          if (q.optional && !optionalSeparatorShown) {
-            optionalSeparatorShown = true;
-            form.createEl("hr", { cls: "emerald-form-separator" });
-            form.createDiv({
-              cls: "emerald-form-desc emerald-text-muted",
-              text: "Questions below are for future integrations, answers optional."
-            });
-          }
-          const group = form.createDiv({ cls: "emerald-form-group" });
-          group.createEl("label", { text: q.question });
-          if (q.type === "slider") {
-            const currentVal = (_a = q.default) != null ? _a : 3;
-            const labelRow = group.createDiv({ cls: "emerald-form-label-row" });
-            const valueEl = labelRow.createSpan({ cls: "emerald-slider-value", text: `${currentVal}/5` });
-            if (q.endpointLeft || q.endpointRight) {
-              const endpoints = group.createDiv({ cls: "emerald-slider-endpoints" });
-              endpoints.createSpan({ cls: "emerald-slider-endpoint-left", text: (_b = q.endpointLeft) != null ? _b : "" });
-              endpoints.createSpan({ cls: "emerald-slider-endpoint-right", text: (_c = q.endpointRight) != null ? _c : "" });
-            }
-            const slider = group.createEl("input", { cls: "emerald-slider" });
-            slider.type = "range";
-            slider.min = String((_d = q.min) != null ? _d : 1);
-            slider.max = String((_e = q.max) != null ? _e : 5);
-            slider.value = String(currentVal);
-            const key = q.key;
-            this.answers[key] = currentVal;
-            slider.addEventListener("input", () => {
-              const val = parseInt(slider.value);
-              valueEl.textContent = `${val}/5`;
-              this.answers[key] = val;
-            });
-          } else if (q.type === "enum" && q.options) {
-            const btnColumn = group.createDiv({ cls: "emerald-onboard-enum-group" });
-            for (const opt of q.options) {
-              const btn = btnColumn.createEl("button", {
-                cls: "emerald-onboard-enum-btn",
-                text: opt.label
-              });
-              const key = q.key;
-              btn.addEventListener("click", () => {
-                this.answers[key] = opt.value;
-                btnColumn.querySelectorAll(".emerald-onboard-enum-btn").forEach((b) => b.removeClass("is-active"));
-                btn.addClass("is-active");
-              });
-            }
-          } else if (q.type === "text") {
-            const input = group.createEl("input", {
-              cls: "emerald-onboard-input",
-              type: "text",
-              placeholder: "Type your answer..."
-            });
-            const key = q.key;
-            input.addEventListener("input", () => {
-              const val = input.value.trim();
-              if (val) {
-                this.answers[key] = val;
-              } else {
-                delete this.answers[key];
-              }
-            });
-          }
-        }
-        const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
-        const submitBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Save & continue"
-        });
-        submitBtn.addEventListener("click", () => {
-          void (async () => {
-            try {
-              const answeredCount = Object.keys(this.answers).length;
-              if (answeredCount > 0) {
-                try {
-                  await this.plugin.apiClient.updateCalibration(this.answers);
-                  new import_obsidian3.Notice(`${answeredCount} answers saved \u2713`);
-                } catch (e) {
-                }
-              }
-              const remainingRequired = this.allUnanswered.filter((q) => !q.optional);
-              const answeredRequired = remainingRequired.filter((q) => this.answers[q.key] !== void 0);
-              if (remainingRequired.length > 0 && answeredRequired.length === remainingRequired.length) {
-                this.plugin.settings.advancedProfileCompleted = true;
-                await this.plugin.saveSettings();
-                this.close();
-                const { AdvancedCompleteModal: AdvancedCompleteModal2 } = await Promise.resolve().then(() => (init_advanced_complete(), advanced_complete_exports));
-                const completeModal = new AdvancedCompleteModal2(this.app, () => {
-                  this.onComplete();
-                });
-                completeModal.open();
-                return;
-              }
-              this.close();
-              this.onComplete();
-            } catch (e) {
-            }
-          })();
-        });
-        const skipBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-subtle",
-          text: "Skip for now"
-        });
-        skipBtn.addEventListener("click", () => {
-          this.close();
-          this.onSkip();
-        });
-      }
-      onClose() {
-        this.contentEl.empty();
-      }
-    };
   }
 });
 
-// src/modals/advanced-upgrade.ts
-var advanced_upgrade_exports = {};
-__export(advanced_upgrade_exports, {
-  AdvancedUpgradeModal: () => AdvancedUpgradeModal
-});
-var import_obsidian4, AdvancedUpgradeModal;
-var init_advanced_upgrade = __esm({
-  "src/modals/advanced-upgrade.ts"() {
-    import_obsidian4 = require("obsidian");
-    AdvancedUpgradeModal = class extends import_obsidian4.Modal {
-      constructor(app, plugin, onAccept, onDecline) {
-        super(app);
-        this.plugin = plugin;
-        this.onAccept = onAccept;
-        this.onDecline = onDecline;
-      }
-      onOpen() {
-        const { contentEl } = this;
-        contentEl.empty();
-        contentEl.addClass("emerald-modal");
-        const iconEl = contentEl.createDiv({ cls: "emerald-onboard-icon" });
-        (0, import_obsidian4.setIcon)(iconEl, "sparkles");
-        contentEl.createEl("h2", { text: "Go advanced?" });
-        contentEl.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "You've completed your basic effort profile. EMRALD is already working for you."
-        });
-        contentEl.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "Advanced mode unlocks 30 additional profile questions that map your work style in more detail. They're presented gradually: just 3-4 questions before each session, over about 8 sessions."
-        });
-        const benefits = contentEl.createDiv({ cls: "emerald-onboard-features" });
-        const items = [
-          { icon: "target", text: "Effort forecasts built on more of your answers" },
-          { icon: "brain", text: "Deeper personality-aware insights" },
-          { icon: "flame", text: "Earlier burnout pattern detection" },
-          { icon: "trending-up", text: "Closer tracking of drift from your profile" }
-        ];
-        for (const item of items) {
-          const row = benefits.createDiv({ cls: "emerald-onboard-feature" });
-          const iconSpan = row.createSpan({ cls: "emerald-onboard-feature-icon" });
-          (0, import_obsidian4.setIcon)(iconSpan, item.icon);
-          row.createSpan({ text: item.text });
-        }
-        contentEl.createEl("p", {
-          cls: "emerald-onboard-desc emerald-text-muted",
-          text: "You can always switch back to simple mode in settings."
-        });
-        const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
-        const acceptBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Enable advanced mode"
-        });
-        acceptBtn.addEventListener("click", () => {
-          void (async () => {
-            try {
-              try {
-                await this.plugin.apiClient.updateProfile({ question_mode: "advanced" });
-                new import_obsidian4.Notice("Advanced mode enabled! You'll see profile questions before your next session.");
-              } catch (e) {
-                new import_obsidian4.Notice("Advanced mode enabled locally. Will sync on next session.");
-              }
-              this.close();
-              const { AdvancedCalibrationModal: AdvancedCalibrationModal2, getAdvancedQuestionCount: getAdvancedQuestionCount2 } = await Promise.resolve().then(() => (init_advanced_calibration(), advanced_calibration_exports));
-              const total = getAdvancedQuestionCount2();
-              const startNowModal = new AdvancedCalibrationModal2(
-                this.app,
-                this.plugin,
-                [],
-                // no answered keys yet
-                total,
-                // all remaining
-                () => {
-                  this.onAccept();
-                },
-                () => {
-                  this.onAccept();
-                }
-              );
-              startNowModal.open();
-            } catch (e) {
-            }
-          })();
-        });
-        const declineBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-subtle",
-          text: "Maybe later: keep simple mode"
-        });
-        declineBtn.addEventListener("click", () => {
-          this.close();
-          this.onDecline();
-        });
-      }
-      onClose() {
-        this.contentEl.empty();
-      }
-    };
+// src/onboarding/questions.ts
+function progressLine(template, page) {
+  return template.replace("{a}", String(PAGE_BOUNDS[page][0] + 1)).replace("{b}", String(PAGE_BOUNDS[page][1]));
+}
+var WORK_KEYS, energyOpts, drainOpts, QUESTIONS, PAGE_BOUNDS;
+var init_questions = __esm({
+  "src/onboarding/questions.ts"() {
+    init_copy();
+    WORK_KEYS = ["wonder", "invention", "discernment", "galvanizing", "enablement", "tenacity"];
+    energyOpts = WORK_KEYS.map((k) => ({ value: k, label: WORK_TYPES[k].label, desc: WORK_TYPES[k].energy }));
+    drainOpts = WORK_KEYS.map((k) => ({ value: k, label: WORK_TYPES[k].label, desc: WORK_TYPES[k].drain }));
+    QUESTIONS = [
+      {
+        key: "chronotype",
+        question: "When do you do your best, most focused work?",
+        type: "enum",
+        options: [
+          { value: "early_morning", label: "Early morning (5\u20138am)" },
+          { value: "mid_morning", label: "Mid-morning (8\u201311am)" },
+          { value: "afternoon", label: "Afternoon (12\u20134pm)" },
+          { value: "evening", label: "Evening (5\u20139pm)" },
+          { value: "late_night", label: "Late night (10pm+)" }
+        ]
+      },
+      {
+        key: "work_pace_style",
+        question: "Do you prefer to work in intense bursts with breaks, or steady?",
+        type: "enum",
+        options: [
+          { value: "burst", label: "Intense bursts with breaks" },
+          { value: "mix", label: "A mix of both" },
+          { value: "steady", label: "Steady and consistent" }
+        ]
+      },
+      {
+        key: "social_energy_direction",
+        question: "After a day of socializing, I feel...",
+        type: "enum",
+        options: [
+          { value: "energized", label: "Energized: people charge me up" },
+          { value: "neutral", label: "Neutral: depends on the people" },
+          { value: "drained", label: "Drained: I need alone time to recharge" }
+        ]
+      },
+      { key: "sleep_quality_baseline", question: "In general, how well do you sleep?", type: "scale" },
+      { key: "conscientiousness", question: "I see myself as someone who is organized and follows through...", type: "scale" },
+      { key: "stress_vulnerability", question: "I get stressed easily and worry about things going wrong.", type: "scale" },
+      { key: "novelty_tolerance", question: "I\u2019m energized by trying new things and tackling unfamiliar challenges.", type: "scale" },
+      { key: "routine_tolerance", question: "I can do routine, repetitive work for long stretches without losing focus.", type: "scale" },
+      { key: "procrastination_tendency", question: "How often do you delay starting tasks you\u2019ve committed to?", type: "scale", low: "Rarely", high: "Often" },
+      {
+        key: "procrastination_trigger",
+        question: "When you procrastinate, it\u2019s usually because...",
+        type: "enum",
+        options: [
+          { value: "boring", label: "The task is boring" },
+          { value: "uncertain", label: "I\u2019m unsure how to start" },
+          { value: "fear", label: "Fear of failure or judgment" },
+          { value: "tired", label: "I\u2019m just tired" },
+          { value: "distracted", label: "I get distracted easily" },
+          { value: "overwhelmed", label: "It feels too big" }
+        ]
+      },
+      { key: "working_genius_primary", question: "Which type of work energizes you MOST?", type: "enum", options: energyOpts },
+      { key: "working_frustration_primary", question: "Which type of work DRAINS you MOST?", type: "enum", options: drainOpts },
+      { key: "autonomy_satisfaction", question: "How much control do you feel over your daily choices?", type: "scale" }
+    ];
+    PAGE_BOUNDS = [[0, 4], [4, 9], [9, 13]];
   }
 });
 
@@ -1225,30 +767,31 @@ var onboarding_exports = {};
 __export(onboarding_exports, {
   OnboardingModal: () => OnboardingModal
 });
-var import_obsidian5, STEP_ORDER, _OnboardingModal, OnboardingModal, NoteSuggestModal;
+var import_obsidian2, OnboardingModal, NoteSuggestModal;
 var init_onboarding = __esm({
   "src/onboarding/onboarding.ts"() {
-    import_obsidian5 = require("obsidian");
+    import_obsidian2 = require("obsidian");
     init_base();
-    init_e_levels();
-    STEP_ORDER = ["welcome", "connect", "profile", "calibration", "recovery", "schedule", "projects", "tour", "done"];
-    _OnboardingModal = class extends import_obsidian5.Modal {
-      // Sun=0 through Sat=6
-      constructor(app, plugin, onComplete) {
+    init_copy();
+    init_questions();
+    OnboardingModal = class extends import_obsidian2.Modal {
+      constructor(app, plugin, onComplete, mode = "signup") {
         super(app);
-        this.currentStep = "welcome";
         // State accumulated across steps
         this.apiKey = "";
         this.isNewUser = false;
-        // Onboarding only OFFERS the built-in levels — a brand-new account has no
-        // custom levels yet — but the field is a level ref so nothing downstream has
-        // to narrow it back to the built-in union.
-        this.projects = [];
-        this.calibrationAnswers = {};
-        this.calibrationPage = 0;
-        this.dailyHours = [4, 4, 4, 4, 4, 4, 4];
+        this.projectName = "";
+        this.projectLevel = "E2";
+        this.createdItemId = null;
+        this.hours = 4;
+        this.answers = {};
+        this.qPage = 0;
+        this.savedSomething = false;
+        this.finished = false;
         this.plugin = plugin;
         this.onComplete = onComplete;
+        this.mode = mode;
+        this.currentStep = mode === "questions" ? "questions" : "connect";
       }
       onOpen() {
         this.modalEl.addClass("emerald-onboarding-modal");
@@ -1256,7 +799,7 @@ var init_onboarding = __esm({
       }
       onClose() {
         this.contentEl.empty();
-        if (!this.plugin.settings.onboardingComplete) {
+        if (this.mode === "signup" && !this.finished && !this.plugin.settings.onboardingComplete) {
           this.plugin.settings.onboardingComplete = true;
           void this.plugin.saveSettings();
           window.setTimeout(() => {
@@ -1269,98 +812,67 @@ var init_onboarding = __esm({
         const { contentEl } = this;
         contentEl.empty();
         contentEl.addClass("emerald-modal");
-        this.renderProgress(contentEl);
         switch (this.currentStep) {
-          case "welcome":
-            this.renderWelcome(contentEl);
-            break;
           case "connect":
             this.renderConnect(contentEl);
             break;
-          case "profile":
-            this.renderProfile(contentEl);
+          case "welcome":
+            this.renderWelcome(contentEl);
             break;
-          case "calibration":
-            this.renderCalibration(contentEl);
+          case "project":
+            this.renderProject(contentEl);
             break;
-          case "recovery":
-            this.renderRecovery(contentEl);
+          case "ready":
+            this.renderReady(contentEl);
             break;
-          case "schedule":
-            this.renderSchedule(contentEl);
+          case "questions":
+            this.renderQuestions(contentEl);
             break;
-          case "projects":
-            this.renderProjects(contentEl);
-            break;
-          case "tour":
-            this.renderTour(contentEl);
+          case "recharge":
+            this.renderRecharge(contentEl);
             break;
           case "done":
             this.renderDone(contentEl);
             break;
         }
       }
-      renderProgress(container) {
-        const stepIndex = STEP_ORDER.indexOf(this.currentStep);
-        const total = STEP_ORDER.length - 1;
-        const bar = container.createDiv({ cls: "emerald-onboard-progress" });
-        for (let i = 0; i < total; i++) {
-          bar.createDiv({
-            cls: `emerald-onboard-dot ${i < stepIndex ? "is-done" : ""} ${i === stepIndex ? "is-active" : ""}`
-          });
-          if (i < total - 1) {
-            bar.createDiv({
-              cls: `emerald-onboard-line ${i < stepIndex ? "is-done" : ""}`
-            });
-          }
-        }
-        if (stepIndex > 0 && this.currentStep !== "done") {
-          container.createDiv({
-            cls: "emerald-onboard-step-label",
-            text: `Step ${stepIndex} of ${total - 1}`
-          });
-        }
-      }
-      // ── Step 1: Welcome ──────────────────────────────────
+      // ── Welcome ──────────────────────────────────────────
       renderWelcome(container) {
         const welcomeIcon = container.createDiv({ cls: "emerald-onboard-icon" });
-        (0, import_obsidian5.setIcon)(welcomeIcon, "gem");
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Welcome to EMRALD" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "Track your work sessions, measure effort in real time, and let EMRALD surface patterns you might otherwise miss."
-        });
+        (0, import_obsidian2.setIcon)(welcomeIcon, "gem");
+        container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["welcome.title"] });
+        container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["welcome.body"] });
         const features = container.createDiv({ cls: "emerald-onboard-features" });
         const items = [
-          { icon: "timer", text: "Track work sessions with effort-aware timing" },
-          { icon: "bar-chart-2", text: "See 20 metrics about how you work" },
-          { icon: "flame", text: "Get burnout warnings before you feel it" },
-          { icon: "lightbulb", text: "Get short notes on what EMRALD spots in your numbers" }
+          { icon: "timer", text: COPY["welcome.bullets.1"] },
+          { icon: "clock", text: COPY["welcome.bullets.2"] },
+          { icon: "lightbulb", text: COPY["welcome.bullets.3"] },
+          { icon: "flame", text: COPY["welcome.bullets.4"] }
         ];
         for (const item of items) {
           const row = features.createDiv({ cls: "emerald-onboard-feature" });
           const iconEl = row.createSpan({ cls: "emerald-onboard-feature-icon" });
-          (0, import_obsidian5.setIcon)(iconEl, item.icon);
+          (0, import_obsidian2.setIcon)(iconEl, item.icon);
           row.createSpan({ text: item.text });
         }
         const actions = container.createDiv({ cls: "emerald-modal-actions emerald-onboard-actions" });
         const startBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Get started"
+          text: COPY["welcome.cta"]
         });
-        startBtn.addEventListener("click", () => this.goTo("connect"));
+        startBtn.addEventListener("click", () => this.goTo("project"));
       }
-      // ── Step 2: API Connection ───────────────────────────
+      // ── Connect (first screen) ───────────────────────────
       renderConnect(container) {
         container.createEl("h2", { cls: "emerald-onboard-title", text: "Connect to EMRALD" });
         container.createEl("p", {
           cls: "emerald-onboard-desc",
-          text: "Enter your API key to connect. You can get one from your EMRALD dashboard."
+          text: COPY["connect.body"]
         });
         const privacyEl = container.createDiv({ cls: "emerald-onboard-privacy" });
         const privacyText = privacyEl.createEl("p", { cls: "emerald-onboard-privacy-text" });
         const lockIcon = privacyText.createSpan({ cls: "emerald-onboard-privacy-icon" });
-        (0, import_obsidian5.setIcon)(lockIcon, "lock");
+        (0, import_obsidian2.setIcon)(lockIcon, "lock");
         privacyText.appendText(" EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes. It couldn\u2019t access them even if it tried.");
         const linkEl = container.createDiv({ cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
@@ -1430,7 +942,12 @@ var init_onboarding = __esm({
                 await this.plugin.saveSettings();
                 const itemsResp = await this.plugin.apiClient.getItems();
                 this.isNewUser = !itemsResp.data || Array.isArray(itemsResp.data) && itemsResp.data.length === 0;
-                window.setTimeout(() => this.goTo(this.isNewUser ? "profile" : "calibration"), 800);
+                window.setTimeout(() => {
+                  if (this.isNewUser)
+                    this.goTo("welcome");
+                  else
+                    void this.finish(false);
+                }, 800);
               }
             } catch (e) {
               this.restoreCredentials();
@@ -1442,174 +959,256 @@ var init_onboarding = __esm({
           text: "Skip: i'll configure later"
         });
         skipBtn.addEventListener("click", () => {
-          void this.finish();
+          void this.finish(false);
         });
-        const backBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-secondary",
-          text: "Back"
+      }
+      // ── First project (required) ─────────────────────────
+      renderProject(container) {
+        container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["project.title"] });
+        container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["project.body"] });
+        container.createDiv({ cls: "emerald-onboard-hint emerald-onboard-hint-top", text: COPY["project.what"] });
+        const explainer = container.createDiv({ cls: "emerald-onboard-explainer" });
+        for (const n of [1, 2, 3, 4])
+          explainer.createDiv({ text: COPY[`project.legend.${n}`] });
+        container.createDiv({ cls: "emerald-onboard-hint", text: COPY["project.noteLink"] });
+        const form = container.createDiv({ cls: "emerald-form" });
+        const addRow = form.createDiv({ cls: "emerald-onboard-add-row" });
+        const nameInput = addRow.createEl("input", {
+          cls: "emerald-onboard-input emerald-onboard-proj-name",
+          type: "text",
+          placeholder: "Project name"
         });
+        nameInput.value = this.projectName;
+        const levelSelect = addRow.createEl("select", { cls: "emerald-onboard-select" });
+        for (const l of LEVEL_OPTIONS) {
+          const opt = levelSelect.createEl("option", { value: l.value, text: l.label });
+          if (l.value === this.projectLevel)
+            opt.selected = true;
+        }
+        levelSelect.addEventListener("change", () => {
+          this.projectLevel = levelSelect.value;
+        });
+        const linkBtn = addRow.createEl("button", { cls: "emerald-btn-tiny" });
+        const notePathEl = form.createDiv({ cls: "emerald-onboard-note-path" });
+        const showLink = () => {
+          var _a;
+          linkBtn.empty();
+          (0, import_obsidian2.setIcon)(linkBtn, this.projectNotePath ? "pencil" : "link");
+          linkBtn.title = this.projectNotePath ? "Change linked note" : "Link to a note";
+          notePathEl.setText((_a = this.projectNotePath) != null ? _a : "");
+        };
+        showLink();
+        linkBtn.addEventListener("click", () => {
+          new NoteSuggestModal(this.app, (file) => {
+            this.projectNotePath = file.path;
+            showLink();
+          }).open();
+        });
+        const requiredEl = form.createDiv({ cls: "emerald-onboard-hint", text: COPY["project.required"] });
+        form.createDiv({ cls: "emerald-form-desc", text: COPY["project.cap"] });
+        const actions = container.createDiv({ cls: "emerald-modal-actions" });
+        const nextBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary", text: "Next" });
+        const sync = () => {
+          const ok = this.projectName.trim().length > 0;
+          nextBtn.disabled = !ok;
+          if (ok)
+            requiredEl.addClass("emrald-hidden");
+          else
+            requiredEl.removeClass("emrald-hidden");
+        };
+        nameInput.addEventListener("input", () => {
+          this.projectName = nameInput.value;
+          sync();
+        });
+        nameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !nextBtn.disabled)
+            nextBtn.click();
+        });
+        sync();
+        nextBtn.addEventListener("click", () => {
+          if (this.projectName.trim())
+            this.goTo("ready");
+        });
+        const backBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-secondary", text: "Back" });
         backBtn.addEventListener("click", () => this.goTo("welcome"));
       }
-      // ── Step 3: Profile Setup ────────────────────────────
-      renderProfile(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Quick profile" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "Tell EMRALD a bit about your work capacity. This helps set your effort levels. You can always update these later."
-        });
+      // ── Ready: one hours line, then the first session ────
+      renderReady(container) {
+        container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["ready.title"] });
         const form = container.createDiv({ cls: "emerald-form" });
-        const availGroup = form.createDiv({ cls: "emerald-form-group" });
-        availGroup.createEl("label", { text: "How many hours per day do you work on projects?" });
-        availGroup.createDiv({ cls: "emerald-form-desc", text: "This sets your daily time budget. You can override it any day." });
-        const sliderRow = availGroup.createDiv({ cls: "emerald-form-label-row" });
-        const valueEl = sliderRow.createSpan({ cls: "emerald-slider-value", text: "4h" });
-        const slider = availGroup.createEl("input", { cls: "emerald-slider" });
-        slider.type = "range";
-        slider.min = "2";
-        slider.max = "16";
-        slider.value = "4";
-        slider.addEventListener("input", () => {
-          valueEl.textContent = `${slider.value}h`;
-        });
+        const group = form.createDiv({ cls: "emerald-form-group" });
+        group.createEl("label", { text: COPY["ready.hours"] });
+        const hoursInput = group.createEl("input", { cls: "emerald-onboard-input emerald-onboard-hours", type: "number" });
+        hoursInput.min = "0.5";
+        hoursInput.max = "24";
+        hoursInput.step = "0.5";
+        hoursInput.value = String(this.hours);
+        group.createDiv({ cls: "emerald-form-desc", text: COPY["ready.hours.hint"] });
+        form.createDiv({ cls: "emerald-form-desc", text: COPY["ready.short"] });
+        const statusEl = form.createDiv({ cls: "emerald-onboard-status" });
         const actions = container.createDiv({ cls: "emerald-modal-actions" });
-        const nextBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Next"
-        });
-        nextBtn.addEventListener("click", () => {
+        const startBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary emerald-btn-lg", text: COPY["ready.cta"] });
+        const sync = () => {
+          const h = parseFloat(hoursInput.value);
+          this.hours = h;
+          startBtn.disabled = !(Number.isFinite(h) && h > 0 && h <= 24);
+        };
+        hoursInput.addEventListener("input", sync);
+        sync();
+        startBtn.addEventListener("click", () => {
           void (async () => {
+            var _a;
+            if (startBtn.disabled)
+              return;
+            startBtn.disabled = true;
+            statusEl.textContent = "";
             try {
-              const hours = parseInt(slider.value) || 4;
+              if (!this.createdItemId) {
+                const resp = await this.plugin.apiClient.createItem({
+                  name: this.projectName.trim(),
+                  effort_level: this.projectLevel,
+                  obsidian_note_path: this.projectNotePath
+                });
+                if (resp.error || !resp.data) {
+                  statusEl.textContent = `Could not create the project: ${(_a = resp.error) != null ? _a : "try again"}`;
+                  statusEl.className = "emerald-onboard-status is-error";
+                  startBtn.disabled = false;
+                  return;
+                }
+                this.createdItemId = resp.data.id;
+              }
               try {
-                await this.plugin.apiClient.setWeeklyAvailability(hours);
+                await this.plugin.apiClient.setWeeklyAvailability(this.hours);
               } catch (e) {
               }
-              this.goTo("calibration");
+              this.plugin._firstSessionItemId = this.createdItemId;
+              await this.finish(true);
             } catch (e) {
+              statusEl.textContent = "Something went wrong. Try again.";
+              statusEl.className = "emerald-onboard-status is-error";
+              startBtn.disabled = false;
             }
           })();
         });
+        const backBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-secondary", text: "Back" });
+        backBtn.addEventListener("click", () => this.goTo("project"));
       }
-      renderCalibration(container) {
-        var _a, _b, _c, _d, _e;
-        const questions = _OnboardingModal.CALIBRATION_QUESTIONS;
-        const perPage = _OnboardingModal.QUESTIONS_PER_PAGE;
-        const totalPages = Math.ceil(questions.length / perPage);
-        const pageQuestions = questions.slice(
-          this.calibrationPage * perPage,
-          (this.calibrationPage + 1) * perPage
-        );
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Effort profile" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "These questions help EMRALD fit effort levels to your personal style. There are no wrong answers."
-        });
-        container.createDiv({
-          cls: "emerald-onboard-step-label",
-          text: `Page ${this.calibrationPage + 1} of ${totalPages}  \u2022  Question ${this.calibrationPage * perPage + 1}\u2013${Math.min((this.calibrationPage + 1) * perPage, questions.length)} of ${questions.length}`
-        });
+      // ── Questions flow (optional): 13 questions, then what recharges you ──
+      renderQuestions(container) {
+        var _a, _b;
+        const [from, to] = PAGE_BOUNDS[this.qPage];
+        container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["questions.title"] });
+        container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["questions.body"] });
+        container.createDiv({ cls: "emerald-onboard-step-label", text: progressLine(COPY["questions.progress"], this.qPage) });
         const form = container.createDiv({ cls: "emerald-form" });
-        for (const q of pageQuestions) {
+        for (const q of QUESTIONS.slice(from, to)) {
           const group = form.createDiv({ cls: "emerald-form-group" });
           group.createEl("label", { text: q.question });
-          if (q.type === "slider") {
-            const currentVal = (_b = (_a = this.calibrationAnswers[q.key]) != null ? _a : q.default) != null ? _b : 3;
-            const labelRow = group.createDiv({ cls: "emerald-form-label-row" });
-            const valueEl = labelRow.createSpan({ cls: "emerald-slider-value", text: `${currentVal}/5` });
-            const endpoints = group.createDiv({ cls: "emerald-slider-endpoints" });
-            endpoints.createSpan({ cls: "emerald-slider-endpoint-left", text: "Not at all" });
-            endpoints.createSpan({ cls: "emerald-slider-endpoint-right", text: "Very much" });
-            const slider = group.createEl("input", { cls: "emerald-slider" });
-            slider.type = "range";
-            slider.min = String((_c = q.min) != null ? _c : 1);
-            slider.max = String((_d = q.max) != null ? _d : 5);
-            slider.value = String(currentVal);
-            const key = q.key;
-            slider.addEventListener("input", () => {
-              const val = parseInt(slider.value);
-              valueEl.textContent = `${val}/5`;
-              this.calibrationAnswers[key] = val;
-            });
-            if (this.calibrationAnswers[key] === void 0) {
-              this.calibrationAnswers[key] = currentVal;
-            }
-          } else if (q.type === "enum" && q.options) {
-            const currentVal = (_e = this.calibrationAnswers[q.key]) != null ? _e : null;
-            const btnColumn = group.createDiv({ cls: "emerald-onboard-enum-group" });
-            for (const opt of q.options) {
-              const btn = btnColumn.createEl("button", {
-                cls: `emerald-onboard-enum-btn ${currentVal === opt.value ? "is-active" : ""}`,
-                text: opt.label
-              });
-              const key = q.key;
+          const key = q.key;
+          if (q.type === "scale") {
+            const row = group.createDiv({ cls: "emerald-btn-group emerald-scale-row" });
+            row.setAttribute("role", "radiogroup");
+            row.setAttribute("aria-label", q.question);
+            for (let v = 1; v <= 5; v++) {
+              const btn = row.createEl("button", { cls: "emerald-btn-toggle emerald-scale-btn", text: String(v) });
+              btn.setAttribute("role", "radio");
+              const paint = () => {
+                const on = this.answers[key] === v;
+                btn.setAttribute("aria-checked", String(on));
+                if (on)
+                  btn.addClass("is-active");
+                else
+                  btn.removeClass("is-active");
+              };
+              paint();
               btn.addEventListener("click", () => {
-                this.calibrationAnswers[key] = opt.value;
-                btnColumn.querySelectorAll(".emerald-onboard-enum-btn").forEach((b) => b.removeClass("is-active"));
-                btn.addClass("is-active");
+                if (this.answers[key] === v)
+                  delete this.answers[key];
+                else
+                  this.answers[key] = v;
+                row.querySelectorAll(".emerald-scale-btn").forEach((b) => {
+                  b.removeClass("is-active");
+                  b.setAttribute("aria-checked", "false");
+                });
+                paint();
+              });
+            }
+            const ends = group.createDiv({ cls: "emerald-slider-endpoints" });
+            ends.createSpan({ cls: "emerald-slider-endpoint-left", text: (_a = q.low) != null ? _a : "Low" });
+            ends.createSpan({ cls: "emerald-slider-endpoint-right", text: (_b = q.high) != null ? _b : "High" });
+          } else if (q.options) {
+            const col = group.createDiv({ cls: "emerald-onboard-enum-group" });
+            for (const opt of q.options) {
+              const btn = col.createEl("button", {
+                cls: `emerald-onboard-enum-btn ${this.answers[key] === opt.value ? "is-active" : ""}`
+              });
+              btn.setAttribute("aria-pressed", String(this.answers[key] === opt.value));
+              if (opt.desc) {
+                btn.createSpan({ cls: "emerald-opt-label", text: opt.label });
+                btn.createSpan({ cls: "emerald-opt-desc", text: opt.desc });
+              } else {
+                btn.setText(opt.label);
+              }
+              btn.addEventListener("click", () => {
+                if (this.answers[key] === opt.value)
+                  delete this.answers[key];
+                else
+                  this.answers[key] = opt.value;
+                col.querySelectorAll(".emerald-onboard-enum-btn").forEach((b) => {
+                  b.removeClass("is-active");
+                  b.setAttribute("aria-pressed", "false");
+                });
+                if (this.answers[key] === opt.value) {
+                  btn.addClass("is-active");
+                  btn.setAttribute("aria-pressed", "true");
+                }
               });
             }
           }
         }
         const actions = container.createDiv({ cls: "emerald-modal-actions emerald-calibration-actions" });
-        if (this.calibrationPage > 0) {
-          const backBtn = actions.createEl("button", {
-            cls: "emerald-btn emerald-btn-secondary",
-            text: "Back"
-          });
+        if (this.qPage > 0) {
+          const backBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-secondary", text: "Back" });
           backBtn.addEventListener("click", () => {
-            this.calibrationPage--;
+            this.qPage--;
             this.renderStep();
           });
         }
-        if (this.calibrationPage < totalPages - 1) {
-          const nextBtn = actions.createEl("button", {
-            cls: "emerald-btn emerald-btn-primary",
-            text: "Next"
-          });
-          nextBtn.addEventListener("click", () => {
-            this.calibrationPage++;
+        const nextBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary", text: "Next" });
+        nextBtn.addEventListener("click", () => {
+          if (this.qPage < PAGE_BOUNDS.length - 1) {
+            this.qPage++;
             this.renderStep();
-          });
-        } else {
-          const saveBtn = actions.createEl("button", {
-            cls: "emerald-btn emerald-btn-primary",
-            text: "Save & continue"
-          });
-          saveBtn.addEventListener("click", () => {
-            void (async () => {
-              try {
-                if (Object.keys(this.calibrationAnswers).length > 0) {
-                  try {
-                    await this.plugin.apiClient.updateCalibration(this.calibrationAnswers);
-                    new import_obsidian5.Notice("Effort profile saved \u2713");
-                  } catch (e) {
-                    new import_obsidian5.Notice("Profile saved locally: will sync later.");
-                  }
-                }
-                this.goTo("recovery");
-              } catch (e) {
-              }
-            })();
-          });
-        }
-      }
-      // ── Step 5: Recovery Protocols ─────────────────────
-      renderRecovery(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "What recharges you?" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "Recharge activities are things that restore your energy, like walking, piano, or reading. If your burnout score gets high, EMRALD reminds you of something from this list."
+          } else
+            void this.leaveQuestions();
         });
+        const skipBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-subtle", text: COPY["questions.skip"] });
+        skipBtn.addEventListener("click", () => {
+          void this.leaveQuestions();
+        });
+      }
+      /** Save only what was answered (a blank is never written), then move on to the recharge step. */
+      async leaveQuestions() {
+        if (Object.keys(this.answers).length > 0) {
+          try {
+            await this.plugin.apiClient.updateCalibration(this.answers);
+            this.savedSomething = true;
+          } catch (e) {
+            new import_obsidian2.Notice("Could not save your answers. Try again in a moment.");
+          }
+        }
+        this.goTo("recharge");
+      }
+      renderRecharge(container) {
+        container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["recharge.title"] });
+        container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["recharge.body"] });
         const form = container.createDiv({ cls: "emerald-form" });
         const protocolGroup = form.createDiv({ cls: "emerald-form-group" });
-        protocolGroup.createEl("label", { text: "Add up to 3 recharge activities" });
-        const hintEl = protocolGroup.createDiv({
-          cls: "emerald-form-desc",
-          text: "Press Enter to add another. These help EMRALD suggest recovery when it matters."
-        });
+        protocolGroup.createEl("label", { text: COPY["recharge.label"] });
+        const hintEl = protocolGroup.createDiv({ cls: "emerald-form-desc", text: COPY["recharge.hint"] });
         let rowCount = 0;
         const MAX_ROWS = 3;
-        const addRow = (prefill) => {
+        const addRow = () => {
           if (rowCount >= MAX_ROWS)
             return;
           rowCount++;
@@ -1619,8 +1218,6 @@ var init_onboarding = __esm({
             type: "text",
             placeholder: "e.g., Walking, Piano, Reading"
           });
-          if (prefill)
-            input.value = prefill;
           input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -1632,288 +1229,46 @@ var init_onboarding = __esm({
         };
         addRow();
         const actions = container.createDiv({ cls: "emerald-modal-actions" });
-        const saveBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Next"
-        });
+        const saveBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary", text: "Next" });
         saveBtn.addEventListener("click", () => {
           void (async () => {
-            try {
-              const inputs = protocolGroup.querySelectorAll("input");
-              const activities = [];
-              inputs.forEach((input) => {
-                const val = input.value.trim();
-                if (val)
-                  activities.push(val);
-              });
-              if (activities.length > 0) {
-                try {
-                  for (const activity of activities) {
-                    await this.plugin.apiClient.createRecoveryProtocol(activity);
-                  }
-                  new import_obsidian5.Notice("Recharge processes saved");
-                } catch (e) {
-                  new import_obsidian5.Notice("Saved locally: will sync later.");
-                }
-              }
-              this.goTo("schedule");
-            } catch (e) {
-            }
-          })();
-        });
-        const backBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-secondary",
-          text: "Back"
-        });
-        backBtn.addEventListener("click", () => this.goTo("calibration"));
-      }
-      // ── Step 5: Weekly Schedule ──────────────────────────
-      renderSchedule(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Your weekly schedule" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "How many hours per day do you typically devote to tracked projects?"
-        });
-        const trackedExplainer = container.createDiv({ cls: "emerald-onboard-hint emerald-onboard-hint-top" });
-        trackedExplainer.createEl("strong", { text: "What's a tracked project?" });
-        trackedExplainer.createSpan({
-          text: " A tracked project is something you're actively working on: a creative pursuit, a work initiative, a learning goal, a side project. It's bigger than a single task or errand."
-        });
-        trackedExplainer.createEl("br");
-        trackedExplainer.createSpan({
-          text: "Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list."
-        });
-        const form = container.createDiv({ cls: "emerald-form" });
-        const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dayGroup = form.createDiv({ cls: "emerald-form-group" });
-        const dayRow = dayGroup.createDiv({ cls: "emerald-schedule-row" });
-        const inputs = [];
-        for (let d = 0; d < 7; d++) {
-          const dayCol = dayRow.createDiv({ cls: "emerald-schedule-day" });
-          dayCol.createEl("label", { text: dayLabels[d], cls: "emerald-schedule-label" });
-          const input = dayCol.createEl("input", {
-            cls: "emerald-onboard-input emerald-schedule-input",
-            type: "number"
-          });
-          input.min = "0";
-          input.max = "24";
-          input.step = "0.5";
-          input.value = String(this.dailyHours[d]);
-          const dayIndex = d;
-          input.addEventListener("input", () => {
-            const val = parseFloat(input.value);
-            if (!isNaN(val) && val >= 0 && val <= 24) {
-              this.dailyHours[dayIndex] = val;
-            }
-          });
-          inputs.push(input);
-        }
-        const actions = container.createDiv({ cls: "emerald-modal-actions" });
-        const nextBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Next"
-        });
-        nextBtn.addEventListener("click", () => {
-          void (async () => {
-            try {
-              const schedule = this.dailyHours.map((hours, day) => ({
-                day,
-                available_hours: hours
-              }));
+            const names = [];
+            protocolGroup.querySelectorAll("input").forEach((input) => {
+              const val = input.value.trim();
+              if (val)
+                names.push(val);
+            });
+            if (names.length > 0) {
               try {
-                await this.plugin.apiClient.setDailyAvailability(schedule);
+                for (const name of names)
+                  await this.plugin.apiClient.createRecoveryProtocol(name);
+                this.savedSomething = true;
               } catch (e) {
+                new import_obsidian2.Notice("Could not save what recharges you. Try again in a moment.");
               }
-              this.goTo("projects");
-            } catch (e) {
             }
+            this.afterRecharge();
           })();
         });
-        const backBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-secondary",
-          text: "Back"
-        });
-        backBtn.addEventListener("click", () => this.goTo("recovery"));
+        const skipBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-subtle", text: COPY["recharge.skip"] });
+        skipBtn.addEventListener("click", () => this.afterRecharge());
+        const backBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-secondary", text: "Back" });
+        backBtn.addEventListener("click", () => this.goTo("questions"));
       }
-      // ── Step 6: Projects ─────────────────────────────
-      renderProjects(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Add your first projects" });
-        const projectsDesc = "What are you working on? Pick an effort level for each project: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.";
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: projectsDesc
-        });
-        container.createDiv({
-          cls: "emerald-onboard-hint emerald-onboard-hint-top",
-          text: "We recommend keeping 5 or fewer active projects. Focus is a feature, not a limitation."
-        });
-        const explainer = container.createDiv({ cls: "emerald-onboard-explainer" });
-        explainer.createDiv({ text: "E1 = Light (25% of your work hours)" });
-        explainer.createDiv({ text: "E2 = Moderate (50% of your work hours)" });
-        explainer.createDiv({ text: "E3 = Demanding (75% of your work hours)" });
-        explainer.createDiv({ text: "E4 = Maximum (100% of your work hours)" });
-        container.createDiv({
-          cls: "emerald-onboard-hint",
-          text: "Tip: click the link icon to connect a project to an existing note. EMRALD will sync session data directly to that note. Without a link, the project lives only in your project list."
-        });
-        const form = container.createDiv({ cls: "emerald-form" });
-        const listEl = form.createDiv({ cls: "emerald-onboard-project-list" });
-        const renderList = () => {
-          listEl.empty();
-          for (let i = 0; i < this.projects.length; i++) {
-            const proj = this.projects[i];
-            const row = listEl.createDiv({ cls: "emerald-onboard-project-row" });
-            const infoCol = row.createDiv({ cls: "emerald-onboard-project-info" });
-            infoCol.createSpan({ cls: "emerald-onboard-project-name", text: proj.name });
-            const badge = infoCol.createSpan({
-              cls: "emerald-elevel-badge",
-              text: levelBadgeText(proj.effortLevel),
-              attr: { "aria-label": levelTooltip(proj.effortLevel) || "No effort level" }
-            });
-            badge.style.color = colorForLevel(proj.effortLevel);
-            const noteCol = row.createDiv({ cls: "emerald-onboard-project-note" });
-            if (proj.notePath) {
-              const noteLabel = noteCol.createSpan({ cls: "emerald-onboard-note-path", text: proj.notePath });
-              noteLabel.title = proj.notePath;
-            }
-            const linkBtn = noteCol.createEl("button", {
-              cls: "emerald-btn-tiny"
-            });
-            if (proj.notePath) {
-              (0, import_obsidian5.setIcon)(linkBtn, "pencil");
-              linkBtn.title = "Change linked note";
-            } else {
-              (0, import_obsidian5.setIcon)(linkBtn, "link");
-              linkBtn.title = "Link to a note";
-            }
-            const idx = i;
-            linkBtn.addEventListener("click", () => {
-              const picker = new NoteSuggestModal(this.app, (file) => {
-                this.projects[idx].notePath = file.path;
-                renderList();
-              });
-              picker.open();
-            });
-            const removeBtn = row.createEl("button", { cls: "emerald-btn-tiny" });
-            (0, import_obsidian5.setIcon)(removeBtn, "x");
-            removeBtn.addEventListener("click", () => {
-              this.projects.splice(i, 1);
-              renderList();
-            });
-          }
-        };
-        const addRow = form.createDiv({ cls: "emerald-onboard-add-row" });
-        const nameInput = addRow.createEl("input", {
-          cls: "emerald-onboard-input emerald-onboard-proj-name",
-          type: "text",
-          placeholder: "Project name..."
-        });
-        const levelSelect = addRow.createEl("select", { cls: "emerald-onboard-select" });
-        for (const l of ["E1", "E2", "E3", "E4"]) {
-          const opt = levelSelect.createEl("option", { value: l, text: l });
-          if (l === "E2")
-            opt.selected = true;
-        }
-        const addBtn = addRow.createEl("button", { cls: "emerald-btn emerald-btn-secondary", text: "+ add" });
-        addBtn.addEventListener("click", () => {
-          const name = nameInput.value.trim();
-          if (!name)
-            return;
-          this.projects.push({ name, effortLevel: levelSelect.value });
-          nameInput.value = "";
-          renderList();
-        });
-        nameInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter")
-            addBtn.click();
-        });
-        renderList();
-        container.createDiv({
-          cls: "emerald-onboard-hint",
-          text: "Add at least 1 to get started. You can always add more later."
-        });
-        const actions = container.createDiv({ cls: "emerald-modal-actions" });
-        const nextBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Next"
-        });
-        nextBtn.addEventListener("click", () => {
-          void (async () => {
-            try {
-              for (const proj of this.projects) {
-                const resp = await this.plugin.apiClient.createItem({
-                  name: proj.name,
-                  effort_level: proj.effortLevel,
-                  obsidian_note_path: proj.notePath
-                });
-                if (resp.error) {
-                  new import_obsidian5.Notice(`Failed to create project "${proj.name}": ${resp.error}`);
-                }
-              }
-              this.goTo("tour");
-            } catch (e) {
-            }
-          })();
-        });
+      afterRecharge() {
+        if (this.savedSomething)
+          this.goTo("done");
+        else
+          this.close();
       }
-      // ── Step 7: Tour & Done ──────────────────────────
-      renderTour(container) {
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "Quick tour" });
-        const steps = [
-          {
-            icon: "timer",
-            title: "Timeblock",
-            desc: "This is your day. A 24-hour bar shows time passing. When you start a session, the clock freezes and a green bar fills, showing your daily effort in real time."
-          },
-          {
-            icon: "folder",
-            title: "Projects",
-            desc: "Your active projects live here. Click one to start a session, open the project note, or change the location / effort level."
-          },
-          {
-            icon: "bar-chart-2",
-            title: "Effort management",
-            desc: "Seven sections break down the ins and outs of your effort levels. Each one opens a detailed workspace view for you to analyze and track. If you're a PRO user, read effort insights and pinnable sparklines at a glance."
-          },
-          {
-            icon: "flame",
-            title: "Burnout Protection",
-            desc: "EMRALD watches your work patterns. If effort levels get risky, you'll get a gentle heads-up with suggested actions."
-          }
-        ];
-        const tourList = container.createDiv({ cls: "emerald-onboard-tour" });
-        for (const step of steps) {
-          const card = tourList.createDiv({ cls: "emerald-onboard-tour-step" });
-          const iconEl = card.createSpan({ cls: "emerald-onboard-tour-icon" });
-          (0, import_obsidian5.setIcon)(iconEl, step.icon);
-          const content = card.createDiv({ cls: "emerald-onboard-tour-content" });
-          content.createDiv({ cls: "emerald-onboard-tour-title", text: step.title });
-          content.createDiv({ cls: "emerald-onboard-tour-desc", text: step.desc });
-        }
-        const actions = container.createDiv({ cls: "emerald-modal-actions" });
-        const doneBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Let's go!"
-        });
-        doneBtn.addEventListener("click", () => this.goTo("done"));
-      }
-      // ── Done ─────────────────────────────────────────────
       renderDone(container) {
         const doneIcon = container.createDiv({ cls: "emerald-onboard-icon" });
-        (0, import_obsidian5.setIcon)(doneIcon, "sparkles");
-        container.createEl("h2", { cls: "emerald-onboard-title", text: "You're all set!" });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc",
-          text: "You're all set. Start a session before you start your work, and EMRALD will track the work time for you. When you stop, you'll file a ten-second receipt: five quick questions about how your work really felt."
-        });
-        container.createEl("p", {
-          cls: "emerald-onboard-desc emerald-onboard-profile-nudge",
-          text: "Want more from your insights? Complete your effort profile. It helps EMRALD fit effort levels to your work style and watch for burnout patterns."
-        });
+        (0, import_obsidian2.setIcon)(doneIcon, "sparkles");
+        container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["card.done"] });
         const researchRow = container.createDiv({ cls: "emerald-onboard-research" });
         const researchToggle = researchRow.createEl("label", { cls: "emerald-onboard-research-label" });
         const checkbox = researchToggle.createEl("input", { type: "checkbox" });
-        checkbox.checked = this.plugin.settings.researchOptIn;
+        checkbox.checked = !!this.plugin.settings.researchOptIn;
         checkbox.addEventListener("change", () => {
           void (async () => {
             try {
@@ -1927,43 +1282,10 @@ var init_onboarding = __esm({
             }
           })();
         });
-        researchToggle.appendText(" Help improve EMRALD: contribute anonymous usage data to build additional features and improve existing ones, and to advance effort management research. ");
-        researchToggle.createSpan({
-          cls: "emerald-link",
-          text: "Change anytime in Settings \u2192 Privacy."
-        });
+        researchToggle.appendText(` ${COPY["optin.line"]}`);
         const actions = container.createDiv({ cls: "emerald-modal-actions emerald-onboard-done-actions" });
-        const profileBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
-          text: "Enable advanced profile"
-        });
-        profileBtn.addEventListener("click", () => {
-          void (async () => {
-            try {
-              const { AdvancedUpgradeModal: AdvancedUpgradeModal2 } = await Promise.resolve().then(() => (init_advanced_upgrade(), advanced_upgrade_exports));
-              const modal = new AdvancedUpgradeModal2(
-                this.app,
-                this.plugin,
-                () => {
-                  void this.finish();
-                },
-                () => {
-                  void this.finish();
-                }
-              );
-              this.close();
-              modal.open();
-            } catch (e) {
-            }
-          })();
-        });
-        const laterBtn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-subtle",
-          text: "Keep it simple for now"
-        });
-        laterBtn.addEventListener("click", () => {
-          void this.finish();
-        });
+        const doneBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary emerald-btn-lg", text: "Done" });
+        doneBtn.addEventListener("click", () => this.close());
       }
       /** A failed connection test must not leave the typed key live in place of the saved one. */
       restoreCredentials() {
@@ -1974,154 +1296,20 @@ var init_onboarding = __esm({
         this.currentStep = step;
         this.renderStep();
       }
-      async finish() {
+      /** Mark the signup done. startedSession = the Ready button was pressed (the sidebar starts the session); About opens only when the user skipped. */
+      async finish(startedSession) {
+        this.finished = true;
         this.plugin.settings.onboardingComplete = true;
         await this.plugin.saveSettings();
-        const aboutViewType = VIEW_ABOUT;
         this.close();
         window.setTimeout(() => {
-          void this.plugin.openWorkspaceView(aboutViewType);
+          if (!startedSession)
+            void this.plugin.openWorkspaceView(VIEW_ABOUT);
           this.onComplete();
         }, 300);
       }
     };
-    OnboardingModal = _OnboardingModal;
-    // ── Step 3b: Calibration Questions ───────────────────
-    OnboardingModal.CALIBRATION_QUESTIONS = [
-      // Page 1: Work style
-      {
-        key: "chronotype",
-        question: "When do you do your best, most focused work?",
-        type: "enum",
-        options: [
-          { value: "early_morning", label: "Early morning (5\u20138am)" },
-          { value: "mid_morning", label: "Mid-morning (8\u201311am)" },
-          { value: "afternoon", label: "Afternoon (12\u20134pm)" },
-          { value: "evening", label: "Evening (5\u20139pm)" },
-          { value: "late_night", label: "Late night (10pm+)" }
-        ]
-      },
-      {
-        key: "work_pace_style",
-        question: "Do you prefer to work in intense bursts with breaks, or steady?",
-        type: "enum",
-        options: [
-          { value: "burst", label: "Intense bursts with breaks" },
-          { value: "mix", label: "A mix of both" },
-          { value: "steady", label: "Steady and consistent" }
-        ]
-      },
-      {
-        key: "social_energy_direction",
-        question: "After a day of socializing, I feel...",
-        type: "enum",
-        options: [
-          { value: "energized", label: "Energized: people charge me up" },
-          { value: "neutral", label: "Neutral: depends on the people" },
-          { value: "drained", label: "Drained: I need alone time to recover" }
-        ]
-      },
-      // Page 2: Personality traits
-      {
-        key: "sleep_quality_baseline",
-        question: "In general, how well do you sleep?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      {
-        key: "conscientiousness",
-        question: "I see myself as someone who is organized and follows through...",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      {
-        key: "stress_vulnerability",
-        question: "I get stressed easily and worry about things going wrong.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      {
-        key: "novelty_tolerance",
-        question: "I'm energized by trying new things and tackling unfamiliar challenges.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      // Page 3: Work patterns
-      {
-        key: "routine_tolerance",
-        question: "I can do routine, repetitive work for long stretches without losing focus.",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      {
-        key: "procrastination_tendency",
-        question: "How often do you delay starting tasks you've committed to?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      },
-      {
-        key: "procrastination_trigger",
-        question: "When you procrastinate, it's usually because...",
-        type: "enum",
-        options: [
-          { value: "boring", label: "The task is boring" },
-          { value: "uncertain", label: "I'm unsure how to start" },
-          { value: "fear", label: "Fear of failure or judgment" },
-          { value: "tired", label: "I'm just tired" },
-          { value: "distracted", label: "I get distracted easily" },
-          { value: "overwhelmed", label: "It feels too big" }
-        ]
-      },
-      // Page 4: Working genius + autonomy
-      {
-        key: "working_genius_primary",
-        question: "Which type of work energizes you MOST?",
-        type: "enum",
-        options: [
-          { value: "wonder", label: "Wonder: asking big questions, imagining possibilities" },
-          { value: "invention", label: "Invention: creating new solutions and ideas" },
-          { value: "discernment", label: "Discernment: evaluating and giving feedback" },
-          { value: "galvanizing", label: "Galvanizing: rallying people to take action" },
-          { value: "enablement", label: "Enablement: helping others succeed" },
-          { value: "tenacity", label: "Tenacity: finishing tasks and crossing the line" }
-        ]
-      },
-      {
-        key: "working_frustration_primary",
-        question: "Which type of work DRAINS you MOST?",
-        type: "enum",
-        options: [
-          { value: "wonder", label: "Wonder: thinking abstractly without action" },
-          { value: "invention", label: "Invention: having to create from scratch" },
-          { value: "discernment", label: "Discernment: evaluating others' work" },
-          { value: "galvanizing", label: "Galvanizing: motivating and organizing people" },
-          { value: "enablement", label: "Enablement: supporting others' priorities" },
-          { value: "tenacity", label: "Tenacity: grinding through repetitive details" }
-        ]
-      },
-      {
-        key: "autonomy_satisfaction",
-        question: "How much control do you feel over your daily choices?",
-        type: "slider",
-        min: 1,
-        max: 5,
-        default: 3
-      }
-    ];
-    OnboardingModal.QUESTIONS_PER_PAGE = 3;
-    NoteSuggestModal = class extends import_obsidian5.FuzzySuggestModal {
+    NoteSuggestModal = class extends import_obsidian2.FuzzySuggestModal {
       constructor(app, onChoose) {
         super(app);
         this.onChoose = onChoose;
@@ -2146,17 +1334,17 @@ __export(custom_elevel_editor_exports, {
   ConfirmRemoveELevelModal: () => ConfirmRemoveELevelModal,
   CustomELevelEditorModal: () => CustomELevelEditorModal
 });
-var import_obsidian6, TITLES, CustomELevelEditorModal, ConfirmRemoveELevelModal;
+var import_obsidian3, TITLES, CustomELevelEditorModal, ConfirmRemoveELevelModal;
 var init_custom_elevel_editor = __esm({
   "src/modals/custom-elevel-editor.ts"() {
-    import_obsidian6 = require("obsidian");
+    import_obsidian3 = require("obsidian");
     init_e_levels();
     TITLES = {
       create: "New effort level",
       rename: "Rename effort level",
       percent: "Change percent"
     };
-    CustomELevelEditorModal = class extends import_obsidian6.Modal {
+    CustomELevelEditorModal = class extends import_obsidian3.Modal {
       constructor(app, plugin, mode, level, onDone) {
         var _a;
         super(app);
@@ -2285,7 +1473,7 @@ var init_custom_elevel_editor = __esm({
           return;
         const problem = this.blockingProblem();
         if (problem) {
-          new import_obsidian6.Notice(problem);
+          new import_obsidian3.Notice(problem);
           return;
         }
         this.submitting = true;
@@ -2312,7 +1500,7 @@ var init_custom_elevel_editor = __esm({
       async runCreate() {
         const resp = await this.plugin.apiClient.createELevel(this.name.trim(), this.percent);
         if (resp.queued) {
-          new import_obsidian6.Notice("You're offline. This level will be created when you reconnect.");
+          new import_obsidian3.Notice("You're offline. This level will be created when you reconnect.");
           this.close();
           return;
         }
@@ -2322,7 +1510,7 @@ var init_custom_elevel_editor = __esm({
         }
         eLevelStore.upsert(resp.data);
         await this.afterMutation();
-        new import_obsidian6.Notice(`Created ${resp.data.name} (${resp.data.percent}%)`);
+        new import_obsidian3.Notice(`Created ${resp.data.name} (${resp.data.percent}%)`);
         this.close();
       }
       async runRename() {
@@ -2330,7 +1518,7 @@ var init_custom_elevel_editor = __esm({
           return;
         const resp = await this.plugin.apiClient.renameELevel(this.level.id, this.name.trim());
         if (resp.queued) {
-          new import_obsidian6.Notice("You're offline. The rename will sync when you reconnect.");
+          new import_obsidian3.Notice("You're offline. The rename will sync when you reconnect.");
           this.close();
           return;
         }
@@ -2340,7 +1528,7 @@ var init_custom_elevel_editor = __esm({
         }
         eLevelStore.upsert(resp.data);
         await this.afterMutation();
-        new import_obsidian6.Notice(`Renamed to ${resp.data.name}`);
+        new import_obsidian3.Notice(`Renamed to ${resp.data.name}`);
         this.close();
       }
       async runPercent() {
@@ -2348,7 +1536,7 @@ var init_custom_elevel_editor = __esm({
           return;
         const resp = await this.plugin.apiClient.changeELevelPercent(this.level.id, this.percent);
         if (resp.queued) {
-          new import_obsidian6.Notice("You're offline. The change will sync when you reconnect.");
+          new import_obsidian3.Notice("You're offline. The change will sync when you reconnect.");
           this.close();
           return;
         }
@@ -2358,7 +1546,7 @@ var init_custom_elevel_editor = __esm({
         }
         eLevelStore.upsert(resp.data);
         await this.afterMutation();
-        new import_obsidian6.Notice(`${resp.data.name} is now ${resp.data.percent}%`);
+        new import_obsidian3.Notice(`${resp.data.name} is now ${resp.data.percent}%`);
         this.close();
       }
       /** Refresh the cache from the server after a mutation, then redraw callers. */
@@ -2399,7 +1587,7 @@ var init_custom_elevel_editor = __esm({
         if (this.noticeEl) {
           this.noticeEl.empty();
           const icon = this.noticeEl.createSpan({ cls: "emerald-form-error-icon" });
-          (0, import_obsidian6.setIcon)(icon, "alert-circle");
+          (0, import_obsidian3.setIcon)(icon, "alert-circle");
           this.noticeEl.createSpan({ text: ` ${message}` });
           if (retryable) {
             const retry = this.noticeEl.createEl("button", { cls: "emerald-btn-link", text: "Retry" });
@@ -2409,13 +1597,13 @@ var init_custom_elevel_editor = __esm({
           }
           this.noticeEl.removeClass("emrald-hidden");
         }
-        new import_obsidian6.Notice(message);
+        new import_obsidian3.Notice(message);
       }
       onClose() {
         this.contentEl.empty();
       }
     };
-    ConfirmRemoveELevelModal = class extends import_obsidian6.Modal {
+    ConfirmRemoveELevelModal = class extends import_obsidian3.Modal {
       constructor(app, level, onConfirm) {
         super(app);
         this.level = level;
@@ -2450,13 +1638,13 @@ var init_custom_elevel_editor = __esm({
 // src/utils/icons.ts
 function createIconEl(parent, iconId, cls) {
   const span = parent.createSpan({ cls: cls || "emerald-icon" });
-  (0, import_obsidian8.setIcon)(span, iconId);
+  (0, import_obsidian5.setIcon)(span, iconId);
   return span;
 }
-var import_obsidian8, ICONS;
+var import_obsidian5, ICONS;
 var init_icons = __esm({
   "src/utils/icons.ts"() {
-    import_obsidian8 = require("obsidian");
+    import_obsidian5 = require("obsidian");
     ICONS = {
       // Sidebar sections
       gem: "gem",
@@ -2500,10 +1688,10 @@ var effort_profile_exports = {};
 __export(effort_profile_exports, {
   EffortProfileModal: () => EffortProfileModal
 });
-var import_obsidian9, EMPTY_DRAFT, EffortProfileModal;
+var import_obsidian6, EMPTY_DRAFT, EffortProfileModal;
 var init_effort_profile = __esm({
   "src/modals/effort-profile.ts"() {
-    import_obsidian9 = require("obsidian");
+    import_obsidian6 = require("obsidian");
     EMPTY_DRAFT = {
       duration_estimate_hours: null,
       task_complexity_intrinsic: null,
@@ -2523,7 +1711,7 @@ var init_effort_profile = __esm({
       mental_demand: null,
       routine_level: null
     };
-    EffortProfileModal = class extends import_obsidian9.Modal {
+    EffortProfileModal = class extends import_obsidian6.Modal {
       constructor(app, plugin, item, existing, onSaved) {
         super(app);
         this.showExtended = false;
@@ -2904,19 +2092,19 @@ var init_effort_profile = __esm({
         var _a;
         const payload = this.buildPayload();
         if (Object.keys(payload).length === 0) {
-          new import_obsidian9.Notice("Nothing to save. Set at least one field first.");
+          new import_obsidian6.Notice("Nothing to save. Set at least one field first.");
           return;
         }
         saveBtn.disabled = true;
         saveBtn.setText("Saving\u2026");
         const resp = await this.plugin.apiClient.patchEffortProfile(this.item.id, payload);
         if (resp.error || !resp.data) {
-          new import_obsidian9.Notice(`Couldn\u2019t save effort profile: ${(_a = resp.error) != null ? _a : "unknown error"}`);
+          new import_obsidian6.Notice(`Couldn\u2019t save effort profile: ${(_a = resp.error) != null ? _a : "unknown error"}`);
           saveBtn.disabled = false;
           saveBtn.setText(this.existing ? "Save changes" : "Save profile");
           return;
         }
-        new import_obsidian9.Notice("Effort profile saved.");
+        new import_obsidian6.Notice("Effort profile saved.");
         this.onSaved(resp.data);
         this.close();
       }
@@ -2932,17 +2120,17 @@ var effort_forecast_exports = {};
 __export(effort_forecast_exports, {
   EffortForecastModal: () => EffortForecastModal
 });
-var import_obsidian10, E_LEVEL_COLOR, EffortForecastModal;
+var import_obsidian7, E_LEVEL_COLOR, EffortForecastModal;
 var init_effort_forecast = __esm({
   "src/modals/effort-forecast.ts"() {
-    import_obsidian10 = require("obsidian");
+    import_obsidian7 = require("obsidian");
     E_LEVEL_COLOR = {
       E1: "#2D7A4A",
       E2: "#B8912E",
       E3: "#C06A30",
       E4: "#B54545"
     };
-    EffortForecastModal = class extends import_obsidian10.Modal {
+    EffortForecastModal = class extends import_obsidian7.Modal {
       constructor(app, plugin, item) {
         super(app);
         this.plugin = plugin;
@@ -2955,7 +2143,7 @@ var init_effort_forecast = __esm({
         contentEl.addClass("emerald-modal", "emerald-effort-forecast-modal");
         const titleRow = contentEl.createDiv({ cls: "emerald-modal-title-row" });
         const titleIcon = titleRow.createSpan({ cls: "emerald-modal-title-icon" });
-        (0, import_obsidian10.setIcon)(titleIcon, "trending-up");
+        (0, import_obsidian7.setIcon)(titleIcon, "trending-up");
         titleRow.createEl("h2", { text: "Effort forecast" });
         titleRow.createSpan({
           cls: "emerald-pill emerald-pill-experimental",
@@ -3034,7 +2222,7 @@ var init_effort_forecast = __esm({
         if (fc.status === "coarse_fallback") {
           const banner = container.createDiv({ cls: "emerald-forecast-fallback-banner" });
           const bIcon = banner.createSpan({ cls: "emerald-forecast-fallback-icon" });
-          (0, import_obsidian10.setIcon)(bIcon, "info");
+          (0, import_obsidian7.setIcon)(bIcon, "info");
           banner.createSpan({ text: this.matchModeLabel(fc.match_mode) });
         }
         if (fc.suggested_e_level) {
@@ -3142,11 +2330,11 @@ var area_picker_exports = {};
 __export(area_picker_exports, {
   AreaPickerModal: () => AreaPickerModal
 });
-var import_obsidian11, AreaPickerModal;
+var import_obsidian8, AreaPickerModal;
 var init_area_picker = __esm({
   "src/modals/area-picker.ts"() {
-    import_obsidian11 = require("obsidian");
-    AreaPickerModal = class extends import_obsidian11.SuggestModal {
+    import_obsidian8 = require("obsidian");
+    AreaPickerModal = class extends import_obsidian8.SuggestModal {
       constructor(app, labels, currentAreaId, onChoose) {
         super(app);
         this.labels = labels;
@@ -3199,10 +2387,11 @@ var reassessment_exports = {};
 __export(reassessment_exports, {
   ReassessmentModal: () => ReassessmentModal
 });
-var import_obsidian19, CALIBRATION_QUESTIONS, QUESTIONS_PER_PAGE, ADVANCED_QUESTIONS2, CORE_FIELDS, ReassessmentModal;
+var import_obsidian16, CALIBRATION_QUESTIONS, QUESTIONS_PER_PAGE, ADVANCED_QUESTIONS, CORE_FIELDS, ReassessmentModal;
 var init_reassessment = __esm({
   "src/modals/reassessment.ts"() {
-    import_obsidian19 = require("obsidian");
+    import_obsidian16 = require("obsidian");
+    init_copy();
     CALIBRATION_QUESTIONS = [
       // Page 1: Work style
       {
@@ -3305,27 +2494,13 @@ var init_reassessment = __esm({
         key: "working_genius_primary",
         question: "Which type of work energizes you MOST?",
         type: "enum",
-        options: [
-          { value: "wonder", label: "Wonder: asking big questions, imagining possibilities" },
-          { value: "invention", label: "Invention: creating new solutions and ideas" },
-          { value: "discernment", label: "Discernment: evaluating and giving feedback" },
-          { value: "galvanizing", label: "Galvanizing: rallying people to take action" },
-          { value: "enablement", label: "Enablement: helping others succeed" },
-          { value: "tenacity", label: "Tenacity: finishing tasks and crossing the line" }
-        ]
+        options: workTypeOptions("energy")
       },
       {
         key: "working_frustration_primary",
         question: "Which type of work DRAINS you MOST?",
         type: "enum",
-        options: [
-          { value: "wonder", label: "Wonder: thinking abstractly without action" },
-          { value: "invention", label: "Invention: having to create from scratch" },
-          { value: "discernment", label: "Discernment: evaluating others' work" },
-          { value: "galvanizing", label: "Galvanizing: motivating and organizing people" },
-          { value: "enablement", label: "Enablement: supporting others' priorities" },
-          { value: "tenacity", label: "Tenacity: grinding through repetitive details" }
-        ]
+        options: workTypeOptions("drain")
       },
       {
         key: "autonomy_satisfaction",
@@ -3337,7 +2512,7 @@ var init_reassessment = __esm({
       }
     ];
     QUESTIONS_PER_PAGE = 3;
-    ADVANCED_QUESTIONS2 = [
+    ADVANCED_QUESTIONS = [
       { key: "interest_consistency", question: "I often set goals but later choose to pursue different ones.", type: "slider", min: 1, max: 5, default: 3, endpointLeft: "Never", endpointRight: "Constantly" },
       { key: "achievement_drive", question: "I maintain effort on long projects even when progress is slow.", type: "slider", min: 1, max: 5, default: 3, endpointLeft: "Rarely", endpointRight: "Always" },
       { key: "impulsiveness", question: "I tend to act on impulse rather than thinking things through.", type: "slider", min: 1, max: 5, default: 3, endpointLeft: "Never", endpointRight: "Very often" },
@@ -3425,7 +2600,7 @@ var init_reassessment = __esm({
       "motivation_personal",
       "motivation_social"
     ];
-    ReassessmentModal = class extends import_obsidian19.Modal {
+    ReassessmentModal = class extends import_obsidian16.Modal {
       constructor(app, plugin) {
         super(app);
         this.answers = {};
@@ -3470,7 +2645,7 @@ var init_reassessment = __esm({
         this.isAdvancedMode = profile.question_mode === "advanced";
         this.allQuestions = [...CALIBRATION_QUESTIONS];
         if (this.isAdvancedMode) {
-          this.allQuestions = [...this.allQuestions, ...ADVANCED_QUESTIONS2];
+          this.allQuestions = [...this.allQuestions, ...ADVANCED_QUESTIONS];
         }
         for (const field of CORE_FIELDS) {
           if (profile[field] != null) {
@@ -3500,7 +2675,7 @@ var init_reassessment = __esm({
         const pageStart = this.page * QUESTIONS_PER_PAGE;
         const isInAdvancedSection = this.isAdvancedMode && pageStart >= basicCount;
         const headerIcon = contentEl.createDiv({ cls: "emerald-onboard-icon" });
-        (0, import_obsidian19.setIcon)(headerIcon, "refresh-cw");
+        (0, import_obsidian16.setIcon)(headerIcon, "refresh-cw");
         contentEl.createEl("h2", { cls: "emerald-onboard-title", text: isInAdvancedSection ? "Retake the questions: advanced profile" : "Retake your profile questions" });
         contentEl.createEl("p", {
           cls: "emerald-onboard-desc",
@@ -3640,7 +2815,7 @@ var init_reassessment = __esm({
           }
           loadingEl.remove();
           const doneIcon = contentEl.createDiv({ cls: "emerald-onboard-icon" });
-          (0, import_obsidian19.setIcon)(doneIcon, "check-circle");
+          (0, import_obsidian16.setIcon)(doneIcon, "check-circle");
           contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile updated!" });
           const changedCount = Object.keys(changed).length;
           const message = changedCount > 0 ? `${changedCount} answer${changedCount > 1 ? "s" : ""} updated. Your previous profile has been saved to history.` : "No answers changed, but your reassessment counter has been reset. EMRALD will check in again after your next 60 days of use.";
@@ -3677,11 +2852,11 @@ var energy_checkin_exports = {};
 __export(energy_checkin_exports, {
   EnergyCheckinModal: () => EnergyCheckinModal
 });
-var import_obsidian24, EnergyCheckinModal;
+var import_obsidian21, EnergyCheckinModal;
 var init_energy_checkin = __esm({
   "src/modals/energy-checkin.ts"() {
-    import_obsidian24 = require("obsidian");
-    EnergyCheckinModal = class extends import_obsidian24.Modal {
+    import_obsidian21 = require("obsidian");
+    EnergyCheckinModal = class extends import_obsidian21.Modal {
       // 1=Low, 2=Moderate, 3=High
       constructor(app, plugin, onSubmit) {
         super(app);
@@ -3868,11 +3043,11 @@ var welcome_back_exports = {};
 __export(welcome_back_exports, {
   WelcomeBackModal: () => WelcomeBackModal
 });
-var import_obsidian26, WelcomeBackModal;
+var import_obsidian23, WelcomeBackModal;
 var init_welcome_back = __esm({
   "src/modals/welcome-back.ts"() {
-    import_obsidian26 = require("obsidian");
-    WelcomeBackModal = class extends import_obsidian26.Modal {
+    import_obsidian23 = require("obsidian");
+    WelcomeBackModal = class extends import_obsidian23.Modal {
       constructor(app, plugin, opts) {
         var _a;
         super(app);
@@ -3921,12 +3096,12 @@ var burnout_warning_exports = {};
 __export(burnout_warning_exports, {
   BurnoutWarningModal: () => BurnoutWarningModal
 });
-var import_obsidian27, BurnoutWarningModal;
+var import_obsidian24, BurnoutWarningModal;
 var init_burnout_warning = __esm({
   "src/modals/burnout-warning.ts"() {
-    import_obsidian27 = require("obsidian");
+    import_obsidian24 = require("obsidian");
     init_icons();
-    BurnoutWarningModal = class extends import_obsidian27.Modal {
+    BurnoutWarningModal = class extends import_obsidian24.Modal {
       constructor(app, plugin, opts, onAction) {
         var _a, _b, _c;
         super(app);
@@ -4033,24 +3208,552 @@ var init_burnout_warning = __esm({
   }
 });
 
+// src/modals/advanced-complete.ts
+var advanced_complete_exports = {};
+__export(advanced_complete_exports, {
+  AdvancedCompleteModal: () => AdvancedCompleteModal
+});
+var import_obsidian25, AdvancedCompleteModal;
+var init_advanced_complete = __esm({
+  "src/modals/advanced-complete.ts"() {
+    import_obsidian25 = require("obsidian");
+    AdvancedCompleteModal = class extends import_obsidian25.Modal {
+      constructor(app, onDismiss) {
+        super(app);
+        this.onDismiss = onDismiss;
+      }
+      onOpen() {
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.addClass("emerald-modal");
+        const iconEl = contentEl.createDiv({ cls: "emerald-onboard-icon" });
+        (0, import_obsidian25.setIcon)(iconEl, "sparkles");
+        contentEl.createEl("h2", { cls: "emerald-onboard-title", text: "Profile complete!" });
+        contentEl.createEl("p", {
+          cls: "emerald-onboard-desc",
+          text: "EMRALD now has the fullest picture of how you work. Your effort forecasts, burnout detection, and insights will draw on all of your answers."
+        });
+        contentEl.createEl("p", {
+          cls: "emerald-onboard-desc",
+          text: "You can revisit and update your answers anytime in the effort profile workspace view. If your habits shift, retake the questions to keep your profile current."
+        });
+        const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
+        const goBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-primary emerald-btn-lg",
+          text: "Let's go"
+        });
+        goBtn.addEventListener("click", () => {
+          this.close();
+          this.onDismiss();
+        });
+      }
+      onClose() {
+        this.contentEl.empty();
+      }
+    };
+  }
+});
+
+// src/modals/advanced-calibration.ts
+var advanced_calibration_exports = {};
+__export(advanced_calibration_exports, {
+  AdvancedCalibrationModal: () => AdvancedCalibrationModal,
+  checkAdvancedCalibrationNeeded: () => checkAdvancedCalibrationNeeded,
+  getAdvancedQuestionCount: () => getAdvancedQuestionCount
+});
+async function checkAdvancedCalibrationNeeded(plugin) {
+  var _a;
+  try {
+    if (plugin.settings.advancedProfileCompleted)
+      return null;
+    const profileResp = await plugin.apiClient.getProfile();
+    if (!profileResp.data)
+      return null;
+    const profile = profileResp.data;
+    if (profile.question_mode !== "advanced")
+      return null;
+    const advancedAnswers = (_a = profile.advanced_answers) != null ? _a : {};
+    const answeredKeys = Object.keys(advancedAnswers);
+    const requiredKeys = ADVANCED_QUESTIONS2.filter((q) => !q.optional).map((q) => q.key);
+    const actualRemaining = requiredKeys.filter((k) => !answeredKeys.includes(k)).length;
+    if (actualRemaining <= 0)
+      return null;
+    return { answeredKeys, remaining: actualRemaining };
+  } catch (e) {
+    return null;
+  }
+}
+function getAdvancedQuestionCount() {
+  return ADVANCED_QUESTIONS2.length;
+}
+var import_obsidian26, ADVANCED_QUESTIONS2, QUESTIONS_PER_SESSION, AdvancedCalibrationModal;
+var init_advanced_calibration = __esm({
+  "src/modals/advanced-calibration.ts"() {
+    import_obsidian26 = require("obsidian");
+    ADVANCED_QUESTIONS2 = [
+      // Batch 1 (Sessions 2-3): Personality deep-dive
+      {
+        key: "interest_consistency",
+        question: "I often set goals but later choose to pursue different ones.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Never",
+        endpointRight: "Constantly"
+      },
+      {
+        key: "achievement_drive",
+        question: "I maintain effort on long projects even when progress is slow.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Rarely",
+        endpointRight: "Always"
+      },
+      {
+        key: "impulsiveness",
+        question: "I tend to act on impulse rather than thinking things through.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Never",
+        endpointRight: "Very often"
+      },
+      {
+        key: "structure_preference",
+        question: "I prefer clear plans and structure over flexible situations.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Flexibility",
+        endpointRight: "Structure"
+      },
+      {
+        key: "delegation_comfort",
+        question: "I find it easy to delegate work to others.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Very hard",
+        endpointRight: "Very easy"
+      },
+      // Batch 2 (Sessions 3-4): Motivations & stress
+      {
+        key: "decision_style",
+        question: "I prioritize logical consistency over impact on people.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "People first",
+        endpointRight: "Logic first"
+      },
+      {
+        key: "core_motivation",
+        question: "I'm driven by a desire for...",
+        type: "enum",
+        options: [
+          { value: "correctness", label: "Correctness: doing things right" },
+          { value: "helping", label: "Helping: making others' lives better" },
+          { value: "achievement", label: "Achievement: accomplishing goals" },
+          { value: "authenticity", label: "Authenticity: being true to myself" },
+          { value: "understanding", label: "Understanding: knowing how things work" },
+          { value: "security", label: "Security: stability and safety" },
+          { value: "experience", label: "Experience: variety and stimulation" },
+          { value: "autonomy", label: "Autonomy: freedom and independence" },
+          { value: "peace", label: "Peace: harmony and balance" }
+        ]
+      },
+      {
+        key: "stress_pattern_primary",
+        question: "When overwhelmed, my first response is to...",
+        type: "enum",
+        options: [
+          { value: "withdraw", label: "Withdraw: pull back and isolate" },
+          { value: "over_prepare", label: "Over-prepare: plan obsessively" },
+          { value: "push_harder", label: "Push harder: brute force through it" },
+          { value: "scatter", label: "Scatter: jump between tasks" },
+          { value: "become_critical", label: "Become critical: nitpick everything" }
+        ]
+      },
+      {
+        key: "competition_response",
+        question: "Competitive situations make me...",
+        type: "enum",
+        options: [
+          { value: "energized", label: "Energized: I thrive on competition" },
+          { value: "neutral", label: "Neutral: depends on the stakes" },
+          { value: "uncomfortable", label: "Uncomfortable: I prefer collaboration" }
+        ]
+      },
+      {
+        key: "stimulation_need",
+        question: "I need regular variety in my work to stay engaged.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Not at all",
+        endpointRight: "Absolutely"
+      },
+      // Batch 3 (Sessions 4-5): Tolerance & needs
+      {
+        key: "ambiguity_tolerance",
+        question: "I'm comfortable with ambiguity and undefined outcomes.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Very uncomfortable",
+        endpointRight: "Very comfortable"
+      },
+      {
+        key: "enablement_tendency",
+        question: "I find helping and supporting others' projects genuinely fulfilling.",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Not really",
+        endpointRight: "Absolutely"
+      },
+      {
+        key: "competence_satisfaction",
+        question: "How confident are you in handling unfamiliar challenges?",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Not confident",
+        endpointRight: "Very confident"
+      },
+      {
+        key: "relatedness_satisfaction",
+        question: "How connected do you feel to people who depend on your work?",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Disconnected",
+        endpointRight: "Deeply connected"
+      },
+      {
+        key: "physical_fitness_baseline",
+        question: "How would you rate your physical fitness?",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Low",
+        endpointRight: "High"
+      },
+      // Batch 4 (Sessions 5-6): Capacity & patterns
+      {
+        key: "max_sustained_project_duration",
+        question: "Longest project you've sustained consistent effort on?",
+        type: "enum",
+        options: [
+          { value: "days", label: "Days" },
+          { value: "weeks", label: "Weeks" },
+          { value: "months", label: "Months" },
+          { value: "years", label: "Years" }
+        ]
+      },
+      {
+        key: "focus_session_capacity",
+        question: "How many hours of focused work before quality drops?",
+        type: "enum",
+        options: [
+          { value: "under_1h", label: "Under 1 hour" },
+          { value: "1_2h", label: "1\u20132 hours" },
+          { value: "2_3h", label: "2\u20133 hours" },
+          { value: "3_4h", label: "3\u20134 hours" },
+          { value: "over_4h", label: "Over 4 hours" }
+        ]
+      },
+      {
+        key: "recovery_rate",
+        question: "After an intense 90-minute session, how long do you need to recover?",
+        type: "enum",
+        options: [
+          { value: "15min", label: "15 minutes" },
+          { value: "30min", label: "30 minutes" },
+          { value: "1h", label: "About an hour" },
+          { value: "over_2h", label: "Over 2 hours" }
+        ]
+      },
+      {
+        key: "life_domains_count",
+        question: "How many distinct areas of your life do you actively manage?",
+        type: "enum",
+        options: [
+          { value: "2_3", label: "2\u20133 areas" },
+          { value: "4_5", label: "4\u20135 areas" },
+          { value: "6_7", label: "6\u20137 areas" },
+          { value: "8_plus", label: "8 or more" }
+        ]
+      },
+      {
+        key: "overcommitment_tendency",
+        question: "How often do you feel like you're juggling too many projects?",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Never",
+        endpointRight: "Constantly"
+      },
+      // Batch 5 (Sessions 6-7): Preferences & self-knowledge
+      {
+        key: "task_switching_preference",
+        question: "Would you rather have 4 different tasks or 1 deep task?",
+        type: "enum",
+        options: [
+          { value: "variety", label: "4 different tasks: I like variety" },
+          { value: "mix", label: "A mix of both" },
+          { value: "focus", label: "1 deep task: I like going deep" }
+        ]
+      },
+      {
+        key: "purpose_sensitivity",
+        question: "How important is it that your work feels meaningful?",
+        type: "slider",
+        min: 1,
+        max: 5,
+        default: 3,
+        endpointLeft: "Not important",
+        endpointRight: "Essential"
+      },
+      // Batch 6: Free text reflections (future integrations)
+      {
+        key: "flow_activities",
+        question: "What activities put you in deep focus most easily?",
+        type: "text",
+        optional: true
+      },
+      {
+        key: "avoidance_pattern",
+        question: "What type of task do you most consistently avoid?",
+        type: "text",
+        optional: true
+      },
+      {
+        key: "natural_gravitation",
+        question: "On a completely free day, what do you do first?",
+        type: "text",
+        optional: true
+      },
+      {
+        key: "current_frustration",
+        question: "What's your biggest productivity frustration right now?",
+        type: "text",
+        optional: true
+      },
+      // Batch 7: Optional imports
+      {
+        key: "imported_mbti",
+        question: "Do you know your MBTI type? (optional)",
+        type: "text",
+        optional: true
+      },
+      {
+        key: "imported_enneagram",
+        question: "Do you know your Enneagram type? (optional)",
+        type: "text",
+        optional: true
+      },
+      {
+        key: "imported_clifton_top5",
+        question: "CliftonStrengths top 5? (optional, comma-separated)",
+        type: "text",
+        optional: true
+      }
+    ];
+    QUESTIONS_PER_SESSION = 4;
+    AdvancedCalibrationModal = class extends import_obsidian26.Modal {
+      constructor(app, plugin, answeredKeys, remaining, onComplete, onSkip) {
+        super(app);
+        this.answers = {};
+        this.showAll = false;
+        this.plugin = plugin;
+        this.onComplete = onComplete;
+        this.onSkip = onSkip;
+        this.remaining = remaining;
+        this.allUnanswered = ADVANCED_QUESTIONS2.filter((q) => !answeredKeys.includes(q.key));
+        this.questions = this.allUnanswered.slice(0, QUESTIONS_PER_SESSION);
+      }
+      onOpen() {
+        this.renderContent();
+      }
+      renderContent() {
+        var _a, _b, _c, _d, _e;
+        const { contentEl } = this;
+        contentEl.empty();
+        contentEl.addClass("emerald-modal", "emerald-calibration-modal");
+        const displayQuestions = this.showAll ? this.allUnanswered : this.questions;
+        contentEl.createEl("h2", { text: "Effort profile: advanced" });
+        const remainingAfter = Math.max(this.remaining - displayQuestions.length, 0);
+        if (this.showAll) {
+          contentEl.createEl("p", {
+            cls: "emerald-modal-subtitle",
+            text: `All ${displayQuestions.length} remaining questions. Take your time.`
+          });
+        } else {
+          contentEl.createEl("p", {
+            cls: "emerald-modal-subtitle",
+            text: `${displayQuestions.length} quick questions before your session. ${remainingAfter} remaining after this.`
+          });
+          if (this.allUnanswered.length > QUESTIONS_PER_SESSION) {
+            const allBtn = contentEl.createEl("button", {
+              cls: "emerald-btn emerald-btn-subtle emerald-btn-sm",
+              text: `Answer all ${this.allUnanswered.length} remaining at once`
+            });
+            allBtn.addEventListener("click", () => {
+              this.showAll = true;
+              this.renderContent();
+            });
+          }
+        }
+        const form = contentEl.createDiv({ cls: "emerald-form" });
+        let optionalSeparatorShown = false;
+        for (const q of displayQuestions) {
+          if (q.optional && !optionalSeparatorShown) {
+            optionalSeparatorShown = true;
+            form.createEl("hr", { cls: "emerald-form-separator" });
+            form.createDiv({
+              cls: "emerald-form-desc emerald-text-muted",
+              text: "Questions below are for future integrations, answers optional."
+            });
+          }
+          const group = form.createDiv({ cls: "emerald-form-group" });
+          group.createEl("label", { text: q.question });
+          if (q.type === "slider") {
+            const currentVal = (_a = q.default) != null ? _a : 3;
+            const labelRow = group.createDiv({ cls: "emerald-form-label-row" });
+            const valueEl = labelRow.createSpan({ cls: "emerald-slider-value", text: `${currentVal}/5` });
+            if (q.endpointLeft || q.endpointRight) {
+              const endpoints = group.createDiv({ cls: "emerald-slider-endpoints" });
+              endpoints.createSpan({ cls: "emerald-slider-endpoint-left", text: (_b = q.endpointLeft) != null ? _b : "" });
+              endpoints.createSpan({ cls: "emerald-slider-endpoint-right", text: (_c = q.endpointRight) != null ? _c : "" });
+            }
+            const slider = group.createEl("input", { cls: "emerald-slider" });
+            slider.type = "range";
+            slider.min = String((_d = q.min) != null ? _d : 1);
+            slider.max = String((_e = q.max) != null ? _e : 5);
+            slider.value = String(currentVal);
+            const key = q.key;
+            this.answers[key] = currentVal;
+            slider.addEventListener("input", () => {
+              const val = parseInt(slider.value);
+              valueEl.textContent = `${val}/5`;
+              this.answers[key] = val;
+            });
+          } else if (q.type === "enum" && q.options) {
+            const btnColumn = group.createDiv({ cls: "emerald-onboard-enum-group" });
+            for (const opt of q.options) {
+              const btn = btnColumn.createEl("button", {
+                cls: "emerald-onboard-enum-btn",
+                text: opt.label
+              });
+              const key = q.key;
+              btn.addEventListener("click", () => {
+                this.answers[key] = opt.value;
+                btnColumn.querySelectorAll(".emerald-onboard-enum-btn").forEach((b) => b.removeClass("is-active"));
+                btn.addClass("is-active");
+              });
+            }
+          } else if (q.type === "text") {
+            const input = group.createEl("input", {
+              cls: "emerald-onboard-input",
+              type: "text",
+              placeholder: "Type your answer..."
+            });
+            const key = q.key;
+            input.addEventListener("input", () => {
+              const val = input.value.trim();
+              if (val) {
+                this.answers[key] = val;
+              } else {
+                delete this.answers[key];
+              }
+            });
+          }
+        }
+        const actions = contentEl.createDiv({ cls: "emerald-modal-actions" });
+        const submitBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-primary",
+          text: "Save & continue"
+        });
+        submitBtn.addEventListener("click", () => {
+          void (async () => {
+            try {
+              const answeredCount = Object.keys(this.answers).length;
+              if (answeredCount > 0) {
+                try {
+                  await this.plugin.apiClient.updateCalibration(this.answers);
+                  new import_obsidian26.Notice(`${answeredCount} answers saved \u2713`);
+                } catch (e) {
+                }
+              }
+              const remainingRequired = this.allUnanswered.filter((q) => !q.optional);
+              const answeredRequired = remainingRequired.filter((q) => this.answers[q.key] !== void 0);
+              if (remainingRequired.length > 0 && answeredRequired.length === remainingRequired.length) {
+                this.plugin.settings.advancedProfileCompleted = true;
+                await this.plugin.saveSettings();
+                this.close();
+                const { AdvancedCompleteModal: AdvancedCompleteModal2 } = await Promise.resolve().then(() => (init_advanced_complete(), advanced_complete_exports));
+                const completeModal = new AdvancedCompleteModal2(this.app, () => {
+                  this.onComplete();
+                });
+                completeModal.open();
+                return;
+              }
+              this.close();
+              this.onComplete();
+            } catch (e) {
+            }
+          })();
+        });
+        const skipBtn = actions.createEl("button", {
+          cls: "emerald-btn emerald-btn-subtle",
+          text: "Skip for now"
+        });
+        skipBtn.addEventListener("click", () => {
+          this.close();
+          this.onSkip();
+        });
+      }
+      onClose() {
+        this.contentEl.empty();
+      }
+    };
+  }
+});
+
 // src/modals/effort-receipt.ts
 var effort_receipt_exports = {};
 __export(effort_receipt_exports, {
   EffortReceiptModal: () => EffortReceiptModal
 });
-var import_obsidian28, EffortReceiptModal;
+var import_obsidian27, EffortReceiptModal;
 var init_effort_receipt = __esm({
   "src/modals/effort-receipt.ts"() {
-    import_obsidian28 = require("obsidian");
+    import_obsidian27 = require("obsidian");
     init_e_levels();
-    EffortReceiptModal = class extends import_obsidian28.Modal {
+    EffortReceiptModal = class extends import_obsidian27.Modal {
       constructor(app, plugin, opts, onSubmit) {
         var _a, _b;
         super(app);
         // Form state
         this.perceivedEffort = 5;
         this.hedonicValence = 5;
-        this.flowOccurred = 0;
+        this.flowOccurred = null;
+        // blank until answered; never saved as a default
         this.demandInvestmentBalance = 5;
         this.effortSource = [];
         this.unexpectedComplications = 0;
@@ -4247,7 +3950,7 @@ var init_effort_receipt = __esm({
         const receipt = {
           perceived_effort: this.perceivedEffort,
           hedonic_valence: this.hedonicValence,
-          flow_occurred: this.flowOccurred,
+          ...this.flowOccurred !== null ? { flow_occurred: this.flowOccurred } : {},
           demand_investment_balance: this.demandInvestmentBalance,
           effort_source: this.effortSource,
           notes: this.notes || void 0
@@ -4280,20 +3983,16 @@ var celebration_exports = {};
 __export(celebration_exports, {
   CelebrationModal: () => CelebrationModal
 });
-var import_obsidian29, CelebrationModal;
+var import_obsidian28, CelebrationModal;
 var init_celebration = __esm({
   "src/modals/celebration.ts"() {
-    import_obsidian29 = require("obsidian");
-    init_e_levels();
-    CelebrationModal = class extends import_obsidian29.Modal {
-      constructor(app, plugin, opts) {
-        var _a;
+    import_obsidian28 = require("obsidian");
+    init_copy();
+    CelebrationModal = class extends import_obsidian28.Modal {
+      // Callers still pass the session context; the first celebration does not use it.
+      constructor(app, plugin, _opts) {
         super(app);
         this.plugin = plugin;
-        this.itemName = opts.itemName;
-        this.effortLevel = (_a = opts.effortLevel) != null ? _a : "";
-        this.sessionMinutes = opts.sessionMinutes;
-        this.availableHours = opts.availableHours;
       }
       onOpen() {
         const { contentEl } = this;
@@ -4301,60 +4000,17 @@ var init_celebration = __esm({
         contentEl.addClass("emerald-modal", "emerald-celebration-modal");
         const iconEl = contentEl.createDiv({ cls: "emerald-celebration-icon" });
         iconEl.textContent = "\u{1F389}";
-        contentEl.createEl("h2", { text: "First receipt filed." });
+        contentEl.createEl("h2", { text: COPY["cel.title"] });
         const body = contentEl.createDiv({ cls: "emerald-celebration-body" });
-        body.createEl("p", {
-          text: "Done! That's your first effort receipt filed. Check out the other core elements of EMRALD."
-        });
-        if (this.effortLevel && this.availableHours > 0) {
-          const budgetInfo = this.getBudgetContext();
-          body.createEl("p", {
-            cls: "emerald-celebration-context",
-            text: budgetInfo
-          });
-        }
+        body.createEl("p", { text: COPY["cel.win"] });
         const list = body.createEl("ul", { cls: "emerald-celebration-list" });
-        const items = [
-          ["Check-in", "Give context to the day's weight to better understand your effort."],
-          ["Projects", "Choose what to work on next, and set how much of your day it takes."],
-          ["Session timer", "Start (and stop) your project sessions."],
-          ["Data Center and effort profile", "Built from your numbers and receipts. PRO unlocks the whole catalog."],
-          ["Burnout", "A heads-up, free on every plan."]
-        ];
-        for (const [label, text] of items) {
-          const li = list.createEl("li");
-          li.createEl("strong", { text: `${label}: ` });
-          li.appendText(text);
+        for (const key of ["cel.numbers", "cel.checkin", "cel.burnout"]) {
+          list.createEl("li", { text: COPY[key] });
         }
-        body.createEl("p", {
-          cls: "emerald-celebration-encouragement",
-          text: "Your receipts land in your numbers from here on out. Keep filling them out for a month and the full picture is yours!"
-        });
+        body.createEl("p", { cls: "emerald-celebration-encouragement", text: COPY["cel.closer"] });
         const actions = contentEl.createDiv({ cls: "emerald-modal-actions emerald-celebration-actions" });
-        const btn = actions.createEl("button", {
-          cls: "emerald-btn emerald-btn-primary",
-          text: "Got it!"
-        });
+        const btn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary", text: COPY["cel.cta"] });
         btn.addEventListener("click", () => this.close());
-      }
-      getBudgetContext() {
-        const prescribedMin = prescribedMinutes(this.effortLevel, this.availableHours);
-        const levelName = levelDisplayName(this.effortLevel) || "effort";
-        const percentUsed = prescribedMin > 0 ? Math.round(this.sessionMinutes / prescribedMin * 100) : 0;
-        if (percentUsed >= 100) {
-          return `That session covered your full ${levelName} budget for ${this.itemName} today.`;
-        } else {
-          return `That's ${percentUsed}% of your ${levelName} budget for ${this.itemName}.`;
-        }
-      }
-      formatDuration(minutes) {
-        const h = Math.floor(minutes / 60);
-        const m = Math.round(minutes % 60);
-        if (h === 0)
-          return `${m}m`;
-        if (m === 0)
-          return `${h}h`;
-        return `${h}h ${m}m`;
       }
       onClose() {
         this.contentEl.empty();
@@ -4368,11 +4024,11 @@ var close_day_exports = {};
 __export(close_day_exports, {
   CloseDayModal: () => CloseDayModal
 });
-var import_obsidian30, CloseDayModal;
+var import_obsidian29, CloseDayModal;
 var init_close_day = __esm({
   "src/modals/close-day.ts"() {
-    import_obsidian30 = require("obsidian");
-    CloseDayModal = class extends import_obsidian30.Modal {
+    import_obsidian29 = require("obsidian");
+    CloseDayModal = class extends import_obsidian29.Modal {
       constructor(app, plugin, summary, onConfirm) {
         super(app);
         this.plugin = plugin;
@@ -4454,12 +4110,12 @@ var hour_override_exports = {};
 __export(hour_override_exports, {
   HourOverrideModal: () => HourOverrideModal
 });
-var import_obsidian31, DAY_NAMES, HourOverrideModal;
+var import_obsidian30, DAY_NAMES, HourOverrideModal;
 var init_hour_override = __esm({
   "src/modals/hour-override.ts"() {
-    import_obsidian31 = require("obsidian");
+    import_obsidian30 = require("obsidian");
     DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    HourOverrideModal = class extends import_obsidian31.Modal {
+    HourOverrideModal = class extends import_obsidian30.Modal {
       constructor(app, plugin, currentHours, baseScheduleHours, onSubmit) {
         super(app);
         this.plugin = plugin;
@@ -4597,7 +4253,7 @@ function renderCustomLevelRows(opts) {
     if (!isPro) {
       btn.disabled = true;
       btn.addEventListener("click", () => {
-        new import_obsidian32.Notice("Custom e-levels are a PRO feature.");
+        new import_obsidian31.Notice("Custom e-levels are a PRO feature.");
       });
       continue;
     }
@@ -4619,10 +4275,10 @@ function renderCustomLevelRows(opts) {
     });
   }
 }
-var import_obsidian32, CUSTOM_LEVEL_POINTER_TEXT;
+var import_obsidian31, CUSTOM_LEVEL_POINTER_TEXT;
 var init_elevel_picker_rows = __esm({
   "src/modals/elevel-picker-rows.ts"() {
-    import_obsidian32 = require("obsidian");
+    import_obsidian31 = require("obsidian");
     init_e_levels();
     init_tier();
     init_settings_nav();
@@ -4635,12 +4291,12 @@ var new_project_exports = {};
 __export(new_project_exports, {
   NewProjectModal: () => NewProjectModal
 });
-var import_obsidian33, NewProjectModal;
+var import_obsidian32, NewProjectModal;
 var init_new_project = __esm({
   "src/modals/new-project.ts"() {
-    import_obsidian33 = require("obsidian");
+    import_obsidian32 = require("obsidian");
     init_elevel_picker_rows();
-    NewProjectModal = class extends import_obsidian33.Modal {
+    NewProjectModal = class extends import_obsidian32.Modal {
       constructor(app, plugin, onSubmit, availableHours = 4) {
         super(app);
         this.nameInput = null;
@@ -4701,7 +4357,7 @@ var init_new_project = __esm({
         var _a, _b, _c;
         const name = (_b = (_a = this.nameInput) == null ? void 0 : _a.value.trim()) != null ? _b : "";
         if (!name) {
-          new import_obsidian33.Notice("Project name is required");
+          new import_obsidian32.Notice("Project name is required");
           (_c = this.nameInput) == null ? void 0 : _c.focus();
           return;
         }
@@ -4720,13 +4376,13 @@ var elevel_exports = {};
 __export(elevel_exports, {
   ELevelModal: () => ELevelModal
 });
-var import_obsidian34, ELevelModal;
+var import_obsidian33, ELevelModal;
 var init_elevel = __esm({
   "src/modals/elevel.ts"() {
-    import_obsidian34 = require("obsidian");
+    import_obsidian33 = require("obsidian");
     init_e_levels();
     init_elevel_picker_rows();
-    ELevelModal = class extends import_obsidian34.Modal {
+    ELevelModal = class extends import_obsidian33.Modal {
       constructor(app, plugin, itemName, currentLevel, availableHours, onSubmit) {
         super(app);
         this.plugin = plugin;
@@ -4796,10 +4452,10 @@ __export(main_exports, {
   default: () => EmraldPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian39 = require("obsidian");
+var import_obsidian38 = require("obsidian");
 
 // src/settings.ts
-var import_obsidian7 = require("obsidian");
+var import_obsidian4 = require("obsidian");
 
 // src/utils/export-tip.ts
 var EXPORT_TIP = "Saves your EMRALD data as a portable JSON file. Receipts, sessions and check-ins are never deleted. PRO exports include your full daily metric history, kept indefinitely (intra-day snapshots are consolidated into daily values after 120 days). Free exports cover the last 90 days and current metric values.";
@@ -4896,7 +4552,7 @@ var PRO_REQUIRED_NOTICE = `Custom e-levels are a PRO feature. Upgrade at ${PRO_U
 var ELEVEL_ANCHOR_CLASS = "emerald-elevel-manage-anchor";
 var ELEVEL_EMPTY_STATE = "No custom levels yet. Create one to prescribe a share of your day that E1-E4 does not cover.";
 var ELEVEL_PRO_PITCH = "Custom effort levels are a PRO feature. Name your own effort levels at any percent of your work hours. EMRALD prescribes time, tracks overtime, and colours them just like the built-in levels.";
-var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
+var EmraldSettingTab = class extends import_obsidian4.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     /** Guards the network refresh kicked off from update(). */
@@ -5170,7 +4826,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     setting.addButton((btn) => btn.setDestructive().setButtonText("Clear queue").onClick(() => {
       this.plugin.offlineQueue.clear();
       void this.plugin.saveData(this.plugin.settings);
-      new import_obsidian7.Notice("Offline queue cleared.");
+      new import_obsidian4.Notice("Offline queue cleared.");
       this.redraw();
     }));
   }
@@ -5179,9 +4835,9 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
       this.plugin.settings.researchOptIn = value;
       void this.plugin.saveSettings();
       void this.plugin.apiClient.updatePreferences({ research_opt_in: value }).then(() => {
-        new import_obsidian7.Notice(value ? "Thank you! Research opt-in saved." : "Research opt-in removed.");
+        new import_obsidian4.Notice(value ? "Thank you! Research opt-in saved." : "Research opt-in removed.");
       }).catch(() => {
-        new import_obsidian7.Notice("Failed to save preference. Try again.");
+        new import_obsidian4.Notice("Failed to save preference. Try again.");
       });
     }));
   }
@@ -5193,17 +4849,17 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
         try {
           const resp = await this.plugin.apiClient.exportData();
           if (resp.error) {
-            new import_obsidian7.Notice(`Export failed: ${resp.error}`);
+            new import_obsidian4.Notice(`Export failed: ${resp.error}`);
             return;
           }
           const dateStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
           const filename = `emrald-export-${dateStr}.json`;
           const content = JSON.stringify(resp.data, null, 2);
           await this.plugin.app.vault.create(filename, content);
-          new import_obsidian7.Notice(`Exported to ${filename}`);
+          new import_obsidian4.Notice(`Exported to ${filename}`);
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Unknown error";
-          new import_obsidian7.Notice(`Export failed: ${msg}`);
+          new import_obsidian4.Notice(`Export failed: ${msg}`);
         } finally {
           btn.setDisabled(false);
           btn.setButtonText("Export");
@@ -5212,7 +4868,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     });
     setting.addExtraButton((btn) => {
       btn.setIcon("info").setTooltip(EXPORT_TIP).onClick(() => {
-        new import_obsidian7.Notice(EXPORT_TIP, 2e4);
+        new import_obsidian4.Notice(EXPORT_TIP, 2e4);
       });
     });
   }
@@ -5296,30 +4952,30 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
   /** Imperative twin of eLevelDefinitions(). */
   renderELevelSection(containerEl) {
     if (!tierState.isPro()) {
-      const heading2 = new import_obsidian7.Setting(containerEl).setName("Custom effort levels").setHeading();
+      const heading2 = new import_obsidian4.Setting(containerEl).setName("Custom effort levels").setHeading();
       heading2.settingEl.addClass(ELEVEL_ANCHOR_CLASS);
       this.renderProLock(
-        new import_obsidian7.Setting(containerEl).setName("Custom effort levels (PRO)").setDesc(ELEVEL_PRO_PITCH)
+        new import_obsidian4.Setting(containerEl).setName("Custom effort levels (PRO)").setDesc(ELEVEL_PRO_PITCH)
       );
       return;
     }
-    const heading = new import_obsidian7.Setting(containerEl).setName(ELEVEL_MANAGE_HEADING).setHeading();
+    const heading = new import_obsidian4.Setting(containerEl).setName(ELEVEL_MANAGE_HEADING).setHeading();
     heading.settingEl.addClass(ELEVEL_ANCHOR_CLASS);
     const active = eLevelStore.active();
     if (active.length === 0) {
       containerEl.createDiv({ cls: "setting-item-description", text: ELEVEL_EMPTY_STATE });
     }
     for (const level of active) {
-      this.renderELevelRow(new import_obsidian7.Setting(containerEl), level);
+      this.renderELevelRow(new import_obsidian4.Setting(containerEl), level);
     }
-    new import_obsidian7.Setting(containerEl).setName("New effort level").setDesc("Name a level and set its share of your work hours.").addButton((btn) => btn.setCta().setButtonText("Create").onClick(() => {
+    new import_obsidian4.Setting(containerEl).setName("New effort level").setDesc("Name a level and set its share of your work hours.").addButton((btn) => btn.setCta().setButtonText("Create").onClick(() => {
       this.openELevelEditor("create", null);
     }));
     const archived = eLevelStore.archived();
     if (archived.length > 0) {
-      new import_obsidian7.Setting(containerEl).setName("Archived levels").setHeading();
+      new import_obsidian4.Setting(containerEl).setName("Archived levels").setHeading();
       for (const level of archived) {
-        this.renderELevelRow(new import_obsidian7.Setting(containerEl), level, true);
+        this.renderELevelRow(new import_obsidian4.Setting(containerEl), level, true);
       }
     }
   }
@@ -5336,7 +4992,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
       text: CUSTOM_BADGE
     });
     badge.style.color = colorForPercent(level.percent);
-    (0, import_obsidian7.setTooltip)(badge, tooltip);
+    (0, import_obsidian4.setTooltip)(badge, tooltip);
     setting.nameEl.createSpan({ cls: "emerald-elevel-row-name", text: level.name });
     if (archived) {
       setting.nameEl.createSpan({ cls: "emerald-elevel-row-archived", text: "Archived" });
@@ -5353,7 +5009,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     setting.addExtraButton((btn) => {
       btn.setIcon("percent").setTooltip(locked ? `Percent is locked: ${refCountLabel(level.ref_count)}` : "Change percent").onClick(() => {
         if (locked) {
-          new import_obsidian7.Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}. Archive it and create a new one to change the percent.`);
+          new import_obsidian4.Notice(`Percent is locked while this level is ${refCountLabel(level.ref_count)}. Archive it and create a new one to change the percent.`);
           return;
         }
         this.openELevelEditor("percent", level);
@@ -5398,23 +5054,23 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
     var _a, _b;
     const resp = await this.plugin.apiClient.deleteELevel(level.id);
     if (resp.queued) {
-      new import_obsidian7.Notice("You're offline. The removal will sync when you reconnect.");
+      new import_obsidian4.Notice("You're offline. The removal will sync when you reconnect.");
       return;
     }
     if (resp.error || !resp.data) {
       if (resp.errorCode === "REF_COUNT_UNAVAILABLE") {
-        new import_obsidian7.Notice(`${(_a = resp.error) != null ? _a : "Could not check how many projects use this level."} Try again in a moment.`);
+        new import_obsidian4.Notice(`${(_a = resp.error) != null ? _a : "Could not check how many projects use this level."} Try again in a moment.`);
       } else if (resp.errorCode === "PRO_REQUIRED" || resp.status === 403) {
-        new import_obsidian7.Notice(PRO_REQUIRED_NOTICE);
+        new import_obsidian4.Notice(PRO_REQUIRED_NOTICE);
       } else {
-        new import_obsidian7.Notice((_b = resp.error) != null ? _b : "Could not remove that level.");
+        new import_obsidian4.Notice((_b = resp.error) != null ? _b : "Could not remove that level.");
       }
       return;
     }
     if (resp.data.archived) {
-      new import_obsidian7.Notice(`Archived ${level.name}. Projects already using it keep their label.`);
+      new import_obsidian4.Notice(`Archived ${level.name}. Projects already using it keep their label.`);
     } else {
-      new import_obsidian7.Notice(`Deleted ${level.name}.`);
+      new import_obsidian4.Notice(`Deleted ${level.name}.`);
       eLevelStore.remove(level.id);
     }
     eLevelStore.invalidate();
@@ -5492,7 +5148,7 @@ var EmraldSettingTab = class extends import_obsidian7.PluginSettingTab {
 };
 
 // src/views/sidebar.ts
-var import_obsidian35 = require("obsidian");
+var import_obsidian34 = require("obsidian");
 
 // src/components/timeblock.ts
 init_icons();
@@ -6022,7 +5678,7 @@ var TimeblockComponent = class {
 };
 
 // src/components/projects.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 init_e_levels();
 var ProjectsComponent = class {
   constructor(plugin, containerEl) {
@@ -6180,7 +5836,7 @@ var ProjectsComponent = class {
       clearBtn.tabIndex = 0;
       clearBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const menu = new import_obsidian12.Menu();
+        const menu = new import_obsidian9.Menu();
         menu.addItem((i) => i.setTitle("Confirm clear").setIcon("trash-2").onClick(() => {
           void this.clearCompletedProjects(items);
         }));
@@ -6216,9 +5872,9 @@ var ProjectsComponent = class {
       const iconEl = row.createSpan({ cls: "emerald-inactive-icon" });
       iconEl.setAttribute("aria-hidden", "true");
       if (sectionStatus === "completed") {
-        (0, import_obsidian12.setIcon)(iconEl, "check-circle-2");
+        (0, import_obsidian9.setIcon)(iconEl, "check-circle-2");
       } else {
-        (0, import_obsidian12.setIcon)(iconEl, "circle-dot");
+        (0, import_obsidian9.setIcon)(iconEl, "circle-dot");
       }
       const nameEl = row.createSpan({ text: item.name });
       nameEl.setAttribute("aria-hidden", "true");
@@ -6239,7 +5895,7 @@ var ProjectsComponent = class {
   }
   // ── Context Menus ───────────────────────────────────────
   showCollapsibleContextMenu(e, item, sectionStatus) {
-    const menu = new import_obsidian12.Menu();
+    const menu = new import_obsidian9.Menu();
     menu.addItem((i) => i.setTitle("Set active").setIcon("play-circle").onClick(() => this.reactivateItem(item)));
     if (sectionStatus === "paused") {
       menu.addItem((i) => i.setTitle("Mark complete").setIcon("check-circle").onClick(() => this.setItemStatus(item, "completed")));
@@ -6254,7 +5910,7 @@ var ProjectsComponent = class {
     menu.showAtMouseEvent(e);
   }
   showContextMenu(e, item, isInSession) {
-    const menu = new import_obsidian12.Menu();
+    const menu = new import_obsidian9.Menu();
     if (isInSession) {
       menu.addItem((i) => i.setTitle("Pause").setIcon("pause").onClick(() => this.onPauseSession()));
       menu.addItem((i) => i.setTitle("Stop").setIcon("square").onClick(() => this.onStopSession()));
@@ -6327,7 +5983,7 @@ var ProjectsComponent = class {
         this.state.items[idx] = { ...this.state.items[idx], multi_day: item.multi_day };
         this.render();
       }
-      new import_obsidian12.Notice(`Couldn\u2019t update \u201C${item.name}\u201D: ${resp.error}`);
+      new import_obsidian9.Notice(`Couldn\u2019t update \u201C${item.name}\u201D: ${resp.error}`);
       return;
     }
     if (resp.data && idx >= 0) {
@@ -6335,9 +5991,9 @@ var ProjectsComponent = class {
       this.render();
     }
     if (next) {
-      new import_obsidian12.Notice(`\u201C${item.name}\u201D marked multi-day. You can now capture an effort profile.`);
+      new import_obsidian9.Notice(`\u201C${item.name}\u201D marked multi-day. You can now capture an effort profile.`);
     } else {
-      new import_obsidian12.Notice(`\u201C${item.name}\u201D is no longer multi-day.`);
+      new import_obsidian9.Notice(`\u201C${item.name}\u201D is no longer multi-day.`);
     }
   }
   async openEffortProfileModal(item) {
@@ -6378,7 +6034,7 @@ var ProjectsComponent = class {
     const { AreaPickerModal: AreaPickerModal2 } = await Promise.resolve().then(() => (init_area_picker(), area_picker_exports));
     const labelsResp = await this.plugin.apiClient.getLabels();
     if (labelsResp.error) {
-      new import_obsidian12.Notice(`Couldn\u2019t load areas: ${labelsResp.error}`);
+      new import_obsidian9.Notice(`Couldn\u2019t load areas: ${labelsResp.error}`);
       return;
     }
     const allLabels = (_a = labelsResp.data) != null ? _a : [];
@@ -6409,7 +6065,7 @@ var ProjectsComponent = class {
     if (!target && newName) {
       const created = await this.plugin.apiClient.createLabel(newName);
       if (created.error || !created.data) {
-        new import_obsidian12.Notice(`Couldn\u2019t create area \u201C${newName}\u201D: ${(_a = created.error) != null ? _a : "unknown error"}`);
+        new import_obsidian9.Notice(`Couldn\u2019t create area \u201C${newName}\u201D: ${(_a = created.error) != null ? _a : "unknown error"}`);
         return;
       }
       target = created.data;
@@ -6427,7 +6083,7 @@ var ProjectsComponent = class {
           this.state.items[idx] = { ...this.state.items[idx], labels: current ? [current] : [] };
           this.render();
         }
-        new import_obsidian12.Notice(`Couldn\u2019t update area: ${det.error}`);
+        new import_obsidian9.Notice(`Couldn\u2019t update area: ${det.error}`);
         return;
       }
     }
@@ -6438,25 +6094,25 @@ var ProjectsComponent = class {
           this.state.items[idx] = { ...this.state.items[idx], labels: current ? [current] : [] };
           this.render();
         }
-        new import_obsidian12.Notice(`Couldn\u2019t set area: ${att.error}`);
+        new import_obsidian9.Notice(`Couldn\u2019t set area: ${att.error}`);
         return;
       }
-      new import_obsidian12.Notice(`\u201C${item.name}\u201D filed under \u201C${target.name}\u201D.`);
+      new import_obsidian9.Notice(`\u201C${item.name}\u201D filed under \u201C${target.name}\u201D.`);
     } else {
-      new import_obsidian12.Notice(`Area cleared for \u201C${item.name}\u201D.`);
+      new import_obsidian9.Notice(`Area cleared for \u201C${item.name}\u201D.`);
     }
   }
   // ── Actions ─────────────────────────────────────────────
   openNote(item) {
     if (item.obsidian_note_path) {
       const file = this.plugin.app.vault.getAbstractFileByPath(item.obsidian_note_path);
-      if (file instanceof import_obsidian12.TFile) {
+      if (file instanceof import_obsidian9.TFile) {
         void this.plugin.app.workspace.getLeaf(false).openFile(file);
       } else {
-        new import_obsidian12.Notice(`Note not found: "${item.obsidian_note_path}". It may have been moved or deleted.`);
+        new import_obsidian9.Notice(`Note not found: "${item.obsidian_note_path}". It may have been moved or deleted.`);
       }
     } else {
-      new import_obsidian12.Notice(`No linked note for "${item.name}"`);
+      new import_obsidian9.Notice(`No linked note for "${item.name}"`);
     }
   }
   async setItemStatus(item, status) {
@@ -6471,7 +6127,7 @@ var ProjectsComponent = class {
         this.state.items[idx] = { ...this.state.items[idx], status: item.status };
         this.render();
       }
-      new import_obsidian12.Notice(`Failed to update "${item.name}": ${resp.error}`);
+      new import_obsidian9.Notice(`Failed to update "${item.name}": ${resp.error}`);
       return;
     }
     if (resp.data) {
@@ -6480,12 +6136,12 @@ var ProjectsComponent = class {
         this.render();
       }
     }
-    new import_obsidian12.Notice(resp.queued ? `"${item.name}" \u2192 ${status} (will sync when online)` : `"${item.name}" \u2192 ${status}`);
+    new import_obsidian9.Notice(resp.queued ? `"${item.name}" \u2192 ${status} (will sync when online)` : `"${item.name}" \u2192 ${status}`);
   }
   async reactivateItem(item) {
     const activeCount = this.state.items.filter((i) => i.status === "active").length;
     if (activeCount >= 5) {
-      new import_obsidian12.Notice("Maximum 5 active projects. Deactivate one first.");
+      new import_obsidian9.Notice("Maximum 5 active projects. Deactivate one first.");
       return;
     }
     const idx = this.state.items.findIndex((i) => i.id === item.id);
@@ -6499,7 +6155,7 @@ var ProjectsComponent = class {
         this.state.items[idx] = { ...this.state.items[idx], status: item.status };
         this.render();
       }
-      new import_obsidian12.Notice(`Failed to reactivate "${item.name}": ${resp.error}`);
+      new import_obsidian9.Notice(`Failed to reactivate "${item.name}": ${resp.error}`);
       return;
     }
     if (resp.data) {
@@ -6508,7 +6164,7 @@ var ProjectsComponent = class {
         this.render();
       }
     }
-    new import_obsidian12.Notice(resp.queued ? `"${item.name}" reactivated (will sync when online)` : `"${item.name}" reactivated.`);
+    new import_obsidian9.Notice(resp.queued ? `"${item.name}" reactivated (will sync when online)` : `"${item.name}" reactivated.`);
   }
   // ── Session Progress (live update without full re-render) ────
   /**
@@ -6561,12 +6217,12 @@ var ProjectsComponent = class {
       }
     }
     this.render();
-    new import_obsidian12.Notice(cleared > 0 ? `Cleared ${cleared} completed project${cleared > 1 ? "s" : ""}` : "Failed to clear projects");
+    new import_obsidian9.Notice(cleared > 0 ? `Cleared ${cleared} completed project${cleared > 1 ? "s" : ""}` : "Failed to clear projects");
   }
 };
 
 // src/components/em.ts
-var import_obsidian25 = require("obsidian");
+var import_obsidian22 = require("obsidian");
 
 // src/sync/daily-summary.ts
 init_e_levels();
@@ -6733,12 +6389,12 @@ init_icons();
 init_tier();
 
 // src/views/workspace/data-center.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 init_base();
 init_tier();
 
 // src/views/workspace/provider-note.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 var PROVIDER_TOOLTIP = "Toggl projects follow your Toggl timer habits, so a gap between sessions says nothing about avoidance or start-up delay. This metric looks at projects you start and manage in EMRALD.";
 function providerNoteState(key, metadata) {
   var _a;
@@ -6759,8 +6415,8 @@ function renderProviderNote(parent, key, metadata) {
     return false;
   const note = parent.createDiv({ cls: "emerald-wv-provider-note" });
   const icon = note.createSpan({ cls: "emerald-wv-provider-note-icon", attr: { role: "img" } });
-  (0, import_obsidian13.setIcon)(icon, "info");
-  (0, import_obsidian13.setTooltip)(icon, PROVIDER_TOOLTIP, { placement: "top" });
+  (0, import_obsidian10.setIcon)(icon, "info");
+  (0, import_obsidian10.setTooltip)(icon, PROVIDER_TOOLTIP, { placement: "top" });
   const text = note.createSpan();
   if (state === "empty") {
     text.createEl("strong", { text: "No data yet." });
@@ -6974,7 +6630,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     this.renderHeader(container, "Data center", "All 20 metrics: your effort fingerprint", "trending-up");
     const pinnedNote = container.createDiv({ cls: "emerald-wv-dc-pinned-note" });
     const pinIcon = pinnedNote.createSpan({ cls: "emerald-wv-dc-pin-icon" });
-    (0, import_obsidian14.setIcon)(pinIcon, "pin");
+    (0, import_obsidian11.setIcon)(pinIcon, "pin");
     this.pinnedNoteText = pinnedNote.createSpan({
       text: `Sidebar sparklines: ${this.pinnedNames()}. Click any metric's \u2605 to change.`
     });
@@ -7031,7 +6687,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     container.insertBefore(card, insertBefore);
     const headerRow = card.createDiv({ cls: "emerald-wv-story-header" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-story-icon" });
-    (0, import_obsidian14.setIcon)(iconEl, "book-open");
+    (0, import_obsidian11.setIcon)(iconEl, "book-open");
     headerRow.createSpan({ cls: "emerald-wv-story-title", text: "Your story" });
     const body = card.createDiv({ cls: "emerald-wv-story-body" });
     const sentences = [];
@@ -7105,7 +6761,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
       const section = this.gridContainer.createDiv({ cls: "emerald-wv-dc-category" });
       const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
       const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-      (0, import_obsidian14.setIcon)(iconEl, (_a = CATEGORY_ICONS[category]) != null ? _a : "hash");
+      (0, import_obsidian11.setIcon)(iconEl, (_a = CATEGORY_ICONS[category]) != null ? _a : "hash");
       headerRow.createEl("h3", { text: category });
       const grid = section.createDiv({ cls: "emerald-wv-metric-grid" });
       for (const key of keys) {
@@ -7117,7 +6773,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     if (!tierState.isPro()) {
       const teaser = this.gridContainer.createDiv({ cls: "emerald-wv-dc-pro-teaser" });
       const teaserIcon = teaser.createSpan({ cls: "emerald-wv-dc-pro-teaser-icon" });
-      (0, import_obsidian14.setIcon)(teaserIcon, "sparkles");
+      (0, import_obsidian11.setIcon)(teaserIcon, "sparkles");
       const teaserText = teaser.createSpan({ cls: "emerald-wv-dc-pro-teaser-text" });
       teaserText.createSpan({ text: "Unlock 12 more metrics: " });
       teaserText.createSpan({
@@ -7204,7 +6860,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     if (isLocked) {
       const overlay = card.createDiv({ cls: "emerald-wv-metric-locked-overlay" });
       const lockIcon = overlay.createSpan({ cls: "emerald-wv-metric-lock-icon" });
-      (0, import_obsidian14.setIcon)(lockIcon, "lock");
+      (0, import_obsidian11.setIcon)(lockIcon, "lock");
       overlay.createSpan({ cls: "emerald-wv-metric-lock-text", text: "PRO" });
       card.addClass("emrald-not-clickable");
     } else {
@@ -7221,7 +6877,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     const expanded = card.createDiv({ cls: "emerald-wv-metric-expanded" });
     const explainerEl = expanded.createDiv({ cls: "emerald-wv-metric-explainer" });
     const infoIcon = explainerEl.createSpan({ cls: "emerald-wv-metric-info-icon" });
-    (0, import_obsidian14.setIcon)(infoIcon, "info");
+    (0, import_obsidian11.setIcon)(infoIcon, "info");
     explainerEl.createSpan({ text: info.explainer });
     const chartArea = expanded.createDiv({ cls: "emerald-wv-metric-chart-area" });
     chartArea.createDiv({ cls: "emerald-wv-loading", text: "Loading history..." });
@@ -7448,16 +7104,16 @@ var DataCenterView = class extends EmraldWorkspaceView {
       this.pinnedKeys.delete(key);
       btn.textContent = "\u2606";
       btn.removeClass("is-pinned");
-      new import_obsidian14.Notice(`${key} unpinned from sidebar`);
+      new import_obsidian11.Notice(`${key} unpinned from sidebar`);
     } else {
       if (this.pinnedKeys.size >= 4) {
-        new import_obsidian14.Notice("Maximum 4 pinned metrics. Unpin one first.");
+        new import_obsidian11.Notice("Maximum 4 pinned metrics. Unpin one first.");
         return;
       }
       this.pinnedKeys.add(key);
       btn.textContent = "\u2605";
       btn.addClass("is-pinned");
-      new import_obsidian14.Notice(`${key} pinned to sidebar`);
+      new import_obsidian11.Notice(`${key} pinned to sidebar`);
     }
     this.plugin.settings.pinnedMetricKeys = Array.from(this.pinnedKeys);
     await this.plugin.saveSettings();
@@ -7523,19 +7179,19 @@ var DataCenterView = class extends EmraldWorkspaceView {
 init_base();
 
 // src/views/workspace/elevel-overview.ts
-var import_obsidian17 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 init_base();
 init_base();
 
 // src/modals/effort-comparison.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 var E_LEVEL_COLOR2 = {
   E1: "#2D7A4A",
   E2: "#B8912E",
   E3: "#C06A30",
   E4: "#B54545"
 };
-var EffortComparisonModal = class extends import_obsidian15.Modal {
+var EffortComparisonModal = class extends import_obsidian12.Modal {
   constructor(app, plugin, item) {
     super(app);
     this.plugin = plugin;
@@ -7720,7 +7376,7 @@ var EffortComparisonModal = class extends import_obsidian15.Modal {
 };
 
 // src/views/workspace/receipt-graph.ts
-var import_obsidian16 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 
 // src/views/workspace/receipt-graph-model.ts
 var METRICS = [
@@ -7884,7 +7540,7 @@ function mountReceiptGraph(host, opts) {
   title.createSpan({ cls: "emerald-rg-kicker", text: "Receipt graph" });
   title.createSpan({ cls: "emerald-rg-name", text: itemName });
   const closeBtn = head.createEl("button", { cls: "emerald-rg-close", attr: { type: "button", "aria-label": `Close receipt graph for ${itemName}` } });
-  (0, import_obsidian16.setIcon)(closeBtn, "x");
+  (0, import_obsidian13.setIcon)(closeBtn, "x");
   closeBtn.addEventListener("click", () => onClose());
   const body = panel.createDiv({ cls: "emerald-rg-body" });
   let chartBox = null;
@@ -8341,7 +7997,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
     const emLink = container.createDiv({ cls: "emerald-wv-em-link" });
     const linkEl = emLink.createEl("a", { cls: "emerald-wv-text-link", text: "What is effort management?" });
     const linkIcon = emLink.createSpan({ cls: "emerald-wv-link-arrow" });
-    (0, import_obsidian17.setIcon)(linkIcon, "arrow-right");
+    (0, import_obsidian14.setIcon)(linkIcon, "arrow-right");
     linkEl.addEventListener("click", (e) => {
       e.preventDefault();
       void this.plugin.openWorkspaceView(VIEW_ABOUT);
@@ -8351,7 +8007,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   renderEmptyState(container) {
     const empty = container.createDiv({ cls: "emerald-wv-empty-state" });
     const iconEl = empty.createDiv({ cls: "emerald-wv-empty-icon" });
-    (0, import_obsidian17.setIcon)(iconEl, "bar-chart-2");
+    (0, import_obsidian14.setIcon)(iconEl, "bar-chart-2");
     empty.createEl("h3", { text: "No projects yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
@@ -8430,7 +8086,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
         cls: "emerald-wv-elevel-info-btn",
         attr: { "aria-label": `About ${name}`, title: tooltip }
       });
-      (0, import_obsidian17.setIcon)(infoBtn, "info");
+      (0, import_obsidian14.setIcon)(infoBtn, "info");
       const detailEl = info.createDiv({ cls: "emerald-wv-elevel-detail", text: this.levelDetail(ref) });
       detailEl.addClass("emrald-hidden");
       infoBtn.addEventListener("click", (e) => {
@@ -8477,7 +8133,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-alloc-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian17.setIcon)(iconEl, "pie-chart");
+    (0, import_obsidian14.setIcon)(iconEl, "pie-chart");
     headerRow.createEl("h3", { text: "Daily allocation" });
     const barOuter = section.createDiv({ cls: "emerald-wv-alloc-bar-outer" });
     const barFill = barOuter.createDiv({ cls: "emerald-wv-alloc-bar-fill" });
@@ -8518,7 +8174,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
     const section = this.projectContainer.createDiv({ cls: "emerald-wv-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian17.setIcon)(iconEl, "folder");
+    (0, import_obsidian14.setIcon)(iconEl, "folder");
     const filterName = this.activeFilter ? levelDisplayName(this.activeFilter) : "";
     const title = this.activeFilter ? `${filterName || "Filtered"} Projects` : "All Projects";
     headerRow.createEl("h3", { text: title });
@@ -8613,7 +8269,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
         cls: "emerald-wv-compare-btn emrald-clickable",
         attr: { "aria-label": `Compare your guess with what happened for ${item.name}`, title: "Guess vs. actual" }
       });
-      (0, import_obsidian17.setIcon)(compareBtn, "git-compare");
+      (0, import_obsidian14.setIcon)(compareBtn, "git-compare");
       compareBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         this.openComparison(item);
@@ -8622,7 +8278,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
         cls: "emerald-wv-compare-btn emerald-wv-receipts-btn",
         attr: { type: "button", "aria-label": `Receipt graph for ${item.name}`, "aria-expanded": "false", title: "Receipt graph" }
       });
-      (0, import_obsidian17.setIcon)(graphBtn, "line-chart");
+      (0, import_obsidian14.setIcon)(graphBtn, "line-chart");
       graphBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         this.toggleReceiptGraph(item, row, graphBtn);
@@ -8677,13 +8333,13 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
   openNote(item) {
     if (item.obsidian_note_path) {
       const file = this.plugin.app.vault.getAbstractFileByPath(item.obsidian_note_path);
-      if (file instanceof import_obsidian17.TFile) {
+      if (file instanceof import_obsidian14.TFile) {
         void this.plugin.app.workspace.getLeaf(false).openFile(file);
       } else {
-        new import_obsidian17.Notice(`Note not found: ${item.obsidian_note_path}`);
+        new import_obsidian14.Notice(`Note not found: ${item.obsidian_note_path}`);
       }
     } else {
-      new import_obsidian17.Notice(`No linked note for "${item.name}"`);
+      new import_obsidian14.Notice(`No linked note for "${item.name}"`);
     }
   }
   // ── Session Notes (Receipt notes from last 30 days) ────
@@ -8713,7 +8369,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
     }
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row emrald-clickable" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian17.setIcon)(iconEl, "file-text");
+    (0, import_obsidian14.setIcon)(iconEl, "file-text");
     const headerTitle = headerRow.createEl("h3", { text: `\u25B8 Session notes (${withNotes.length})` });
     const notesContent = section.createDiv({ cls: "emerald-wv-notes-content" });
     notesContent.addClass("emrald-hidden");
@@ -8771,7 +8427,7 @@ var ELevelOverviewView = class extends EmraldWorkspaceView {
 };
 
 // src/views/workspace/insight-log.ts
-var import_obsidian18 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 init_base();
 var INSIGHT_TYPE_META = {
   observation: { label: "Observation", icon: "eye", color: "var(--interactive-accent)" },
@@ -8850,7 +8506,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
   renderEmptyState(container) {
     const empty = container.createDiv({ cls: "emerald-wv-empty-state" });
     const iconEl = empty.createDiv({ cls: "emerald-wv-empty-icon" });
-    (0, import_obsidian18.setIcon)(iconEl, "lightbulb");
+    (0, import_obsidian15.setIcon)(iconEl, "lightbulb");
     empty.createEl("h3", { text: "No insights yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
@@ -8926,7 +8582,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
     const topRow = card.createDiv({ cls: "emerald-wv-insight-top" });
     const typeBadge = topRow.createSpan({ cls: "emerald-wv-insight-type-badge" });
     const typeIcon = typeBadge.createSpan({ cls: "emerald-wv-insight-type-icon" });
-    (0, import_obsidian18.setIcon)(typeIcon, meta.icon);
+    (0, import_obsidian15.setIcon)(typeIcon, meta.icon);
     typeBadge.createSpan({ text: meta.label });
     topRow.createSpan({
       cls: "emerald-wv-insight-date",
@@ -8978,7 +8634,7 @@ var InsightLogView = class extends EmraldWorkspaceView {
             const resp = await this.plugin.apiClient.acknowledgeInsight(insight.id, "dismissed");
             if (!resp.error) {
               insight.acknowledged_at = (/* @__PURE__ */ new Date()).toISOString();
-              new import_obsidian18.Notice("Insight acknowledged");
+              new import_obsidian15.Notice("Insight acknowledged");
               this.refreshView();
               this._ackSelf = true;
               window.dispatchEvent(new CustomEvent("emrald:insight-acknowledged", { detail: { id: insight.id } }));
@@ -9010,8 +8666,10 @@ var InsightLogView = class extends EmraldWorkspaceView {
 };
 
 // src/views/workspace/effort-profile.ts
-var import_obsidian20 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 init_base();
+init_copy();
+init_questions();
 var CORE_TRAITS = [
   { key: "physical_capability", label: "Physical capacity", desc: "How much physical work you can handle", icon: "dumbbell" },
   { key: "mental_capability", label: "Mental capacity", desc: "How much hard thinking you can handle", icon: "brain" },
@@ -9112,12 +8770,12 @@ var ENUM_DISPLAY = {
   distracted: "Get distracted easily",
   overwhelmed: "Overwhelmed",
   // Working genius/frustration
-  wonder: "Wonder",
-  invention: "Invention",
-  discernment: "Discernment",
-  galvanizing: "Galvanizing",
-  enablement: "Enablement",
-  tenacity: "Tenacity",
+  wonder: WORK_TYPES.wonder.label,
+  invention: WORK_TYPES.invention.label,
+  discernment: WORK_TYPES.discernment.label,
+  galvanizing: WORK_TYPES.galvanizing.label,
+  enablement: WORK_TYPES.enablement.label,
+  tenacity: WORK_TYPES.tenacity.label,
   // Core motivation
   correctness: "Correctness",
   helping: "Helping",
@@ -9216,6 +8874,8 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     }
     if (profile) {
       this.renderCoreTraits(container, profile);
+      if (!this.hasSimpleAnswers(profile))
+        this.renderEmptyState(container);
     } else {
       this.renderEmptyState(container);
     }
@@ -9237,25 +8897,33 @@ var EffortProfileView = class extends EmraldWorkspaceView {
   renderEmptyState(container) {
     const empty = container.createDiv({ cls: "emerald-wv-empty-state" });
     const iconEl = empty.createDiv({ cls: "emerald-wv-empty-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "user");
-    empty.createEl("h3", { text: "No profile data yet" });
-    empty.createEl("p", {
-      cls: "emerald-wv-empty-desc",
-      text: "Answer the questions during onboarding and your effort profile will appear here."
-    });
+    (0, import_obsidian17.setIcon)(iconEl, "user");
+    empty.createEl("h3", { text: COPY["card.title"] });
+    empty.createEl("p", { cls: "emerald-wv-empty-desc", text: COPY["card.body"] });
     const btn = empty.createEl("button", {
       cls: "emerald-btn emerald-btn-primary",
-      text: "Answer the questions"
+      text: COPY["card.cta"]
     });
     btn.addEventListener("click", () => {
       void (async () => {
         try {
-          await this.plugin.apiClient.triggerReassessment();
-          new import_obsidian20.Notice("Questions started");
+          const { OnboardingModal: OnboardingModal2 } = await Promise.resolve().then(() => (init_onboarding(), onboarding_exports));
+          new OnboardingModal2(this.app, this.plugin, () => {
+            void this.onOpen();
+          }, "questions").open();
         } catch (e) {
         }
       })();
     });
+  }
+  /** True when at least one of the 13 profile questions has an answer. */
+  hasSimpleAnswers(profile) {
+    var _a, _b;
+    const answers = {
+      ...(_a = profile.calibration_answers) != null ? _a : {},
+      ...(_b = profile.advanced_answers) != null ? _b : {}
+    };
+    return QUESTIONS.some((q) => answers[q.key] !== void 0 && answers[q.key] !== null);
   }
   // ── D19 Drift Indicator ─────────────────────────────
   renderDriftIndicator(container, driftValue, metadata = {}) {
@@ -9301,7 +8969,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const indicator = container.createDiv({ cls: `emerald-wv-section emerald-wv-drift-indicator ${cls}` });
     const headerRow = indicator.createDiv({ cls: "emerald-wv-drift-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-drift-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, icon);
+    (0, import_obsidian17.setIcon)(iconEl, icon);
     headerRow.createSpan({
       cls: "emerald-wv-drift-title",
       text: `Drift from your profile: ${level}`
@@ -9329,7 +8997,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-drift-indicator emerald-wv-drift-pending" });
     const headerRow = section.createDiv({ cls: "emerald-wv-drift-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-drift-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "sparkles");
+    (0, import_obsidian17.setIcon)(iconEl, "sparkles");
     headerRow.createSpan({
       cls: "emerald-wv-drift-title",
       text: "Drift from your profile: Collecting data"
@@ -9358,7 +9026,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const mode = (_a = profile.question_mode) != null ? _a : "simple";
     const banner = container.createDiv({ cls: "emerald-wv-profile-mode" });
     const modeIcon = banner.createSpan({ cls: "emerald-wv-profile-mode-icon" });
-    (0, import_obsidian20.setIcon)(modeIcon, mode === "advanced" ? "sparkles" : "circle");
+    (0, import_obsidian17.setIcon)(modeIcon, mode === "advanced" ? "sparkles" : "circle");
     banner.createSpan({
       cls: "emerald-wv-profile-mode-label",
       text: mode === "advanced" ? "Advanced Profile" : "Simple Profile"
@@ -9372,7 +9040,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
         void (async () => {
           try {
             await this.plugin.apiClient.updateProfile({ question_mode: "advanced" });
-            new import_obsidian20.Notice("Advanced mode enabled! Questions will appear before your next session.");
+            new import_obsidian17.Notice("Advanced mode enabled! Questions will appear before your next session.");
             void this.onOpen();
           } catch (e) {
           }
@@ -9401,7 +9069,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "sliders");
+    (0, import_obsidian17.setIcon)(iconEl, "sliders");
     headerRow.createEl("h3", { text: "Core traits" });
     const traitsEl = section.createDiv({ cls: "emerald-wv-traits" });
     for (const trait of CORE_TRAITS) {
@@ -9410,7 +9078,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       const labelCol = row.createDiv({ cls: "emerald-wv-trait-label" });
       const nameRow = labelCol.createDiv({ cls: "emerald-wv-trait-name-row" });
       const traitIcon = nameRow.createSpan({ cls: "emerald-wv-trait-icon" });
-      (0, import_obsidian20.setIcon)(traitIcon, trait.icon);
+      (0, import_obsidian17.setIcon)(traitIcon, trait.icon);
       nameRow.createSpan({ cls: "emerald-wv-trait-name", text: trait.label });
       labelCol.createSpan({ cls: "emerald-wv-trait-desc", text: trait.desc });
       const barContainer = row.createDiv({ cls: "emerald-wv-trait-bar-container" });
@@ -9434,7 +9102,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-recovery-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "heart-pulse");
+    (0, import_obsidian17.setIcon)(iconEl, "heart-pulse");
     headerRow.createEl("h3", { text: "What recharges you?" });
     const placeholders = [
       "A walk without your phone...",
@@ -9457,7 +9125,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       } else {
         card.addClass("emerald-wv-recovery-card-empty");
         const addIcon = card.createSpan({ cls: "emerald-wv-recovery-add-icon" });
-        (0, import_obsidian20.setIcon)(addIcon, "plus");
+        (0, import_obsidian17.setIcon)(addIcon, "plus");
         card.createDiv({ cls: "emerald-wv-recovery-placeholder", text: (_a = placeholders[i]) != null ? _a : "Add an activity..." });
         card.addEventListener("click", () => this.addRecoveryProtocol(card, placeholders[i]));
       }
@@ -9472,12 +9140,12 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       void (async () => {
         const resp = await this.plugin.apiClient.createRecoveryProtocol(name.trim());
         if (resp.queued) {
-          new import_obsidian20.Notice("Recharge activity queued. Will sync when online");
+          new import_obsidian17.Notice("Recharge activity queued. Will sync when online");
         } else if (resp.data) {
-          new import_obsidian20.Notice("Recharge activity saved.");
+          new import_obsidian17.Notice("Recharge activity saved.");
           await this.onOpen();
         } else {
-          new import_obsidian20.Notice("Failed to save. Try again.");
+          new import_obsidian17.Notice("Failed to save. Try again.");
         }
       })();
     });
@@ -9488,14 +9156,14 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       void (async () => {
         if (name.trim() === "") {
           const delResp = await this.plugin.apiClient.deleteRecoveryProtocol(protocol.id);
-          new import_obsidian20.Notice(delResp.queued ? "Deletion queued. Will sync when online" : "Recharge activity removed.");
+          new import_obsidian17.Notice(delResp.queued ? "Deletion queued. Will sync when online" : "Recharge activity removed.");
           if (!delResp.queued)
             await this.onOpen();
           return;
         }
         if (name.trim() !== protocol.name) {
           const updResp = await this.plugin.apiClient.updateRecoveryProtocol(protocol.id, { name: name.trim() });
-          new import_obsidian20.Notice(updResp.queued ? "Update queued. Will sync when online" : "Recharge activity updated.");
+          new import_obsidian17.Notice(updResp.queued ? "Update queued. Will sync when online" : "Recharge activity updated.");
           if (!updResp.queued)
             await this.onOpen();
         }
@@ -9510,7 +9178,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-cal-score-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "target");
+    (0, import_obsidian17.setIcon)(iconEl, "target");
     headerRow.createEl("h3", { text: "Profile filled in" });
     const scoreRow = section.createDiv({ cls: "emerald-wv-cal-score-row" });
     scoreRow.createSpan({ cls: "emerald-wv-cal-score-value", text: `${Math.round(profile.calibration_score * 10)}%` });
@@ -9560,7 +9228,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "list");
+    (0, import_obsidian17.setIcon)(iconEl, "list");
     headerRow.createEl("h3", { text: `Your Answers (${answeredKeys.length})` });
     const shuffled = this.pseudoShuffleKeys(answeredKeys);
     const grid = section.createDiv({ cls: "emerald-wv-answers-grid" });
@@ -9577,7 +9245,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       if (mismatch) {
         const nudge = card.createDiv({ cls: "emerald-wv-answer-nudge" });
         const nudgeIcon = nudge.createSpan({ cls: "emerald-wv-answer-nudge-icon" });
-        (0, import_obsidian20.setIcon)(nudgeIcon, "refresh-cw");
+        (0, import_obsidian17.setIcon)(nudgeIcon, "refresh-cw");
         nudge.createSpan({ text: isStrong ? "Doesn\u2019t match your behavior" : "Review suggested" });
         card.createDiv({ cls: "emerald-wv-answer-why", text: this.comparisonWhy(mismatch) });
       }
@@ -9666,7 +9334,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row emerald-wv-collapsible-header" });
     const arrowEl = headerRow.createSpan({ cls: "emerald-section-arrow", text: "\u25B8" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "history");
+    (0, import_obsidian17.setIcon)(iconEl, "history");
     headerRow.createEl("h3", { text: "Profile history" });
     const content = section.createDiv({ cls: "emerald-wv-collapsible-content" });
     content.addClass("emrald-hidden");
@@ -9700,7 +9368,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       th.createSpan({ text: col.label });
       if (col.tip) {
         const infoIcon = th.createSpan({ cls: "emerald-wv-col-info", attr: { title: col.tip } });
-        (0, import_obsidian20.setIcon)(infoIcon, "info");
+        (0, import_obsidian17.setIcon)(infoIcon, "info");
       }
     }
     const tbody = table.createEl("tbody");
@@ -9732,12 +9400,12 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-section emerald-wv-profile-actions-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
-    (0, import_obsidian20.setIcon)(iconEl, "settings");
+    (0, import_obsidian17.setIcon)(iconEl, "settings");
     headerRow.createEl("h3", { text: "Actions" });
     const btnRow = section.createDiv({ cls: "emerald-wv-profile-btn-row" });
     const reassessBtn = btnRow.createEl("button", { cls: "emerald-btn emerald-btn-secondary" });
     const reassessIcon = reassessBtn.createSpan({ cls: "emerald-btn-icon" });
-    (0, import_obsidian20.setIcon)(reassessIcon, "refresh-cw");
+    (0, import_obsidian17.setIcon)(reassessIcon, "refresh-cw");
     reassessBtn.createSpan({ text: "Reassess profile" });
     reassessBtn.addEventListener("click", () => {
       void (async () => {
@@ -9750,7 +9418,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     });
     const exportBtn = btnRow.createEl("button", { cls: "emerald-btn emerald-btn-subtle" });
     const exportIcon = exportBtn.createSpan({ cls: "emerald-btn-icon" });
-    (0, import_obsidian20.setIcon)(exportIcon, "download");
+    (0, import_obsidian17.setIcon)(exportIcon, "download");
     exportBtn.createSpan({ text: "Export data" });
     exportBtn.addEventListener("click", () => {
       void (async () => {
@@ -9759,17 +9427,17 @@ var EffortProfileView = class extends EmraldWorkspaceView {
         try {
           const resp = await this.plugin.apiClient.exportData();
           if (resp.error) {
-            new import_obsidian20.Notice(`Export failed: ${resp.error}`);
+            new import_obsidian17.Notice(`Export failed: ${resp.error}`);
             return;
           }
           const dateStr = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
           const filename = `emrald-export-${dateStr}.json`;
           const jsonContent = JSON.stringify(resp.data, null, 2);
           await this.plugin.app.vault.create(filename, jsonContent);
-          new import_obsidian20.Notice(`Exported to ${filename}`);
+          new import_obsidian17.Notice(`Exported to ${filename}`);
         } catch (e) {
           const msg = e instanceof Error ? e.message : "Unknown error";
-          new import_obsidian20.Notice(`Export failed: ${msg}`);
+          new import_obsidian17.Notice(`Export failed: ${msg}`);
         } finally {
           exportBtn.removeAttribute("disabled");
           exportBtn.removeClass("emrald-busy");
@@ -9777,10 +9445,10 @@ var EffortProfileView = class extends EmraldWorkspaceView {
       })();
     });
     const exportTip = btnRow.createEl("button", { cls: "emerald-btn emerald-btn-subtle emerald-export-tip", attr: { type: "button" } });
-    (0, import_obsidian20.setIcon)(exportTip, "info");
-    (0, import_obsidian20.setTooltip)(exportTip, EXPORT_TIP, { placement: "top" });
+    (0, import_obsidian17.setIcon)(exportTip, "info");
+    (0, import_obsidian17.setTooltip)(exportTip, EXPORT_TIP, { placement: "top" });
     exportTip.addEventListener("click", () => {
-      new import_obsidian20.Notice(EXPORT_TIP, 2e4);
+      new import_obsidian17.Notice(EXPORT_TIP, 2e4);
     });
   }
   // ── Data Center Cross-Link ─────────────────────────
@@ -9817,7 +9485,7 @@ var EffortProfileView = class extends EmraldWorkspaceView {
     return new Date(iso).toLocaleDateString(void 0, { month: "short", day: "numeric" });
   }
 };
-var RecoveryInputModal = class extends import_obsidian20.Modal {
+var RecoveryInputModal = class extends import_obsidian17.Modal {
   constructor(app, title, initialValue, onSubmit) {
     super(app);
     this.title = title;
@@ -9827,8 +9495,8 @@ var RecoveryInputModal = class extends import_obsidian20.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.createEl("h2", { text: this.title });
-    new import_obsidian20.Setting(contentEl).setName("Activity").addText((text) => text.setValue(this.initialValue).onChange((value) => this.initialValue = value).inputEl.focus());
-    new import_obsidian20.Setting(contentEl).addButton((btn) => btn.setButtonText("Save").setCta().onClick(() => {
+    new import_obsidian17.Setting(contentEl).setName("Activity").addText((text) => text.setValue(this.initialValue).onChange((value) => this.initialValue = value).inputEl.focus());
+    new import_obsidian17.Setting(contentEl).addButton((btn) => btn.setButtonText("Save").setCta().onClick(() => {
       this.onSubmit(this.initialValue);
       this.close();
     }));
@@ -9839,7 +9507,7 @@ var RecoveryInputModal = class extends import_obsidian20.Modal {
 };
 
 // src/views/workspace/burnout-monitor.ts
-var import_obsidian21 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 
 // src/utils/burnout-score.ts
 function burnoutDisplayScore(state, d8) {
@@ -10004,7 +9672,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
   renderEmptyState(container) {
     const empty = container.createDiv({ cls: "emerald-wv-empty-state" });
     const iconEl = empty.createDiv({ cls: "emerald-wv-empty-icon" });
-    (0, import_obsidian21.setIcon)(iconEl, "flame");
+    (0, import_obsidian18.setIcon)(iconEl, "flame");
     empty.createEl("h3", { text: "Not enough data yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
@@ -10018,7 +9686,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: `emerald-wv-section emerald-wv-burnout-hero emerald-wv-burnout-hero-${state.current_phase}` });
     const phaseRow = section.createDiv({ cls: "emerald-wv-burnout-phase-row" });
     const iconEl = phaseRow.createSpan({ cls: "emerald-wv-burnout-hero-icon" });
-    (0, import_obsidian21.setIcon)(iconEl, meta.icon);
+    (0, import_obsidian18.setIcon)(iconEl, meta.icon);
     phaseRow.createSpan({ cls: "emerald-wv-burnout-phase-label", text: meta.label });
     section.createEl("p", { cls: "emerald-wv-burnout-message", text: meta.message });
     section.createEl("p", { cls: "emerald-wv-burnout-tone", text: meta.tone });
@@ -10030,7 +9698,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       cls: "emerald-wv-burnout-score-info",
       attr: { "aria-label": "About this score" }
     });
-    (0, import_obsidian21.setIcon)(infoBtn, "info");
+    (0, import_obsidian18.setIcon)(infoBtn, "info");
     const infoDetail = section.createDiv({
       cls: "emerald-wv-burnout-score-explainer",
       text: "The score looks at your recent sessions for five things: effort feeling higher than the week before, enjoying work less, jumping between many projects, few in-the-zone sessions, and a lot of your effort being emotional work. 0 means no warning signs. 100 means all of them at full strength."
@@ -10074,7 +9742,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
     for (const sug of suggestions) {
       const row = section.createDiv({ cls: "emerald-wv-suggestion-row" });
       const iconEl = row.createSpan({ cls: "emerald-wv-suggestion-bullet" });
-      (0, import_obsidian21.setIcon)(iconEl, sug.icon);
+      (0, import_obsidian18.setIcon)(iconEl, sug.icon);
       row.createSpan({ text: sug.text });
     }
     if (phase === "green") {
@@ -10147,7 +9815,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
       cls: "emerald-wv-burnout-score-info",
       attr: { "aria-label": "About this trend" }
     });
-    (0, import_obsidian21.setIcon)(sparkInfo, "info");
+    (0, import_obsidian18.setIcon)(sparkInfo, "info");
     const sparkExplainer = section.createDiv({
       cls: "emerald-wv-burnout-score-explainer",
       text: "Each dot is one day's score. Flat and low is good. A line that keeps climbing means warning signs are piling up. That's your cue to ease off."
@@ -10343,7 +10011,7 @@ var BurnoutMonitorView = class extends EmraldWorkspaceView {
 };
 
 // src/views/workspace/digest.ts
-var import_obsidian22 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 init_base();
 init_tier();
 var PERIOD_ICONS = {
@@ -10413,7 +10081,7 @@ var DigestView = class extends EmraldWorkspaceView {
   renderEmptyState(container) {
     const empty = container.createDiv({ cls: "emerald-wv-empty-state" });
     const iconEl = empty.createDiv({ cls: "emerald-wv-empty-icon" });
-    (0, import_obsidian22.setIcon)(iconEl, "clipboard-list");
+    (0, import_obsidian19.setIcon)(iconEl, "clipboard-list");
     empty.createEl("h3", { text: "No recaps yet" });
     empty.createEl("p", {
       cls: "emerald-wv-empty-desc",
@@ -10489,7 +10157,7 @@ var DigestView = class extends EmraldWorkspaceView {
     const digest = filtered[this.selectedIndex];
     const periodIcon = this.navContainer.createSpan({ cls: "emerald-wv-digest-period-label" });
     const iconSpan = periodIcon.createSpan({ cls: "emerald-wv-digest-period-icon" });
-    (0, import_obsidian22.setIcon)(iconSpan, (_a = PERIOD_ICONS[digest.period_type]) != null ? _a : "calendar");
+    (0, import_obsidian19.setIcon)(iconSpan, (_a = PERIOD_ICONS[digest.period_type]) != null ? _a : "calendar");
     const startDate = this.formatDateShort(digest.period_start);
     const endDate = this.formatDateShort(digest.period_end);
     periodIcon.createSpan({
@@ -10554,7 +10222,7 @@ var DigestView = class extends EmraldWorkspaceView {
         for (const proj of content.top_projects) {
           const row = el.createDiv({ cls: "emerald-wv-digest-completed-row" });
           const icon = row.createSpan({ cls: "emerald-wv-digest-check-icon" });
-          (0, import_obsidian22.setIcon)(icon, "folder");
+          (0, import_obsidian19.setIcon)(icon, "folder");
           const label = `${proj.name}: ${proj.sessions} session${proj.sessions === 1 ? "" : "s"}, ${proj.hours.toFixed(1)}h`;
           row.createSpan({ text: label });
         }
@@ -10571,7 +10239,7 @@ var DigestView = class extends EmraldWorkspaceView {
         for (const highlight of insights) {
           const row = el.createDiv({ cls: "emerald-wv-digest-insight-row" });
           const bullet = row.createSpan({ cls: "emerald-wv-digest-insight-bullet" });
-          (0, import_obsidian22.setIcon)(bullet, "sparkle");
+          (0, import_obsidian19.setIcon)(bullet, "sparkle");
           row.createSpan({ text: highlight });
         }
       });
@@ -10590,7 +10258,7 @@ var DigestView = class extends EmraldWorkspaceView {
         for (const proj of content.completed_projects) {
           const row = el.createDiv({ cls: "emerald-wv-digest-completed-row" });
           const check = row.createSpan({ cls: "emerald-wv-digest-check-icon" });
-          (0, import_obsidian22.setIcon)(check, "check");
+          (0, import_obsidian19.setIcon)(check, "check");
           row.createSpan({ text: proj });
         }
       });
@@ -10623,7 +10291,7 @@ var DigestView = class extends EmraldWorkspaceView {
     for (const src of sorted) {
       const chip = summaryRow.createSpan({ cls: "emerald-wv-digest-source-chip" });
       const iconEl = chip.createSpan({ cls: "emerald-wv-digest-source-chip-icon" });
-      (0, import_obsidian22.setIcon)(iconEl, (_a = SOURCE_ICONS[src.source]) != null ? _a : "circle");
+      (0, import_obsidian19.setIcon)(iconEl, (_a = SOURCE_ICONS[src.source]) != null ? _a : "circle");
       chip.createSpan({ text: `${src.percentage}%` });
     }
     const dominantLabel = (_c = (_b = sorted[0]) == null ? void 0 : _b.source) != null ? _c : "";
@@ -10637,7 +10305,7 @@ var DigestView = class extends EmraldWorkspaceView {
       const row = container.createDiv({ cls: "emerald-wv-digest-source-row" });
       const labelRow = row.createDiv({ cls: "emerald-wv-digest-source-label-row" });
       const iconEl = labelRow.createSpan({ cls: "emerald-wv-digest-source-icon" });
-      (0, import_obsidian22.setIcon)(iconEl, (_d = SOURCE_ICONS[src.source]) != null ? _d : "circle");
+      (0, import_obsidian19.setIcon)(iconEl, (_d = SOURCE_ICONS[src.source]) != null ? _d : "circle");
       labelRow.createSpan({ cls: "emerald-wv-digest-source-name", text: src.source });
       labelRow.createSpan({ cls: "emerald-wv-digest-source-pct", text: `${src.percentage}%` });
       const barOuter = row.createDiv({ cls: "emerald-wv-digest-source-bar" });
@@ -10707,7 +10375,7 @@ var DigestView = class extends EmraldWorkspaceView {
   renderStatCard(container, iconId, label, value, sublabel) {
     const card = container.createDiv({ cls: "emerald-wv-stat-card" });
     const iconEl = card.createDiv({ cls: "emerald-wv-stat-icon" });
-    (0, import_obsidian22.setIcon)(iconEl, iconId);
+    (0, import_obsidian19.setIcon)(iconEl, iconId);
     card.createDiv({ cls: "emerald-wv-stat-value", text: value });
     card.createDiv({ cls: "emerald-wv-stat-label", text: label });
     if (sublabel) {
@@ -10734,7 +10402,7 @@ var DigestView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-digest-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-digest-section-header" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-digest-section-icon" });
-    (0, import_obsidian22.setIcon)(iconEl, iconId);
+    (0, import_obsidian19.setIcon)(iconEl, iconId);
     headerRow.createEl("h4", { text: title });
     const body = section.createDiv({ cls: "emerald-wv-digest-section-body" });
     renderContent(body);
@@ -10796,7 +10464,7 @@ var DigestView = class extends EmraldWorkspaceView {
     const section = container.createDiv({ cls: "emerald-wv-digest-section" });
     const headerRow = section.createDiv({ cls: "emerald-wv-digest-section-header emrald-clickable" });
     const iconEl = headerRow.createSpan({ cls: "emerald-wv-digest-section-icon" });
-    (0, import_obsidian22.setIcon)(iconEl, "edit-3");
+    (0, import_obsidian19.setIcon)(iconEl, "edit-3");
     const headerTitle = headerRow.createEl("h4", { text: `\u25B8 Daily check-in notes (${withNotes.length})` });
     const body = section.createDiv({ cls: "emerald-wv-digest-section-body" });
     body.addClass("emrald-hidden");
@@ -10836,7 +10504,7 @@ var DigestView = class extends EmraldWorkspaceView {
 };
 
 // src/views/workspace/about.ts
-var import_obsidian23 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 init_base();
 init_tier();
 var AboutView = class extends EmraldWorkspaceView {
@@ -10854,7 +10522,7 @@ var AboutView = class extends EmraldWorkspaceView {
     const section = parent.createDiv({ cls: "emerald-wv-about-section" });
     const header = section.createDiv({ cls: "emerald-wv-about-section-header" });
     const iconWrap = header.createSpan({ cls: "emerald-wv-about-section-icon" });
-    (0, import_obsidian23.setIcon)(iconWrap, iconName);
+    (0, import_obsidian20.setIcon)(iconWrap, iconName);
     const arrow = header.createSpan({ cls: "emerald-wv-about-section-arrow", text: "\u25B8" });
     header.createEl("h3", { attr: { id }, cls: "emerald-wv-about-section-title", text: title });
     const content = section.createDiv({ cls: "emerald-wv-about-section-content" });
@@ -10911,7 +10579,7 @@ var AboutView = class extends EmraldWorkspaceView {
     ];
     for (const s of specItems) {
       const chip = specs.createSpan({ cls: "emerald-wv-about-speckchip" });
-      (0, import_obsidian23.setIcon)(chip.createSpan({ cls: "emerald-wv-about-speckchip-icon" }), s.icon);
+      (0, import_obsidian20.setIcon)(chip.createSpan({ cls: "emerald-wv-about-speckchip-icon" }), s.icon);
       chip.createSpan({ cls: "emerald-wv-about-speckchip-label", text: s.label });
     }
     this.makeSection(container, "what-it-is", "gem", "What EMRALD is", (el) => {
@@ -11016,7 +10684,7 @@ var AboutView = class extends EmraldWorkspaceView {
       const proSection = container.createDiv({ cls: "emerald-wv-section emerald-wv-about-section emerald-wv-pro-teaser" });
       const proHeader = proSection.createDiv({ cls: "emerald-wv-about-section-header" });
       const proIcon = proHeader.createSpan({ cls: "emerald-wv-about-section-icon" });
-      (0, import_obsidian23.setIcon)(proIcon, "sparkles");
+      (0, import_obsidian20.setIcon)(proIcon, "sparkles");
       proHeader.createEl("h3", { cls: "emerald-wv-about-section-title", text: "What PRO adds" });
       const proContent = proSection.createDiv({ cls: "emerald-wv-about-section-content" });
       this.para(proContent, "All 20 metrics, the Insight Log, your own effort levels, and daily and monthly recaps.");
@@ -11031,7 +10699,7 @@ var AboutView = class extends EmraldWorkspaceView {
       for (const feat of features) {
         const item = featureGrid.createDiv({ cls: "emerald-wv-pro-feature-cell" });
         const iconEl = item.createSpan({ cls: "emerald-wv-pro-feature-icon" });
-        (0, import_obsidian23.setIcon)(iconEl, feat.icon);
+        (0, import_obsidian20.setIcon)(iconEl, feat.icon);
         item.createSpan({ cls: "emerald-wv-pro-feature-text", text: feat.text });
       }
       const ctaRow = proSection.createDiv({ cls: "emerald-wv-pro-cta-row" });
@@ -11153,15 +10821,15 @@ var _EMComponent = class {
               if (resp.queued) {
                 this.checkinDone = true;
                 this.renderCheckinBanner();
-                new import_obsidian25.Notice("Energy check-in queued. Will sync when online");
+                new import_obsidian22.Notice("Energy check-in queued. Will sync when online");
                 void writeDailySummary(this.plugin);
               } else if (!resp.error) {
                 this.checkinDone = true;
                 this.renderCheckinBanner();
-                new import_obsidian25.Notice("Energy check-in recorded \u2713");
+                new import_obsidian22.Notice("Energy check-in recorded \u2713");
                 void writeDailySummary(this.plugin);
               } else {
-                new import_obsidian25.Notice(`Check-in failed: ${resp.error}`);
+                new import_obsidian22.Notice(`Check-in failed: ${resp.error}`);
               }
             });
           }
@@ -11536,7 +11204,7 @@ var _EMComponent = class {
         this.renderUpgradeCard();
       }
       this.renderFeedbackFooter();
-      new import_obsidian25.Notice("Insight acknowledged");
+      new import_obsidian22.Notice("Insight acknowledged");
       window.dispatchEvent(new CustomEvent("emrald:insight-acknowledged", { detail: { id } }));
     }
   }
@@ -11669,7 +11337,7 @@ init_base();
 var VIEW_TYPE_EMRALD = "emrald-sidebar";
 var BURNOUT_SNOOZE_DAYS = 3;
 var BURNOUT_MAX_MODALS_PER_EPISODE = 2;
-var EmraldSidebarView = class extends import_obsidian35.ItemView {
+var EmraldSidebarView = class extends import_obsidian34.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.timeblock = null;
@@ -11748,6 +11416,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     this.renderSidebar(container);
     void this.checkWelcomeBack();
     void this.checkBurnoutWatcher();
+    void this.consumeFirstSession();
   }
   async onClose() {
     await super.onClose();
@@ -11772,9 +11441,35 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
    * Shows a welcome-back modal once per return event.
    * Uses a persisted flag (_welcomeBackShownDate) so it only fires once per day.
    */
+  /**
+   * The Ready screen of the signup hands us the project it just created. Start its session as soon as the sidebar
+   * has loaded; if anything is not ready the user simply sees the project and presses start.
+   */
+  async consumeFirstSession() {
+    var _a, _b;
+    const store = this.plugin;
+    const id = store._firstSessionItemId;
+    if (typeof id !== "string")
+      return;
+    store._firstSessionItemId = void 0;
+    try {
+      for (let i = 0; i < 10 && !this.timeblock; i++) {
+        await new Promise((resolve) => window.setTimeout(resolve, 400));
+      }
+      if (!this.timeblock || ((_a = this.timeblock.state) == null ? void 0 : _a.activeSession))
+        return;
+      const resp = await this.plugin.apiClient.getItems();
+      const item = (_b = resp.data) == null ? void 0 : _b.find((i) => i.id === id);
+      if (item)
+        await this.doStartSession(item);
+    } catch (e) {
+    }
+  }
   async checkWelcomeBack() {
     var _a, _b, _c;
     try {
+      if (!this.plugin.settings.onboardingComplete)
+        return;
       const todayStr = (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
       const shownDate = this.plugin.settings._welcomeBackShownDate;
       if (shownDate === todayStr)
@@ -12011,7 +11706,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian35.setIcon)(iconEl, "timer");
+    (0, import_obsidian34.setIcon)(iconEl, "timer");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: dayLabel });
     const content = section.createDiv({ cls: "emerald-section-content" });
@@ -12061,7 +11756,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian35.setIcon)(iconEl, "folder");
+    (0, import_obsidian34.setIcon)(iconEl, "folder");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: "Projects" });
     const addBtn = header.createSpan({ cls: "emerald-section-action", text: "+ add" });
@@ -12070,7 +11765,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     addBtn.tabIndex = 0;
     addBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      const menu = new import_obsidian35.Menu();
+      const menu = new import_obsidian34.Menu();
       menu.addItem(
         (i) => i.setTitle("+ new project").setIcon("file-plus").onClick(() => {
           void this.handleAddNewProject();
@@ -12133,7 +11828,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     const arrowEl = headerLeft.createSpan({ cls: "emerald-section-arrow", text: "\u25BC" });
     arrowEl.setAttribute("aria-hidden", "true");
     const iconEl = headerLeft.createSpan({ cls: "emerald-section-icon" });
-    (0, import_obsidian35.setIcon)(iconEl, "bar-chart-2");
+    (0, import_obsidian34.setIcon)(iconEl, "bar-chart-2");
     iconEl.setAttribute("aria-hidden", "true");
     headerLeft.createSpan({ text: "Effort management" });
     const content = section.createDiv({ cls: "emerald-section-content" });
@@ -12230,10 +11925,10 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
               if (discardResp.error && !discardResp.queued) {
                 console.warn("[EMRALD] Failed to discard stale session:", discardResp.error);
               }
-              new import_obsidian35.Notice(discardResp.queued ? "Stale session queued for discard. Will sync when online." : "Discarded a stale session from yesterday.");
+              new import_obsidian34.Notice(discardResp.queued ? "Stale session queued for discard. Will sync when online." : "Discarded a stale session from yesterday.");
             } catch (e) {
               console.error("[EMRALD] Error discarding stale session:", e);
-              new import_obsidian35.Notice("Found a stale session but could not discard it. Try refreshing.");
+              new import_obsidian34.Notice("Found a stale session but could not discard it. Try refreshing.");
             }
             return;
           }
@@ -12291,19 +11986,19 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
   // ── Session Handlers ────────────────────────────────────
   handleStartSessionRequest() {
     if (!this.projects) {
-      new import_obsidian35.Notice("No projects loaded yet.");
+      new import_obsidian34.Notice("No projects loaded yet.");
       console.warn("[EMRALD] Start button: projects component is null");
       return;
     }
     const activeItems = this.projects.state.items.filter((i) => i.status === "active");
     if (activeItems.length === 0) {
-      new import_obsidian35.Notice("No active projects. Add one first.");
+      new import_obsidian34.Notice("No active projects. Add one first.");
       return;
     }
     const handleStart = (item) => {
       void this.handleStartSession(item);
     };
-    class ProjectPickerModal extends import_obsidian35.FuzzySuggestModal {
+    class ProjectPickerModal extends import_obsidian34.FuzzySuggestModal {
       getItems() {
         return activeItems;
       }
@@ -12356,7 +12051,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
         const payload = body;
         return (payload == null ? void 0 : payload.item_id) === item.id;
       })) {
-        new import_obsidian35.Notice(`Session start already queued for ${item.name}. Reconnect to sync it.`);
+        new import_obsidian34.Notice(`Session start already queued for ${item.name}. Reconnect to sync it.`);
         return;
       }
       const resp = await this.plugin.apiClient.startSession(item.id);
@@ -12367,11 +12062,11 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
           this.projects.updateState({ activeSessionItemId: item.id });
         }
         await this.persistProvisionalSession();
-        new import_obsidian35.Notice(`Offline. Session started locally for ${item.name}. It will sync when you're back online.`);
+        new import_obsidian34.Notice(`Offline. Session started locally for ${item.name}. It will sync when you're back online.`);
         return;
       }
       if (resp.error || !resp.data) {
-        new import_obsidian35.Notice(`Failed to start session: ${resp.error}`);
+        new import_obsidian34.Notice(`Failed to start session: ${resp.error}`);
         return;
       }
       this._loadingTodayData = false;
@@ -12381,7 +12076,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       if (this.projects) {
         this.projects.updateState({ activeSessionItemId: item.id });
       }
-      new import_obsidian35.Notice(`Session started: ${item.name}`);
+      new import_obsidian34.Notice(`Session started: ${item.name}`);
     } finally {
       this._startingSession = false;
     }
@@ -12398,7 +12093,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       if (session.isPendingSync)
         await this.persistProvisionalSession();
     } else {
-      new import_obsidian35.Notice(`Failed to pause: ${resp.error}`);
+      new import_obsidian34.Notice(`Failed to pause: ${resp.error}`);
     }
   }
   async handleResumeSession() {
@@ -12457,7 +12152,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       this.timeblock.pauseSession();
       if (session.isPendingSync)
         await this.persistProvisionalSession();
-      new import_obsidian35.Notice("Auto-paused. You are two hours past your prescribed effort for today. Resume if you're still going.");
+      new import_obsidian34.Notice("Auto-paused. You are two hours past your prescribed effort for today. Resume if you're still going.");
     } else {
       session.overtimeAutoPaused = false;
     }
@@ -12486,7 +12181,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
               var _a2, _b2, _c2, _d2, _e, _f;
               if (action === "discard") {
                 await this.plugin.apiClient.discardSession(session.sessionId);
-                new import_obsidian35.Notice("Runaway session discarded. No data recorded.");
+                new import_obsidian34.Notice("Runaway session discarded. No data recorded.");
                 (_a2 = this.timeblock) == null ? void 0 : _a2.stopSession();
                 if (this.projects) {
                   this.projects.updateState({ activeSessionItemId: null });
@@ -12518,7 +12213,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
                     void (async () => {
                       const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
                       if (!resp.error || resp.queued) {
-                        new import_obsidian35.Notice(resp.queued ? "Receipt queued. Will sync when online" : "Session recorded");
+                        new import_obsidian34.Notice(resp.queued ? "Receipt queued. Will sync when online" : "Session recorded");
                         void this.loadTodayData();
                         void this.loadProjects();
                         await this.updateFrontmatterStats(session.itemId);
@@ -12539,9 +12234,9 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       if (stopResp.error && !stopResp.queued) {
         if (stopResp.status === 400 || stopResp.status === 404) {
           console.warn(`[EMRALD] Stop returned ${stopResp.status}. Clearing local state anyway:`, stopResp.error);
-          new import_obsidian35.Notice("Session may have already ended. Clearing local state.");
+          new import_obsidian34.Notice("Session may have already ended. Clearing local state.");
         } else {
-          new import_obsidian35.Notice(`Failed to stop session: ${stopResp.error}`);
+          new import_obsidian34.Notice(`Failed to stop session: ${stopResp.error}`);
           return;
         }
       }
@@ -12552,11 +12247,11 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       await this.loadTodayData();
       void this.clearPersistedProvisionalSession();
       if (stopResp.queued) {
-        new import_obsidian35.Notice(`Session stopped locally. Will sync when online.`);
+        new import_obsidian34.Notice(`Session stopped locally. Will sync when online.`);
       }
       const MIN_RECEIPT_MINUTES = 5;
       if (sessionMinutes < MIN_RECEIPT_MINUTES) {
-        new import_obsidian35.Notice(`Session too short for receipt (${Math.round(sessionMinutes)}m < ${MIN_RECEIPT_MINUTES}m). Recorded without receipt.`);
+        new import_obsidian34.Notice(`Session too short for receipt (${Math.round(sessionMinutes)}m < ${MIN_RECEIPT_MINUTES}m). Recorded without receipt.`);
         void this.loadTodayData();
         void this.loadProjects();
         return;
@@ -12579,7 +12274,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
             var _a2, _b2, _c2;
             const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
             if (!resp.error || resp.queued) {
-              new import_obsidian35.Notice(resp.queued ? "Receipt queued. Will sync when online" : "Session recorded");
+              new import_obsidian34.Notice(resp.queued ? "Receipt queued. Will sync when online" : "Session recorded");
               void this.loadTodayData();
               void this.loadProjects();
               await this.updateFrontmatterStats(session.itemId);
@@ -12650,7 +12345,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
       () => {
         var _a2;
         (_a2 = this.timeblock) == null ? void 0 : _a2.closeDay();
-        new import_obsidian35.Notice("Day closed");
+        new import_obsidian34.Notice("Day closed");
         void writeDailySummary(this.plugin);
       }
     );
@@ -12690,7 +12385,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
               this.projects.updateSessionProgress(this.timeblock.state.activeSession.elapsedMs / 6e4);
             }
           }
-          new import_obsidian35.Notice(`Today's hours set to ${hours}h`);
+          new import_obsidian34.Notice(`Today's hours set to ${hours}h`);
         })();
       }
     );
@@ -12701,7 +12396,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     var _a, _b, _c, _d, _e, _f, _g;
     const activeCount = (_d = (_c = (_b = (_a = this.projects) == null ? void 0 : _a.state) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.status === "active").length) != null ? _d : 0;
     if (activeCount >= 5) {
-      new import_obsidian35.Notice("You already have 5 active projects. Complete or deactivate one first.");
+      new import_obsidian34.Notice("You already have 5 active projects. Complete or deactivate one first.");
       return;
     }
     const availableHours = (_g = (_f = (_e = this.timeblock) == null ? void 0 : _e.state) == null ? void 0 : _f.availableHours) != null ? _g : 4;
@@ -12717,10 +12412,10 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
             obsidian_note_path: void 0
           });
           if (resp.error || !resp.data) {
-            new import_obsidian35.Notice(`Failed to create project: ${resp.error}`);
+            new import_obsidian34.Notice(`Failed to create project: ${resp.error}`);
             return;
           }
-          new import_obsidian35.Notice(`Created: ${name}`);
+          new import_obsidian34.Notice(`Created: ${name}`);
           void this.loadProjects();
           this.restoreActiveSessionHighlight();
         })();
@@ -12733,7 +12428,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     var _a, _b, _c, _d, _e, _f, _g;
     const activeCount = (_d = (_c = (_b = (_a = this.projects) == null ? void 0 : _a.state) == null ? void 0 : _b.items) == null ? void 0 : _c.filter((i) => i.status === "active").length) != null ? _d : 0;
     if (activeCount >= 5) {
-      new import_obsidian35.Notice("You already have 5 active projects. Complete or deactivate one first.");
+      new import_obsidian34.Notice("You already have 5 active projects. Complete or deactivate one first.");
       return;
     }
     const files = this.app.vault.getMarkdownFiles();
@@ -12759,11 +12454,11 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
                   obsidian_note_path: file.path
                 });
                 if (resp.error || !resp.data) {
-                  new import_obsidian35.Notice(`Failed to create project: ${resp.error}`);
+                  new import_obsidian34.Notice(`Failed to create project: ${resp.error}`);
                   return;
                 }
                 await initializeEmraldFrontmatter(this.app, file, resp.data.id, level);
-                new import_obsidian35.Notice(`Created & linked: ${name}`);
+                new import_obsidian34.Notice(`Created & linked: ${name}`);
                 void this.loadProjects();
                 this.restoreActiveSessionHighlight();
               })();
@@ -12798,7 +12493,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
         void (async () => {
           const resp = await this.plugin.apiClient.updateItem(item.id, { effort_level: level });
           if (!resp.error) {
-            new import_obsidian35.Notice(`${item.name} \u2192 ${levelLabel(level) || "level updated"}`);
+            new import_obsidian34.Notice(`${item.name} \u2192 ${levelLabel(level) || "level updated"}`);
             void this.loadProjects();
           }
         })();
@@ -12819,7 +12514,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     if (!notePath)
       return;
     const file = this.plugin.app.vault.getAbstractFileByPath(notePath);
-    if (!file || !(file instanceof import_obsidian35.TFile))
+    if (!file || !(file instanceof import_obsidian34.TFile))
       return;
     if (!isEmraldNote(this.plugin.app, file))
       return;
@@ -12916,7 +12611,7 @@ var EmraldSidebarView = class extends import_obsidian35.ItemView {
     }
   }
 };
-var AddProjectSuggestModal = class extends import_obsidian35.SuggestModal {
+var AddProjectSuggestModal = class extends import_obsidian34.SuggestModal {
   constructor(app, files, onChoose) {
     super(app);
     this.files = files;
@@ -12939,7 +12634,7 @@ var AddProjectSuggestModal = class extends import_obsidian35.SuggestModal {
     this.onChoose(file);
   }
 };
-var RunawaySessionModal = class extends import_obsidian35.Modal {
+var RunawaySessionModal = class extends import_obsidian34.Modal {
   constructor(app, itemName, sessionMinutes, onAction) {
     super(app);
     this.itemName = itemName;
@@ -12987,7 +12682,7 @@ init_tier();
 init_e_levels();
 
 // src/api/client.ts
-var import_obsidian36 = require("obsidian");
+var import_obsidian35 = require("obsidian");
 var EmraldAPIClient = class {
   constructor(apiKey, baseUrl) {
     this.offlineQueue = null;
@@ -13071,7 +12766,7 @@ var EmraldAPIClient = class {
       }
       const timeoutMs = method === "GET" ? 15e3 : attempt === 0 ? 3e3 : 1e4;
       const response = await Promise.race([
-        (0, import_obsidian36.requestUrl)(params),
+        (0, import_obsidian35.requestUrl)(params),
         new Promise(
           (_, reject) => window.setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
         )
@@ -13222,7 +12917,7 @@ var EmraldAPIClient = class {
     try {
       const localIds = this.offlineQueue.getLocalSessionIds();
       if (localIds.length > 0) {
-        new import_obsidian36.Notice(`Reconciling ${localIds.length} offline session(s)...`);
+        new import_obsidian35.Notice(`Reconciling ${localIds.length} offline session(s)...`);
         for (const localId of localIds) {
           const startActions = this.offlineQueue.getStartActions();
           const startAction = startActions[0];
@@ -13231,7 +12926,7 @@ var EmraldAPIClient = class {
             for (const a of orphaned) {
               this.offlineQueue.remove(a.id);
             }
-            new import_obsidian36.Notice(`Dropped orphaned offline session (no start action found)`);
+            new import_obsidian35.Notice(`Dropped orphaned offline session (no start action found)`);
             continue;
           }
           const body = startAction.body;
@@ -13251,18 +12946,18 @@ var EmraldAPIClient = class {
               if (remoteId) {
                 this.offlineQueue.removeById(startAction.id);
                 this.offlineQueue.remapSessionId(localId, remoteId);
-                new import_obsidian36.Notice(`Session reconciled: ${localId.slice(0, 12)}... \u2192 ${remoteId.slice(0, 8)}...`);
+                new import_obsidian35.Notice(`Session reconciled: ${localId.slice(0, 12)}... \u2192 ${remoteId.slice(0, 8)}...`);
                 await this.replayUntilNextStart();
               } else {
                 this.offlineQueue.removeById(startAction.id);
-                new import_obsidian36.Notice("Session created but could not extract id. Dependent actions dropped");
+                new import_obsidian35.Notice("Session created but could not extract id. Dependent actions dropped");
                 const deps = this.offlineQueue.getPendingActions().filter((a) => a.path.includes(localId));
                 for (const d of deps)
                   this.offlineQueue.remove(d.id);
               }
             } else {
               const errMsg = result.error || `HTTP ${result.status}`;
-              new import_obsidian36.Notice(`Failed to reconcile offline session: ${errMsg}`);
+              new import_obsidian35.Notice(`Failed to reconcile offline session: ${errMsg}`);
               if (result.status >= 400 && result.status < 500) {
                 this.offlineQueue.removeById(startAction.id);
                 const deps = this.offlineQueue.getPendingActions().filter((a) => a.path.includes(localId));
@@ -13271,7 +12966,7 @@ var EmraldAPIClient = class {
               }
             }
           } catch (e) {
-            new import_obsidian36.Notice("Network error during session reconciliation. Will retry later");
+            new import_obsidian35.Notice("Network error during session reconciliation. Will retry later");
           }
         }
       }
@@ -13329,7 +13024,7 @@ var EmraldAPIClient = class {
         parts.push(`${synced} synced`);
       if (failed > 0)
         parts.push(`${failed} failed`);
-      new import_obsidian36.Notice(`Session actions: ${parts.join(", ")}`);
+      new import_obsidian35.Notice(`Session actions: ${parts.join(", ")}`);
     }
   }
   async executeQueuedRequest(method, path, body) {
@@ -13345,7 +13040,7 @@ var EmraldAPIClient = class {
       if (body && (method === "POST" || method === "PATCH" || method === "PUT" || method === "DELETE")) {
         params.body = JSON.stringify(body);
       }
-      const response = await (0, import_obsidian36.requestUrl)(params);
+      const response = await (0, import_obsidian35.requestUrl)(params);
       return {
         ok: response.status >= 200 && response.status < 300,
         status: response.status,
@@ -13805,7 +13500,7 @@ function normalizeEffortProfile(profile) {
 }
 
 // src/sync/folder-sync.ts
-var import_obsidian37 = require("obsidian");
+var import_obsidian36 = require("obsidian");
 init_e_levels();
 var FolderSync = class {
   // emrald-id → item
@@ -13822,13 +13517,13 @@ var FolderSync = class {
    */
   start() {
     const createRef = this.app.vault.on("create", (file) => {
-      if (file instanceof import_obsidian37.TFile && file.extension === "md") {
+      if (file instanceof import_obsidian36.TFile && file.extension === "md") {
         void this.handleFileCreate(file);
       }
     });
     this.eventRefs.push(createRef);
     const renameRef = this.app.vault.on("rename", (file, oldPath) => {
-      if (file instanceof import_obsidian37.TFile && file.extension === "md") {
+      if (file instanceof import_obsidian36.TFile && file.extension === "md") {
         void this.handleFileMove(file, oldPath);
       }
     });
@@ -13876,8 +13571,8 @@ var FolderSync = class {
       }
       const activeFolder = this.app.vault.getAbstractFileByPath(this.config.activeFolderPath);
       const inactiveFolder = this.app.vault.getAbstractFileByPath(this.config.inactiveFolderPath);
-      const activeFiles = activeFolder instanceof import_obsidian37.TFolder ? this.getMarkdownFiles(activeFolder) : [];
-      const inactiveFiles = inactiveFolder instanceof import_obsidian37.TFolder ? this.getMarkdownFiles(inactiveFolder) : [];
+      const activeFiles = activeFolder instanceof import_obsidian36.TFolder ? this.getMarkdownFiles(activeFolder) : [];
+      const inactiveFiles = inactiveFolder instanceof import_obsidian36.TFolder ? this.getMarkdownFiles(inactiveFolder) : [];
       for (const file of [...activeFiles, ...inactiveFiles]) {
         await this.syncFileWithAPI(file, apiItems);
       }
@@ -13901,9 +13596,9 @@ var FolderSync = class {
   getMarkdownFiles(folder) {
     const files = [];
     for (const child of folder.children) {
-      if (child instanceof import_obsidian37.TFile && child.extension === "md") {
+      if (child instanceof import_obsidian36.TFile && child.extension === "md") {
         files.push(child);
-      } else if (child instanceof import_obsidian37.TFolder) {
+      } else if (child instanceof import_obsidian36.TFolder) {
         files.push(...this.getMarkdownFiles(child));
       }
     }
@@ -13931,7 +13626,7 @@ var FolderSync = class {
     await sleep(500);
     if (isEmraldNote(this.app, file))
       return;
-    new import_obsidian37.Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
+    new import_obsidian36.Notice(`New note in Active folder: "${file.basename}". Open EMRALD sidebar to track it.`);
   }
   /**
    * Handle file rename/move between folders.
@@ -13950,14 +13645,14 @@ var FolderSync = class {
       const response = await this.apiClient.updateItem(emeraldId, { status: "paused" });
       if (!response.error) {
         await writeEmraldFrontmatter(this.app, file, { "status": "paused" });
-        new import_obsidian37.Notice(`"${file.basename}" paused.`);
+        new import_obsidian36.Notice(`"${file.basename}" paused.`);
       }
     }
     if (wasInactive && nowActive) {
       const response = await this.apiClient.updateItem(emeraldId, { status: "active" });
       if (!response.error) {
         await writeEmraldFrontmatter(this.app, file, { "status": "active" });
-        new import_obsidian37.Notice(`"${file.basename}" reactivated.`);
+        new import_obsidian36.Notice(`"${file.basename}" reactivated.`);
       }
     }
   }
@@ -13982,7 +13677,7 @@ var FolderSync = class {
       });
       if (!response.error && response.data) {
         this.localItemCache.set(emeraldId, response.data);
-        new import_obsidian37.Notice(`E-level updated: ${file.basename} \u2192 ${levelLabel(currentLevel) || "updated"}`);
+        new import_obsidian36.Notice(`E-level updated: ${file.basename} \u2192 ${levelLabel(currentLevel) || "updated"}`);
       }
     }
   }
@@ -14017,7 +13712,7 @@ function sleep(ms) {
 }
 
 // src/sync/offline-queue.ts
-var import_obsidian38 = require("obsidian");
+var import_obsidian37 = require("obsidian");
 var OfflineQueue = class {
   constructor() {
     this.queue = [];
@@ -14049,7 +13744,7 @@ var OfflineQueue = class {
     };
     this.queue.push(action);
     this.notifyChange();
-    new import_obsidian38.Notice(`Queued offline: ${action.description} (${this.queue.length} pending)`);
+    new import_obsidian37.Notice(`Queued offline: ${action.description} (${this.queue.length} pending)`);
   }
   /**
    * Get pending action count.
@@ -14093,7 +13788,7 @@ var OfflineQueue = class {
     if (changed) {
       this.notifyChange();
       if (online && this.queue.length > 0) {
-        new import_obsidian38.Notice(`Back online. ${this.queue.length} actions queued for replay`);
+        new import_obsidian37.Notice(`Back online. ${this.queue.length} actions queued for replay`);
       }
     }
   }
@@ -14117,7 +13812,7 @@ var OfflineQueue = class {
     let success = 0;
     let failed = 0;
     const remaining = [];
-    new import_obsidian38.Notice(`Replaying ${this.queue.length} queued actions...`);
+    new import_obsidian37.Notice(`Replaying ${this.queue.length} queued actions...`);
     for (const action of this.queue) {
       try {
         const result = await executor(action.method, action.path, action.body);
@@ -14156,7 +13851,7 @@ var OfflineQueue = class {
       msg.push(`${failed} dropped`);
     if (remaining.length > 0)
       msg.push(`${remaining.length} still pending`);
-    new import_obsidian38.Notice(`Replay complete: ${msg.join(", ")}`);
+    new import_obsidian37.Notice(`Replay complete: ${msg.join(", ")}`);
     return { success, failed, remaining: remaining.length };
   }
   /**
@@ -14478,7 +14173,7 @@ var DataCache = class {
 };
 
 // main.ts
-var EmraldPlugin = class extends import_obsidian39.Plugin {
+var EmraldPlugin = class extends import_obsidian38.Plugin {
   constructor() {
     super(...arguments);
     this.syncIntervalId = null;
@@ -14536,6 +14231,21 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
     this.registerView(VIEW_ABOUT, (leaf) => new AboutView(leaf, this));
     this.addRibbonIcon("gem", "EMRALD", () => {
       void this.activateView();
+    });
+    this.addCommand({
+      id: "fill-in-profile",
+      name: "Fill in your profile",
+      checkCallback: (checking) => {
+        if (!this.hasApiKey())
+          return false;
+        if (!checking) {
+          void Promise.resolve().then(() => (init_onboarding(), onboarding_exports)).then(({ OnboardingModal: OnboardingModal2 }) => {
+            new OnboardingModal2(this.app, this, () => {
+            }, "questions").open();
+          });
+        }
+        return true;
+      }
     });
     this.addCommand({
       id: "start-session",
@@ -14626,7 +14336,7 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
       const manifestVersion = (_a = this.manifest.version) != null ? _a : "0.0.0";
       const obsidianVersion = (_c = (_b = this.app) == null ? void 0 : _b.version) != null ? _c : "unknown";
       const apiUrl = this.settings.apiUrl || "https://api.effortmastery.com/v1";
-      const resp = await (0, import_obsidian39.requestUrl)({
+      const resp = await (0, import_obsidian38.requestUrl)({
         url: `${apiUrl}/plugins/install`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -14702,7 +14412,7 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
       this.settings.apiKeySecretName = id;
       this.settings.apiKey = "";
       await this.saveData(this.settings);
-      new import_obsidian39.Notice("Your API key is now stored in the keychain.");
+      new import_obsidian38.Notice("Your API key is now stored in the keychain.");
     } catch (err) {
       if (this.settings.debugLogging)
         console.warn("[EMRALD] API key migration failed:", err);
@@ -14815,15 +14525,15 @@ var EmraldPlugin = class extends import_obsidian39.Plugin {
             const rawMsg = (_b = resp.error) == null ? void 0 : _b.message;
             msg = typeof rawMsg === "string" ? rawMsg : "unknown error";
           }
-          new import_obsidian39.Notice(`Recap schedule did not save: ${msg}`);
+          new import_obsidian38.Notice(`Recap schedule did not save: ${msg}`);
         } else {
           const local = utcSlotToLocal({ day: (_c = dayMap[this.settings.digestDay]) != null ? _c : 0, time: raw });
-          new import_obsidian39.Notice(`Recap schedule saved: ${(_d = DIGEST_DAY_NAMES[local.day]) != null ? _d : "Sunday"} at ${formatTime12(local.time)} (your time).`);
+          new import_obsidian38.Notice(`Recap schedule saved: ${(_d = DIGEST_DAY_NAMES[local.day]) != null ? _d : "Sunday"} at ${formatTime12(local.time)} (your time).`);
         }
       }
     } catch (err) {
       if (!silent)
-        new import_obsidian39.Notice(`Recap schedule did not save: ${String((_e = err == null ? void 0 : err.message) != null ? _e : err)}`);
+        new import_obsidian38.Notice(`Recap schedule did not save: ${String((_e = err == null ? void 0 : err.message) != null ? _e : err)}`);
       if (this.settings.debugLogging)
         console.warn("[EMRALD] syncDigestPreferences failed:", err);
     }

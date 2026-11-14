@@ -82,7 +82,9 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   ok(p.saved >= 1, 'A settings persisted');
   ok(p.creds.at(-1)[0] === 'KEY-NEW', 'A API client holds the key resolved from the keychain');
   ok(p.syncStarted === 1, 'A sync started (hasApiKey true)');
-  ok(r.modal.currentStep === 'welcome' && timeouts.length === 1, 'A advance to next step scheduled');
+  ok(r.modal.currentStep === 'connect' && timeouts.length === 1, 'A advance to next step scheduled');
+  timeouts[0](); // 800 ms later a NEW account lands on Welcome (signup: Connect, Welcome, First project, Ready)
+  ok(r.modal.currentStep === 'welcome', 'A new account goes to Welcome next');
   timeouts.length = 0;
 
   // B. wrong key

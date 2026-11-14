@@ -136,6 +136,7 @@ export class EmraldSidebarView extends ItemView {
 		// refresh cycle — same reconnect/midnight/manual-refresh triggers as checkWelcomeBack,
 		// no separate timer. See checkBurnoutWatcher() for the web-parity episode/snooze logic.
 		void this.checkBurnoutWatcher();
+		void this.consumeFirstSession();
 	}
 
 	async onClose() {
@@ -162,8 +163,30 @@ export class EmraldSidebarView extends ItemView {
 	 * Shows a welcome-back modal once per return event.
 	 * Uses a persisted flag (_welcomeBackShownDate) so it only fires once per day.
 	 */
+	/**
+	 * The Ready screen of the signup hands us the project it just created. Start its session as soon as the sidebar
+	 * has loaded; if anything is not ready the user simply sees the project and presses start.
+	 */
+	private async consumeFirstSession() {
+		const store = this.plugin as unknown as Record<string, unknown>;
+		const id = store._firstSessionItemId;
+		if (typeof id !== 'string') return;
+		store._firstSessionItemId = undefined;
+		try {
+			for (let i = 0; i < 10 && !this.timeblock; i++) {
+				await new Promise<void>((resolve) => window.setTimeout(resolve, 400));
+			}
+			if (!this.timeblock || this.timeblock.state?.activeSession) return;
+			const resp = await this.plugin.apiClient.getItems();
+			const item = resp.data?.find((i) => i.id === id);
+			if (item) await this.doStartSession(item);
+		} catch { /* non-fatal: the project is in the list, start it by hand */ }
+	}
+
 	private async checkWelcomeBack() {
 		try {
+			// One banner at a time: never over the first-run screens (the burnout watcher has the same guard).
+			if (!this.plugin.settings.onboardingComplete) return;
 			const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 
 			// Don't show if we already showed today

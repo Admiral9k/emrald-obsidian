@@ -21,7 +21,7 @@ export class EffortReceiptModal extends Modal {
 	// Form state
 	private perceivedEffort: number = 5;
 	private hedonicValence: number = 5;
-	private flowOccurred: number = 0;
+	private flowOccurred: number | null = null; // blank until answered; never saved as a default
 	private demandInvestmentBalance: number = 5;
 	private effortSource: string[] = [];
 	private unexpectedComplications: number = 0; // SEQ-3 (mig 012), only sent if isMultiDay
@@ -291,7 +291,7 @@ export class EffortReceiptModal extends Modal {
 		const receipt: CreateReceiptPayload = {
 			perceived_effort: this.perceivedEffort,
 			hedonic_valence: this.hedonicValence,
-			flow_occurred: this.flowOccurred,
+			...(this.flowOccurred !== null ? { flow_occurred: this.flowOccurred } : {}),
 			demand_investment_balance: this.demandInvestmentBalance,
 			effort_source: this.effortSource,
 			notes: this.notes || undefined
