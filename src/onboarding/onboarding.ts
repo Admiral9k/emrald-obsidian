@@ -15,6 +15,11 @@ import { QUESTIONS, PAGE_BOUNDS, progressLine } from './questions';
 type OnboardingStep = 'connect' | 'welcome' | 'project' | 'ready' | 'questions' | 'recharge' | 'done';
 export type OnboardingMode = 'signup' | 'questions';
 
+/** The API client returns { error } instead of throwing. A queued (offline) write replays later, so it counts as saved. */
+function isFailed(resp: { error?: string | null; queued?: boolean } | null | undefined): resp is { error: string; queued?: boolean } {
+	return !!resp && !!resp.error && !resp.queued;
+}
+
 // ── Main Onboarding Modal ────────────────────────────────
 
 export class OnboardingModal extends Modal {
@@ -35,6 +40,9 @@ export class OnboardingModal extends Modal {
 	private qPage: number = 0;
 	private savedSomething: boolean = false;
 	private finished: boolean = false;
+	private saving: boolean = false;   // the Ready button is mid-save: Esc must not run the close steps
+	private isClosed: boolean = false;
+	private errorMsg: string = '';     // shown once, on the next render of the questions page
 
 	constructor(app: App, plugin: EmraldPlugin, onComplete: () => void, mode: OnboardingMode = 'signup') {
 		super(app);
@@ -50,9 +58,14 @@ export class OnboardingModal extends Modal {
 	}
 
 	onClose() {
+		this.isClosed = true;
 		this.contentEl.empty();
-		// Closing the signup early still counts as done, so it never nags again; the questions flow has no such flag.
-		if (this.mode === 'signup' && !this.finished && !this.plugin.settings.onboardingComplete) {
+		// The questions flow never marks onboarding done; it just tells the opener (Effort Profile) to refresh.
+		if (this.mode === 'questions') { this.onComplete(); return; }
+		// Esc while the Ready button is saving: finish() runs the close steps once the save ends.
+		if (this.saving) return;
+		// Closing the signup early still counts as done, so it never nags again.
+		if (!this.finished && !this.plugin.settings.onboardingComplete) {
 			this.plugin.settings.onboardingComplete = true;
 			void this.plugin.saveSettings();
 			window.setTimeout(() => {
@@ -122,7 +135,7 @@ export class OnboardingModal extends Modal {
 		const privacyText = privacyEl.createEl('p', { cls: 'emerald-onboard-privacy-text' });
 		const lockIcon = privacyText.createSpan({ cls: 'emerald-onboard-privacy-icon' });
 		setIcon(lockIcon, 'lock');
-		privacyText.appendText(' EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes. It couldn\u2019t access them even if it tried.');
+		privacyText.appendText(` ${COPY['connect.privacy']}`);
 
 		// "Get an API key" link for community plugin store users
 		const linkEl = container.createDiv({ cls: 'emerald-onboard-link' });
@@ -174,7 +187,7 @@ export class OnboardingModal extends Modal {
 
 		const testBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-primary',
-			text: 'Test connection'
+			text: COPY['connect.cta']
 		});
 		testBtn.addEventListener('click', () => { void (async () => {
 			try {
@@ -208,7 +221,14 @@ export class OnboardingModal extends Modal {
 
 					// Check if new user (no items yet)
 					const itemsResp = await this.plugin.apiClient.getItems();
-					this.isNewUser = !itemsResp.data || (Array.isArray(itemsResp.data) && itemsResp.data.length === 0);
+					// Only a SUCCESSFUL empty list is a new account. A failed check must never send a returning user
+					// through signup (it would add a duplicate project and overwrite their weekly hours).
+					if (itemsResp.error || !Array.isArray(itemsResp.data)) {
+						statusEl.textContent = `Connected, but your projects could not be checked: ${itemsResp.error ?? 'no data'}. Press Connect to try again.`;
+						statusEl.className = 'emerald-onboard-status is-error';
+						return;
+					}
+					this.isNewUser = itemsResp.data.length === 0;
 
 					// New accounts see Welcome, First project and Ready. An account that already has projects is done.
 					window.setTimeout(() => { if (this.isNewUser) this.goTo('welcome'); else void this.finish(false); }, 800);
@@ -218,7 +238,7 @@ export class OnboardingModal extends Modal {
 
 		const skipBtn = actions.createEl('button', {
 			cls: 'emerald-btn emerald-btn-subtle',
-			text: "Skip: i'll configure later"
+			text: COPY['connect.skip']
 		});
 		skipBtn.addEventListener('click', () => { void this.finish(false); });
 	}
@@ -313,6 +333,7 @@ export class OnboardingModal extends Modal {
 		startBtn.addEventListener('click', () => { void (async () => {
 			if (startBtn.disabled) return;
 			startBtn.disabled = true;
+			this.saving = true;
 			statusEl.textContent = '';
 			try {
 				// Project, hours and the first session are saved together, once, on this button.
@@ -326,13 +347,19 @@ export class OnboardingModal extends Modal {
 						statusEl.textContent = `Could not create the project: ${resp.error ?? 'try again'}`;
 						statusEl.className = 'emerald-onboard-status is-error';
 						startBtn.disabled = false;
+						this.saving = false;
 						return;
 					}
 					this.createdItemId = resp.data.id;
 				}
-				try {
-					await this.plugin.apiClient.setWeeklyAvailability(this.hours);
-				} catch { /* non-fatal: the hours can be set from the session bar any day */ }
+				const hoursResp = await this.plugin.apiClient.setWeeklyAvailability(this.hours);
+				if (isFailed(hoursResp)) {
+					statusEl.textContent = `Could not save your hours: ${hoursResp.error}. Try again.`;
+					statusEl.className = 'emerald-onboard-status is-error';
+					startBtn.disabled = false;
+					this.saving = false;
+					return;
+				}
 				// The sidebar starts this project's session as soon as it has loaded (see sidebar.consumeFirstSession).
 				(this.plugin as unknown as Record<string, unknown>)._firstSessionItemId = this.createdItemId;
 				await this.finish(true);
@@ -340,6 +367,7 @@ export class OnboardingModal extends Modal {
 				statusEl.textContent = 'Something went wrong. Try again.';
 				statusEl.className = 'emerald-onboard-status is-error';
 				startBtn.disabled = false;
+				this.saving = false;
 			}
 		})(); });
 
@@ -354,6 +382,10 @@ export class OnboardingModal extends Modal {
 		container.createEl('h2', { cls: 'emerald-onboard-title', text: COPY['questions.title'] });
 		container.createEl('p', { cls: 'emerald-onboard-desc', text: COPY['questions.body'] });
 		container.createDiv({ cls: 'emerald-onboard-step-label', text: progressLine(COPY['questions.progress'], this.qPage) });
+		if (this.errorMsg) {
+			container.createDiv({ cls: 'emerald-onboard-status is-error', text: this.errorMsg });
+			this.errorMsg = '';
+		}
 
 		const form = container.createDiv({ cls: 'emerald-form' });
 		for (const q of QUESTIONS.slice(from, to)) {
@@ -423,12 +455,15 @@ export class OnboardingModal extends Modal {
 	/** Save only what was answered (a blank is never written), then move on to the recharge step. */
 	private async leaveQuestions() {
 		if (Object.keys(this.answers).length > 0) {
-			try {
-				await this.plugin.apiClient.updateCalibration(this.answers);
-				this.savedSomething = true;
-			} catch { /* non-fatal */
-				new Notice('Could not save your answers. Try again in a moment.');
+			// The API client returns { error } instead of throwing; a queued (offline) write counts as saved.
+			let resp: { error?: string | null; queued?: boolean } | undefined;
+			try { resp = await this.plugin.apiClient.updateCalibration(this.answers); } catch (e) { resp = { error: String(e) }; }
+			if (isFailed(resp)) {
+				this.errorMsg = `Could not save your answers: ${resp?.error}. Try again, or press Skip for now to leave them for later.`;
+				this.renderStep(); // stay on this page; the answers are still held
+				return;
 			}
+			this.savedSomething = true;
 		}
 		this.goTo('recharge');
 	}
@@ -465,19 +500,24 @@ export class OnboardingModal extends Modal {
 
 		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 		const saveBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Next' });
+		const statusEl = form.createDiv({ cls: 'emerald-onboard-status' });
 		saveBtn.addEventListener('click', () => { void (async () => {
-			const names: string[] = [];
-			protocolGroup.querySelectorAll('input').forEach((input) => {
-				const val = (input).value.trim();
-				if (val) names.push(val);
-			});
-			if (names.length > 0) {
-				try {
-					for (const name of names) await this.plugin.apiClient.createRecoveryProtocol(name);
-					this.savedSomething = true;
-				} catch { /* non-fatal */
-					new Notice('Could not save what recharges you. Try again in a moment.');
+			const inputs: HTMLInputElement[] = [];
+			protocolGroup.querySelectorAll('input').forEach((input) => { if (input.value.trim()) inputs.push(input); });
+			saveBtn.disabled = true;
+			statusEl.textContent = '';
+			for (const input of inputs) {
+				let resp: { error?: string | null; queued?: boolean } | undefined;
+				try { resp = await this.plugin.apiClient.createRecoveryProtocol(input.value.trim()); } catch (e) { resp = { error: String(e) }; }
+				if (isFailed(resp)) {
+					// Stay here with what is left typed in; the ones that saved are cleared so a retry never doubles them.
+					statusEl.textContent = `Could not save that: ${resp?.error}. Try again, or press Skip.`;
+					statusEl.className = 'emerald-onboard-status is-error';
+					saveBtn.disabled = false;
+					return;
 				}
+				input.value = '';
+				this.savedSomething = true;
 			}
 			this.afterRecharge();
 		})(); });
@@ -505,13 +545,16 @@ export class OnboardingModal extends Modal {
 		const checkbox = researchToggle.createEl('input', { type: 'checkbox' });
 		checkbox.checked = !!this.plugin.settings.researchOptIn;
 		checkbox.addEventListener('change', () => { void (async () => {
-			try {
-				this.plugin.settings.researchOptIn = checkbox.checked;
-				await this.plugin.saveSettings();
-				try {
-					await this.plugin.apiClient.updatePreferences({ research_opt_in: checkbox.checked });
-				} catch { /* non-fatal */ }
-			} catch { /* non-fatal */ }
+			const wanted = checkbox.checked;
+			let resp: { error?: string | null; queued?: boolean } | undefined;
+			try { resp = await this.plugin.apiClient.updatePreferences({ research_opt_in: wanted }); } catch (e) { resp = { error: String(e) }; }
+			if (isFailed(resp)) {
+				checkbox.checked = !wanted; // show what is actually saved
+				new Notice(`Could not save that choice: ${resp?.error}. Try again.`);
+				return;
+			}
+			this.plugin.settings.researchOptIn = wanted;
+			await this.plugin.saveSettings();
 		})(); });
 		researchToggle.appendText(` ${COPY['optin.line']}`);
 
@@ -537,7 +580,7 @@ export class OnboardingModal extends Modal {
 		this.finished = true;
 		this.plugin.settings.onboardingComplete = true;
 		await this.plugin.saveSettings();
-		this.close();
+		if (!this.isClosed) this.close();
 		window.setTimeout(() => {
 			if (!startedSession) void this.plugin.openWorkspaceView(VIEW_ABOUT);
 			this.onComplete();

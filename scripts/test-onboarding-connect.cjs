@@ -62,7 +62,7 @@ async function runConnect(p, typedKey) {
   const els = root.all();
   const input = els.find(e => e.placeholder === 'em_...');
   input.value = typedKey; (input.listeners.input || []).forEach(f => f());
-  const btn = els.find(e => e.text === 'Test connection');
+  const btn = els.find(e => e.text === 'Connect');
   btn.listeners.click.forEach(f => f());
   await settle();
   const status = els.find(e => String(e.className).startsWith('emerald-onboard-status'));
@@ -103,6 +103,13 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++
   ({ p, store } = setup({ items: { data: [{ id: 1 }] } }));
   r = await runConnect(p, 'KEY-RET');
   ok(r.modal.isNewUser === false && store.get('emrald-api-key') === 'KEY-RET', 'D returning user detected, key stored');
+  timeouts.length = 0;
+
+  // D2. project check FAILS after a good key: must NOT be treated as a new account (no signup, no timer)
+  ({ p, store } = setup({ items: { data: null, error: 'Network down' } }));
+  r = await runConnect(p, 'KEY-ERR');
+  ok(r.modal.isNewUser === false && timeouts.length === 0 && r.modal.currentStep === 'connect', 'D2 failed project check keeps the user on Connect (not a new account)');
+  ok(/could not be checked/.test(r.status.textContent) && store.get('emrald-api-key') === 'KEY-ERR', 'D2 says so, key already saved');
   timeouts.length = 0;
 
   // E. re-run onboarding on a vault that already migrated: replaces own secret, no second id

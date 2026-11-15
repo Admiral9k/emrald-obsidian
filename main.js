@@ -610,6 +610,9 @@ var init_copy = __esm({
       "welcome.bullets.4": "A burnout score from your own numbers",
       "welcome.cta": "Get started",
       "connect.body": "Paste your API key from the web app. It takes about a minute.",
+      "connect.cta": "Connect",
+      "connect.skip": "Skip for now",
+      "connect.privacy": "EMRALD syncs session times, effort ratings, check-ins and project names. Your note content stays in your vault.",
       "project.title": "Add your first project",
       "project.body": "What are you working on? Pick an effort level for it: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.",
       "project.what": "Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list.",
@@ -767,6 +770,9 @@ var onboarding_exports = {};
 __export(onboarding_exports, {
   OnboardingModal: () => OnboardingModal
 });
+function isFailed(resp) {
+  return !!resp && !!resp.error && !resp.queued;
+}
 var import_obsidian2, OnboardingModal, NoteSuggestModal;
 var init_onboarding = __esm({
   "src/onboarding/onboarding.ts"() {
@@ -775,6 +781,7 @@ var init_onboarding = __esm({
     init_copy();
     init_questions();
     OnboardingModal = class extends import_obsidian2.Modal {
+      // shown once, on the next render of the questions page
       constructor(app, plugin, onComplete, mode = "signup") {
         super(app);
         // State accumulated across steps
@@ -788,6 +795,10 @@ var init_onboarding = __esm({
         this.qPage = 0;
         this.savedSomething = false;
         this.finished = false;
+        this.saving = false;
+        // the Ready button is mid-save: Esc must not run the close steps
+        this.isClosed = false;
+        this.errorMsg = "";
         this.plugin = plugin;
         this.onComplete = onComplete;
         this.mode = mode;
@@ -798,8 +809,15 @@ var init_onboarding = __esm({
         this.renderStep();
       }
       onClose() {
+        this.isClosed = true;
         this.contentEl.empty();
-        if (this.mode === "signup" && !this.finished && !this.plugin.settings.onboardingComplete) {
+        if (this.mode === "questions") {
+          this.onComplete();
+          return;
+        }
+        if (this.saving)
+          return;
+        if (!this.finished && !this.plugin.settings.onboardingComplete) {
           this.plugin.settings.onboardingComplete = true;
           void this.plugin.saveSettings();
           window.setTimeout(() => {
@@ -873,7 +891,7 @@ var init_onboarding = __esm({
         const privacyText = privacyEl.createEl("p", { cls: "emerald-onboard-privacy-text" });
         const lockIcon = privacyText.createSpan({ cls: "emerald-onboard-privacy-icon" });
         (0, import_obsidian2.setIcon)(lockIcon, "lock");
-        privacyText.appendText(" EMRALD syncs effort data only: session timestamps, effort ratings, and project names. Your note content never leaves your vault. The plugin has no mechanism to read, upload, or index your notes. It couldn\u2019t access them even if it tried.");
+        privacyText.appendText(` ${COPY["connect.privacy"]}`);
         const linkEl = container.createDiv({ cls: "emerald-onboard-link" });
         const anchor = linkEl.createEl("a", { text: "Don't have an API key? Get one at app.effortmastery.com \u2192", href: "https://app.effortmastery.com" });
         anchor.addEventListener("click", (e) => {
@@ -915,10 +933,11 @@ var init_onboarding = __esm({
         const actions = container.createDiv({ cls: "emerald-modal-actions" });
         const testBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-primary",
-          text: "Test connection"
+          text: COPY["connect.cta"]
         });
         testBtn.addEventListener("click", () => {
           void (async () => {
+            var _a;
             try {
               if (!this.apiKey.trim()) {
                 statusEl.textContent = "Please enter an API key";
@@ -941,7 +960,12 @@ var init_onboarding = __esm({
                 this.plugin.settings.apiUrl = apiUrl;
                 await this.plugin.saveSettings();
                 const itemsResp = await this.plugin.apiClient.getItems();
-                this.isNewUser = !itemsResp.data || Array.isArray(itemsResp.data) && itemsResp.data.length === 0;
+                if (itemsResp.error || !Array.isArray(itemsResp.data)) {
+                  statusEl.textContent = `Connected, but your projects could not be checked: ${(_a = itemsResp.error) != null ? _a : "no data"}. Press Connect to try again.`;
+                  statusEl.className = "emerald-onboard-status is-error";
+                  return;
+                }
+                this.isNewUser = itemsResp.data.length === 0;
                 window.setTimeout(() => {
                   if (this.isNewUser)
                     this.goTo("welcome");
@@ -956,7 +980,7 @@ var init_onboarding = __esm({
         });
         const skipBtn = actions.createEl("button", {
           cls: "emerald-btn emerald-btn-subtle",
-          text: "Skip: i'll configure later"
+          text: COPY["connect.skip"]
         });
         skipBtn.addEventListener("click", () => {
           void this.finish(false);
@@ -1061,6 +1085,7 @@ var init_onboarding = __esm({
             if (startBtn.disabled)
               return;
             startBtn.disabled = true;
+            this.saving = true;
             statusEl.textContent = "";
             try {
               if (!this.createdItemId) {
@@ -1073,13 +1098,18 @@ var init_onboarding = __esm({
                   statusEl.textContent = `Could not create the project: ${(_a = resp.error) != null ? _a : "try again"}`;
                   statusEl.className = "emerald-onboard-status is-error";
                   startBtn.disabled = false;
+                  this.saving = false;
                   return;
                 }
                 this.createdItemId = resp.data.id;
               }
-              try {
-                await this.plugin.apiClient.setWeeklyAvailability(this.hours);
-              } catch (e) {
+              const hoursResp = await this.plugin.apiClient.setWeeklyAvailability(this.hours);
+              if (isFailed(hoursResp)) {
+                statusEl.textContent = `Could not save your hours: ${hoursResp.error}. Try again.`;
+                statusEl.className = "emerald-onboard-status is-error";
+                startBtn.disabled = false;
+                this.saving = false;
+                return;
               }
               this.plugin._firstSessionItemId = this.createdItemId;
               await this.finish(true);
@@ -1087,6 +1117,7 @@ var init_onboarding = __esm({
               statusEl.textContent = "Something went wrong. Try again.";
               statusEl.className = "emerald-onboard-status is-error";
               startBtn.disabled = false;
+              this.saving = false;
             }
           })();
         });
@@ -1100,6 +1131,10 @@ var init_onboarding = __esm({
         container.createEl("h2", { cls: "emerald-onboard-title", text: COPY["questions.title"] });
         container.createEl("p", { cls: "emerald-onboard-desc", text: COPY["questions.body"] });
         container.createDiv({ cls: "emerald-onboard-step-label", text: progressLine(COPY["questions.progress"], this.qPage) });
+        if (this.errorMsg) {
+          container.createDiv({ cls: "emerald-onboard-status is-error", text: this.errorMsg });
+          this.errorMsg = "";
+        }
         const form = container.createDiv({ cls: "emerald-form" });
         for (const q of QUESTIONS.slice(from, to)) {
           const group = form.createDiv({ cls: "emerald-form-group" });
@@ -1190,12 +1225,18 @@ var init_onboarding = __esm({
       /** Save only what was answered (a blank is never written), then move on to the recharge step. */
       async leaveQuestions() {
         if (Object.keys(this.answers).length > 0) {
+          let resp;
           try {
-            await this.plugin.apiClient.updateCalibration(this.answers);
-            this.savedSomething = true;
+            resp = await this.plugin.apiClient.updateCalibration(this.answers);
           } catch (e) {
-            new import_obsidian2.Notice("Could not save your answers. Try again in a moment.");
+            resp = { error: String(e) };
           }
+          if (isFailed(resp)) {
+            this.errorMsg = `Could not save your answers: ${resp == null ? void 0 : resp.error}. Try again, or press Skip for now to leave them for later.`;
+            this.renderStep();
+            return;
+          }
+          this.savedSomething = true;
         }
         this.goTo("recharge");
       }
@@ -1230,22 +1271,31 @@ var init_onboarding = __esm({
         addRow();
         const actions = container.createDiv({ cls: "emerald-modal-actions" });
         const saveBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-primary", text: "Next" });
+        const statusEl = form.createDiv({ cls: "emerald-onboard-status" });
         saveBtn.addEventListener("click", () => {
           void (async () => {
-            const names = [];
+            const inputs = [];
             protocolGroup.querySelectorAll("input").forEach((input) => {
-              const val = input.value.trim();
-              if (val)
-                names.push(val);
+              if (input.value.trim())
+                inputs.push(input);
             });
-            if (names.length > 0) {
+            saveBtn.disabled = true;
+            statusEl.textContent = "";
+            for (const input of inputs) {
+              let resp;
               try {
-                for (const name of names)
-                  await this.plugin.apiClient.createRecoveryProtocol(name);
-                this.savedSomething = true;
+                resp = await this.plugin.apiClient.createRecoveryProtocol(input.value.trim());
               } catch (e) {
-                new import_obsidian2.Notice("Could not save what recharges you. Try again in a moment.");
+                resp = { error: String(e) };
               }
+              if (isFailed(resp)) {
+                statusEl.textContent = `Could not save that: ${resp == null ? void 0 : resp.error}. Try again, or press Skip.`;
+                statusEl.className = "emerald-onboard-status is-error";
+                saveBtn.disabled = false;
+                return;
+              }
+              input.value = "";
+              this.savedSomething = true;
             }
             this.afterRecharge();
           })();
@@ -1271,15 +1321,20 @@ var init_onboarding = __esm({
         checkbox.checked = !!this.plugin.settings.researchOptIn;
         checkbox.addEventListener("change", () => {
           void (async () => {
+            const wanted = checkbox.checked;
+            let resp;
             try {
-              this.plugin.settings.researchOptIn = checkbox.checked;
-              await this.plugin.saveSettings();
-              try {
-                await this.plugin.apiClient.updatePreferences({ research_opt_in: checkbox.checked });
-              } catch (e) {
-              }
+              resp = await this.plugin.apiClient.updatePreferences({ research_opt_in: wanted });
             } catch (e) {
+              resp = { error: String(e) };
             }
+            if (isFailed(resp)) {
+              checkbox.checked = !wanted;
+              new import_obsidian2.Notice(`Could not save that choice: ${resp == null ? void 0 : resp.error}. Try again.`);
+              return;
+            }
+            this.plugin.settings.researchOptIn = wanted;
+            await this.plugin.saveSettings();
           })();
         });
         researchToggle.appendText(` ${COPY["optin.line"]}`);
@@ -1301,7 +1356,8 @@ var init_onboarding = __esm({
         this.finished = true;
         this.plugin.settings.onboardingComplete = true;
         await this.plugin.saveSettings();
-        this.close();
+        if (!this.isClosed)
+          this.close();
         window.setTimeout(() => {
           if (!startedSession)
             void this.plugin.openWorkspaceView(VIEW_ABOUT);
@@ -3989,10 +4045,8 @@ var init_celebration = __esm({
     import_obsidian28 = require("obsidian");
     init_copy();
     CelebrationModal = class extends import_obsidian28.Modal {
-      // Callers still pass the session context; the first celebration does not use it.
-      constructor(app, plugin, _opts) {
+      constructor(app) {
         super(app);
-        this.plugin = plugin;
       }
       onOpen() {
         const { contentEl } = this;
@@ -4515,7 +4569,6 @@ var DEFAULT_SETTINGS = {
   frontmatterEnabled: true,
   debugLogging: false,
   onboardingComplete: false,
-  tourDismissed: false,
   advancedProfileCompleted: false,
   installId: "",
   installPinged: false,
@@ -4875,7 +4928,6 @@ var EmraldSettingTab = class extends import_obsidian4.PluginSettingTab {
   renderResetOnboarding(setting) {
     setting.addButton((btn) => btn.setButtonText("Reset onboarding").onClick(() => {
       this.plugin.settings.onboardingComplete = false;
-      this.plugin.settings.tourDismissed = false;
       this.plugin.settings.advancedProfileCompleted = false;
       void this.plugin.saveSettings().then(async () => {
         const { OnboardingModal: OnboardingModal2 } = await Promise.resolve().then(() => (init_onboarding(), onboarding_exports));
@@ -12271,28 +12323,22 @@ var EmraldSidebarView = class extends import_obsidian34.ItemView {
         },
         (receipt, _markComplete) => {
           void (async () => {
-            var _a2, _b2, _c2;
             const resp = await this.plugin.apiClient.submitReceipt(session.sessionId, receipt);
             if (!resp.error || resp.queued) {
               new import_obsidian34.Notice(resp.queued ? "Receipt queued. Will sync when online" : "Session recorded");
               void this.loadTodayData();
               void this.loadProjects();
               await this.updateFrontmatterStats(session.itemId);
-              if (!this.plugin.settings.celebrationShown) {
-                const { CelebrationModal: CelebrationModal2 } = await Promise.resolve().then(() => (init_celebration(), celebration_exports));
-                const celebrationModal = new CelebrationModal2(
-                  this.app,
-                  this.plugin,
-                  {
-                    itemName: session.itemName,
-                    effortLevel: session.effortLevel,
-                    sessionMinutes,
-                    availableHours: (_c2 = (_b2 = (_a2 = this.timeblock) == null ? void 0 : _a2.state) == null ? void 0 : _b2.availableHours) != null ? _c2 : 4
-                  }
-                );
-                celebrationModal.open();
-                this.plugin.settings.celebrationShown = true;
-                await this.plugin.saveData(this.plugin.settings);
+              if (!this.plugin.settings.celebrationShown && !resp.queued) {
+                const total = await this.plugin.apiClient.getReceiptTotal();
+                if (total === 1) {
+                  const { CelebrationModal: CelebrationModal2 } = await Promise.resolve().then(() => (init_celebration(), celebration_exports));
+                  new CelebrationModal2(this.app).open();
+                }
+                if (total !== null) {
+                  this.plugin.settings.celebrationShown = true;
+                  await this.plugin.saveData(this.plugin.settings);
+                }
               }
             }
           })();
@@ -13218,6 +13264,13 @@ var EmraldAPIClient = class {
       params.set("to", opts.to);
     params.set("limit", String((_a = opts == null ? void 0 : opts.limit) != null ? _a : 50));
     return this.request("GET", `/receipts?${params.toString()}`);
+  }
+  /** How many receipts this account has filed (all projects). null when the call failed. Never cached. */
+  async getReceiptTotal() {
+    const resp = await this.request("GET", "/receipts?limit=1", void 0, { rawEnvelope: true, skipCache: true });
+    if (resp.error || !resp.data)
+      return null;
+    return typeof resp.data.total === "number" ? resp.data.total : null;
   }
   /**
    * One project's receipts, newest first, for the per-project receipt graph. The API filters by

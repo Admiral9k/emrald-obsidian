@@ -15,6 +15,9 @@ export const COPY: Record<string, string> = {
 	'welcome.bullets.4': 'A burnout score from your own numbers',
 	'welcome.cta': 'Get started',
 	'connect.body': 'Paste your API key from the web app. It takes about a minute.',
+	'connect.cta': 'Connect',
+	'connect.skip': 'Skip for now',
+	'connect.privacy': 'EMRALD syncs session times, effort ratings, check-ins and project names. Your note content stays in your vault.',
 	'project.title': 'Add your first project',
 	'project.body':
 		'What are you working on? Pick an effort level for it: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.',

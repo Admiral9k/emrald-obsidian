@@ -712,6 +712,13 @@ export class EmraldAPIClient {
 		return this.request('GET', `/receipts?${params.toString()}`);
 	}
 
+	/** How many receipts this account has filed (all projects). null when the call failed. Never cached. */
+	async getReceiptTotal(): Promise<number | null> {
+		const resp = await this.request<{ data?: unknown[]; total?: number }>('GET', '/receipts?limit=1', undefined, { rawEnvelope: true, skipCache: true });
+		if (resp.error || !resp.data) return null;
+		return typeof resp.data.total === 'number' ? resp.data.total : null;
+	}
+
 	/**
 	 * One project's receipts, newest first, for the per-project receipt graph. The API filters by
 	 * item_id (emrald-api 915e0dde) and returns `{data, total}`; the total is the project's own

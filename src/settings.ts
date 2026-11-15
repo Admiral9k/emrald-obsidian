@@ -46,7 +46,6 @@ export interface EmraldSettings {
 
 	// Onboarding
 	onboardingComplete: boolean;
-	tourDismissed: boolean;
 	advancedProfileCompleted: boolean;
 
 	// Install tracking
@@ -85,7 +84,6 @@ export const DEFAULT_SETTINGS: EmraldSettings = {
 	frontmatterEnabled: true,
 	debugLogging: false,
 	onboardingComplete: false,
-	tourDismissed: false,
 	advancedProfileCompleted: false,
 	installId: '',
 	installPinged: false,
@@ -479,7 +477,6 @@ export class EmraldSettingTab extends PluginSettingTab {
 			.setButtonText('Reset onboarding')
 			.onClick(() => {
 				this.plugin.settings.onboardingComplete = false;
-				this.plugin.settings.tourDismissed = false;
 				this.plugin.settings.advancedProfileCompleted = false;
 				void this.plugin.saveSettings().then(async () => {
 					const { OnboardingModal } = await import('./onboarding/onboarding');

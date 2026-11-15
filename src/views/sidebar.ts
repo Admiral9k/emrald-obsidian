@@ -1175,22 +1175,19 @@ export class EmraldSidebarView extends ItemView {
 					// Update frontmatter session stats if note is linked
 					await this.updateFrontmatterStats(session.itemId);
 
-					// Celebration modal — one-time only (first receipt ever)
-					if (!this.plugin.settings.celebrationShown) {
-						const { CelebrationModal } = await import('../modals/celebration');
-						const celebrationModal = new CelebrationModal(
-							this.app,
-							this.plugin,
-							{
-								itemName: session.itemName,
-								effortLevel: session.effortLevel,
-								sessionMinutes,
-								availableHours: this.timeblock?.state?.availableHours ?? 4
-							}
-						);
-						celebrationModal.open();
-						this.plugin.settings.celebrationShown = true;
-						await this.plugin.saveData(this.plugin.settings);
+					// Celebration modal: only the account's FIRST receipt. The account's receipt total decides (the web app
+					// does the same), so a new vault on an old account never celebrates receipt #200. An offline or failed
+					// count fails closed: no modal.
+					if (!this.plugin.settings.celebrationShown && !resp.queued) {
+						const total = await this.plugin.apiClient.getReceiptTotal();
+						if (total === 1) {
+							const { CelebrationModal } = await import('../modals/celebration');
+							new CelebrationModal(this.app).open();
+						}
+						if (total !== null) {
+							this.plugin.settings.celebrationShown = true;
+							await this.plugin.saveData(this.plugin.settings);
+						}
 					}
 				}
 			})(); }

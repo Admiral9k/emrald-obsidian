@@ -41,7 +41,7 @@ class FakeEl {
   empty() { this.children = []; } addClass(...c) { c.forEach((x) => this.classes.add(x)); } removeClass(c) { this.classes.delete(c); } hasClass(c) { return this.classes.has(c); }
   appendText() {} setText(t) { this.textContent = t; this.text = t; } addEventListener(ev, cb) { (this.listeners[ev] ||= []).push(cb); }
   setAttribute(k, v) { this.attrs[k] = v; } insertBefore(n) { this.children.push(n); }
-  querySelectorAll(sel) { const c = sel.replace('.', ''); return this.all().filter((e) => e !== this && e.classes.has(c)); }
+  querySelectorAll(sel) { if (!sel.startsWith('.')) return this.all().filter((e) => e !== this && e.tag === sel); const c = sel.replace('.', ''); return this.all().filter((e) => e !== this && e.classes.has(c)); }
   all() { return [this, ...this.children.flatMap((c) => c.all())]; }
   fire(ev, arg) { (this.listeners[ev] || []).forEach((f) => f(arg)); }
   texts() { return this.all().map((e) => e.text || e.textContent).filter(Boolean); }
@@ -65,10 +65,10 @@ function setup(over = {}) {
     openWorkspaceView: async (v) => { p.views.push(v); },
     apiClient: {
       createItem: async (b) => { calls.createItem.push(b); return over.createItem ? over.createItem() : { data: { id: 'item-1' } }; },
-      setWeeklyAvailability: async (h) => { calls.avail.push(h); },
-      updateCalibration: async (a) => { calls.calib.push(a); },
-      createRecoveryProtocol: async (n) => { calls.recovery.push(n); },
-      updatePreferences: async () => {},
+      setWeeklyAvailability: async (h) => { calls.avail.push(h); return over.avail ? over.avail() : { data: null, error: null }; },
+      updateCalibration: async (a) => { calls.calib.push(a); return over.calib ? over.calib() : { data: {}, error: null }; },
+      createRecoveryProtocol: async (n) => { calls.recovery.push(n); return over.recovery ? over.recovery() : { data: {}, error: null }; },
+      updatePreferences: async (b) => { calls.prefs = (calls.prefs || []).concat([b]); return over.prefs ? over.prefs() : { data: {}, error: null }; },
     },
   };
   return p;
@@ -178,6 +178,55 @@ const ok = (c, msg) => { console.log((c ? 'PASS ' : 'FAIL ') + msg); if (!c) fai
   // I. receipt form: zone question starts blank and is omitted when unanswered
   const src = fs.readFileSync(path.resolve(__dirname, '..', 'src/modals/effort-receipt.ts'), 'utf8');
   ok(/flowOccurred: number \| null = null/.test(src) && /\.\.\.\(this\.flowOccurred !== null/.test(src), 'I receipt: zone answer starts null and is sent only when answered');
+
+  // J. FAILED SAVES (the API client returns { error }, it does not throw)
+  // J1. hours fail: stay on Ready, say so, retry does not create a second project
+  p = setup({ avail: () => ({ data: null, error: 'HTTP 500' }) });
+  m = modalAt(p, 'ready'); m.projectName = 'P'; m.goTo('ready');
+  find(m, COPY['ready.cta']).fire('click'); await settle();
+  ok(p.settings.onboardingComplete === false && p._firstSessionItemId === undefined, 'J1 hours save failed: not marked done, no hand-off');
+  ok(root(m).texts().some((t) => /Could not save your hours/.test(t)), 'J1 the error is shown');
+  find(m, COPY['ready.cta']).fire('click'); await settle();
+  ok(p.calls.createItem.length === 1, 'J1 retry does not create a second project');
+  // J2. questions save fails: stay on the page, show the error, answers still held
+  p = setup({ calib: () => ({ data: null, error: 'HTTP 500' }) });
+  m = modalAt(p, 'questions', 'questions'); m.answers = { sleep_quality_baseline: 4 }; m.qPage = 2; m.goTo('questions');
+  find(m, COPY['questions.skip']).fire('click'); await settle();
+  ok(m.currentStep === 'questions' && root(m).texts().some((t) => /Could not save your answers/.test(t)), 'J2 failed answers save stays on the page with the error');
+  ok(m.answers.sleep_quality_baseline === 4 && m.savedSomething === false, 'J2 answers kept, nothing claimed as saved');
+  // J3. a queued (offline) write counts as saved
+  p = setup({ calib: () => ({ data: null, error: null, queued: true }) });
+  m = modalAt(p, 'questions', 'questions'); m.answers = { sleep_quality_baseline: 4 }; m.qPage = 2; m.goTo('questions');
+  find(m, COPY['questions.skip']).fire('click'); await settle();
+  ok(m.currentStep === 'recharge' && m.savedSomething === true, 'J3 queued write moves on');
+  // J4. recharge fails: stay, nothing claimed
+  p = setup({ recovery: () => ({ data: null, error: 'HTTP 500' }) });
+  m = modalAt(p, 'recharge', 'questions');
+  root(m).all().find((e) => e.placeholder && /Walking/.test(e.placeholder)).value = 'Walking';
+  find(m, 'Next').fire('click'); await settle();
+  ok(m.currentStep === 'recharge' && m.savedSomething === false && m.closed !== 1 && root(m).texts().some((t) => /Could not save that/.test(t)), 'J4 failed recharge save stays with the error');
+  // J5. opt-in fails: checkbox shows what is really saved, setting unchanged
+  p = setup({ prefs: () => ({ data: null, error: 'HTTP 500' }) });
+  m = modalAt(p, 'done', 'questions');
+  const box = root(m).all().find((e) => e.type === 'checkbox'); box.checked = true; box.fire('change'); await settle();
+  ok(box.checked === false && p.settings.researchOptIn === false && notices.some((n) => /Could not save that choice/.test(n)), 'J5 failed opt-in reverts the box and tells the user');
+  box.checked = true; p.apiClient.updatePreferences = async () => ({ data: {}, error: null }); box.fire('change'); await settle();
+  ok(p.settings.researchOptIn === true, 'J5 a good save sticks');
+
+  // K. closing
+  // K1. Esc while the Ready save is in flight: close steps run ONCE (after the save), About never opens over the session
+  p = setup(); let release; p.apiClient.createItem = () => new Promise((res) => { release = () => res({ data: { id: 'item-9' }, error: null }); });
+  m = modalAt(p, 'ready'); m.projectName = 'P'; m.goTo('ready');
+  find(m, COPY['ready.cta']).fire('click'); await settle();
+  m.onClose(); // Esc pressed mid-save
+  timeouts.splice(0).forEach((f) => f());
+  ok(!p.completed && !p.views.length && p.settings.onboardingComplete === false, 'K1 Esc mid-save runs no close steps yet');
+  release(); await settle(); await settle(); timeouts.splice(0).forEach((f) => f());
+  ok(p.completed === 1 && p.views.length === 0 && p.settings.onboardingComplete === true && p._firstSessionItemId === 'item-9', 'K1 after the save: completion once, no About, first session handed off');
+  ok(m.closed === 0, 'K1 finish does not close an already closed modal again');
+  // K2. questions mode tells its opener to refresh when it closes
+  p = setup(); m = modalAt(p, 'questions', 'questions'); m.onClose();
+  ok(p.completed === 1, 'K2 questions mode fires the completion callback on close (Effort Profile refreshes)');
 
   console.log(fails ? ('FAILURES: ' + fails) : 'ALL PASS');
   process.exit(fails ? 1 : 0);

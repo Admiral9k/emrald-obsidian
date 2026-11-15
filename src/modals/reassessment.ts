@@ -8,7 +8,8 @@ import EmraldPlugin from '../../main';
 import { workTypeOptions } from '../onboarding/copy';
 
 // ── Question Definitions ────────────────────────────────
-// Mirrors OnboardingModal.CALIBRATION_QUESTIONS exactly.
+// The 13 simple questions, pre-filled with the saved answers. The first-time flow keeps its own copy in
+// src/onboarding/questions.ts (blank by default, five-point buttons); work-type wording comes from onboarding/copy.ts.
 
 interface CalibrationQuestion {
 	key: string;

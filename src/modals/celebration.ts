@@ -1,26 +1,14 @@
 // EMRALD Celebration Modal
 // One-time modal after the first effort receipt. Copy: src/onboarding/copy.ts (deck keys cel.*).
-// Gated by settings.celebrationShown: fires once, then never again.
+// Gated by the account's receipt total (sidebar.ts): fires only when the receipt just filed is the account's first.
 // The "N% of today's work hours" line is cut from this first modal on purpose (deck: cel.context, later).
 
 import { App, Modal } from 'obsidian';
-import EmraldPlugin from '../../main';
 import { COPY } from '../onboarding/copy';
 
-export interface CelebrationOptions {
-	itemName: string;
-	effortLevel?: string;
-	sessionMinutes: number;
-	availableHours: number;
-}
-
 export class CelebrationModal extends Modal {
-	private plugin: EmraldPlugin;
-
-	// Callers still pass the session context; the first celebration does not use it.
-	constructor(app: App, plugin: EmraldPlugin, _opts?: CelebrationOptions) {
+	constructor(app: App) {
 		super(app);
-		this.plugin = plugin;
 	}
 
 	onOpen() {
