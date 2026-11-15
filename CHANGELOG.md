@@ -4,6 +4,23 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.4.3] - 2026-11-14
+
+A shorter first run.
+
+### Changed
+- Setup is Connect, Welcome, your first project, and Ready (hours, then your first session starts).
+- The profile questions are optional, outside setup: open them from Effort Profile or the command "Fill in your profile". Five-point buttons, nothing pre-answered, skipped questions stay blank.
+- The six work types have plain names.
+- The first-receipt welcome appears once per account, in any vault.
+- The Connect screen lists what syncs.
+
+### Fixed
+- A failed save during setup shows a message and keeps your answers; Skip for now moves on without saving.
+- An account whose projects cannot be checked at connect is no longer sent through setup.
+- Esc while setup is saving no longer opens About over your session.
+- The zone question on the receipt starts blank.
+
 ## [1.4.2] - 2026-11-13
 
 Plainer words.

@@ -91,6 +91,8 @@ The first few sessions give you a starting point. Keep filling in your receipts 
 
 ## What's new
 
+**A shorter first run (1.4.3).** Setup is now Connect, Welcome, your first project, then Ready: pick your hours a day and your first session starts. The profile questions are no longer part of setup. Open them any time from Effort Profile or the command "Fill in your profile". Nothing is pre-answered, five-point buttons replace the sliders, and a question you skip stays blank. The six work types have plain names, like Big-picture ideas and Finishing things. The first-receipt welcome appears once per account, in any vault.
+
 **Plainer words throughout (1.4.2).** The plugin now reads the same as the web app, in everyday words instead of jargon. Digests are recaps, the E-Level Overview is Effort Allocations, "Calibration" is "Guesses" and "Drift from your profile", and the Burnout Monitor says "Not enough data yet" instead of "All Clear" when there is no score to judge from.
 
 **Your recap time, in your time zone.** Pick the day and hour of your weekly recap in your own local time. The plugin reads your saved schedule when it starts, so a change made on the web stays changed.
@@ -195,11 +197,12 @@ EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync sess
 
 **What EMRALD sends:**
 - Session data (start/stop times, effort level, project association)
-- Daily check-in responses (energy, readiness)
-- Project metadata (name, folder, effort level, linked note path)
+- Effort receipts (your ratings, plus any short note you type)
+- Daily check-in responses (energy, readiness, plus any short note you type)
+- Project details (name, effort level, status, area, and the path of a linked note)
 
 **What EMRALD never sends:**
-- Note content: EMRALD does not read, upload, or modify the body of your notes
+- Note content: EMRALD does not read, upload, or modify the body of your vault notes
 - File contents, attachments, or images
 - Vault structure beyond the folders you designate as Active/Inactive during onboarding and the note path you choose for a linked project
 

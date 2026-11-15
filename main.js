@@ -7977,7 +7977,7 @@ function mountReceiptGraph(host, opts) {
 // src/views/workspace/elevel-overview.ts
 init_e_levels();
 var BUILT_IN_DETAIL = {
-  E1: "Low-effort tasks you can sustain indefinitely: quick check-ins, light reading, routine maintenance. These barely dent your energy budget.",
+  E1: "Low-effort tasks you can sustain indefinitely: quick check-ins, light reading, routine maintenance. These barely dent your energy.",
   E2: "Meaningful work that requires focus but not peak performance: writing, planning, steady progress on familiar projects.",
   E3: "High-effort work that taxes your energy significantly: complex problem-solving, learning new skills, deep creative work. Limit how many Demanding projects run simultaneously.",
   E4: "Maximum effort: peak cognitive demand, high stakes, full immersion. Unsustainable long-term. One Maximum project at a time is the hard ceiling before burnout risk spikes."

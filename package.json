@@ -1,6 +1,6 @@
 {
   "name": "emrald-obsidian-plugin",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "EMRALD plugin for Obsidian",
   "main": "main.js",
   "scripts": {
