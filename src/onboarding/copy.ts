@@ -17,7 +17,7 @@ export const COPY: Record<string, string> = {
 	'connect.body': 'Paste your API key from the web app. It takes about a minute.',
 	'connect.cta': 'Connect',
 	'connect.skip': 'Skip for now',
-	'connect.privacy': 'EMRALD syncs session times, effort ratings, check-ins and project names. Your note content stays in your vault.',
+	'connect.privacy': 'EMRALD syncs your sessions, receipts and check-ins (with any notes you type there) and project details (name, effort level, status, area and linked note path). The text of your vault notes stays in your vault.',
 	'project.title': 'Add your first project',
 	'project.body':
 		'What are you working on? Pick an effort level for it: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.',

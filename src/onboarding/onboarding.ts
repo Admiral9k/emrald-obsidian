@@ -62,17 +62,27 @@ export class OnboardingModal extends Modal {
 		this.contentEl.empty();
 		// The questions flow never marks onboarding done; it just tells the opener (Effort Profile) to refresh.
 		if (this.mode === 'questions') { this.onComplete(); return; }
-		// Esc while the Ready button is saving: finish() runs the close steps once the save ends.
+		// Esc while the Ready button is saving: the save's own ending runs the close steps (success: finish(); failure: failSave()).
 		if (this.saving) return;
-		// Closing the signup early still counts as done, so it never nags again.
-		if (!this.finished && !this.plugin.settings.onboardingComplete) {
-			this.plugin.settings.onboardingComplete = true;
-			void this.plugin.saveSettings();
-			window.setTimeout(() => {
-				void this.plugin.openWorkspaceView(VIEW_ABOUT);
-				this.onComplete();
-			}, 300);
-		}
+		this.runCloseSteps();
+	}
+
+	/** Closing the signup early still counts as done, so it never nags again. Runs at most once. */
+	private runCloseSteps() {
+		if (this.finished || this.plugin.settings.onboardingComplete) return;
+		this.finished = true;
+		this.plugin.settings.onboardingComplete = true;
+		void this.plugin.saveSettings();
+		window.setTimeout(() => {
+			void this.plugin.openWorkspaceView(VIEW_ABOUT);
+			this.onComplete();
+		}, 300);
+	}
+
+	/** The Ready save failed. If the window was already closed with Esc, nothing is left to retry in: do what Esc would have done. */
+	private failSave() {
+		this.saving = false;
+		if (this.isClosed) this.runCloseSteps();
 	}
 
 	private renderStep() {
@@ -347,7 +357,7 @@ export class OnboardingModal extends Modal {
 						statusEl.textContent = `Could not create the project: ${resp.error ?? 'try again'}`;
 						statusEl.className = 'emerald-onboard-status is-error';
 						startBtn.disabled = false;
-						this.saving = false;
+						this.failSave();
 						return;
 					}
 					this.createdItemId = resp.data.id;
@@ -357,7 +367,7 @@ export class OnboardingModal extends Modal {
 					statusEl.textContent = `Could not save your hours: ${hoursResp.error}. Try again.`;
 					statusEl.className = 'emerald-onboard-status is-error';
 					startBtn.disabled = false;
-					this.saving = false;
+					this.failSave();
 					return;
 				}
 				// The sidebar starts this project's session as soon as it has loaded (see sidebar.consumeFirstSession).
@@ -367,7 +377,7 @@ export class OnboardingModal extends Modal {
 				statusEl.textContent = 'Something went wrong. Try again.';
 				statusEl.className = 'emerald-onboard-status is-error';
 				startBtn.disabled = false;
-				this.saving = false;
+				this.failSave();
 			}
 		})(); });
 
@@ -448,8 +458,9 @@ export class OnboardingModal extends Modal {
 			if (this.qPage < PAGE_BOUNDS.length - 1) { this.qPage++; this.renderStep(); }
 			else void this.leaveQuestions();
 		});
+		// Skip for now never saves: it is the way out when a save keeps failing.
 		const skipBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-subtle', text: COPY['questions.skip'] });
-		skipBtn.addEventListener('click', () => { void this.leaveQuestions(); });
+		skipBtn.addEventListener('click', () => { this.errorMsg = ''; this.goTo('recharge'); });
 	}
 
 	/** Save only what was answered (a blank is never written), then move on to the recharge step. */
@@ -459,7 +470,7 @@ export class OnboardingModal extends Modal {
 			let resp: { error?: string | null; queued?: boolean } | undefined;
 			try { resp = await this.plugin.apiClient.updateCalibration(this.answers); } catch (e) { resp = { error: String(e) }; }
 			if (isFailed(resp)) {
-				this.errorMsg = `Could not save your answers: ${resp?.error}. Try again, or press Skip for now to leave them for later.`;
+				this.errorMsg = `Could not save your answers: ${resp?.error}. Try again, or press Skip for now to move on without saving them.`;
 				this.renderStep(); // stay on this page; the answers are still held
 				return;
 			}

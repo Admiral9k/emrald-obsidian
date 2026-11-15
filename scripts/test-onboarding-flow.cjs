@@ -154,7 +154,7 @@ const ok = (c, msg) => { console.log((c ? 'PASS ' : 'FAIL ') + msg); if (!c) fai
   const firstScale = root(m).all().find((e) => e.classes.has('emerald-scale-row'));
   firstScale.children[3].fire('click'); // pick 4
   ok(firstScale.children[3].classes.has('is-active') && firstScale.children[0].classes.has('is-active') === false, 'F pressed scale button is the only active one');
-  find(m, 'Next').fire('click'); find(m, COPY['questions.skip']).fire('click'); await settle();
+  find(m, 'Next').fire('click'); find(m, 'Next').fire('click'); await settle();
   const saved = p.calls.calib[0] || {};
   ok(Object.keys(saved).length === 1 && Object.values(saved)[0] === 4, 'F only the answered question is saved');
 
@@ -191,13 +191,21 @@ const ok = (c, msg) => { console.log((c ? 'PASS ' : 'FAIL ') + msg); if (!c) fai
   // J2. questions save fails: stay on the page, show the error, answers still held
   p = setup({ calib: () => ({ data: null, error: 'HTTP 500' }) });
   m = modalAt(p, 'questions', 'questions'); m.answers = { sleep_quality_baseline: 4 }; m.qPage = 2; m.goTo('questions');
-  find(m, COPY['questions.skip']).fire('click'); await settle();
+  find(m, 'Next').fire('click'); await settle();
   ok(m.currentStep === 'questions' && root(m).texts().some((t) => /Could not save your answers/.test(t)), 'J2 failed answers save stays on the page with the error');
   ok(m.answers.sleep_quality_baseline === 4 && m.savedSomething === false, 'J2 answers kept, nothing claimed as saved');
+  // J2b. "Skip for now" is the way out: it moves on WITHOUT trying the save again
+  const callsBefore = p.calls.calib.length;
+  find(m, COPY['questions.skip']).fire('click'); await settle();
+  ok(m.currentStep === 'recharge' && p.calls.calib.length === callsBefore && m.savedSomething === false, 'J2b Skip for now goes to the recharge step without saving');
+  // Skip also works from page 1 with answers held: nothing is written
+  p = setup(); m = modalAt(p, 'questions', 'questions'); m.answers = { chronotype: 'evening' };
+  find(m, COPY['questions.skip']).fire('click'); await settle();
+  ok(m.currentStep === 'recharge' && p.calls.calib.length === 0, 'J2b Skip for now never writes, even with answers held');
   // J3. a queued (offline) write counts as saved
   p = setup({ calib: () => ({ data: null, error: null, queued: true }) });
   m = modalAt(p, 'questions', 'questions'); m.answers = { sleep_quality_baseline: 4 }; m.qPage = 2; m.goTo('questions');
-  find(m, COPY['questions.skip']).fire('click'); await settle();
+  find(m, 'Next').fire('click'); await settle();
   ok(m.currentStep === 'recharge' && m.savedSomething === true, 'J3 queued write moves on');
   // J4. recharge fails: stay, nothing claimed
   p = setup({ recovery: () => ({ data: null, error: 'HTTP 500' }) });
@@ -224,6 +232,18 @@ const ok = (c, msg) => { console.log((c ? 'PASS ' : 'FAIL ') + msg); if (!c) fai
   release(); await settle(); await settle(); timeouts.splice(0).forEach((f) => f());
   ok(p.completed === 1 && p.views.length === 0 && p.settings.onboardingComplete === true && p._firstSessionItemId === 'item-9', 'K1 after the save: completion once, no About, first session handed off');
   ok(m.closed === 0, 'K1 finish does not close an already closed modal again');
+  // K3. Esc mid-save and then the save FAILS: the close steps still run, once
+  for (const [label, over] of [['create fails', { createItem: () => ({ data: null, error: 'HTTP 500' }) }], ['hours fail', { avail: () => ({ data: null, error: 'HTTP 500' }) }]]) {
+    p = setup(over); let go2; const gate = new Promise((res) => { go2 = res; });
+    const origCreate = p.apiClient.createItem, origAvail = p.apiClient.setWeeklyAvailability;
+    p.apiClient.createItem = async (b) => { await gate; return origCreate(b); };
+    p.apiClient.setWeeklyAvailability = async (h) => { await gate; return origAvail(h); };
+    m = modalAt(p, 'ready'); m.projectName = 'P'; m.goTo('ready');
+    find(m, COPY['ready.cta']).fire('click'); await settle();
+    m.onClose(); // Esc mid-save
+    go2(); await settle(); await settle(); timeouts.splice(0).forEach((f) => f());
+    ok(p.settings.onboardingComplete === true && p.completed === 1 && p.views.length === 1, 'K3 ' + label + ' after Esc: close steps ran once (sidebar opens, signup will not show again)');
+  }
   // K2. questions mode tells its opener to refresh when it closes
   p = setup(); m = modalAt(p, 'questions', 'questions'); m.onClose();
   ok(p.completed === 1, 'K2 questions mode fires the completion callback on close (Effort Profile refreshes)');

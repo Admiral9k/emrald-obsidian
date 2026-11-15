@@ -612,7 +612,7 @@ var init_copy = __esm({
       "connect.body": "Paste your API key from the web app. It takes about a minute.",
       "connect.cta": "Connect",
       "connect.skip": "Skip for now",
-      "connect.privacy": "EMRALD syncs session times, effort ratings, check-ins and project names. Your note content stays in your vault.",
+      "connect.privacy": "EMRALD syncs your sessions, receipts and check-ins (with any notes you type there) and project details (name, effort level, status, area and linked note path). The text of your vault notes stays in your vault.",
       "project.title": "Add your first project",
       "project.body": "What are you working on? Pick an effort level for it: Light, Moderate, Demanding, or Maximum. It sets how much of your work hours the project takes.",
       "project.what": "Think of it as anything worth dedicating focused time to: your novel, your certification prep, a weekly meal-planning routine, learning a new song on piano. Not your grocery list.",
@@ -817,14 +817,25 @@ var init_onboarding = __esm({
         }
         if (this.saving)
           return;
-        if (!this.finished && !this.plugin.settings.onboardingComplete) {
-          this.plugin.settings.onboardingComplete = true;
-          void this.plugin.saveSettings();
-          window.setTimeout(() => {
-            void this.plugin.openWorkspaceView(VIEW_ABOUT);
-            this.onComplete();
-          }, 300);
-        }
+        this.runCloseSteps();
+      }
+      /** Closing the signup early still counts as done, so it never nags again. Runs at most once. */
+      runCloseSteps() {
+        if (this.finished || this.plugin.settings.onboardingComplete)
+          return;
+        this.finished = true;
+        this.plugin.settings.onboardingComplete = true;
+        void this.plugin.saveSettings();
+        window.setTimeout(() => {
+          void this.plugin.openWorkspaceView(VIEW_ABOUT);
+          this.onComplete();
+        }, 300);
+      }
+      /** The Ready save failed. If the window was already closed with Esc, nothing is left to retry in: do what Esc would have done. */
+      failSave() {
+        this.saving = false;
+        if (this.isClosed)
+          this.runCloseSteps();
       }
       renderStep() {
         const { contentEl } = this;
@@ -1098,7 +1109,7 @@ var init_onboarding = __esm({
                   statusEl.textContent = `Could not create the project: ${(_a = resp.error) != null ? _a : "try again"}`;
                   statusEl.className = "emerald-onboard-status is-error";
                   startBtn.disabled = false;
-                  this.saving = false;
+                  this.failSave();
                   return;
                 }
                 this.createdItemId = resp.data.id;
@@ -1108,7 +1119,7 @@ var init_onboarding = __esm({
                 statusEl.textContent = `Could not save your hours: ${hoursResp.error}. Try again.`;
                 statusEl.className = "emerald-onboard-status is-error";
                 startBtn.disabled = false;
-                this.saving = false;
+                this.failSave();
                 return;
               }
               this.plugin._firstSessionItemId = this.createdItemId;
@@ -1117,7 +1128,7 @@ var init_onboarding = __esm({
               statusEl.textContent = "Something went wrong. Try again.";
               statusEl.className = "emerald-onboard-status is-error";
               startBtn.disabled = false;
-              this.saving = false;
+              this.failSave();
             }
           })();
         });
@@ -1219,7 +1230,8 @@ var init_onboarding = __esm({
         });
         const skipBtn = actions.createEl("button", { cls: "emerald-btn emerald-btn-subtle", text: COPY["questions.skip"] });
         skipBtn.addEventListener("click", () => {
-          void this.leaveQuestions();
+          this.errorMsg = "";
+          this.goTo("recharge");
         });
       }
       /** Save only what was answered (a blank is never written), then move on to the recharge step. */
@@ -1232,7 +1244,7 @@ var init_onboarding = __esm({
             resp = { error: String(e) };
           }
           if (isFailed(resp)) {
-            this.errorMsg = `Could not save your answers: ${resp == null ? void 0 : resp.error}. Try again, or press Skip for now to leave them for later.`;
+            this.errorMsg = `Could not save your answers: ${resp == null ? void 0 : resp.error}. Try again, or press Skip for now to move on without saving them.`;
             this.renderStep();
             return;
           }

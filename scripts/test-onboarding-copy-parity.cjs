@@ -40,6 +40,8 @@ const BANNED = [
   [/\bfaster sync\b/i, 'Faster sync'],
   [/\bverification tax\b/i, 'verification tax'],
   [/\blearns?\b/i, 'learn / learns'],
+  [/\blearn(s|ing)? (about )?you\b/i, 'learning about you'],
+  [/\bEMRALD (is )?learning\b/i, 'EMRALD is learning'],
   [/\bgets? better\b/i, 'gets better'],
   [/\bweeks of data\b/i, 'weeks of data'],
   [/\btrains? you\b/i, 'trains you'],
