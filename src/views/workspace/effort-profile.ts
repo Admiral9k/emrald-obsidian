@@ -107,7 +107,7 @@ const SLIDER_SCALES: Record<string, [string, string, string, string, string]> = 
 
 const ENUM_DISPLAY: Record<string, string> = {
 	// Chronotype
-	early_morning: 'Early Morning', mid_morning: 'Mid-Morning', afternoon: 'Afternoon',
+	very_early: 'Very Early', early_morning: 'Early Morning', mid_morning: 'Mid-Morning', afternoon: 'Afternoon',
 	evening: 'Evening', late_night: 'Late Night',
 	// Work pace
 	burst: 'Intense Bursts', mix: 'Mix', steady: 'Steady',

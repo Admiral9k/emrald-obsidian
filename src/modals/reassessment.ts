@@ -31,11 +31,12 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 		question: 'When do you do your best, most focused work?',
 		type: 'enum',
 		options: [
+			{ value: 'very_early', label: 'Very early (3–5am)' },
 			{ value: 'early_morning', label: 'Early morning (5–8am)' },
 			{ value: 'mid_morning', label: 'Mid-morning (8–11am)' },
 			{ value: 'afternoon', label: 'Afternoon (12–4pm)' },
 			{ value: 'evening', label: 'Evening (5–9pm)' },
-			{ value: 'late_night', label: 'Late night (10pm+)' }
+			{ value: 'late_night', label: 'Late night (10pm–2am)' }
 		]
 	},
 	{

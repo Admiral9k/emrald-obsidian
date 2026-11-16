@@ -20,11 +20,12 @@ export const QUESTIONS: Question[] = [
 	{
 		key: 'chronotype', question: 'When do you do your best, most focused work?', type: 'enum',
 		options: [
+			{ value: 'very_early', label: 'Very early (3\u20135am)' },
 			{ value: 'early_morning', label: 'Early morning (5\u20138am)' },
 			{ value: 'mid_morning', label: 'Mid-morning (8\u201311am)' },
 			{ value: 'afternoon', label: 'Afternoon (12\u20134pm)' },
 			{ value: 'evening', label: 'Evening (5\u20139pm)' },
-			{ value: 'late_night', label: 'Late night (10pm+)' },
+			{ value: 'late_night', label: 'Late night (10pm\u20132am)' },
 		],
 	},
 	{
