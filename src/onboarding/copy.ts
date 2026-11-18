@@ -40,7 +40,7 @@ export const COPY: Record<string, string> = {
 	// 5b. First-receipt celebration
 	'cel.title': 'First receipt filed.',
 	'cel.win': "That's your first receipt, and it already counts in your numbers.",
-	'cel.numbers': 'Your numbers: receipts fill them in. 8 free, all 20 with PRO.',
+	'cel.numbers': 'Your numbers: each receipt fills them in. 8 are free; PRO unlocks all 20.',
 	'cel.checkin':
 		'Daily check-in: about 15 seconds. Sleep, energy, and how your body and mind feel. Skip any day you like.',
 	'cel.burnout':
@@ -65,9 +65,9 @@ export const COPY: Record<string, string> = {
 	'recharge.label': 'Add up to 3 things that recharge you',
 	'recharge.hint': 'Optional. You can add them later.',
 	'recharge.skip': 'Skip',
-	'card.done': 'Thanks. Your profile is more filled in now.',
+	'card.done': 'Thanks. Your profile is filling in.',
 	'optin.line':
-		'Share anonymous usage data to help improve EMRALD. You can change this anytime in Settings.',
+		'Share anonymous usage data to help improve EMRALD. You can change this any time in Settings.',
 };
 
 // 5f. Work types in plain words (display labels only; stored keys are unchanged).

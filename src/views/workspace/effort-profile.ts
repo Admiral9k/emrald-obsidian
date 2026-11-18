@@ -10,6 +10,7 @@ import { EmraldWorkspaceView, VIEW_EFFORT_PROFILE, VIEW_DATA_CENTER } from './ba
 import { RecoveryProtocol, TraitComparison } from '../../api/client';
 import { WORK_TYPES, COPY } from '../../onboarding/copy';
 import { QUESTIONS } from '../../onboarding/questions';
+import { EDITABLE_BY_KEY, EDIT_COPY, directionHint, toAnswerValue } from '../../modals/answer-edit-model';
 
 // ── Calibration Fields (core 6) ─────────────────────────
 
@@ -658,11 +659,33 @@ export class EffortProfileView extends EmraldWorkspaceView {
 				? `emerald-wv-answer-card emerald-wv-answer-card-nudge${isStrong ? ' emerald-wv-answer-card-nudge-strong' : ''}`
 				: 'emerald-wv-answer-card';
 
-			const card = grid.createDiv({ cls: cardCls });
+			const editable = !!EDITABLE_BY_KEY[key];
+			const card = grid.createDiv({ cls: editable ? `${cardCls} emerald-wv-answer-card-btn` : cardCls });
 			card.createDiv({ cls: 'emerald-wv-answer-question', text: info.label });
 
 			const valueText = this.formatAnswerValue(value, info.format, key);
 			card.createDiv({ cls: 'emerald-wv-answer-value', text: valueText });
+
+			// Click a card to change just that answer (every profile answer can be changed here).
+			if (editable) {
+				const changeEl = card.createDiv({ cls: 'emerald-wv-answer-change' });
+				const changeIcon = changeEl.createSpan({ cls: 'emerald-wv-answer-change-icon' });
+				setIcon(changeIcon, 'pencil');
+				changeEl.createSpan({ text: EDIT_COPY.change });
+				card.setAttribute('role', 'button');
+				card.tabIndex = 0;
+				card.setAttribute('aria-label', `Change your answer: ${info.label}`);
+				const open = () => { void (async () => {
+					try {
+						const { AnswerEditModal } = await import('../../modals/answer-edit');
+						new AnswerEditModal(this.app, this.plugin, key, toAnswerValue(value), directionHint(key, mismatch), () => { void this.onOpen(); }).open();
+					} catch { /* non-fatal */ }
+				})(); };
+				card.addEventListener('click', open);
+				card.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+				});
+			}
 
 			if (mismatch) {
 				const nudge = card.createDiv({ cls: 'emerald-wv-answer-nudge' });

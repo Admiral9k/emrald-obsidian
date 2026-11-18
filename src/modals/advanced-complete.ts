@@ -29,7 +29,7 @@ export class AdvancedCompleteModal extends Modal {
 
 		contentEl.createEl('p', {
 			cls: 'emerald-onboard-desc',
-			text: 'You can revisit and update your answers anytime in the effort profile workspace view. If your habits shift, retake the questions to keep your profile current.'
+			text: 'You can revisit and update your answers any time in the effort profile workspace view. If your habits shift, retake the questions to keep your profile current.'
 		});
 
 		const actions = contentEl.createDiv({ cls: 'emerald-modal-actions' });

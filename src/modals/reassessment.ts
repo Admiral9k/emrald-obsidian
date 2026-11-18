@@ -68,28 +68,33 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
 	{
 		key: 'conscientiousness',
 		question: 'I see myself as someone who is organized and follows through...',
-		type: 'slider', min: 1, max: 5, default: 3
+		type: 'slider', min: 1, max: 5, default: 3,
+		endpointLeft: 'Disagree', endpointRight: 'Agree'
 	},
 	{
 		key: 'stress_vulnerability',
 		question: 'I get stressed easily and worry about things going wrong.',
-		type: 'slider', min: 1, max: 5, default: 3
+		type: 'slider', min: 1, max: 5, default: 3,
+		endpointLeft: 'Disagree', endpointRight: 'Agree'
 	},
 	{
 		key: 'novelty_tolerance',
 		question: "I'm energized by trying new things and tackling unfamiliar challenges.",
-		type: 'slider', min: 1, max: 5, default: 3
+		type: 'slider', min: 1, max: 5, default: 3,
+		endpointLeft: 'Disagree', endpointRight: 'Agree'
 	},
 	// Page 3: Work patterns
 	{
 		key: 'routine_tolerance',
 		question: 'I can do routine, repetitive work for long stretches without losing focus.',
-		type: 'slider', min: 1, max: 5, default: 3
+		type: 'slider', min: 1, max: 5, default: 3,
+		endpointLeft: 'Disagree', endpointRight: 'Agree'
 	},
 	{
 		key: 'procrastination_tendency',
 		question: "How often do you delay starting tasks you've committed to?",
-		type: 'slider', min: 1, max: 5, default: 3
+		type: 'slider', min: 1, max: 5, default: 3,
+		endpointLeft: 'Rarely', endpointRight: 'Often'
 	},
 	{
 		key: 'procrastination_trigger',

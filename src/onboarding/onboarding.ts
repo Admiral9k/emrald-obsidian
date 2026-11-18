@@ -263,8 +263,6 @@ export class OnboardingModal extends Modal {
 		const explainer = container.createDiv({ cls: 'emerald-onboard-explainer' });
 		for (const n of [1, 2, 3, 4]) explainer.createDiv({ text: COPY[`project.legend.${n}`] });
 
-		container.createDiv({ cls: 'emerald-onboard-hint', text: COPY['project.noteLink'] });
-
 		const form = container.createDiv({ cls: 'emerald-form' });
 		const addRow = form.createDiv({ cls: 'emerald-onboard-add-row' });
 		const nameInput = addRow.createEl('input', {
@@ -296,6 +294,8 @@ export class OnboardingModal extends Modal {
 
 		const requiredEl = form.createDiv({ cls: 'emerald-onboard-hint', text: COPY['project.required'] });
 		form.createDiv({ cls: 'emerald-form-desc', text: COPY['project.cap'] });
+		// The note-link tip sits below the input, after the cap line (S17 parity: the web screen has no tip, so it reads as a footnote here).
+		form.createDiv({ cls: 'emerald-onboard-hint', text: COPY['project.noteLink'] });
 
 		const actions = container.createDiv({ cls: 'emerald-modal-actions' });
 		const nextBtn = actions.createEl('button', { cls: 'emerald-btn emerald-btn-primary', text: 'Next' });

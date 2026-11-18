@@ -24,7 +24,7 @@ const ALLOWED_DIFF = {
   'optin.line': [/in Profile\./g, 'in Settings.'], // web Profile page, plugin Settings
 };
 const PLUGIN_ONLY = new Set(['welcome.bullets.1', 'welcome.bullets.2', 'welcome.bullets.3', 'welcome.bullets.4', 'connect.body', 'connect.cta', 'connect.skip', 'connect.privacy', 'project.noteLink']);
-const WEB_ONLY = (k) => k.startsWith('chk.'); // the Overview checklist is web only
+const WEB_ONLY = (k) => k.startsWith('chk.') || k.startsWith('hours.'); // the Overview checklist and the Profile page Work hours setting are web only (the plugin sets hours on the Ready screen)
 
 // Retired and banned words (copy-standard-2026-11 sections 4 to 6, plus Devon's rulings).
 const BANNED = [

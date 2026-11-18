@@ -1,4 +1,4 @@
-// EMRALD Data Center — Deep dive into all 20 D-metrics.
+// EMRALD Data Center — Deep dive into all 21 D-metrics.
 // Features: metric grid with current values, SVG time-series graphs,
 // time range toggle, info popovers, pin management, "need more data" states.
 // This is the crown jewel — Obsidian-native, data-dense, beautiful.
@@ -81,16 +81,21 @@ export const D_METRICS: Record<string, MetricInfo> = {
 	       explainer: 'Compares your profile answers with the effort you actually report. Lower means they line up. Based on your last 30 days.' },
 	D20: { name: 'Recharge Effectiveness', unit: '/10', category: 'Energy', goodDirection: 'up',
 	       desc: 'How well your recharge routines restore energy',
-	       explainer: 'How effective your recharge time is. Higher = better recharging. Only counts recharges you log: skipped days are not measured here.' }
+	       explainer: 'How effective your recharge time is. Higher = better recharging. Only counts recharges you log: skipped days are not measured here.' },
+	// D21 is free on every plan. It reads the answer to "how much of this stint went to verifying" that receipts carry (wording matches the web Data Center).
+	D21: { name: 'Verification share', unit: '/10', category: 'Qarett', goodDirection: 'varies',
+	       desc: 'How much of a stint went to checking rather than producing',
+	       explainer: 'Across the receipts you answered in the window, the average of your 1 to 10 answer to how much of each stint went to verifying and checking work instead of producing it. The share shown is that average. Qarett stints ask the same question.' }
 };
 
-const CATEGORIES = ['Effort', 'Guesses', 'Productivity', 'Energy'];
+const CATEGORIES = ['Effort', 'Guesses', 'Productivity', 'Energy', 'Qarett'];
 
 const CATEGORY_ICONS: Record<string, string> = {
 	Effort: 'flame',
 	Energy: 'battery-charging',
 	Productivity: 'trending-up',
-	Guesses: 'sliders'
+	Guesses: 'sliders',
+	Qarett: 'shield-check'
 };
 
 // SVG chart constants
@@ -122,7 +127,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 
 	async onOpen() {
 		const container = this.getContainer();
-		this.renderHeader(container, 'Data center', 'All 20 metrics: your effort fingerprint', 'trending-up');
+		this.renderHeader(container, 'Data center', 'Every metric: your effort fingerprint', 'trending-up');
 
 		// Pinned metrics note
 		const pinnedNote = container.createDiv({ cls: 'emerald-wv-dc-pinned-note' });
@@ -338,9 +343,9 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const isPinned = this.pinnedKeys.has(key);
 		const hasData = metric && metric.value !== null;
 
-		// D9-D20 are Pro-only — free users see frosted cards
+		// D9-D20 are Pro-only — free users see frosted cards. D21 (Verification share) is free.
 		const keyNum = parseInt(key.replace('D', ''), 10);
-		const isProMetric = keyNum >= 9;
+		const isProMetric = keyNum >= 9 && keyNum <= 20;
 		const isLocked = isProMetric && !tierState.isPro();
 
 		const card = grid.createDiv({
@@ -582,6 +587,23 @@ export class DataCenterView extends EmraldWorkspaceView {
 			});
 		}
 
+		// D21 trend line: a straight best-fit line through the days shown. Direction only (web twin: chart-trend).
+		if (metricKey === 'D21' && values.length >= 3) {
+			const n = values.length;
+			const mx = (n - 1) / 2;
+			const my = values.reduce((a, b) => a + b, 0) / n;
+			const sxx = values.reduce((a, _v, i) => a + (i - mx) * (i - mx), 0);
+			const slope = sxx === 0 ? 0 : values.reduce((a, v, i) => a + (v - my) * (i - mx), 0) / sxx;
+			const fitY = (i: number): number => {
+				const v = Math.max(min, Math.min(max, my + slope * (i - mx)));
+				return (CHART_HEIGHT - CHART_PAD) - ((v - min) / range) * (CHART_HEIGHT - CHART_PAD * 2);
+			};
+			svg.createSvg('line', {
+				attr: { x1: '0', y1: fitY(0).toFixed(1), x2: String(CHART_WIDTH), y2: fitY(n - 1).toFixed(1) },
+				cls: 'emerald-wv-chart-trend'
+			});
+		}
+
 		// Endpoint dot (larger, accent)
 		const last = coords[coords.length - 1];
 		if (last) {
@@ -603,6 +625,15 @@ export class DataCenterView extends EmraldWorkspaceView {
 			cls: 'emerald-wv-chart-range-label'
 		});
 		minLabel.textContent = min.toFixed(1);
+
+		// The note sits in the band under the bars, inside the SVG, so the card height matches every other metric.
+		if (metricKey === 'D21' && values.length >= 3) {
+			const note = svg.createSvg('text', {
+				attr: { x: String(CHART_PAD + 2), y: String(CHART_HEIGHT - CHART_PAD - 1) },
+				cls: 'emerald-wv-chart-trend-note'
+			});
+			note.textContent = 'Dashed line: your trend over this range.';
+		}
 
 		return svg;
 	}
