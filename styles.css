@@ -5978,3 +5978,21 @@ button.emerald-rg-link {
 	color: var(--text-muted);
 	margin-bottom: 8px;
 }
+.emerald-wv-chart-avg-label {
+	font-size: 11px;
+	font-weight: 600;
+	fill: var(--emerald-e2);
+	paint-order: stroke;
+	stroke: var(--background-primary);
+	stroke-width: 3px;
+}
+.emerald-wv-chart-count {
+	font-size: 10px;
+	fill: var(--text-muted);
+	paint-order: stroke;
+	stroke: var(--background-primary);
+	stroke-width: 3px;
+}
+.emerald-wv-metric-svg.emerald-wv-answers-svg {
+	max-height: none;
+}

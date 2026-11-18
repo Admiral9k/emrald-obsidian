@@ -7208,7 +7208,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
       const answers = await this.loadVerificationAnswers(days);
       chartArea.empty();
       if (answers.length > 0)
-        chartArea.appendChild(this.buildAnswerChart(answers, days, this.d21Average(metric)));
+        this.mountAnswerChart(chartArea, answers, days, this.d21Average(metric));
       await this.renderVerificationAnswers(expanded, days, metric, answers);
       return;
     }
@@ -7415,13 +7415,33 @@ var DataCenterView = class extends EmraldWorkspaceView {
     }
     return answered;
   }
+  /** Draw the answers chart at the panel's own width and redraw when the pane is resized (panes tile side by side). */
+  mountAnswerChart(host, answers, days, avg) {
+    let drawn = 0;
+    const draw = () => {
+      const w = Math.max(280, Math.round(host.clientWidth || CHART_WIDTH));
+      if (Math.abs(w - drawn) < 8)
+        return;
+      drawn = w;
+      host.empty();
+      host.appendChild(this.buildAnswerChart(answers, days, avg, w));
+    };
+    draw();
+    if (typeof ResizeObserver !== "undefined")
+      new ResizeObserver(() => draw()).observe(host);
+  }
   /**
-   * One dot per stored answer, placed on its own date across the chosen range and at its own value. Days with no answer
-   * stay empty (no line between dots, no fill). The 30-day average is a separate dashed line.
+   * One dot per stored answer value per day, placed on its own date across the chosen range and at its own value.
+   * Answers that share a day and a value are one dot with a count ("×3"), so the dots never stack. Days with no answer
+   * stay empty (no line between dots, no fill). The 30-day average is a separate dashed line with its value beside it.
+   * `width` is the drawing width in pixels (the panel's own width), so the chart fills the panel.
    */
-  buildAnswerChart(answers, days, avg) {
+  buildAnswerChart(answers, days, avg, width = CHART_WIDTH) {
     var _a;
-    const padX = 10;
+    const padL = 24;
+    const padR = 10;
+    const dateRow = 18;
+    const height = CHART_HEIGHT + dateRow;
     const min = 0;
     const max = 10;
     const range = max - min;
@@ -7429,40 +7449,55 @@ var DataCenterView = class extends EmraldWorkspaceView {
     const start = end - days * 864e5;
     const xOf = (iso) => {
       const t = Math.max(start, Math.min(end, new Date(iso).getTime()));
-      return padX + (t - start) / (end - start) * (CHART_WIDTH - padX * 2);
+      return padL + (t - start) / (end - start) * (width - padL - padR);
     };
     const yOf = (v) => CHART_HEIGHT - CHART_PAD - (v - min) / range * (CHART_HEIGHT - CHART_PAD * 2);
     const svg = createSvg("svg", {
-      attr: { width: "100%", height: String(CHART_HEIGHT), viewBox: `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}` },
-      cls: "emerald-wv-metric-svg"
+      attr: { width: "100%", height: String(height), viewBox: `0 0 ${width} ${height}` },
+      // The shared chart class caps the height at 175px, which would shrink this taller chart; the second class lifts the cap.
+      cls: ["emerald-wv-metric-svg", "emerald-wv-answers-svg"]
     });
     for (let i = 0; i <= 2; i++) {
       const y = CHART_PAD + (CHART_HEIGHT - CHART_PAD * 2) / 2 * i;
-      svg.createSvg("line", { attr: { x1: "0", y1: String(y), x2: String(CHART_WIDTH), y2: String(y) }, cls: "emerald-wv-chart-grid" });
+      svg.createSvg("line", { attr: { x1: String(padL), y1: String(y), x2: String(width - padR), y2: String(y) }, cls: "emerald-wv-chart-grid" });
     }
+    const topLabel = svg.createSvg("text", { attr: { x: String(padL - 6), y: String(CHART_PAD + 4), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
+    topLabel.textContent = String(max);
+    const zeroLabel = svg.createSvg("text", { attr: { x: String(padL - 6), y: String(CHART_HEIGHT - CHART_PAD + 4), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
+    zeroLabel.textContent = String(min);
     if (avg !== null) {
       const y = yOf(Math.max(min, Math.min(max, avg)));
-      svg.createSvg("line", { attr: { x1: "0", y1: y.toFixed(1), x2: String(CHART_WIDTH), y2: y.toFixed(1) }, cls: "emerald-wv-chart-trend" });
-    }
-    for (const a of answers) {
-      const dot = svg.createSvg("circle", {
-        attr: { cx: xOf(a.created_at).toFixed(1), cy: yOf((_a = a.verification_share) != null ? _a : 0).toFixed(1), r: "4" },
-        cls: "emerald-wv-chart-dot"
+      svg.createSvg("line", { attr: { x1: String(padL), y1: y.toFixed(1), x2: String(width - padR), y2: y.toFixed(1) }, cls: "emerald-wv-chart-trend" });
+      const label = svg.createSvg("text", {
+        attr: { x: String(width - padR), y: (y < 22 ? y + 13 : y - 5).toFixed(1), "text-anchor": "end" },
+        cls: "emerald-wv-chart-avg-label"
       });
-      dot.createSvg("title").textContent = `${this.formatDateShort(a.created_at)}: ${a.verification_share}/10`;
+      label.textContent = `30-day average ${avg.toFixed(2)}`;
     }
-    const maxLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - 4), y: String(CHART_PAD + 10), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
-    maxLabel.textContent = max.toFixed(1);
-    const minLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - 4), y: String(CHART_HEIGHT - CHART_PAD), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
-    minLabel.textContent = min.toFixed(1);
-    const fromLabel = svg.createSvg("text", { attr: { x: String(padX), y: String(CHART_HEIGHT - CHART_PAD - 12) }, cls: "emerald-wv-chart-trend-note" });
+    const groups = /* @__PURE__ */ new Map();
+    for (const a of answers) {
+      const v = (_a = a.verification_share) != null ? _a : 0;
+      const key = `${new Date(a.created_at).toLocaleDateString("en-CA")}|${v}`;
+      const g = groups.get(key);
+      if (g)
+        g.n += 1;
+      else
+        groups.set(key, { at: a.created_at, value: v, n: 1 });
+    }
+    for (const g of groups.values()) {
+      const cx = xOf(g.at);
+      const cy = yOf(g.value);
+      const dot = svg.createSvg("circle", { attr: { cx: cx.toFixed(1), cy: cy.toFixed(1), r: "4" }, cls: "emerald-wv-chart-dot" });
+      dot.createSvg("title").textContent = g.n > 1 ? `${this.formatDateShort(g.at)}, ${g.n} answers: ${g.value}/10` : `${this.formatDateShort(g.at)}: ${g.value}/10`;
+      if (g.n > 1) {
+        const count = svg.createSvg("text", { attr: { x: (cx + 7).toFixed(1), y: (cy + 4).toFixed(1) }, cls: "emerald-wv-chart-count" });
+        count.textContent = `\xD7${g.n}`;
+      }
+    }
+    const fromLabel = svg.createSvg("text", { attr: { x: String(padL), y: String(CHART_HEIGHT + 12) }, cls: "emerald-wv-chart-trend-note" });
     fromLabel.textContent = this.formatDateShort(new Date(start).toISOString());
-    const toLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - padX), y: String(CHART_HEIGHT - CHART_PAD - 12), "text-anchor": "end" }, cls: "emerald-wv-chart-trend-note" });
+    const toLabel = svg.createSvg("text", { attr: { x: String(width - padR), y: String(CHART_HEIGHT + 12), "text-anchor": "end" }, cls: "emerald-wv-chart-trend-note" });
     toLabel.textContent = this.formatDateShort(new Date(end).toISOString());
-    if (avg !== null) {
-      const note = svg.createSvg("text", { attr: { x: String(CHART_WIDTH / 2), y: String(CHART_HEIGHT - CHART_PAD - 12), "text-anchor": "middle" }, cls: "emerald-wv-chart-trend-note" });
-      note.textContent = "Dashed line: your 30-day average.";
-    }
     return svg;
   }
   async renderVerificationAnswers(container, days, metric, preloaded) {
