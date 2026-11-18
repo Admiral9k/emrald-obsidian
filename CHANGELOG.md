@@ -4,6 +4,18 @@ All notable changes to the Emrald Obsidian plugin will be documented in this fil
 
 ## [Unreleased]
 
+## [1.4.4] - 2026-11-18
+
+Change a profile answer in place, and see Qarett's number.
+
+### Added
+- Click any answer on Effort Profile to change just that one. Your current answer is marked, and only the answer you change is saved. When your recent sessions point a different way, a short note says which.
+- Data Center: a From Qarett section with Verification share, free on every plan. It lists each answer with its date and project, plots them, and shows your 30-day average as a dashed line.
+
+### Changed
+- The profile questions match the web app: the five-point scales read Disagree to Agree or Rarely to Often, the chronotype list adds Very early (3–5am), and late night reads 10pm–2am.
+- Small wording fixes in setup and in the profile screens.
+
 ## [1.4.3] - 2026-11-14
 
 A shorter first run.

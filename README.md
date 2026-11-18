@@ -91,6 +91,8 @@ The first few sessions give you a starting point. Keep filling in your receipts 
 
 ## What's new
 
+**Change an answer, and see Qarett's number (1.4.4).** Click any answer on Effort Profile to change just that one. Your current answer is marked, and only the answer you change is saved. Data Center has a new From Qarett section with Verification share, how much of each stint went to checking work rather than producing it. It lists each answer with its date and project, plots them, and shows your 30-day average as a dashed line. It is free on every plan. The profile questions now match the web app: five-point scales read Disagree to Agree or Rarely to Often, and the chronotype list adds Very early (3–5am).
+
 **A shorter first run (1.4.3).** Setup is now Connect, Welcome, your first project, then Ready: pick your hours a day and your first session starts. The profile questions are no longer part of setup. Open them any time from Effort Profile or the command "Fill in your profile". Nothing is pre-answered, five-point buttons replace the sliders, and a question you skip stays blank. The six work types have plain names, like Big-picture ideas and Finishing things. The first-receipt welcome appears once per account, in any vault.
 
 **Plainer words throughout (1.4.2).** The plugin now reads the same as the web app, in everyday words instead of jargon. Digests are recaps, the E-Level Overview is Effort Allocations, "Calibration" is "Guesses" and "Drift from your profile", and the Burnout Monitor says "Not enough data yet" instead of "All Clear" when there is no score to judge from.
@@ -200,6 +202,7 @@ EMRALD connects to the Effort Mastery API (`api.effortmastery.com`) to sync sess
 - Effort receipts (your ratings, plus any short note you type)
 - Daily check-in responses (energy, readiness, plus any short note you type)
 - Project details (name, effort level, status, area, and the path of a linked note)
+- Profile answers (only the questions you choose to answer, and any answer you change later)
 
 **What EMRALD never sends:**
 - Note content: EMRALD does not read, upload, or modify the body of your vault notes
