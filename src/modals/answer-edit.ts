@@ -82,11 +82,13 @@ export class AnswerEditModal extends Modal {
 			for (const opt of q.options) {
 				const btn = col.createEl('button', { cls: `emerald-onboard-enum-btn ${this.picked === opt.value ? 'is-active' : ''}` });
 				btn.setAttribute('aria-pressed', String(this.picked === opt.value));
+				// Label (and description) in one flexible block so the tag centers on the whole row, not on the first line.
+				const main = btn.createSpan({ cls: 'emerald-ae-opt-main' });
 				if (opt.desc) {
-					btn.createSpan({ cls: 'emerald-opt-label', text: opt.label });
-					btn.createSpan({ cls: 'emerald-opt-desc', text: opt.desc });
+					main.createSpan({ cls: 'emerald-opt-label', text: opt.label });
+					main.createSpan({ cls: 'emerald-opt-desc', text: opt.desc });
 				} else {
-					btn.createSpan({ text: opt.label });
+					main.setText(opt.label);
 				}
 				if (this.current === opt.value) btn.createSpan({ cls: 'emerald-ae-current-tag', text: EDIT_COPY.current });
 				btn.addEventListener('click', () => {

@@ -6,7 +6,7 @@
 import { WorkspaceLeaf, Notice, setIcon } from 'obsidian';
 import EmraldPlugin from '../../../main';
 import { EmraldWorkspaceView, VIEW_DATA_CENTER } from './base';
-import { ComputedMetric, ComputedMetricHistory } from '../../api/client';
+import { ComputedMetric, ComputedMetricHistory, AllReceiptRow } from '../../api/client';
 import { tierState } from '../../tier';
 import { providerNoteState, renderProviderNote } from './provider-note';
 
@@ -493,6 +493,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 		const entries = this.normalizeHistory(histResp.data ?? []).slice(-days); // oldest → newest, one per day
 		if (entries.length === 0) {
 			chartArea.createDiv({ cls: 'emerald-wv-empty', text: `No history data for the last ${this.timeRange}.` });
+			if (key === 'D21') await this.renderVerificationAnswers(expanded, days, metric);
 			return;
 		}
 
@@ -507,6 +508,13 @@ export class DataCenterView extends EmraldWorkspaceView {
 			chartArea.appendChild(this.buildLineChart(entries, info, key));
 		} else {
 			chartArea.createDiv({ cls: 'emerald-wv-empty', text: 'One value so far. The chart needs at least two.' });
+		}
+
+		// D21 is a 30-day average, so its history rows are the same average repeated day after day. The table lists each
+		// stored answer on its own instead, and the average appears once, on the line above it.
+		if (key === 'D21') {
+			await this.renderVerificationAnswers(expanded, days, metric);
+			return;
 		}
 
 		// History table (below chart) — skip for D11 and D15 (custom viz IS the data story)
@@ -728,6 +736,53 @@ export class DataCenterView extends EmraldWorkspaceView {
 		}
 
 		return [];
+	}
+
+	// ── Verification share: each stored answer ────────────
+
+	/** Each receipt answer in the chosen range with its own stored value, newest first. The 30-day average shows once. */
+	private async renderVerificationAnswers(container: Element, days: number, metric: ComputedMetric | undefined) {
+		const section = container.createDiv({ cls: 'emerald-wv-d21-answers' });
+		section.createDiv({ cls: 'emerald-wv-d21-answers-title', text: 'Your answers' });
+
+		const meta = metric?.metadata ?? {};
+		const avg = typeof meta.avg_verification_share === 'number' ? meta.avg_verification_share : null;
+		const n = typeof meta.answered_receipts === 'number' ? meta.answered_receipts : null;
+		if (avg !== null && n !== null && n > 0) {
+			section.createDiv({
+				cls: 'emerald-wv-d21-answers-avg',
+				text: `Average over the last 30 days: ${avg.toFixed(2)} from ${n} ${n === 1 ? 'answer' : 'answers'}.`
+			});
+		}
+
+		const from = new Date(Date.now() - days * 86400000).toISOString();
+		const answered: AllReceiptRow[] = [];
+		for (let offset = 0; offset < 500; offset += 100) {
+			const resp = await this.plugin.apiClient.getReceiptsPage({ from, limit: 100, offset });
+			const page = resp.data?.data ?? [];
+			for (const r of page) {
+				if (typeof r.verification_share === 'number' && Number.isInteger(r.verification_share)) answered.push(r);
+			}
+			if (page.length < 100) break;
+		}
+
+		if (answered.length === 0) {
+			section.createDiv({ cls: 'emerald-wv-empty', text: `No answers in the last ${this.timeRange}.` });
+			return;
+		}
+
+		const table = section.createEl('table', { cls: 'emerald-wv-table emerald-wv-history-table' });
+		const headerRow = table.createEl('thead').createEl('tr');
+		headerRow.createEl('th', { text: 'Date' });
+		headerRow.createEl('th', { text: 'Project' });
+		headerRow.createEl('th', { text: 'Answer' });
+		const tbody = table.createEl('tbody');
+		for (const r of answered.slice(0, 20)) {
+			const row = tbody.createEl('tr');
+			row.createEl('td', { text: this.formatDateShort(r.created_at) });
+			row.createEl('td', { text: r.item?.name ?? '—' });
+			row.createEl('td', { text: `${r.verification_share}/10` });
+		}
 	}
 
 	// ── History Table ────────────────────────────────────

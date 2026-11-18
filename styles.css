@@ -5913,25 +5913,40 @@ button.emerald-rg-link {
 	margin: 0 0 12px;
 	font-size: 13px;
 	line-height: 1.4;
-	color: var(--emerald-e1, #2D7A4A);
+	color: var(--emerald-e1);
 }
+/* "Current answer" chip: the brand gold (E2) token, the same role as the web app's gold current-state tag. */
 .emerald-ae-current-tag {
-	display: inline-block;
-	margin-left: 8px;
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
 	padding: 1px 8px;
 	border-radius: 999px;
 	font-size: 11px;
 	font-weight: 600;
-	color: var(--text-warning, #C09A4A);
-	border: 1px solid var(--text-warning, #C09A4A);
+	line-height: 1.4;
+	white-space: nowrap;
+	color: var(--emerald-e2);
+	border: 1px solid var(--emerald-e2);
+}
+/* Option rows that carry the chip: label block on the left, chip centered on the row's vertical middle. */
+.emerald-ae-modal .emerald-onboard-enum-btn {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+.emerald-ae-modal .emerald-ae-opt-main {
+	flex: 1;
+	min-width: 0;
 }
 .emerald-ae-modal .emerald-ae-current-line {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	margin: 10px 0 0;
 	font-size: 13px;
 	color: var(--text-muted);
-}
-.emerald-ae-modal .emerald-ae-current-line .emerald-ae-current-tag {
-	margin-left: 0;
 }
 .emerald-ae-modal .emerald-ae-text {
 	width: 100%;
@@ -5939,7 +5954,7 @@ button.emerald-rg-link {
 	resize: vertical;
 }
 .emerald-wv-chart-trend {
-	stroke: #C9A227;
+	stroke: var(--emerald-e2);
 	stroke-width: 1.5;
 	stroke-dasharray: 5 4;
 	fill: none;
@@ -5948,4 +5963,18 @@ button.emerald-rg-link {
 .emerald-wv-chart-trend-note {
 	font-size: 10px;
 	fill: var(--text-muted);
+}
+.emerald-wv-d21-answers {
+	margin-top: 12px;
+}
+.emerald-wv-d21-answers-title {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-muted);
+	margin-bottom: 4px;
+}
+.emerald-wv-d21-answers-avg {
+	font-size: 12px;
+	color: var(--text-muted);
+	margin-bottom: 8px;
 }

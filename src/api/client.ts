@@ -733,6 +733,18 @@ export class EmraldAPIClient {
 		return this.request('GET', `/receipts?${params.toString()}`, undefined, { rawEnvelope: true, skipCache: true });
 	}
 
+	/**
+	 * Every project's receipts in a date range, newest first, one page at a time. Used by the Data Center to list each
+	 * stored Verification share answer on its own (the metric itself is a 30-day average). Never cached.
+	 */
+	async getReceiptsPage(opts: { from?: string; limit?: number; offset?: number }): Promise<APIResponse<AllReceiptsPage>> {
+		const params = new URLSearchParams();
+		if (opts.from) params.set('from', opts.from);
+		params.set('limit', String(Math.min(100, opts.limit ?? 100)));
+		params.set('offset', String(opts.offset ?? 0));
+		return this.request('GET', `/receipts?${params.toString()}`, undefined, { rawEnvelope: true, skipCache: true });
+	}
+
 	// ── Energy Check-ins ─────────────────────────────────
 
 	async submitEnergyCheckin(checkin: CreateEnergyCheckinPayload): Promise<APIResponse<EnergyCheckin>> {
@@ -1140,6 +1152,19 @@ export interface ProjectReceipt {
 	ai_authored: boolean | null;
 	ai_edited_by_user: boolean | null;
 	session: { started_at: string; duration_minutes: number | null } | null;
+}
+
+// One receipt from GET /receipts without an item filter: the receipt columns plus the project (item) it belongs to.
+export interface AllReceiptRow {
+	id: string;
+	created_at: string;
+	verification_share: number | null;
+	item?: { name?: string | null } | null;
+}
+
+export interface AllReceiptsPage {
+	data: AllReceiptRow[];
+	total?: number;
 }
 
 export interface ProjectReceiptPage {

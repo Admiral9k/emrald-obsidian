@@ -19,6 +19,7 @@ const suites = [
   ['test-overtime-autopause.cjs', []],
   ['test-receipt-graph.cjs', []],
   ['test-answer-edit.cjs', []],
+  ['test-data-center-d21.cjs', []],
 ];
 const failed = [];
 for (const [file, args] of suites) {

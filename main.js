@@ -2899,11 +2899,12 @@ var init_answer_edit = __esm({
           for (const opt of q.options) {
             const btn = col.createEl("button", { cls: `emerald-onboard-enum-btn ${this.picked === opt.value ? "is-active" : ""}` });
             btn.setAttribute("aria-pressed", String(this.picked === opt.value));
+            const main = btn.createSpan({ cls: "emerald-ae-opt-main" });
             if (opt.desc) {
-              btn.createSpan({ cls: "emerald-opt-label", text: opt.label });
-              btn.createSpan({ cls: "emerald-opt-desc", text: opt.desc });
+              main.createSpan({ cls: "emerald-opt-label", text: opt.label });
+              main.createSpan({ cls: "emerald-opt-desc", text: opt.desc });
             } else {
-              btn.createSpan({ text: opt.label });
+              main.setText(opt.label);
             }
             if (this.current === opt.value)
               btn.createSpan({ cls: "emerald-ae-current-tag", text: EDIT_COPY.current });
@@ -7209,6 +7210,8 @@ var DataCenterView = class extends EmraldWorkspaceView {
     const entries = this.normalizeHistory((_b = histResp.data) != null ? _b : []).slice(-days);
     if (entries.length === 0) {
       chartArea.createDiv({ cls: "emerald-wv-empty", text: `No history data for the last ${this.timeRange}.` });
+      if (key === "D21")
+        await this.renderVerificationAnswers(expanded, days, metric);
       return;
     }
     if (key === "D15") {
@@ -7221,6 +7224,10 @@ var DataCenterView = class extends EmraldWorkspaceView {
       chartArea.appendChild(this.buildLineChart(entries, info, key));
     } else {
       chartArea.createDiv({ cls: "emerald-wv-empty", text: "One value so far. The chart needs at least two." });
+    }
+    if (key === "D21") {
+      await this.renderVerificationAnswers(expanded, days, metric);
+      return;
     }
     if (key !== "D11" && key !== "D15") {
       this.renderHistoryTable(expanded, entries, info, key);
@@ -7403,6 +7410,50 @@ var DataCenterView = class extends EmraldWorkspaceView {
       ];
     }
     return [];
+  }
+  // ── Verification share: each stored answer ────────────
+  /** Each receipt answer in the chosen range with its own stored value, newest first. The 30-day average shows once. */
+  async renderVerificationAnswers(container, days, metric) {
+    var _a, _b, _c, _d, _e;
+    const section = container.createDiv({ cls: "emerald-wv-d21-answers" });
+    section.createDiv({ cls: "emerald-wv-d21-answers-title", text: "Your answers" });
+    const meta = (_a = metric == null ? void 0 : metric.metadata) != null ? _a : {};
+    const avg = typeof meta.avg_verification_share === "number" ? meta.avg_verification_share : null;
+    const n = typeof meta.answered_receipts === "number" ? meta.answered_receipts : null;
+    if (avg !== null && n !== null && n > 0) {
+      section.createDiv({
+        cls: "emerald-wv-d21-answers-avg",
+        text: `Average over the last 30 days: ${avg.toFixed(2)} from ${n} ${n === 1 ? "answer" : "answers"}.`
+      });
+    }
+    const from = new Date(Date.now() - days * 864e5).toISOString();
+    const answered = [];
+    for (let offset = 0; offset < 500; offset += 100) {
+      const resp = await this.plugin.apiClient.getReceiptsPage({ from, limit: 100, offset });
+      const page = (_c = (_b = resp.data) == null ? void 0 : _b.data) != null ? _c : [];
+      for (const r of page) {
+        if (typeof r.verification_share === "number" && Number.isInteger(r.verification_share))
+          answered.push(r);
+      }
+      if (page.length < 100)
+        break;
+    }
+    if (answered.length === 0) {
+      section.createDiv({ cls: "emerald-wv-empty", text: `No answers in the last ${this.timeRange}.` });
+      return;
+    }
+    const table = section.createEl("table", { cls: "emerald-wv-table emerald-wv-history-table" });
+    const headerRow = table.createEl("thead").createEl("tr");
+    headerRow.createEl("th", { text: "Date" });
+    headerRow.createEl("th", { text: "Project" });
+    headerRow.createEl("th", { text: "Answer" });
+    const tbody = table.createEl("tbody");
+    for (const r of answered.slice(0, 20)) {
+      const row = tbody.createEl("tr");
+      row.createEl("td", { text: this.formatDateShort(r.created_at) });
+      row.createEl("td", { text: (_e = (_d = r.item) == null ? void 0 : _d.name) != null ? _e : "\u2014" });
+      row.createEl("td", { text: `${r.verification_share}/10` });
+    }
   }
   // ── History Table ────────────────────────────────────
   renderHistoryTable(container, entries, info, metricKey) {
@@ -13606,6 +13657,19 @@ var EmraldAPIClient = class {
       params.set("from", opts.from);
     params.set("limit", String(Math.min(100, (_a = opts == null ? void 0 : opts.limit) != null ? _a : 50)));
     params.set("offset", String((_b = opts == null ? void 0 : opts.offset) != null ? _b : 0));
+    return this.request("GET", `/receipts?${params.toString()}`, void 0, { rawEnvelope: true, skipCache: true });
+  }
+  /**
+   * Every project's receipts in a date range, newest first, one page at a time. Used by the Data Center to list each
+   * stored Verification share answer on its own (the metric itself is a 30-day average). Never cached.
+   */
+  async getReceiptsPage(opts) {
+    var _a, _b;
+    const params = new URLSearchParams();
+    if (opts.from)
+      params.set("from", opts.from);
+    params.set("limit", String(Math.min(100, (_a = opts.limit) != null ? _a : 100)));
+    params.set("offset", String((_b = opts.offset) != null ? _b : 0));
     return this.request("GET", `/receipts?${params.toString()}`, void 0, { rawEnvelope: true, skipCache: true });
   }
   // ── Energy Check-ins ─────────────────────────────────
