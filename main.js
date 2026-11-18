@@ -6907,6 +6907,9 @@ var D_METRICS = {
   }
 };
 var CATEGORIES = ["Effort", "Guesses", "Productivity", "Energy", "Qarett"];
+var CATEGORY_TITLES = {
+  Qarett: "From Qarett"
+};
 var CATEGORY_ICONS = {
   Effort: "flame",
   Energy: "battery-charging",
@@ -7067,7 +7070,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
   }
   // ── Category Rendering ──────────────────────────────
   renderAllCategories() {
-    var _a;
+    var _a, _b;
     if (!this.gridContainer)
       return;
     this.gridContainer.empty();
@@ -7079,7 +7082,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
       const headerRow = section.createDiv({ cls: "emerald-wv-section-header-row" });
       const iconEl = headerRow.createSpan({ cls: "emerald-wv-section-icon" });
       (0, import_obsidian11.setIcon)(iconEl, (_a = CATEGORY_ICONS[category]) != null ? _a : "hash");
-      headerRow.createEl("h3", { text: category });
+      headerRow.createEl("h3", { text: (_b = CATEGORY_TITLES[category]) != null ? _b : category });
       const grid = section.createDiv({ cls: "emerald-wv-metric-grid" });
       for (const key of keys) {
         const info = D_METRICS[key];
@@ -7439,11 +7442,12 @@ var DataCenterView = class extends EmraldWorkspaceView {
   }
   // ── Pin Management ──────────────────────────────────
   async togglePin(key, btn) {
+    var _a, _b, _c, _d;
     if (this.pinnedKeys.has(key)) {
       this.pinnedKeys.delete(key);
       btn.textContent = "\u2606";
       btn.removeClass("is-pinned");
-      new import_obsidian11.Notice(`${key} unpinned from sidebar`);
+      new import_obsidian11.Notice(`${(_b = (_a = D_METRICS[key]) == null ? void 0 : _a.name) != null ? _b : "Metric"} unpinned from sidebar`);
     } else {
       if (this.pinnedKeys.size >= 4) {
         new import_obsidian11.Notice("Maximum 4 pinned metrics. Unpin one first.");
@@ -7452,7 +7456,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
       this.pinnedKeys.add(key);
       btn.textContent = "\u2605";
       btn.addClass("is-pinned");
-      new import_obsidian11.Notice(`${key} pinned to sidebar`);
+      new import_obsidian11.Notice(`${(_d = (_c = D_METRICS[key]) == null ? void 0 : _c.name) != null ? _d : "Metric"} pinned to sidebar`);
     }
     this.plugin.settings.pinnedMetricKeys = Array.from(this.pinnedKeys);
     await this.plugin.saveSettings();

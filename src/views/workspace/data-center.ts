@@ -90,6 +90,12 @@ export const D_METRICS: Record<string, MetricInfo> = {
 
 const CATEGORIES = ['Effort', 'Guesses', 'Productivity', 'Energy', 'Qarett'];
 
+// Section headings where the category name alone would read as one of EMRALD's own groups.
+// D21 comes from Qarett's receipts, so it sits beside EMRALD's metrics and is labelled as Qarett's.
+const CATEGORY_TITLES: Record<string, string> = {
+	Qarett: 'From Qarett'
+};
+
 const CATEGORY_ICONS: Record<string, string> = {
 	Effort: 'flame',
 	Energy: 'battery-charging',
@@ -305,7 +311,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			const headerRow = section.createDiv({ cls: 'emerald-wv-section-header-row' });
 			const iconEl = headerRow.createSpan({ cls: 'emerald-wv-section-icon' });
 			setIcon(iconEl, CATEGORY_ICONS[category] ?? 'hash');
-			headerRow.createEl('h3', { text: category });
+			headerRow.createEl('h3', { text: CATEGORY_TITLES[category] ?? category });
 
 			const grid = section.createDiv({ cls: 'emerald-wv-metric-grid' });
 
@@ -776,7 +782,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			this.pinnedKeys.delete(key);
 			btn.textContent = '☆';
 			btn.removeClass('is-pinned');
-			new Notice(`${key} unpinned from sidebar`);
+			new Notice(`${D_METRICS[key]?.name ?? 'Metric'} unpinned from sidebar`);
 		} else {
 			if (this.pinnedKeys.size >= 4) {
 				new Notice('Maximum 4 pinned metrics. Unpin one first.');
@@ -785,7 +791,7 @@ export class DataCenterView extends EmraldWorkspaceView {
 			this.pinnedKeys.add(key);
 			btn.textContent = '★';
 			btn.addClass('is-pinned');
-			new Notice(`${key} pinned to sidebar`);
+			new Notice(`${D_METRICS[key]?.name ?? 'Metric'} pinned to sidebar`);
 		}
 
 		// Save to settings
