@@ -7204,14 +7204,20 @@ var DataCenterView = class extends EmraldWorkspaceView {
     chartArea.createDiv({ cls: "emerald-wv-loading", text: "Loading history..." });
     const daysMap = { "7d": 7, "14d": 14, "30d": 30, "90d": 90 };
     const days = (_a = daysMap[this.timeRange]) != null ? _a : 14;
+    if (key === "D21") {
+      const answers = await this.loadVerificationAnswers(days);
+      chartArea.empty();
+      if (answers.length > 0)
+        chartArea.appendChild(this.buildAnswerChart(answers, days, this.d21Average(metric)));
+      await this.renderVerificationAnswers(expanded, days, metric, answers);
+      return;
+    }
     const fromDate = new Date(Date.now() - days * 864e5).toISOString().split("T")[0];
     const histResp = await this.plugin.apiClient.getMetricHistory(key, fromDate);
     chartArea.empty();
     const entries = this.normalizeHistory((_b = histResp.data) != null ? _b : []).slice(-days);
     if (entries.length === 0) {
       chartArea.createDiv({ cls: "emerald-wv-empty", text: `No history data for the last ${this.timeRange}.` });
-      if (key === "D21")
-        await this.renderVerificationAnswers(expanded, days, metric);
       return;
     }
     if (key === "D15") {
@@ -7224,10 +7230,6 @@ var DataCenterView = class extends EmraldWorkspaceView {
       chartArea.appendChild(this.buildLineChart(entries, info, key));
     } else {
       chartArea.createDiv({ cls: "emerald-wv-empty", text: "One value so far. The chart needs at least two." });
-    }
-    if (key === "D21") {
-      await this.renderVerificationAnswers(expanded, days, metric);
-      return;
     }
     if (key !== "D11" && key !== "D15") {
       this.renderHistoryTable(expanded, entries, info, key);
@@ -7293,21 +7295,6 @@ var DataCenterView = class extends EmraldWorkspaceView {
         cls: "emerald-wv-chart-dot"
       });
     }
-    if (metricKey === "D21" && values.length >= 3) {
-      const n = values.length;
-      const mx = (n - 1) / 2;
-      const my = values.reduce((a, b) => a + b, 0) / n;
-      const sxx = values.reduce((a, _v, i) => a + (i - mx) * (i - mx), 0);
-      const slope = sxx === 0 ? 0 : values.reduce((a, v, i) => a + (v - my) * (i - mx), 0) / sxx;
-      const fitY = (i) => {
-        const v = Math.max(min, Math.min(max, my + slope * (i - mx)));
-        return CHART_HEIGHT - CHART_PAD - (v - min) / range * (CHART_HEIGHT - CHART_PAD * 2);
-      };
-      svg.createSvg("line", {
-        attr: { x1: "0", y1: fitY(0).toFixed(1), x2: String(CHART_WIDTH), y2: fitY(n - 1).toFixed(1) },
-        cls: "emerald-wv-chart-trend"
-      });
-    }
     const last = coords[coords.length - 1];
     if (last) {
       svg.createSvg("circle", {
@@ -7325,13 +7312,6 @@ var DataCenterView = class extends EmraldWorkspaceView {
       cls: "emerald-wv-chart-range-label"
     });
     minLabel.textContent = min.toFixed(1);
-    if (metricKey === "D21" && values.length >= 3) {
-      const note = svg.createSvg("text", {
-        attr: { x: String(CHART_PAD + 2), y: String(CHART_HEIGHT - CHART_PAD - 1) },
-        cls: "emerald-wv-chart-trend-note"
-      });
-      note.textContent = "Dashed line: your trend over this range.";
-    }
     return svg;
   }
   buildEffortSourceChart(metric, entry) {
@@ -7413,8 +7393,80 @@ var DataCenterView = class extends EmraldWorkspaceView {
   }
   // ── Verification share: each stored answer ────────────
   /** Each receipt answer in the chosen range with its own stored value, newest first. The 30-day average shows once. */
-  async renderVerificationAnswers(container, days, metric) {
-    var _a, _b, _c, _d, _e;
+  d21Average(metric) {
+    var _a;
+    const v = (_a = metric == null ? void 0 : metric.metadata) == null ? void 0 : _a.avg_verification_share;
+    return typeof v === "number" ? v : null;
+  }
+  /** Receipts in the last `days` days that carry a stored Verification share answer, newest first. */
+  async loadVerificationAnswers(days) {
+    var _a, _b;
+    const from = new Date(Date.now() - days * 864e5).toISOString();
+    const answered = [];
+    for (let offset = 0; offset < 500; offset += 100) {
+      const resp = await this.plugin.apiClient.getReceiptsPage({ from, limit: 100, offset });
+      const page = (_b = (_a = resp.data) == null ? void 0 : _a.data) != null ? _b : [];
+      for (const r of page) {
+        if (typeof r.verification_share === "number" && Number.isInteger(r.verification_share))
+          answered.push(r);
+      }
+      if (page.length < 100)
+        break;
+    }
+    return answered;
+  }
+  /**
+   * One dot per stored answer, placed on its own date across the chosen range and at its own value. Days with no answer
+   * stay empty (no line between dots, no fill). The 30-day average is a separate dashed line.
+   */
+  buildAnswerChart(answers, days, avg) {
+    var _a;
+    const padX = 10;
+    const min = 0;
+    const max = 10;
+    const range = max - min;
+    const end = Date.now();
+    const start = end - days * 864e5;
+    const xOf = (iso) => {
+      const t = Math.max(start, Math.min(end, new Date(iso).getTime()));
+      return padX + (t - start) / (end - start) * (CHART_WIDTH - padX * 2);
+    };
+    const yOf = (v) => CHART_HEIGHT - CHART_PAD - (v - min) / range * (CHART_HEIGHT - CHART_PAD * 2);
+    const svg = createSvg("svg", {
+      attr: { width: "100%", height: String(CHART_HEIGHT), viewBox: `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}` },
+      cls: "emerald-wv-metric-svg"
+    });
+    for (let i = 0; i <= 2; i++) {
+      const y = CHART_PAD + (CHART_HEIGHT - CHART_PAD * 2) / 2 * i;
+      svg.createSvg("line", { attr: { x1: "0", y1: String(y), x2: String(CHART_WIDTH), y2: String(y) }, cls: "emerald-wv-chart-grid" });
+    }
+    if (avg !== null) {
+      const y = yOf(Math.max(min, Math.min(max, avg)));
+      svg.createSvg("line", { attr: { x1: "0", y1: y.toFixed(1), x2: String(CHART_WIDTH), y2: y.toFixed(1) }, cls: "emerald-wv-chart-trend" });
+    }
+    for (const a of answers) {
+      const dot = svg.createSvg("circle", {
+        attr: { cx: xOf(a.created_at).toFixed(1), cy: yOf((_a = a.verification_share) != null ? _a : 0).toFixed(1), r: "4" },
+        cls: "emerald-wv-chart-dot"
+      });
+      dot.createSvg("title").textContent = `${this.formatDateShort(a.created_at)}: ${a.verification_share}/10`;
+    }
+    const maxLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - 4), y: String(CHART_PAD + 10), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
+    maxLabel.textContent = max.toFixed(1);
+    const minLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - 4), y: String(CHART_HEIGHT - CHART_PAD), "text-anchor": "end" }, cls: "emerald-wv-chart-range-label" });
+    minLabel.textContent = min.toFixed(1);
+    const fromLabel = svg.createSvg("text", { attr: { x: String(padX), y: String(CHART_HEIGHT - CHART_PAD - 12) }, cls: "emerald-wv-chart-trend-note" });
+    fromLabel.textContent = this.formatDateShort(new Date(start).toISOString());
+    const toLabel = svg.createSvg("text", { attr: { x: String(CHART_WIDTH - padX), y: String(CHART_HEIGHT - CHART_PAD - 12), "text-anchor": "end" }, cls: "emerald-wv-chart-trend-note" });
+    toLabel.textContent = this.formatDateShort(new Date(end).toISOString());
+    if (avg !== null) {
+      const note = svg.createSvg("text", { attr: { x: String(CHART_WIDTH / 2), y: String(CHART_HEIGHT - CHART_PAD - 12), "text-anchor": "middle" }, cls: "emerald-wv-chart-trend-note" });
+      note.textContent = "Dashed line: your 30-day average.";
+    }
+    return svg;
+  }
+  async renderVerificationAnswers(container, days, metric, preloaded) {
+    var _a, _b, _c;
     const section = container.createDiv({ cls: "emerald-wv-d21-answers" });
     section.createDiv({ cls: "emerald-wv-d21-answers-title", text: "Your answers" });
     const meta = (_a = metric == null ? void 0 : metric.metadata) != null ? _a : {};
@@ -7426,18 +7478,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
         text: `Average over the last 30 days: ${avg.toFixed(2)} from ${n} ${n === 1 ? "answer" : "answers"}.`
       });
     }
-    const from = new Date(Date.now() - days * 864e5).toISOString();
-    const answered = [];
-    for (let offset = 0; offset < 500; offset += 100) {
-      const resp = await this.plugin.apiClient.getReceiptsPage({ from, limit: 100, offset });
-      const page = (_c = (_b = resp.data) == null ? void 0 : _b.data) != null ? _c : [];
-      for (const r of page) {
-        if (typeof r.verification_share === "number" && Number.isInteger(r.verification_share))
-          answered.push(r);
-      }
-      if (page.length < 100)
-        break;
-    }
+    const answered = preloaded != null ? preloaded : await this.loadVerificationAnswers(days);
     if (answered.length === 0) {
       section.createDiv({ cls: "emerald-wv-empty", text: `No answers in the last ${this.timeRange}.` });
       return;
@@ -7451,7 +7492,7 @@ var DataCenterView = class extends EmraldWorkspaceView {
     for (const r of answered.slice(0, 20)) {
       const row = tbody.createEl("tr");
       row.createEl("td", { text: this.formatDateShort(r.created_at) });
-      row.createEl("td", { text: (_e = (_d = r.item) == null ? void 0 : _d.name) != null ? _e : "\u2014" });
+      row.createEl("td", { text: (_c = (_b = r.item) == null ? void 0 : _b.name) != null ? _c : "\u2014" });
       row.createEl("td", { text: `${r.verification_share}/10` });
     }
   }

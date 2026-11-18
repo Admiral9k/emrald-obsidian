@@ -22,12 +22,20 @@ const out = path.join(os.tmpdir(), 'emrald-data-center.cjs');
 esbuild.buildSync({ entryPoints: [path.join(root, 'src/views/workspace/data-center.ts')], bundle: true, platform: 'node', format: 'cjs', external: ['obsidian'], outfile: out, logLevel: 'silent' });
 const { DataCenterView, D_METRICS } = require(out);
 
+// Obsidian's createSvg, as a recorder: svg.createSvg(tag, {attr, cls}) returns a child that records the same way.
+class Sv {
+  constructor(tag, o) { this.tag = tag; this.attr = (o && o.attr) || {}; this.cls = (o && o.cls) || ''; this.kids = []; this.textContent = ''; }
+  createSvg(tag, o) { const e = new Sv(tag, o); this.kids.push(e); return e; }
+  find(tag, cls) { const out = []; const walk = (e) => { for (const c of e.kids) { if (c.tag === tag && (!cls || c.cls === cls)) out.push(c); walk(c); } }; walk(this); return out; }
+}
+global.createSvg = (tag, o) => new Sv(tag, o);
+
 let fails = 0;
 const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
 
 function run(pages, metric, range) {
   const calls = [];
-  const self = { timeRange: range || '14d', plugin: { apiClient: { getReceiptsPage: async (o) => { calls.push(o); return { data: { data: pages[o.offset / 100] || [] }, error: null }; } } }, formatDateShort: (iso) => iso.slice(5, 10) };
+  const self = Object.assign(Object.create(DataCenterView.prototype), { timeRange: range || '14d', plugin: { apiClient: { getReceiptsPage: async (o) => { calls.push(o); return { data: { data: pages[o.offset / 100] || [] }, error: null }; } } }, formatDateShort: (iso) => iso.slice(5, 10) });
   const host = new El('div');
   return DataCenterView.prototype.renderVerificationAnswers.call(self, host, 14, metric).then(() => ({ host, calls }));
 }
@@ -61,6 +69,26 @@ const rec = (id, v, name, day) => ({ id, created_at: `2026-11-${day}T12:00:00Z`,
   r = await run([many, many.slice(0, 30)], metric);
   ok(r.calls.length === 2 && r.calls[1].offset === 100, 'a full page triggers the next page read');
   ok(r.host.tags('tr').length - 1 === 20, 'the list is capped at 20 rows');
+
+  // ── chart: one dot per stored answer on its own day, gaps left empty, average as a separate dashed line ──
+  const DAY = 86400000, now = Date.now();
+  const at = (daysAgo, v, id) => ({ id, created_at: new Date(now - daysAgo * DAY).toISOString(), verification_share: v, item: { name: 'P' } });
+  const answers = [at(1, 10, 'a'), at(1.2, 10, 'b'), at(3, 3, 'c'), at(9, 7, 'd')];
+  const chartSelf = Object.assign(Object.create(DataCenterView.prototype), { formatDateShort: (iso) => iso.slice(5, 10) });
+  const svg = chartSelf.buildAnswerChart(answers, 14, 7.63);
+  const dots = svg.find('circle');
+  ok(dots.length === 4, 'one dot per stored answer (not one per day): ' + dots.length);
+  ok(svg.find('polyline').length === 0 && svg.find('polygon').length === 0, 'no connecting line and no fill, so empty days stay empty');
+  const cy = (d) => Number(d.attr.cy), cx = (d) => Number(d.attr.cx);
+  ok(cy(dots[0]) < cy(dots[2]) && cy(dots[0]) === cy(dots[1]), 'a 10 sits above a 3, equal values sit level (own value, 0 to 10 scale)');
+  ok(cx(dots[3]) < cx(dots[2]) && cx(dots[2]) < cx(dots[0]), 'older answers sit further left (placed on their own date)');
+  const gap = (cx(dots[2]) - cx(dots[3])), oneDay = (cx(dots[0]) - cx(dots[2]));
+  ok(Math.abs(gap / oneDay - 3) < 0.2, 'x is proportional to real time: a 6-day gap is about 3 times a 2-day gap (' + (gap / oneDay).toFixed(2) + ')');
+  const dashed = svg.find('line', 'emerald-wv-chart-trend');
+  ok(dashed.length === 1 && Math.abs(Number(dashed[0].attr.y1) - 175 + 4 + (7.63 / 10) * (175 - 8)) < 0.2 && dashed[0].attr.y1 === dashed[0].attr.y2, 'the average is ONE flat dashed line at 7.63, separate from the series');
+  ok(svg.find('text', 'emerald-wv-chart-trend-note').some((t) => t.textContent === 'Dashed line: your 30-day average.'), 'the dashed line is labelled');
+  ok(dots.every((d) => d.kids.some((k) => k.tag === 'title' && /\/10$/.test(k.textContent))), 'each dot carries its date and value as a hover label');
+  ok(chartSelf.buildAnswerChart(answers, 14, null).find('line', 'emerald-wv-chart-trend').length === 0, 'no average yet: no dashed line');
 
   console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' check(s) FAILED');
   process.exit(fails === 0 ? 0 : 1);
